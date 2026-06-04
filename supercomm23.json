@@ -1,0 +1,86 @@
+{
+  "binary": "/home/claude/supercomm23",
+  "output": "/home/claude/supercomm23_proj.asm",
+
+  "module_notes": [
+    "SuperComm v2.3 (16550 UART variant) — OS-9 Level II terminal program",
+    "Author: Dave Philipsen  Copyright (c) 1988, 1989",
+    "'92/3 updates by Randy K. Wilson",
+    "",
+    "New in v2.3 vs v2.2 (+338 bytes total):",
+    "  + Support for 16550 UART hardware (hardware FIFO buffering)",
+    "    The 16550 was likely used in Dave Philipsen's dual-port RS-232",
+    "    hardware modification to the Tandy Deluxe RS-232 pak.",
+    "    The 16550's 16-byte FIFO dramatically reduces missed bytes at",
+    "    high baud rates compared to the 6551 ACIA in the stock pak.",
+    "  + Credit string updated: 'updated by Randy K. Wilson' ('92/3)",
+    "  + Splash screen updated (2 fewer bytes: $53=83 vs $55=85)",
+    "  + 321 bytes of new pre-exec display/config data",
+    "  + Only 17 bytes of new executable code",
+    "  + Init routine completely restructured from v2.2",
+    "    v2.2 Init: STX ,U  (BSS-relative addressing)",
+    "    v2.3 Init: STX <$00 (direct page addressing — different convention)",
+    "",
+    "Same config-patch-and-reseal CRC design as v2.1/v2.2.",
+    "New pre-exec data: 'White  B' at $0ADF suggests new colour/mode options."
+  ],
+
+  "bss": {
+    "2":    "BSS.ParamStr",
+    "4":    "BSS.ParamBase",
+    "6":    "BSS.RxBufPtr",
+    "8":    "BSS.TxBufPtr",
+    "11":   "BSS.Var000B",
+    "30":   "BSS.CurrChar",
+    "31":   "BSS.PrevChar",
+    "32":   "BSS.StateFlag",
+    "45":   "BSS.Counter1",
+    "51":   "BSS.TermMode",
+    "70":   "BSS.EchoFlag",
+    "74":   "BSS.FlowCtrl",
+    "77":   "BSS.Counter2",
+    "78":   "BSS.Counter3",
+    "90":   "BSS.ConnState",
+    "91":   "BSS.ConnWord",
+    "93":   "BSS.BufPtr1",
+    "95":   "BSS.BufCount",
+    "99":   "BSS.BufPtr2",
+    "101":  "BSS.BufPtr3",
+    "103":  "BSS.Counter4",
+    "3660": "BSS.CommPtr",
+    "3665": "BSS.CommState",
+    "3671": "BSS.CommSz1",
+    "3673": "BSS.CommSz2",
+    "3676": "BSS.CommOff",
+    "3693": "BSS.CommFlag",
+    "3699": "BSS.BaudState",
+    "3703": "BSS.FlowState",
+    "6613": "BSS.IoBuf"
+  },
+
+  "labels": {
+    "0BB2": "Init",
+    "3C0F": "CrcTable"
+  },
+
+  "data_regions": [
+    {
+      "start": "3C0F",
+      "end":   "3E0F",
+      "label": "CrcTable",
+      "comment": "CRC-16/CCITT lookup table — 256 entries x 2 bytes = 512 bytes",
+      "format": "fdb"
+    }
+  ],
+
+  "block_comments": {
+    "0BB2": [
+      "Init — program entry point (v2.3 restructured from v2.2)",
+      "v2.2 used STX ,U (BSS-relative); v2.3 uses STX <$00 (direct page)",
+      "On OS-9 entry: U=BSS base  X=param string  DP=BSS high byte"
+    ]
+  },
+
+  "line_comments": {},
+  "custom_equates": []
+}

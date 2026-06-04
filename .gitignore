@@ -1,0 +1,5 @@
+*.dsk
+*.vhd
+*.VHD
+__pycache__/
+*.pyc
