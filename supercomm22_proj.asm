@@ -59,10 +59,104 @@ O.Write  EQU    $02
 O.RdWr   EQU    $03
 O.Exec   EQU    $04
 O.Dir    EQU    $05
+
+; OS-9 I/O system calls
+I$Attach EQU    $80
+I$Detach EQU    $81
+I$Dup    EQU    $82
+I$Create EQU    $83
+I$Open   EQU    $84
+I$MakDir EQU    $85
+I$ChgDir EQU    $86
+I$Delete EQU    $87
+I$Seek   EQU    $88
+I$Read   EQU    $89
+I$Write  EQU    $8A
+I$ReadLn EQU    $8B
+I$WritLn EQU    $8C
+I$GetStt EQU    $8D
+I$SetStt EQU    $8E
+I$Close  EQU    $8F
+I$DupS   EQU    $90
+
+; OS-9 F$ system calls
+F$Link   EQU    $00
+F$Load   EQU    $01
+F$UnLink EQU    $02
+F$Fork   EQU    $03
+F$Wait   EQU    $04
+F$Chain  EQU    $05
+F$Exit   EQU    $06
+F$Mem    EQU    $07
+F$Send   EQU    $08
+F$Icpt   EQU    $09
+F$Sleep  EQU    $0A
+F$SSpd   EQU    $0B
+F$ID     EQU    $0C
+F$SPrior EQU    $0D
+F$SSWI   EQU    $0E
+F$PErr   EQU    $0F
+F$PrsNam EQU    $10
+F$CmpNam EQU    $11
+F$SchBit EQU    $12
+F$AllBit EQU    $13
+F$DelBit EQU    $14
+F$Time   EQU    $15
+F$STime  EQU    $16
+F$CRC    EQU    $17
+F$GPrDsc EQU    $18
+F$GBlkMp EQU    $19
+F$GModDr EQU    $1A
+F$CpyMem EQU    $1B
+F$SUser  EQU    $1C
+F$UnLoad EQU    $1D
+F$RTE    EQU    $1E
+F$GPrDBT EQU    $1F
+F$Julian EQU    $20
+F$TLink  EQU    $21
+F$DFork  EQU    $22
+F$DExec  EQU    $23
+F$DExit  EQU    $24
+F$DaTim  EQU    $25
+F$ALARM  EQU    $26
+F$SigMask EQU   $27
+F$NMLink EQU    $28
 ; ================================================================
 
+; ── BSS Variable Equates ─────────────────────────────────────
+BSS.ParamStr  EQU    2        ; BSS offset $0002
+BSS.ParamBase EQU    4        ; BSS offset $0004
+BSS.RxBufPtr  EQU    6        ; BSS offset $0006
+BSS.TxBufPtr  EQU    8        ; BSS offset $0008
+BSS.Var000B   EQU    11       ; BSS offset $000B
+BSS.CurrChar  EQU    30       ; BSS offset $001E
+BSS.PrevChar  EQU    31       ; BSS offset $001F
+BSS.StateFlag EQU    32       ; BSS offset $0020
+BSS.Counter1  EQU    45       ; BSS offset $002D
+BSS.TermMode  EQU    51       ; BSS offset $0033
+BSS.EchoFlag  EQU    70       ; BSS offset $0046
+BSS.FlowCtrl  EQU    74       ; BSS offset $004A
+BSS.Counter2  EQU    77       ; BSS offset $004D
+BSS.Counter3  EQU    78       ; BSS offset $004E
+BSS.ConnState EQU    90       ; BSS offset $005A
+BSS.ConnWord  EQU    91       ; BSS offset $005B
+BSS.BufPtr1   EQU    93       ; BSS offset $005D
+BSS.BufCount  EQU    95       ; BSS offset $005F
+BSS.BufPtr2   EQU    99       ; BSS offset $0063
+BSS.BufPtr3   EQU    101      ; BSS offset $0065
+BSS.Counter4  EQU    103      ; BSS offset $0067
+BSS.CommPtr   EQU    3660     ; BSS offset $0E4C
+BSS.CommState EQU    3665     ; BSS offset $0E51
+BSS.CommSz1   EQU    3671     ; BSS offset $0E57
+BSS.CommSz2   EQU    3673     ; BSS offset $0E59
+BSS.CommOff   EQU    3676     ; BSS offset $0E5C
+BSS.CommFlag  EQU    3693     ; BSS offset $0E6D
+BSS.BaudState EQU    3699     ; BSS offset $0E73
+BSS.FlowState EQU    3703     ; BSS offset $0E77
+BSS.IoBuf     EQU    6613     ; BSS offset $19D5
+
 ; ==============================================================
-; Disassembly:  /home/claude/supercomm22
+; Disassembly:  supercomm22
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $45C5  (17861 bytes)
@@ -249,6 +343,7 @@ Dat_035A
          FCC    "/t2"
          FCB    $0D               ; CR
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
 
 Dat_0360
 ; Referenced by: $0B4F
@@ -314,10 +409,12 @@ Dat_03A1
 ; Referenced by: Sub_1C6C
          FCB    $07               ; BEL
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
 
 Dat_03A4
 ; Referenced by: $1C66
          FCB    $00               ; NUL
+         FCB    $02               ; CurXY
          FCB    $02               ; CurXY
 
 Dat_03A7
@@ -382,6 +479,7 @@ Dat_03E6
          FCB    NUL,NUL,NUL,NUL,NUL,NUL  ; NUL×6
          FCB    NUL,NUL,NUL  ; NUL×3
          FCB    CurXY,$1F,$22     ; CurXY(row=-1,col=2)
+         FCB    $00               ; NUL
          FCB    $00               ; NUL
          FCB    CurXY,$1F,$24     ; CurXY(row=-1,col=4)
          FCB    NUL,NUL,NUL,NUL,NUL,NUL  ; NUL×6
@@ -847,7 +945,11 @@ Dat_08CF
 Dat_08E8
 ; Referenced by: $4283
          FCB    $00               ; NUL
-         FCC    "&""
+
+
+; & and quote chars — emitted as FCB to avoid FCC string embedding issues
+         FCB    $26
+         FCB    $22
          FCB    CurXY,$21,$24     ; CurXY(row=1,col=4)
          FCC    "is already open.  Close it? (Y/n) "
 
@@ -998,8 +1100,10 @@ Dat_09F5
          FCB    $86
          FCS    " "
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
          FCB    $27               ; '''
          FCB    $10               ; $10
+         FCB    $00               ; NUL
          FCB    $00               ; NUL
          FCB    $03               ; ETX
          FCS    "h"
@@ -1157,8 +1261,8 @@ $0B87  20 09                              BRA Sub_0B92
 
 ; --------------------------------------------------------------
 $0B89  A6 C8 72            Sub_0B89:      LDA 114,U             
-$0B8C  10 3F 8F                           OS9 I$Close            ; path=A
-$0B8D  3F 8F               Sub_0B8D:      SWI $8F               
+$0B8C  10 3F 8F            Insn_0B8C:     OS9 I$Close            ; path=A
+$0B8D  3F                  Sub_0B8D:      EQU    $0B8D            ; mid-instruction overlap: Insn_0B8C+1 -- mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C
 $0B8F  6F C8 72                           CLR 114,U             
 $0B92  30 C9 05 0F         Sub_0B92:      LEAX 1295,U           
 $0B96  AF C8 66                           STX 102,U             
@@ -1225,8 +1329,8 @@ $0C47  86 00                              LDA #$00               ; A = NUL
 $0C49  30 8D F6 CD                        LEAX Dat_031A          ; X → Dat_031A
 $0C4D  AF C8 6C                           STX 108,U             
 $0C50  30 C9 06 0E                        LEAX 1550,U           
-$0C54  10 8E 00 01                        LDY #$0001            
-$0C57  01                  Sub_0C57:      ???                   
+$0C54  10 8E 00 01         Insn_0C54:     LDY #$0001            
+$0C57  01                  Sub_0C57:      EQU    $0C57            ; [*1] branch target 3 byte(s) inside Insn_0C54 -- see [*1]
 $0C58  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $0C5B  16 09 1D                           LBRA Sub_157B         
 
@@ -1554,14 +1658,15 @@ $0F15  10 3F 06            Sub_0F15:      OS9 F$Exit             ; status=B
 
 Dat_0F18
 ; Referenced by: $0B26
+; 7-byte data block referenced by LEAX at $0B26 — appears after OS9 F$Exit
 ; ── 7 bytes  ($0F18—$0F1E) ──
-         FCS    "A"
+         FCB    $C1
          FCB    $80
-         FCB    $26               ; '&'
-         FCB    $03               ; ETX
-         FCC    "l"
-         FCS    "H"
-         FCB    $73               ; 's'
+         FCB    $26
+         FCB    $03
+         FCB    $6C
+         FCB    $C8
+         FCB    $73
 $0F1F  3B                  Sub_0F1F:      RTI                    ; return from interrupt
 $0F20  34 32               Sub_0F20:      PSHS A,X,Y            
 $0F22  30 C9 00 9C                        LEAX 156,U            
@@ -2459,7 +2564,24 @@ $1743  10 8E 00 02                        LDY #$0002
 $1747  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $174A  17 FB 68                           LBSR Sub_12B5          ; call Sub_12B5
 $174D  16 F5 0E                           LBRA Sub_0C5E         
-         FCB    $A6,$80,$A7,$A0,$81,$20,$27,$03,$5A,$26,$F5,$39  ; unreachable padding
+
+; --------------------------------------------------------------
+
+Dat_1750
+; 12-byte orphaned string copy loop (unreferenced from branch analysis)
+; ── 12 bytes  ($1750—$175B) ──
+         FCB    $A6
+         FCB    $80
+         FCB    $A7
+         FCB    $A0
+         FCB    $81
+         FCB    $20
+         FCB    $27
+         FCB    $03
+         FCB    $5A
+         FCB    $26
+         FCB    $F5
+         FCB    $39
 $175C  6D C8 72            Sub_175C:      TST 114,U             
 $175F  27 0B                              BEQ Sub_176C          
 $1761  A6 C8 75                           LDA 117,U             
@@ -2714,8 +2836,8 @@ $19E0  20 2A                              BRA Sub_1A0C
 $19E2  A6 C8 2B            Sub_19E2:      LDA 43,U              
 $19E5  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $19E7  30 8D EF 96         Sub_19E7:      LEAX Dat_0981          ; X → Dat_0981
-$19EB  10 8E 00 01                        LDY #$0001            
-$19EC  8E 00 01            Sub_19EC:      LDX #$0001            
+$19EB  10 8E 00 01         Insn_19EB:     LDY #$0001            
+$19EC  8E                  Sub_19EC:      EQU    $19EC            ; mid-instruction overlap: Insn_19EB+1 -- mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write
 $19EF  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $19F2  8E 00 0C                           LDX #$000C            
 $19F5  17 F5 5E                           LBSR Sub_0F56          ; call Sub_0F56
@@ -3278,7 +3400,7 @@ $1EC2  17 FD 1A                           LBSR Sub_1BDF          ; call Sub_1BDF
 $1EC5  17 FE 16                           LBSR Sub_1CDE          ; call Sub_1CDE
 $1EC8  17 FD 8C                           LBSR Sub_1C57          ; call Sub_1C57
 $1ECB  8D 0F                              BSR Sub_1EDC           ; call Sub_1EDC
-$1ECD  0D                                 ???                   
+$1ECD  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1ECE  40                                 NEGA                  
 $1ECF  27 02                              BEQ Sub_1ED3          
 $1ED1  8D 12                              BSR Sub_1EE5           ; call Sub_1EE5
@@ -5023,7 +5145,7 @@ $2E3A  20 00                              BRA Sub_2E3C
 ; --------------------------------------------------------------
 $2E3C  35 B6               Sub_2E3C:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $2E3E  34 76               Sub_2E3E:      PSHS A,B,X,Y,U        
-$2E40  30 8D D1 BC                        LEAX Dat_0000         
+$2E40  30 8D D1 BC                        LEAX ModHeader        
 $2E44  10 AE 02                           LDY 2,X               
 $2E47  AF C8 15                           STX 21,U              
 $2E4A  31 3D                              LEAY -3,Y             
@@ -5040,7 +5162,7 @@ $2E62  63 41                              COM 1,U
 $2E64  63 42                              COM BSS.ParamStr,U    
 $2E66  35 76                              PULS A,B,X,Y,U        
 $2E68  86 07                              LDA #$07              
-$2E6A  30 8D D1 9F                        LEAX Dat_000D          ; X → Dat_000D
+$2E6A  30 8D D1 9F                        LEAX ModName           ; X → ModName
 $2E6E  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $2E71  25 0F                              BCS Sub_2E82           ; C=1 (BLO)
 $2E73  AE C8 15                           LDX 21,U              
@@ -5926,8 +6048,8 @@ $364A  16 00 A7                           LBRA Sub_36F4
 
 ; --------------------------------------------------------------
 $364D  86 FF               Sub_364D:      LDA #$FF              
-$364E  FF A7 C8            Sub_364E:      STU $A7C8             
-$3651  42                                 ???                   
+$364E  FF                  Sub_364E:      EQU    $364E            ; mid-instruction overlap: Sub_364D+1 -- mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D
+$364F  A7 C8 42                           STA 66,U              
 $3652  6F C8 69                           CLR 105,U             
 $3655  6F C8 5F                           CLR BSS.BufCount,U    
 $3658  6F C8 4C                           CLR 76,U              
@@ -6884,7 +7006,7 @@ Dat_3D80
          FCS    "9"
 
 Dat_3D9C
-; ── 35 bytes  ($3D9C—$3DBE) ──
+; ── 33 bytes  ($3D9C—$3DBC) ──
          FCB    $8A
          FCS    ")"
          FCS    "+"
@@ -6913,8 +7035,7 @@ Dat_3D9C
          FCS    "X"
          FCS    "+"
          FCS    ";"
-         FCS    ";"
-         FCB    $9A
+$3DBD  BB 9A 4A            Insn_3DBD:     ADDB $9A4A            
 
 Dat_3DBF
 ; ── 1 bytes  ($3DBF—$3DBF) ──
@@ -7849,3 +7970,28 @@ $45C0  20 B3                              BRA Sub_4575
 ; ==============================================================
 ModEnd
 ModSize  EQU    ModEnd-$0000
+
+; ══════════════════════════════════════════════════════════════
+; ANALYST NOTES
+; ══════════════════════════════════════════════════════════════
+
+; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $0C57 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_0C54).
+;      Byte $01 at $0C57 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $01 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $01 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_0C57 EQU Insn_0C54+3' resolves
+;      to $0C57 at assembly time. Branches to Sub_0C57
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; ══════════════════════════════════════════════════════════════

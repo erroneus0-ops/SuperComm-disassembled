@@ -59,10 +59,104 @@ O.Write  EQU    $02
 O.RdWr   EQU    $03
 O.Exec   EQU    $04
 O.Dir    EQU    $05
+
+; OS-9 I/O system calls
+I$Attach EQU    $80
+I$Detach EQU    $81
+I$Dup    EQU    $82
+I$Create EQU    $83
+I$Open   EQU    $84
+I$MakDir EQU    $85
+I$ChgDir EQU    $86
+I$Delete EQU    $87
+I$Seek   EQU    $88
+I$Read   EQU    $89
+I$Write  EQU    $8A
+I$ReadLn EQU    $8B
+I$WritLn EQU    $8C
+I$GetStt EQU    $8D
+I$SetStt EQU    $8E
+I$Close  EQU    $8F
+I$DupS   EQU    $90
+
+; OS-9 F$ system calls
+F$Link   EQU    $00
+F$Load   EQU    $01
+F$UnLink EQU    $02
+F$Fork   EQU    $03
+F$Wait   EQU    $04
+F$Chain  EQU    $05
+F$Exit   EQU    $06
+F$Mem    EQU    $07
+F$Send   EQU    $08
+F$Icpt   EQU    $09
+F$Sleep  EQU    $0A
+F$SSpd   EQU    $0B
+F$ID     EQU    $0C
+F$SPrior EQU    $0D
+F$SSWI   EQU    $0E
+F$PErr   EQU    $0F
+F$PrsNam EQU    $10
+F$CmpNam EQU    $11
+F$SchBit EQU    $12
+F$AllBit EQU    $13
+F$DelBit EQU    $14
+F$Time   EQU    $15
+F$STime  EQU    $16
+F$CRC    EQU    $17
+F$GPrDsc EQU    $18
+F$GBlkMp EQU    $19
+F$GModDr EQU    $1A
+F$CpyMem EQU    $1B
+F$SUser  EQU    $1C
+F$UnLoad EQU    $1D
+F$RTE    EQU    $1E
+F$GPrDBT EQU    $1F
+F$Julian EQU    $20
+F$TLink  EQU    $21
+F$DFork  EQU    $22
+F$DExec  EQU    $23
+F$DExit  EQU    $24
+F$DaTim  EQU    $25
+F$ALARM  EQU    $26
+F$SigMask EQU   $27
+F$NMLink EQU    $28
 ; ================================================================
 
+; ── BSS Variable Equates ─────────────────────────────────────
+BSS.ParamStr  EQU    2        ; BSS offset $0002
+BSS.ParamBase EQU    4        ; BSS offset $0004
+BSS.RxBufPtr  EQU    6        ; BSS offset $0006
+BSS.TxBufPtr  EQU    8        ; BSS offset $0008
+BSS.Var000B   EQU    11       ; BSS offset $000B
+BSS.CurrChar  EQU    30       ; BSS offset $001E
+BSS.PrevChar  EQU    31       ; BSS offset $001F
+BSS.StateFlag EQU    32       ; BSS offset $0020
+BSS.Counter1  EQU    45       ; BSS offset $002D
+BSS.TermMode  EQU    51       ; BSS offset $0033
+BSS.EchoFlag  EQU    70       ; BSS offset $0046
+BSS.FlowCtrl  EQU    74       ; BSS offset $004A
+BSS.Counter2  EQU    77       ; BSS offset $004D
+BSS.Counter3  EQU    78       ; BSS offset $004E
+BSS.ConnState EQU    90       ; BSS offset $005A
+BSS.ConnWord  EQU    91       ; BSS offset $005B
+BSS.BufPtr1   EQU    93       ; BSS offset $005D
+BSS.BufCount  EQU    95       ; BSS offset $005F
+BSS.BufPtr2   EQU    99       ; BSS offset $0063
+BSS.BufPtr3   EQU    101      ; BSS offset $0065
+BSS.Counter4  EQU    103      ; BSS offset $0067
+BSS.CommPtr   EQU    3660     ; BSS offset $0E4C
+BSS.CommState EQU    3665     ; BSS offset $0E51
+BSS.CommSz1   EQU    3671     ; BSS offset $0E57
+BSS.CommSz2   EQU    3673     ; BSS offset $0E59
+BSS.CommOff   EQU    3676     ; BSS offset $0E5C
+BSS.CommFlag  EQU    3693     ; BSS offset $0E6D
+BSS.BaudState EQU    3699     ; BSS offset $0E73
+BSS.FlowState EQU    3703     ; BSS offset $0E77
+BSS.IoBuf     EQU    6613     ; BSS offset $19D5
+
 ; ==============================================================
-; Disassembly:  /home/claude/supercomm23
+; Disassembly:  supercomm23
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $4717  (18199 bytes)
@@ -70,7 +164,7 @@ O.Dir    EQU    $05
 ; BSS:          $2000  (8192 bytes)
 ; CRC-24:       $63F8C2
 ;
-; SuperComm v2.3 (16550 UART variant) — OS-9 Level II terminal program
+; SuperComm v2.3 (16550 UART variant) â€” OS-9 Level II terminal program
 ; Author: Dave Philipsen  Copyright (c) 1988, 1989
 ; '92/3 updates by Randy K. Wilson
 ; 
@@ -86,7 +180,7 @@ O.Dir    EQU    $05
 ;   + Only 17 bytes of new executable code
 ;   + Init routine completely restructured from v2.2
 ;     v2.2 Init: STX ,U  (BSS-relative addressing)
-;     v2.3 Init: STX <$00 (direct page addressing — different convention)
+;     v2.3 Init: STX <$00 (direct page addressing â€” different convention)
 ; 
 ; Same config-patch-and-reseal CRC design as v2.1/v2.2.
 ; New pre-exec data: 'White  B' at $0ADF suggests new colour/mode options.
@@ -264,6 +358,7 @@ Dat_0386
          FCC    "/t2"
          FCB    $0D               ; CR
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
 
 Dat_038C
 ; Referenced by: $0CDB
@@ -385,10 +480,12 @@ Dat_03FC
          FCB    NUL,NUL,NUL  ; NUL×3
          FCB    CurXY,$1F,$22     ; CurXY(row=-1,col=2)
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
          FCB    CurXY,$1F,$24     ; CurXY(row=-1,col=4)
          FCB    NUL,NUL,NUL,NUL,NUL,NUL  ; NUL×6
          FCB    NUL  ; NUL×1
          FCB    CurXY,$1F,$20     ; CurXY(row=-1,col=0)
+         FCB    $00               ; NUL
          FCB    $00               ; NUL
          FCB    $03               ; ETX
          FCB    ESC,W.FColor,$00         ; Foreground Color palette[0]
@@ -944,7 +1041,7 @@ Dat_0A93
          FCC    "Space"
 
 Dat_0A98
-; Referenced by: $2488
+; Referenced by: Insn_2488
          FCC    " Even"
 
 Dat_0A9D
@@ -988,8 +1085,10 @@ Dat_0B2B
          FCB    $86
          FCS    " "
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
          FCB    $27               ; '''
          FCB    $10               ; $10
+         FCB    $00               ; NUL
          FCB    $00               ; NUL
          FCB    $03               ; ETX
          FCS    "h"
@@ -1018,6 +1117,7 @@ Dat_0B5B
          FCB    $11               ; DC1/XON
          FCB    $13               ; DC3/XOFF
          FCB    $00               ; NUL
+         FCB    $00               ; NUL
          FCB    CurXY,$00,$01     ; CurXY(row=-32,col=-31)
          FCB    CurXY,$00,$01     ; CurXY(row=-32,col=-31)
          FCB    $06               ; $06
@@ -1040,10 +1140,10 @@ Dat_0B92
 ; Code section  $0BB2—$4713  (15202 bytes)
 ; ==============================================================
 
-; Init — program entry point (v2.3 restructured from v2.2)
+; Init â€” program entry point (v2.3 restructured from v2.2)
 ; v2.2 used STX ,U (BSS-relative); v2.3 uses STX <$00 (direct page)
 ; On OS-9 entry: U=BSS base  X=param string  DP=BSS high byte
-; Init — program entry point (v2.3 restructured from v2.2)
+; Init â€” program entry point (v2.3 restructured from v2.2)
 ; v2.2 used STX ,U (BSS-relative); v2.3 uses STX <$00 (direct page)
 ; On OS-9 entry: U=BSS base  X=param string  DP=BSS high byte
 $0BB2  9F 00               Init:          STX <$00              
@@ -1096,7 +1196,7 @@ $0C12  86 FF                              LDA #$FF
 $0C14  97 37                              STA <$37              
 $0C16  97 4F                              STA <$4F              
 $0C18  8E 00 EC                           LDX #$00EC            
-$0C1B  CC 00 00                           LDD #$0000            
+$0C1A  EC CC 00            Insn_0C1A:     LDD Dat_0C1D          
 
 Dat_0C1D
 ; ── 71 bytes  ($0C1D—$0C63) ──
@@ -1224,8 +1324,8 @@ $0D11  20 07                              BRA Sub_0D1A
 ; --------------------------------------------------------------
 $0D13  96 7B               Sub_0D13:      LDA <$7B              
 $0D15  10 3F 8F                           OS9 I$Close            ; path=A
-$0D18  0F                                 ???                   
-$0D19  7B                                 ???                   
+$0D18  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$0D19  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $0D1A  8E 05 1C            Sub_0D1A:      LDX #$051C            
 $0D1D  9F 71                              STX <$71              
 $0D1F  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
@@ -1243,8 +1343,8 @@ $0D3B  30 8D F7 76                        LEAX Dat_04B5          ; X → Dat_04B
 $0D3F  17 10 53                           LBSR Sub_1D95          ; call Sub_1D95
 $0D42  CC 1A 04                           LDD #$1A04            
 $0D45  FD 0C 9A                           STD $0C9A             
-$0D48  CC 16 09                           LDD #$1609            
-$0D4A  09                  Sub_0D4A:      ???                   
+$0D48  CC 16 09            Insn_0D48:     LDD #$1609            
+$0D4A  09                  Sub_0D4A:      EQU    Insn_0D48+2      ; [*1] branch target 2 byte(s) inside Insn_0D48 — see [*1]
 $0D4B  FD 0C 9C                           STD $0C9C             
 $0D4E  17 11 A0                           LBSR Sub_1EF1          ; call Sub_1EF1
 $0D51  30 8D F3 23                        LEAX Dat_0078          ; X → Dat_0078
@@ -1291,40 +1391,40 @@ $0DB3  84 0F               Sub_0DB3:      ANDA #$0F
 $0DB5  B7 0C B9                           STA $0CB9             
 $0DB8  BF 0C B7                           STX $0CB7             
 $0DBB  1F 10                              TFR X,D               
-$0DBD  0F                                 ???                   
+$0DBD  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $0DBE  29 5D                              BVS Sub_0E1D          
 $0DC0  27 02                              BEQ Sub_0DC4          
-$0DC2  0C                                 ???                   
+$0DC2  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $0DC3  29 85                              BVS Sub_0D4A          
 $0DC4  85 01               Sub_0DC4:      BITA #$01             
 $0DC6  34 80                              PSHS PC               
 $0DC8  26 07                              BNE Sub_0DD1          
 $0DCA  CC 03 53                           LDD #$0353            
-$0DCD  0F                                 ???                   
+$0DCD  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $0DCE  1F 20                              TFR Y,D               
-$0DD0  05                                 ???                   
+$0DD0  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $0DD1  CC 03 49            Sub_0DD1:      LDD #$0349            
-$0DD4  0C                                 ???                   
+$0DD4  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $0DD5  1F E3                              TFR ?,U               
 $0DD7  E4 FD                              ANDB ?$FD             
-$0DD9  0C                                 ???                   
+$0DD9  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $0DDA  B3 B6 0C                           SUBD $B60C            
 $0DDD  B7 85 02                           STA $8502             
 $0DE0  26 07                              BNE Sub_0DE9          
 $0DE2  CC 03 75                           LDD #$0375            
-$0DE5  0F                                 ???                   
+$0DE5  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $0DE6  1E 20                              EXG Y,D               
-$0DE8  05                                 ???                   
+$0DE8  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $0DE9  CC 03 6C            Sub_0DE9:      LDD #$036C            
-$0DEC  0C                                 ???                   
+$0DEC  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $0DED  1E E3                              EXG ?,U               
 $0DEF  E1 FD                              CMPB ?$FD             
-$0DF1  0C                                 ???                   
+$0DF1  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $0DF2  B5 30 8D                           BITA $308D            
 $0DF5  F6 8D 17                           LDB $8D17             
-$0DF8  0F                                 ???                   
+$0DF8  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $0DF9  9B 17                              ADDA <$17             
-$0DFB  05                                 ???                   
+$0DFB  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $0DFC  8B 17                              ADDA #$17             
 $0DFE  1F 08                              TFR D,A               
 $0E00  17 36 F0                           LBSR Sub_44F3          ; call Sub_44F3
@@ -1347,15 +1447,15 @@ $0E2A  8E 00 EC            Sub_0E2A:      LDX #$00EC
 $0E2D  96 38                              LDA <$38              
 $0E2F  AD 9F 0C B3                        JSR [$0CB3]            ; call via indexed pointer
 $0E33  10 24 03 A9                        LBCC Sub_11E0         
-$0E37  0D                                 ???                   
+$0E37  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $0E38  32 10                              LEAS -16,X            
 $0E3A  26 35                              BNE Sub_0E71          
 $0E3C  7F 8E 00                           CLR $8E00             
-$0E3F  03                                 ???                   
+$0E3F  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $0E40  17 03 35                           LBSR Sub_1178          ; call Sub_1178
 $0E43  17 07 5E                           LBSR Sub_15A4          ; call Sub_15A4
 $0E46  25 E2                              BCS Sub_0E2A           ; C=1 (BLO)
-$0E48  0D                                 ???                   
+$0E48  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $0E49  4D                                 TSTA                  
 $0E4A  10 26 1A CB                        LBNE Sub_2919         
 $0E4E  16 08 E2                           LBRA Sub_1733         
@@ -1377,8 +1477,8 @@ $0E6B  39                                 RTS                    ; return from s
 ; --------------------------------------------------------------
 $0E6C  81 08               Sub_0E6C:      CMPA #$08              ; compare A with BS
 $0E6E  26 05                              BNE Sub_0E75          
-$0E70  17 07 54                           LBSR Sub_15C7          ; call Sub_15C7
-$0E71  07                  Sub_0E71:      ???                   
+$0E70  17 07 54            Insn_0E70:     LBSR Sub_15C7          ; call Sub_15C7
+$0E71  07                  Sub_0E71:      EQU    Insn_0E70+1      ; [*2] branch target 1 byte(s) inside Insn_0E70 — see [*2]
 $0E72  54                                 LSRB                  
 $0E73  20 F1                              BRA Sub_0E66          
 
@@ -1419,7 +1519,7 @@ $0EAC  20 BA                              BRA Sub_0E68
 $0EAE  8E 00 EC            Sub_0EAE:      LDX #$00EC            
 $0EB1  10 8E 07 1A                        LDY #$071A            
 $0EB5  F6 0C 96                           LDB $0C96             
-$0EB8  0D                                 ???                   
+$0EB8  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $0EB9  6E 2B                              JMP 11,Y              
 $0EBB  1D                                 SEX                    ; sign-extend B into A
 $0EBC  10 26 00 C2                        LBNE $0F82            
@@ -1455,10 +1555,10 @@ $10ED  17 04 47                           LBSR Sub_1537          ; call Sub_1537
 $10F0  17 04 A9                           LBSR Sub_159C          ; call Sub_159C
 $10F3  96 7B                              LDA <$7B              
 $10F5  27 03                              BEQ Sub_10FA          
-$10F7  10 3F 8F                           OS9 I$Close            ; path=A
-$10FA  0D                  Sub_10FA:      ???                   
+$10F7  10 3F 8F            Insn_10F7:     OS9 I$Close            ; path=A
+$10FA  0D                  Sub_10FA:      EQU    Insn_10F7+3      ; [*3] branch target 3 byte(s) inside Insn_10F7 — see [*3]
 $10FB  34 27                              PSHS CC,A,B,Y         
-$10FD  08                                 ???                   
+$10FD  08                                 FCB    $08                ; undefined opcode $08 -- not a valid 6809 instruction
 $10FE  17 35 29                           LBSR Sub_462A          ; call Sub_462A
 $1101  96 37                              LDA <$37              
 $1103  10 3F 8F                           OS9 I$Close            ; path=A
@@ -1481,7 +1581,7 @@ $112F  39                  Sub_112F:      RTS                    ; return from s
 $1130  C6 80               Sub_1130:      LDB #$80              
 $1132  20 F4                              BRA Sub_1128          
          FCB    $34,$04,$C6,$D1,$10,$3F,$8E,$35,$84,$10,$3F,$8A,$35,$80,$34,$32,$8E,$00,$A9,$B6,$0C,$CB,$17,$0D,$7F,$A7,$02,$96,$4B,$10,$8E,$00  ; unreachable padding
-$1154  03                  Sub_1154:      ???                   
+$1154  03                  Sub_1154:      EQU    $1154            ; [*4] undefined opcode at $1154 — see [*4]
 $1155  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $1158  8E 00 80                           LDX #$0080            
 $115B  10 8E 00 0B                        LDY #$000B            
@@ -1501,7 +1601,7 @@ $117A  10 9E 12                           LDY <$12
 $117D  31 21                              LEAY 1,Y              
 $117F  10 9F 12                           STY <$12              
 $1182  34 02                              PSHS A                
-$1184  0D                                 ???                   
+$1184  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1185  7E 27 0D                           JMP $270D             
 $1188  96 7D                              LDA <$7D              
 $118A  91 7C                              CMPA <$7C             
@@ -1534,26 +1634,26 @@ $120B  10 BE 0C 95                        LDY $0C95
 $120F  10 8C 00 00                        CMPY #$0000           
 $1213  27 0E                              BEQ Sub_1223          
 $1215  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$1218  0D                                 ???                   
+$1218  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1219  34 27                              PSHS CC,A,B,Y         
-$121B  07                                 ???                   
-$121C  0D                                 ???                   
+$121B  07                                 FCB    $07                ; undefined opcode $07 -- not a valid 6809 instruction
+$121C  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $121D  35 27                              PULS CC,A,B,Y         
-$121F  03                                 ???                   
+$121F  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $1220  17 30 C8                           LBSR Sub_42EB          ; call Sub_42EB
 $1223  17 32 4C            Sub_1223:      LBSR Sub_4472          ; call Sub_4472
 $1226  7D 0C 90                           TST $0C90             
 $1229  27 03                              BEQ Sub_122E          
-$122B  17 15 A6                           LBSR Sub_27D4          ; call Sub_27D4
-$122E  0D                  Sub_122E:      ???                   
+$122B  17 15 A6            Insn_122B:     LBSR Sub_27D4          ; call Sub_27D4
+$122E  0D                  Sub_122E:      EQU    Insn_122B+3      ; [*5] branch target 3 byte(s) inside Insn_122B — see [*5]
 $122F  76 2A 0C                           ROR $2A0C             
-$1232  0F                                 ???                   
+$1232  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $1233  76 7D 0C                           ROR $7D0C             
 $1236  AA 10                              ORA -16,X             
 $1238  27 08                              BEQ Sub_1242          
 $123A  7F 16 07                           CLR $1607             
-$123D  A1 0D                              CMPA 13,X             
-$123E  0D                  Sub_123E:      ???                   
+$123D  A1 0D               Insn_123D:     CMPA 13,X             
+$123E  0D                  Sub_123E:      EQU    Insn_123D+1      ; [*6] branch target 1 byte(s) inside Insn_123D — see [*6]
 $123F  32 10                              LEAS -16,X            
 $1241  27 FB                              BEQ Sub_123E          
 $1242  FB FF 16            Sub_1242:      ADDB $FF16            
@@ -1577,7 +1677,7 @@ $126C  10 9E 77                           LDY <$77
 $126F  8E 00 EC                           LDX #$00EC            
 $1272  5D                  Sub_1272:      TSTB                  
 $1273  27 2F                              BEQ Sub_12A4          
-$1275  0D                                 ???                   
+$1275  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1276  76 27 0C                           ROR $270C             
 $1279  A6 84                              LDA ,X                
 $127B  81 30                              CMPA #$30              ; compare A with '0'
@@ -1588,11 +1688,11 @@ $1283  20 0B                              BRA Sub_1290
          FCB    $A6,$80,$84,$7F,$5A,$0F,$7A,$A1,$A4,$27,$16  ; unreachable padding
 $1290  31 8D F0 A3         Sub_1290:      LEAY Dat_0337          ; Y → Dat_0337
 $1294  10 9F 77                           STY <$77              
-$1297  0D                                 ???                   
+$1297  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1298  7A 26 04                           DEC $2604             
-$129B  0C                                 ???                   
-$129C  7A 20 ED                           DEC $20ED             
-$129F  0F                  Sub_129F:      ???                   
+$129B  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$129C  7A 20 ED            Insn_129C:     DEC $20ED             
+$129F  0F                  Sub_129F:      EQU    Insn_129C+3      ; [*7] branch target 3 byte(s) inside Insn_129C — see [*7]
 $12A0  7A 5D 26                           DEC $5D26             
 $12A3  E1 35                              CMPB -11,Y            
 $12A4  35 B6               Sub_12A4:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
@@ -2005,7 +2105,7 @@ $17F1  86 01                              LDA #$01
 $17F3  8E 04 FC            Sub_17F3:      LDX #$04FC            
 $17F5  FC A7 84            Sub_17F5:      LDD $A784             
 $17F7  84 86               Sub_17F7:      ANDA #$86             
-$17F9  01                                 ???                   
+$17F9  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
 $17FA  10 8E 00 01                        LDY #$0001            
 $17FE  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $1801  16 F6 26                           LBRA Sub_0E2A         
@@ -2147,7 +2247,7 @@ $1941  8E 13 C3                           LDX #$13C3
 $1944  96 9D                              LDA <$9D              
 $1946  A7 05                              STA 5,X               
 $1948  96 9E                              LDA <$9E              
-$194A  0D                                 ???                   
+$194A  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $194B  4D                                 TSTA                  
 $194C  27 02                              BEQ Sub_1950          
 $194E  80 03                              SUBA #$03             
@@ -2182,16 +2282,16 @@ $1998  10 3F 8A                           OS9 I$Write            ; path=A  count
 $199B  17 FB 07                           LBSR Sub_14A5          ; call Sub_14A5
 $199E  16 F4 89                           LBRA Sub_0E2A         
          FCB    $A6,$80,$A7,$A0,$81,$20,$27,$03,$5A,$26,$F5,$39  ; unreachable padding
-$19AD  0D                  Sub_19AD:      ???                   
-$19AE  7B                                 ???                   
+$19AD  0D                  Sub_19AD:      EQU    $19AD            ; [*8] undefined opcode at $19AD — see [*8]
+$19AE  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $19AF  27 09                              BEQ Sub_19BA          
 $19B1  96 7E                              LDA <$7E              
 $19B3  27 08                              BEQ Sub_19BD          
-$19B5  0F                                 ???                   
+$19B5  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $19B6  7E 17 F7                           JMP $17F7             
 $19B9  88 16                              EORA #$16             
 $19BA  16 F4 6D            Sub_19BA:      LBRA Sub_0E2A         
-$19BD  0C                  Sub_19BD:      ???                   
+$19BD  0C                  Sub_19BD:      EQU    Sub_19BA+3       ; [*9] branch target 3 byte(s) inside Sub_19BA — see [*9]
 $19BE  7E 30 8D                           JMP $308D             
 $19C1  E9 CF                              ADCB ?$CF             
 $19C3  10 8E 00 80                        LDY #$0080            
@@ -2322,11 +2422,11 @@ $1AED  17 02 A5                           LBSR Sub_1D95          ; call Sub_1D95
 $1AF0  35 20                              PULS Y                
 $1AF2  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 $1AF4  17 02 F9                           LBSR Sub_1DF0          ; call Sub_1DF0
-$1AF7  0D                                 ???                   
+$1AF7  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1AF8  30 10                              LEAX -16,X            
 $1AFA  26 00                              BNE Sub_1AFC          
 $1AFC  BE 8E 06            Sub_1AFC:      LDX $8E06             
-$1AFF  1B                                 ???                   
+$1AFF  1B                                 FCB    $1B                ; undefined opcode $1B -- not a valid 6809 instruction
 $1B00  F6 00 2C                           LDB $002C             
 $1B03  C1 01                              CMPB #$01             
 $1B05  27 0D                              BEQ Sub_1B14          
@@ -2423,15 +2523,13 @@ $1BD1  96 7F               Sub_1BD1:      LDA <$7F
 $1BD3  5F                                 CLRB                   ; B = 0
 $1BD4  10 3F 08                           OS9 F$Send             ; pid=A  signal=B
 $1BD7  10 3F 04                           OS9 F$Wait             ; → wait for child; status→D
-$1BDA  39                                 RTS                    ; return from subroutine
-
-; --------------------------------------------------------------
-$1BDB  0D                  Sub_1BDB:      ???                   
-$1BDC  7B                                 ???                   
+$1BDA  39                  Insn_1BDA:     RTS                    ; return from subroutine
+$1BDB  0D                  Sub_1BDB:      EQU    Insn_1BDA+1      ; [*10] branch target 1 byte(s) inside Insn_1BDA — see [*10]
+$1BDC  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $1BDD  27 05                              BEQ Sub_1BE4          
-$1BDF  0F                                 ???                   
+$1BDF  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $1BE0  7E 17 F5                           JMP $17F5             
-$1BE3  5E                                 ???                   
+$1BE3  5E                                 FCB    $5E                ; undefined opcode $5E -- not a valid 6809 instruction
 $1BE4  7F 0C 8F            Sub_1BE4:      CLR $0C8F             
 $1BE7  CC 21 05                           LDD #$2105            
 $1BEA  FD 0C 9A                           STD $0C9A             
@@ -2444,16 +2542,16 @@ $1BFD  30 8D E7 74                        LEAX Dat_0375          ; X → Dat_037
 $1C01  17 01 91                           LBSR Sub_1D95          ; call Sub_1D95
 $1C04  7D 0C C0                           TST $0CC0             
 $1C07  26 2B                              BNE Sub_1C34          
-$1C09  0D                                 ???                   
+$1C09  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1C0A  29 27                              BVS Sub_1C33          
-$1C0C  0F                                 ???                   
+$1C0C  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $1C0D  96 38                              LDA <$38              
 $1C0F  C6 2B                              LDB #$2B               ; B = SS.CtlSg  (GetStt/SetStt subcode)
 $1C11  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
 $1C13  8E 8E 00            Sub_1C13:      LDX #$8E00            
 $1C16  3C 17                              CWAI #$17             
 $1C18  F5 5E 20                           BITB $5E20            
-$1C1B  41                                 ???                   
+$1C1B  41                                 FCB    $41                ; undefined opcode $41 -- not a valid 6809 instruction
 $1C1C  9E 20                              LDX <$20              
 $1C1E  E6 02                              LDB 2,X               
 $1C20  C4 FE                              ANDB #$FE             
@@ -2620,12 +2718,12 @@ $1DEE  35 94                              PULS B,X,PC            ; return from s
 
 ; --------------------------------------------------------------
 $1DF0  34 36               Sub_1DF0:      PSHS A,B,X,Y          
-$1DF2  0F                                 ???                   
+$1DF2  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $1DF3  2B 0F                              BMI Sub_1E04          
 $1DF5  2C 0F                              BGE Sub_1E06          
 $1DF7  30 8E                              LEAX ?$8E             
-$1DF9  06                                 ???                   
-$1DFA  1B                                 ???                   
+$1DF9  06                                 FCB    $06                ; undefined opcode $06 -- not a valid 6809 instruction
+$1DFA  1B                                 FCB    $1B                ; undefined opcode $1B -- not a valid 6809 instruction
 $1DFB  17 0E 5C            Sub_1DFB:      LBSR Sub_2C5A          ; call Sub_2C5A
 $1DFE  81 2D                              CMPA #$2D              ; compare A with '-'
 $1E00  23 0D                              BLS Sub_1E0F          
@@ -2633,28 +2731,28 @@ $1E02  5D                                 TSTB
 $1E03  27 F6                              BEQ Sub_1DFB          
 $1E04  F6 A7 80            Sub_1E04:      LDB $A780             
 $1E06  80 5A               Sub_1E06:      SUBA #$5A             
-$1E08  0C                                 ???                   
+$1E08  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $1E09  2C 17                              BGE Sub_1E22          
-$1E0B  03                                 ???                   
+$1E0B  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $1E0C  2E 20                              BGT Sub_1E2E          
 $1E0E  EC 81                              LDD ,X++              
 $1E0F  81 08               Sub_1E0F:      CMPA #$08              ; compare A with BS
 $1E11  26 0E                              BNE Sub_1E21          
-$1E13  0D                                 ???                   
+$1E13  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $1E14  2C 27                              BGE Sub_1E3D          
 $1E16  E4 5C                              ANDB -4,U             
-$1E18  0A                                 ???                   
+$1E18  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
 $1E19  2C 30                              BGE Sub_1E4B          
 $1E1B  1F 17                              TFR X,?               
-$1E1D  03                                 ???                   
+$1E1D  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $1E1E  1C 20                              ANDCC #$20             ; clr CC: C,V,Z,N,I,F,E
-$1E20  DA 81                              ORB <$81              
+$1E20  DA 81               Insn_1E20:     ORB <$81              
 $1E21  81 05               Sub_1E21:      CMPA #$05             
-$1E22  05                  Sub_1E22:      ???                   
+$1E22  05                  Sub_1E22:      EQU    Sub_1E21+1       ; [*11] branch target 1 byte(s) inside Sub_1E21 — see [*11]
 $1E23  26 04                              BNE Sub_1E29          
-$1E25  0C                                 ???                   
+$1E25  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $1E26  30 20                              LEAX 0,Y              
-$1E28  08                                 ???                   
+$1E28  08                                 FCB    $08                ; undefined opcode $08 -- not a valid 6809 instruction
 $1E29  81 0D               Sub_1E29:      CMPA #$0D              ; compare A with CR
 $1E2B  26 CE                              BNE Sub_1DFB          
 $1E2D  A7 84                              STA ,X                
@@ -2887,16 +2985,16 @@ $201D  35 B6                              PULS A,B,X,Y,PC        ; return from s
 
 ; --------------------------------------------------------------
 $201F  34 32               Sub_201F:      PSHS A,X,Y            
-$2021  0F                                 ???                   
+$2021  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $2022  A6 F7                              LDA ?$F7              
-$2024  0C                                 ???                   
+$2024  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $2025  91 8E                              CMPA <$8E             
 $2027  13                                 SYNC                   ; wait for interrupt
 $2028  C3 CC 1B                           ADDD #$CC1B           
 $202B  25 ED                              BCS $201A              ; C=1 (BLO)
 $202D  84 CC                              ANDA #$CC             
-$202F  01                                 ???                   
-$2030  02                                 ???                   
+$202F  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
+$2030  02                                 FCB    $02                ; undefined opcode $02 -- not a valid 6809 instruction
 $2031  ED 02                              STD 2,X               
 $2033  86 04                              LDA #$04              
 $2035  F6 13 BD                           LDB $13BD             
@@ -2951,10 +3049,8 @@ $2098  35 B2               Sub_2098:      PULS A,X,Y,PC          ; return from s
 $209A  F6 13 BD            Sub_209A:      LDB $13BD             
 $209D  5C                                 INCB                  
 $209E  F7 0C 91                           STB $0C91             
-$20A1  20 F5                              BRA Sub_2098          
-
-; --------------------------------------------------------------
-$20A3  0C                  Sub_20A3:      ???                   
+$20A1  20 F5               Insn_20A1:     BRA Sub_2098          
+$20A3  0C                  Sub_20A3:      EQU    Insn_20A2+1      ; [*12] branch target 1 byte(s) inside Insn_20A2 — see [*12]
 $20A4  A6 20                              LDA 0,Y               
 $20A6  EE 34                              LDU -12,Y             
 $20A7  34 36               Sub_20A7:      PSHS A,B,X,Y          
@@ -2978,8 +3074,8 @@ $20DD  86 05                              LDA #$05
 $20DF  F6 0C 91                           LDB $0C91             
 $20E2  3D                                 MUL                    ; D = A×B unsigned
 $20E3  30 8B                              LEAX D,X              
-$20E5  10 8E 00 05                        LDY #$0005            
-$20E8  05                  Sub_20E8:      ???                   
+$20E5  10 8E 00 05         Insn_20E5:     LDY #$0005            
+$20E8  05                  Sub_20E8:      EQU    Insn_20E5+3      ; [*13] branch target 3 byte(s) inside Insn_20E5 — see [*13]
 $20E9  86 01                              LDA #$01              
 $20EB  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $20EE  17 0B 69            Sub_20EE:      LBSR Sub_2C5A          ; call Sub_2C5A
@@ -3004,7 +3100,7 @@ $2113  17 FE 3D                           LBSR Sub_1F53          ; call Sub_1F53
 $2116  17 FD BE                           LBSR Sub_1ED7          ; call Sub_1ED7
 $2119  8D 12                              BSR Sub_212D           ; call Sub_212D
 $211B  17 F4 D5                           LBSR Sub_15F3          ; call Sub_15F3
-$211E  0D                                 ???                   
+$211E  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $211F  4D                                 TSTA                  
 $2120  27 02                              BEQ Sub_2124          
 $2122  8D 12                              BSR Sub_2136           ; call Sub_2136
@@ -3075,13 +3171,13 @@ $21AD  ED 04                              STD 4,X
 $21AF  10 8E 00 06                        LDY #$0006            
 $21B3  86 01                              LDA #$01              
 $21B5  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$21B8  0D                                 ???                   
+$21B8  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $21B9  A6 10                              LDA -16,X             
 $21BB  26 00                              BNE Sub_21BD          
 $21BD  1A F6               Sub_21BD:      ORCC #$F6              ; set CC: V,Z,I,H,F,E
-$21BF  0C                                 ???                   
+$21BF  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $21C0  91 C1                              CMPA <$C1             
-$21C2  09                                 ???                   
+$21C2  09                                 FCB    $09                ; undefined opcode $09 -- not a valid 6809 instruction
 $21C3  10 22 00 11                        LBHI Sub_21D8         
 $21C7  8E 0C C7                           LDX #$0CC7            
 $21CA  A6 85                              LDA B,X               
@@ -3175,7 +3271,7 @@ $2296  ED 04                              STD 4,X
 $2298  10 8E 00 06                        LDY #$0006            
 $229C  86 01                              LDA #$01              
 $229E  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$22A1  0D                                 ???                   
+$22A1  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $22A2  A6 10                              LDA -16,X             
 $22A4  26 01                              BNE Sub_22A7          
 $22A6  1F F6                              TFR ?,?               
@@ -3424,8 +3520,8 @@ $2482  20 18                              BRA Sub_249C
 ; --------------------------------------------------------------
 $2484  81 60               Sub_2484:      CMPA #$60              ; compare A with '`'
 $2486  26 06                              BNE Sub_248E          
-$2488  30 8D E6 0C                        LEAX Dat_0A98          ; X → Dat_0A98
-$248B  0C                  Sub_248B:      ???                   
+$2488  30 8D E6 0C         Insn_2488:     LEAX Dat_0A98          ; X → Dat_0A98
+$248B  0C                  Sub_248B:      EQU    Insn_2488+3      ; [*14] branch target 3 byte(s) inside Insn_2488 — see [*14]
 $248C  20 0E                              BRA Sub_249C          
 
 ; --------------------------------------------------------------
@@ -3502,7 +3598,7 @@ $2521  C6 1F                              LDB #$1F
 $2523  30 8D E5 80                        LEAX -6784,PC         
 $2527  17 F8 6B                           LBSR Sub_1D95          ; call Sub_1D95
 $252A  17 F8 C3                           LBSR Sub_1DF0          ; call Sub_1DF0
-$252D  0D                                 ???                   
+$252D  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $252E  30 26                              LEAX 6,Y              
 $252F  26 1E               Sub_252F:      BNE Sub_254F          
 $2531  B6 06 1B                           LDA $061B             
@@ -3559,14 +3655,14 @@ $259E  35 B6                              PULS A,B,X,Y,PC        ; return from s
          FCB    $20,$18  ; unreachable padding
 $25A2  20 16               Sub_25A2:      BRA Sub_25BA          
 $25A4  34 06               Sub_25A4:      PSHS A,B              
-$25A6  0D                                 ???                   
+$25A6  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $25A7  35 27               Sub_25A7:      PULS CC,A,B,Y         
-$25A9  06                                 ???                   
-$25AA  0F                                 ???                   
+$25A9  06                                 FCB    $06                ; undefined opcode $06 -- not a valid 6809 instruction
+$25AA  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $25AB  35 8D                              PULS CC,B,DP,PC        ; return from subroutine  (PULS PC = RTS)
          FCB    $F4,$35,$86,$0D,$34,$27,$FA,$0C,$35,$8D,$E8,$20,$F4  ; unreachable padding
 $25BA  34 36               Sub_25BA:      PSHS A,B,X,Y          
-$25BC  0D                                 ???                   
+$25BC  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $25BD  35 26                              PULS A,B,Y            
 $25BF  28 31                              BVC Sub_25F2          
 $25C1  8D E4                              BSR Sub_25A7           ; call Sub_25A7
@@ -3586,7 +3682,7 @@ $25E1  96 4B                              LDA <$4B
 $25E3  17 F7 B1                           LBSR Sub_1D97          ; call Sub_1D97
 $25E6  35 B6               Sub_25E6:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
          FCB    $31,$8D,$E4,$72,$8E,$13,$C3,$34,$10,$C6  ; unreachable padding
-$25F2  0D                  Sub_25F2:      ???                   
+$25F2  0D                  Sub_25F2:      EQU    $25F2            ; [*15] undefined opcode at $25F2 — see [*15]
 $25F3  AD 9F 0C B1                        JSR [$0CB1]            ; call via indexed pointer
 $25F7  35 10                              PULS X                
 $25F9  B6 0C C9                           LDA $0CC9             
@@ -3649,9 +3745,9 @@ $2661  96 4F                              LDA <$4F
 $2663  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $2666  24 08                              BCC Sub_2670           ; C=0 (BHS)
 $2668  10 8E 00 00                        LDY #$0000            
-$266C  0C                                 ???                   
+$266C  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $266D  6A 20                              DEC 0,Y               
-$266F  05                                 ???                   
+$266F  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $2670  10 9C 62            Sub_2670:      CMPY <$62             
 $2673  27 17                              BEQ Sub_268C          
 $2675  1F 20                              TFR Y,D               
@@ -3683,7 +3779,7 @@ $26A6  20 04                              BRA Sub_26AC
 $26A8  86 02               Sub_26A8:      LDA #$02               ; A = CurXY
 $26AA  A7 84                              STA ,X                
 $26AC  35 B6               Sub_26AC:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
-$26AE  0D                  Sub_26AE:      ???                   
+$26AE  0D                  Sub_26AE:      EQU    Sub_26AC+2       ; [*16] branch target 2 byte(s) inside Sub_26AC — see [*16]
 $26AF  74 27 0C                           LSR $270C             
 $26B2  8E 00 EF                           LDX #$00EF            
 $26B5  C6 80                              LDB #$80              
@@ -3693,16 +3789,16 @@ $26BA  26 FB                              BNE Sub_26B7
 $26BC  20 CE                              BRA Sub_268C          
          FCB    $8E,$00,$EF,$10,$8E,$00,$AC,$C6,$20,$A6,$A0,$27,$09,$81,$0D,$27,$05,$A7,$80,$5A,$26,$F3,$6F,$80,$17,$06,$DD,$20,$B1  ; unreachable padding
 $26DB  34 36               Sub_26DB:      PSHS A,B,X,Y          
-$26DD  0F                                 ???                   
+$26DD  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $26DE  53                                 COMB                  
-$26DF  0F                                 ???                   
+$26DF  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $26E0  54                                 LSRB                  
 $26E1  8E 00 EF                           LDX #$00EF            
 $26E4  DC 62                              LDD <$62              
 $26E6  31 8B                              LEAY D,X              
 $26E8  10 9F 5B                           STY <$5B              
-$26EB  0D                                 ???                   
-$26EC  65                                 ???                   
+$26EB  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$26EC  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $26ED  26 0B                              BNE Sub_26FA          
 $26EF  17 17 4F                           LBSR Sub_3E41          ; call Sub_3E41
 $26F2  30 8B                              LEAX D,X              
@@ -3719,7 +3815,7 @@ $2703  20 F3                              BRA Sub_26F8
 $2705  34 36               Sub_2705:      PSHS A,B,X,Y          
 $2707  8E 11 3B                           LDX #$113B            
 $270A  10 8E 02 00                        LDY #$0200            
-$270D  00                  Sub_270D:      ???                   
+$270D  00                  Sub_270D:      EQU    $270D            ; [*17] undefined opcode at $270D — see [*17]
 $270E  6F 80               Sub_270E:      CLR ,X+               
 $2710  31 3F                              LEAY -1,Y             
 $2712  26 FA                              BNE Sub_270E          
@@ -3780,7 +3876,7 @@ $277F  10 BE 13 BB                        LDY $13BB
 $2783  A6 80                              LDA ,X+               
 $2785  84 7F                              ANDA #$7F             
 $2787  5A                                 DECB                  
-$2788  0F                                 ???                   
+$2788  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $2789  7A A1 A4                           DEC $A1A4             
 $278C  27 24                              BEQ Sub_27B2          
 $278E  B6 0C 8F                           LDA $0C8F             
@@ -3792,11 +3888,11 @@ $2797  10 8E 11 3B                        LDY #$113B
 $279B  31 AB                              LEAY D,Y              
 $279D  10 BF 13 BB                        STY $13BB             
 $27A1  35 04                              PULS B                
-$27A3  0D                                 ???                   
+$27A3  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $27A4  7A 26 04                           DEC $2604             
-$27A7  0C                                 ???                   
-$27A8  7A 20 DF                           DEC $20DF             
-$27AB  0F                  Sub_27AB:      ???                   
+$27A7  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$27A8  7A 20 DF            Insn_27A8:     DEC $20DF             
+$27AB  0F                  Sub_27AB:      EQU    Insn_27A8+3      ; [*18] branch target 3 byte(s) inside Insn_27A8 — see [*18]
 $27AC  7A 5D 26                           DEC $5D26             
 $27AF  D3 35                              ADDD <$35             
 $27B1  B6 31 21                           LDA $3121             
@@ -3846,10 +3942,10 @@ $2806  26 F3                              BNE $27FB
 $2808  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
          FCB    $34,$10,$8E,$00,$1E,$17,$E9,$66,$35,$10,$20,$EF,$A6,$80,$5A,$81,$5E,$27,$0F,$81,$2A,$27,$E9,$81,$5C,$27,$02,$80,$40,$17,$F4,$9F,$20,$D9,$86,$1B,$20,$F7  ; unreachable padding
 $2830  34 36               Sub_2830:      PSHS A,B,X,Y          
-$2832  0D                  Sub_2832:      ???                   
+$2832  0D                  Sub_2832:      EQU    Sub_2830+2       ; [*19] branch target 2 byte(s) inside Sub_2830 — see [*19]
 $2833  4D                                 TSTA                  
 $2834  10 26 00 8F                        LBNE Sub_28C7         
-$2838  0C                                 ???                   
+$2838  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $2839  4D                                 TSTA                  
 $283A  8D 02                              BSR Sub_283E           ; call Sub_283E
 $283C  20 0F                              BRA Sub_284D          
@@ -3909,7 +4005,7 @@ $28BC  96 4B                              LDA <$4B
 $28BE  10 8E 00 07                        LDY #$0007            
 $28C2  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $28C5  35 B6               Sub_28C5:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
-$28C7  0F                  Sub_28C7:      ???                   
+$28C7  0F                  Sub_28C7:      EQU    Sub_28C5+2       ; [*20] branch target 2 byte(s) inside Sub_28C5 — see [*20]
 $28C8  4D                                 TSTA                  
 $28C9  30 8D DB CE                        LEAX Dat_049B          ; X → Dat_049B
 $28CD  96 4C                              LDA <$4C              
@@ -3974,7 +4070,7 @@ $2960  D6 73                              LDB <$73
 $2962  27 21                              BEQ Sub_2985          
 $2964  30 1F                              LEAX -1,X             
 $2966  9F 71                              STX <$71              
-$2968  0A                                 ???                   
+$2968  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
 $2969  73 20 14                           COM $2014             
 $296C  D6 73               Sub_296C:      LDB <$73              
 $296E  C1 FD                              CMPB #$FD             
@@ -3983,7 +4079,7 @@ $2972  81 0D                              CMPA #$0D              ; compare A wit
 $2974  26 0F                              BNE Sub_2985          
 $2976  A7 80               Sub_2976:      STA ,X+               
 $2978  9F 71                              STX <$71              
-$297A  0C                                 ???                   
+$297A  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $297B  73 81 0D                           COM $810D             
 $297E  27 18                              BEQ Sub_2998          
 $2980  8D 44                              BSR Sub_29C6           ; call Sub_29C6
@@ -4010,10 +4106,10 @@ $29A5  1F 02                              TFR D,Y
 $29A7  96 38                              LDA <$38              
 $29A9  8E 05 1C                           LDX #$051C            
 $29AC  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$29AF  0F                                 ???                   
+$29AF  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $29B0  73 8E 05                           COM $8E05             
 $29B3  1C 9F                              ANDCC #$9F             ; clr CC: H,F
-$29B5  71                                 ???                   
+$29B5  71                                 FCB    $71                ; undefined opcode $71 -- not a valid 6809 instruction
 $29B6  86 0D                              LDA #$0D               ; A = CR
 $29B8  B7 06 1B                           STA $061B             
 $29BB  8D 09                              BSR Sub_29C6           ; call Sub_29C6
@@ -4067,7 +4163,7 @@ $2A25  6D 80                              TST ,X+
 $2A27  26 FC                              BNE $2A25             
 $2A29  30 1F                              LEAX -1,X             
 $2A2B  34 10                              PSHS X                
-$2A2D  0F                                 ???                   
+$2A2D  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $2A2E  A7 A6                              STA A,Y               
 $2A2F  A6 82               Sub_2A2F:      LDA ,-X               
 $2A31  AC 62                              CMPX 2,S              
@@ -4111,9 +4207,9 @@ $2A75  30 1F               Sub_2A75:      LEAX -1,X
 $2A77  86 78                              LDA #$78               ; A = 'x'
 $2A79  A7 84                              STA ,X                
 $2A7B  AF 62               Sub_2A7B:      STX 2,S               
-$2A7D  0D                                 ???                   
+$2A7D  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2A7E  A7 26                              STA 6,Y               
-$2A80  14                                 ???                   
+$2A80  14                                 FCB    $14                ; undefined opcode $14 -- not a valid 6809 instruction
 $2A81  A6 80               Sub_2A81:      LDA ,X+               
 $2A83  AC E4                              CMPX ,S               
 $2A85  22 0E                              BHI Sub_2A95          
@@ -4314,9 +4410,9 @@ $2C05  35 14                              PULS B,X
 $2C07  B6 06 1B                           LDA $061B             
 $2C0A  81 0D                              CMPA #$0D              ; compare A with CR
 $2C0C  27 09                              BEQ Sub_2C17          
-$2C0E  0D                                 ???                   
+$2C0E  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2C0F  30 26                              LEAX 6,Y              
-$2C11  05                                 ???                   
+$2C11  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $2C12  5C                                 INCB                  
 $2C13  C1 20                              CMPB #$20              ; compare B with ' '
 $2C15  26 EA                              BNE Sub_2C01          
@@ -4346,7 +4442,7 @@ $2C60  20 04                              BRA Sub_2C66
 
 ; --------------------------------------------------------------
 $2C62  34 34               Sub_2C62:      PSHS B,X,Y            
-$2C64  0F                                 ???                   
+$2C64  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $2C65  36 17                              PSHU CC,A,B,X         
 $2C66  17 E9 3B            Sub_2C66:      LBSR Sub_15A4          ; call Sub_15A4
 $2C69  24 08                              BCC Sub_2C73           ; C=0 (BHS)
@@ -4362,17 +4458,17 @@ $2C79  10 8E 00 01                        LDY #$0001
 $2C7D  86 00                              LDA #$00               ; A = NUL
 $2C7F  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $2C82  A6 84                              LDA ,X                
-$2C84  0D                                 ???                   
+$2C84  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2C85  36 26                              PSHU A,B,Y            
-$2C87  08                                 ???                   
+$2C87  08                                 FCB    $08                ; undefined opcode $08 -- not a valid 6809 instruction
 $2C88  84 7F                              ANDA #$7F             
 $2C8A  81 60               Sub_2C8A:      CMPA #$60              ; compare A with '`'
 $2C8C  25 02                              BCS Sub_2C90           ; C=1 (BLO)
 $2C8E  80 20                              SUBA #$20             
 $2C90  35 B4               Sub_2C90:      PULS B,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
-$2C92  0D                  Sub_2C92:      ???                   
+$2C92  0D                  Sub_2C92:      EQU    Sub_2C90+2       ; [*21] branch target 2 byte(s) inside Sub_2C90 — see [*21]
 $2C93  29 26                              BVS Sub_2CBB          
-$2C95  3E                                 ???                   
+$2C95  3E                                 FCB    $3E                ; undefined opcode $3E -- not a valid 6809 instruction
 $2C96  8E 0C 3B                           LDX #$0C3B            
 $2C99  EC 88 1B                           LDD 27,X              
 $2C9C  C3 00 04                           ADDD #$0004           
@@ -4388,7 +4484,7 @@ $2CB3  10 8E 00 02                        LDY #$0002
 $2CB7  34 40                              PSHS U                
 $2CB9  CE 13 C3                           LDU #$13C3            
 $2CBB  C3 10 3F            Sub_2CBB:      ADDD #$103F           
-$2CBE  1B                                 ???                   
+$2CBE  1B                                 FCB    $1B                ; undefined opcode $1B -- not a valid 6809 instruction
 $2CBF  BE 13 C3                           LDX $13C3             
 $2CC2  30 88 24                           LEAX 36,X             
 $2CC5  FC 0C 91                           LDD $0C91             
@@ -4439,7 +4535,7 @@ $2D27  A7 02                              STA 2,X
 $2D29  96 4B                              LDA <$4B              
 $2D2B  10 8E 00 07                        LDY #$0007            
 $2D2F  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$2D32  0D                                 ???                   
+$2D32  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2D33  4D                                 TSTA                  
 $2D34  27 0D                              BEQ Sub_2D43          
 $2D36  96 4B                              LDA <$4B              
@@ -4451,22 +4547,22 @@ $2D47  8E 13 C3                           LDX #$13C3
 $2D4A  C6 18                              LDB #$18              
 $2D4C  AD 9F 0C B1                        JSR [$0CB1]            ; call via indexed pointer
 $2D50  8E 13 C3                           LDX #$13C3            
-$2D53  0D                                 ???                   
+$2D53  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2D54  28 27                              BVC Sub_2D7D          
-$2D56  05                                 ???                   
+$2D56  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
 $2D57  86 61                              LDA #$61               ; A = 'a'
 $2D59  A7 88 13                           STA 19,X              
 $2D5C  96 4B                              LDA <$4B              
 $2D5E  17 F0 36                           LBSR Sub_1D97          ; call Sub_1D97
 $2D61  17 FF 71                           LBSR Sub_2CD5          ; call Sub_2CD5
 $2D64  17 F8 3B                           LBSR Sub_25A2          ; call Sub_25A2
-$2D67  0D                                 ???                   
-$2D68  38                                 ???                   
+$2D67  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$2D68  38                                 FCB    $38                ; undefined opcode $38 -- not a valid 6809 instruction
 $2D69  27 03                              BEQ Sub_2D6E          
 $2D6B  17 E6 28                           LBSR Sub_1396          ; call Sub_1396
 $2D6E  96 7B               Sub_2D6E:      LDA <$7B              
 $2D70  27 10                              BEQ Sub_2D82          
-$2D72  0D                                 ???                   
+$2D72  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2D73  7E 27 0D                           JMP $270D             
 $2D76  8E 00 80                           LDX #$0080            
 $2D79  10 8E 00 0B                        LDY #$000B            
@@ -4474,7 +4570,7 @@ $2D7D  96 4B               Sub_2D7D:      LDA <$4B
 $2D7F  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $2D82  39                  Sub_2D82:      RTS                    ; return from subroutine
          FCB    $17,$E3,$BC,$39  ; unreachable padding
-$2D87  0D                  Sub_2D87:      ???                   
+$2D87  0D                  Sub_2D87:      EQU    $2D87            ; [*22] undefined opcode at $2D87 — see [*22]
 $2D88  4D                                 TSTA                  
 $2D89  27 2A                              BEQ Sub_2DB5          
 $2D8B  31 8D D7 18                        LEAY Dat_04A7          ; Y → Dat_04A7
@@ -4577,9 +4673,9 @@ $2E50  20 CF                              BRA Sub_2E21
 $2E52  39                  Sub_2E52:      RTS                    ; return from subroutine
          FCB    $A6,$80,$A7,$A0,$5A,$26,$F9,$39,$A6,$A0,$A7,$80,$5A,$26,$F9,$39,$4F,$1E,$06,$11,$38,$12,$39,$4F,$1E,$06,$11,$38,$21,$39  ; unreachable padding
 $2E71  34 12               Sub_2E71:      PSHS A,X              
-$2E73  0D                                 ???                   
+$2E73  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $2E74  29 27                              BVS Sub_2E9D          
-$2E76  0B                                 ???                   
+$2E76  0B                                 FCB    $0B                ; undefined opcode $0B -- not a valid 6809 instruction
 $2E77  96 38                              LDA <$38              
 $2E79  C6 28                              LDB #$28               ; B = SS.EnRTS  (GetStt/SetStt subcode)
 $2E7B  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
@@ -4759,10 +4855,10 @@ $2FF8  35 B6                              PULS A,B,X,Y,PC        ; return from s
 
 ; --------------------------------------------------------------
 $2FFA  34 36               Sub_2FFA:      PSHS A,B,X,Y          
-$2FFC  0D                                 ???                   
-$2FFD  7B                                 ???                   
+$2FFC  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$2FFD  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $2FFE  27 13                              BEQ Sub_3013          
-$3000  0F                                 ???                   
+$3000  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3001  7E 30 8D                           JMP $308D             
 $3004  D3 8C                              ADDD <$8C             
 $3006  10 8E 00 80                        LDY #$0080            
@@ -4770,7 +4866,7 @@ $300A  C6 0B                              LDB #$0B               ; B = SS.FD  (G
 $300C  AD 9F 0C AF                        JSR [$0CAF]            ; call via indexed pointer
 $3010  17 E1 2F                           LBSR $1142            
 $3013  17 16 14            Sub_3013:      LBSR Sub_462A          ; call Sub_462A
-$3016  0D                                 ???                   
+$3016  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $3017  4D                                 TSTA                  
 $3018  27 03                              BEQ Sub_301D          
 $301A  17 F8 13                           LBSR Sub_2830          ; call Sub_2830
@@ -4778,11 +4874,11 @@ $301D  CC 00 00            Sub_301D:      LDD #$0000
 $3020  DD 0A                              STD <$0A              
 $3022  8E 16 D3                           LDX #$16D3            
 $3025  9F A0                              STX <$A0              
-$3027  0F                                 ???                   
+$3027  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3028  6F 17                              CLR -9,X              
 $302A  F1 01 CC                           CMPB $01CC            
-$302D  05                                 ???                   
-$302E  03                                 ???                   
+$302D  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
+$302E  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $302F  FD 0C 9A                           STD $0C9A             
 $3032  CC 44 11                           LDD #$4411            
 $3035  FD 0C 9C                           STD $0C9C             
@@ -4822,7 +4918,7 @@ $307E  B7 0C A2                           STA $0CA2
 $3081  96 4A                              LDA <$4A              
 $3083  10 3F 8F                           OS9 I$Close            ; path=A
 $3086  17 00 CA                           LBSR Sub_3153          ; call Sub_3153
-$3089  0D                                 ???                   
+$3089  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $308A  9F 27                              STX <$27              
 $308C  16 17 ED                           LBRA $487C            
 
@@ -4869,10 +4965,10 @@ $30E6  20 05                              BRA Sub_30ED
 ; --------------------------------------------------------------
 $30E8  A7 A0               Sub_30E8:      STA ,Y+               
 $30EA  5D                                 TSTB                  
-$30EB  26 EA                              BNE Sub_30D7          
-$30ED  0C                  Sub_30ED:      ???                   
+$30EB  26 EA               Insn_30EB:     BNE Sub_30D7          
+$30ED  0C                  Sub_30ED:      EQU    Insn_30EB+2      ; [*23] branch target 2 byte(s) inside Insn_30EB — see [*23]
 $30EE  6F 8D 3A 8D                        CLR +14989,PC         
-$30F2  0B                                 ???                   
+$30F2  0B                                 FCB    $0B                ; undefined opcode $0B -- not a valid 6809 instruction
 $30F3  10 9E A0                           LDY <$A0              
 $30F6  31 A8 20                           LEAY 32,Y             
 $30F9  10 9F A0                           STY <$A0              
@@ -4993,7 +5089,7 @@ $31F6  35 B6                              PULS A,B,X,Y,PC        ; return from s
 ; --------------------------------------------------------------
 $31F8  81 05               Sub_31F8:      CMPA #$05             
 $31FA  26 A6                              BNE Sub_31A2          
-$31FC  0F                                 ???                   
+$31FC  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $31FD  9F 20                              STX <$20              
 $31FF  EF 97                              STU ?$97              
 $3200  97 9F               Sub_3200:      STA <$9F              
@@ -5408,9 +5504,9 @@ $3534  10 3F 8D                           OS9 I$GetStt           ; path=A  subco
 $3537  24 09                              BCC Sub_3542           ; C=0 (BHS)
 $3539  17 F9 35                           LBSR Sub_2E71          ; call Sub_2E71
 $353C  25 04                              BCS Sub_3542           ; C=1 (BLO)
-$353E  0F                                 ???                   
+$353E  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $353F  31 20                              LEAY 0,Y              
-$3541  04                                 ???                   
+$3541  04                                 FCB    $04                ; undefined opcode $04 -- not a valid 6809 instruction
 $3542  86 01               Sub_3542:      LDA #$01              
 $3544  97 31                              STA <$31              
 $3546  17 F9 47                           LBSR Sub_2E90          ; call Sub_2E90
@@ -5422,10 +5518,10 @@ $3555  17 F9 38                           LBSR Sub_2E90          ; call Sub_2E90
 $3558  C6 FF                              LDB #$FF              
 $355A  F7 0C AE                           STB $0CAE             
 $355D  17 E8 7E            Sub_355D:      LBSR Sub_1DDE          ; call Sub_1DDE
-$3560  B7 0C AD                           STA $0CAD             
-$3563  0D                  Sub_3563:      ???                   
+$3560  B7 0C AD            Insn_3560:     STA $0CAD             
+$3563  0D                  Sub_3563:      EQU    Insn_3560+3      ; [*24] branch target 3 byte(s) inside Insn_3560 — see [*24]
 $3564  31 27                              LEAY 7,Y              
-$3566  0C                                 ???                   
+$3566  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $3567  17 F9 AC                           LBSR Sub_2F16          ; call Sub_2F16
 $356A  24 62                              BCC Sub_35CE           ; C=0 (BHS)
 $356C  17 F9 F0                           LBSR Sub_2F5F          ; call Sub_2F5F
@@ -5476,10 +5572,10 @@ $35DC  10 8E 0E 00                        LDY #$0E00
 $35E0  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
 $35E3  10 8E 0F 00                        LDY #$0F00            
 $35E7  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
-$35EA  0D                                 ???                   
-$35EB  7B                                 ???                   
+$35EA  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$35EB  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $35EC  27 06                              BEQ Sub_35F4          
-$35EE  0C                                 ???                   
+$35EE  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $35EF  7E 96 7C                           JMP $967C             
 $35F2  97 7D                              STA <$7D              
 $35F4  17 E8 3C            Sub_35F4:      LBSR Sub_1E33          ; call Sub_1E33
@@ -5540,8 +5636,8 @@ $3664  17 E9 B8                           LBSR Sub_201F          ; call Sub_201F
 $3667  17 E8 E9                           LBSR Sub_1F53          ; call Sub_1F53
 $366A  30 8D CE 43                        LEAX Dat_04B1          ; X → Dat_04B1
 $366E  17 E7 24                           LBSR Sub_1D95          ; call Sub_1D95
-$3671  0F                                 ???                   
-$3672  52                                 ???                   
+$3671  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$3672  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3673  F6 0C 91                           LDB $0C91             
 $3676  27 12                              BEQ Sub_368A          
 $3678  C1 03                              CMPB #$03             
@@ -5550,8 +5646,8 @@ $367C  D7 56                              STB <$56
 $367E  C1 02                              CMPB #$02              ; compare B with CurXY
 $3680  10 22 E3 5B                        LBHI Sub_19DF         
 $3684  25 69                              BCS Sub_36EF           ; C=1 (BLO)
-$3686  0C                                 ???                   
-$3687  52                                 ???                   
+$3686  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$3687  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3688  20 65                              BRA Sub_36EF          
 
 ; --------------------------------------------------------------
@@ -5577,10 +5673,10 @@ $36B9  17 E9 63                           LBSR Sub_201F          ; call Sub_201F
 $36BC  17 E8 94                           LBSR Sub_1F53          ; call Sub_1F53
 $36BF  30 8D CD EE                        LEAX Dat_04B1          ; X → Dat_04B1
 $36C3  17 E6 CF                           LBSR Sub_1D95          ; call Sub_1D95
-$36C6  0F                                 ???                   
-$36C7  52                                 ???                   
-$36C8  0F                                 ???                   
-$36C9  51                                 ???                   
+$36C6  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$36C7  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
+$36C8  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$36C9  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
 $36CA  F6 0C 91                           LDB $0C91             
 $36CD  27 18                              BEQ Sub_36E7          
 $36CF  C1 04                              CMPB #$04             
@@ -5588,13 +5684,13 @@ $36D1  22 BC                              BHI Sub_368F
 $36D3  D7 55                              STB <$55              
 $36D5  C1 02                              CMPB #$02              ; compare B with CurXY
 $36D7  25 16                              BCS Sub_36EF           ; C=1 (BLO)
-$36D9  0C                                 ???                   
-$36DA  51                                 ???                   
+$36D9  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$36DA  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
 $36DB  C1 03                              CMPB #$03             
 $36DD  25 10                              BCS Sub_36EF           ; C=1 (BLO)
 $36DF  10 22 E3 D7                        LBHI Sub_1ABA         
-$36E3  0C                                 ???                   
-$36E4  52                                 ???                   
+$36E3  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$36E4  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $36E5  20 08                              BRA Sub_36EF          
 
 ; --------------------------------------------------------------
@@ -5613,16 +5709,16 @@ $3700  16 00 79                           LBRA Sub_377C
 ; --------------------------------------------------------------
 $3703  86 FF               Sub_3703:      LDA #$FF              
 $3705  97 4F                              STA <$4F              
-$3707  0F                                 ???                   
+$3707  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3708  74 0F 6A                           LSR $0F6A             
-$370B  0F                                 ???                   
+$370B  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $370C  57                                 ASRB                  
-$370D  0F                                 ???                   
-$370E  75                                 ???                   
-$370F  0F                                 ???                   
+$370D  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$370E  75                                 FCB    $75                ; undefined opcode $75 -- not a valid 6809 instruction
+$370F  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3710  6D 0F                              TST 15,X              
 $3712  5D                                 TSTB                  
-$3713  0F                                 ???                   
+$3713  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3714  A8 8E                              EORA ?$8E             
 $3716  13                                 SYNC                   ; wait for interrupt
 $3717  C3 96 38                           ADDD #$9638           
@@ -5642,9 +5738,9 @@ $3736  ED 88 18                           STD 24,X
 $3739  ED 04                              STD 4,X               
 $373B  35 06                              PULS A,B              
 $373D  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
-$3740  17 0E E7                           LBSR Sub_462A          ; call Sub_462A
-$3741  0E                  Sub_3741:      ???                   
-$3742  E7 CC 00                           STB Dat_3745          
+$3740  17 0E E7            Insn_3740:     LBSR Sub_462A          ; call Sub_462A
+$3741  0E                  Sub_3741:      EQU    Insn_3740+1      ; [*25] branch target 1 byte(s) inside Insn_3740 — see [*25]
+$3742  E7 CC 00            Insn_3742:     STB Dat_3745          
 
 Dat_3745
 ; ── 19 bytes  ($3745—$3757) ──
@@ -5690,15 +5786,15 @@ $377A  20 DE                              BRA Sub_375A
 $377C  17 FF 84            Sub_377C:      LBSR Sub_3703          ; call Sub_3703
 $377F  30 8D CD 92                        LEAX Dat_0515          ; X → Dat_0515
 $3783  17 E6 0F                           LBSR Sub_1D95          ; call Sub_1D95
-$3786  0D                                 ???                   
-$3787  52                                 ???                   
+$3786  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3787  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3788  27 07                              BEQ Sub_3791          
 $378A  30 8D CD A9                        LEAX Dat_0537          ; X → Dat_0537
 $378E  17 E6 04                           LBSR Sub_1D95          ; call Sub_1D95
 $3791  30 8D CD C0         Sub_3791:      LEAX Dat_0555          ; X → Dat_0555
 $3795  17 E5 FD                           LBSR Sub_1D95          ; call Sub_1D95
-$3798  0D                                 ???                   
-$3799  52                                 ???                   
+$3798  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3799  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $379A  27 09                              BEQ Sub_37A5          
 $379C  30 8D CD 15                        LEAX Dat_04B5          ; X → Dat_04B5
 $37A0  17 E5 F2                           LBSR Sub_1D95          ; call Sub_1D95
@@ -5708,7 +5804,7 @@ $37A3  20 54                              BRA Sub_37F9
 $37A5  30 8D CD DC         Sub_37A5:      LEAX Dat_0585          ; X → Dat_0585
 $37A9  17 E5 E9                           LBSR Sub_1D95          ; call Sub_1D95
 $37AC  17 0C E3                           LBSR Sub_4492          ; call Sub_4492
-$37AF  0D                                 ???                   
+$37AF  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $37B0  A8 27                              EORA 7,Y              
 $37B2  12                                 NOP                   
 $37B3  8E 00 AC                           LDX #$00AC            
@@ -5719,7 +5815,7 @@ $37BF  CC 07 04                           LDD #$0704
 $37C2  17 ED 17                           LBSR Sub_24DC          ; call Sub_24DC
 $37C5  C6 1E                              LDB #$1E              
 $37C7  17 E6 26                           LBSR Sub_1DF0          ; call Sub_1DF0
-$37CA  0D                                 ???                   
+$37CA  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $37CB  30 10                              LEAX -16,X            
 $37CD  26 01                              BNE $37D0             
 $37CF  BF 30 8D                           STX $308D             
@@ -5732,17 +5828,17 @@ $37E2  8E 00 AC                           LDX #$00AC
 $37E5  A6 A4                              LDA ,Y                
 $37E7  81 0D                              CMPA #$0D              ; compare A with CR
 $37E9  26 08                              BNE $37F3             
-$37EB  0D                                 ???                   
+$37EB  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $37EC  A8 10                              EORA -16,X            
 $37EE  27 01                              BEQ $37F1             
 $37F0  9E 20                              LDX <$20              
-$37F2  06                                 ???                   
+$37F2  06                                 FCB    $06                ; undefined opcode $06 -- not a valid 6809 instruction
 $37F3  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 $37F5  AD 9F 0C B1                        JSR [$0CB1]            ; call via indexed pointer
 $37F9  7D 0C AA            Sub_37F9:      TST $0CAA             
 $37FC  10 27 07 02                        LBEQ Sub_3F02         
-$3800  0D                                 ???                   
-$3801  52                                 ???                   
+$3800  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3801  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3802  26 2A                              BNE Sub_382E          
 $3804  30 8D CD 89                        LEAX Dat_0591          ; X → Dat_0591
 $3808  17 E5 8A                           LBSR Sub_1D95          ; call Sub_1D95
@@ -5766,8 +5862,8 @@ $383C  30 8D CD 15                        LEAX Dat_0555          ; X → Dat_055
 $3840  17 E5 52                           LBSR Sub_1D95          ; call Sub_1D95
 $3843  17 06 3B                           LBSR Sub_3E81          ; call Sub_3E81
 $3846  17 06 50                           LBSR Sub_3E99          ; call Sub_3E99
-$3849  0D                                 ???                   
-$384A  52                                 ???                   
+$3849  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$384A  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $384B  27 05                              BEQ Sub_3852          
 $384D  CC 00 00                           LDD #$0000            
 $3850  20 06                              BRA Sub_3858          
@@ -5784,14 +5880,14 @@ $3867  30 8D CD 82                        LEAX Dat_05ED          ; X → Dat_05E
 $386B  86 01                              LDA #$01              
 $386D  10 8E 00 14                        LDY #$0014            
 $3871  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$3874  0C                                 ???                   
-$3875  65                                 ???                   
+$3874  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$3875  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $3876  C6 04                              LDB #$04              
 $3878  D7 64                              STB <$64              
 $387A  17 05 F4                           LBSR Sub_3E71          ; call Sub_3E71
-$387D  0A                                 ???                   
+$387D  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
 $387E  64 17                              LSR -9,X              
-$3880  03                                 ???                   
+$3880  03                                 FCB    $03                ; undefined opcode $03 -- not a valid 6809 instruction
 $3881  4A                                 DECA                  
 $3882  96 38               Sub_3882:      LDA <$38              
 $3884  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
@@ -5802,10 +5898,10 @@ $388E  10 25 01 49                        LBCS Sub_39DB
 $3892  17 03 50                           LBSR Sub_3BE5          ; call Sub_3BE5
 $3895  81 03                              CMPA #$03             
 $3897  25 E9                              BCS Sub_3882           ; C=1 (BLO)
-$3899  0D                                 ???                   
+$3899  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $389A  64 26                              LSR 6,Y               
 $389C  DD 0F                              STD <$0F              
-$389E  65                                 ???                   
+$389E  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $389F  17 05 DB            Sub_389F:      LBSR Sub_3E7D          ; call Sub_3E7D
 $38A2  17 03 27                           LBSR Sub_3BCC          ; call Sub_3BCC
 $38A5  96 38               Sub_38A5:      LDA <$38              
@@ -5817,7 +5913,7 @@ $38B1  10 25 01 26                        LBCS Sub_39DB
 $38B5  17 03 2D                           LBSR Sub_3BE5          ; call Sub_3BE5
 $38B8  81 0A                              CMPA #$0A              ; compare A with LF
 $38BA  25 E9                              BCS Sub_38A5           ; C=1 (BLO)
-$38BC  0C                                 ???                   
+$38BC  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $38BD  5D                                 TSTB                  
 $38BE  17 06 01                           LBSR Sub_3EC2          ; call Sub_3EC2
 $38C1  17 E6 A7                           LBSR Sub_1F6B          ; call Sub_1F6B
@@ -5836,7 +5932,7 @@ $38DB  4F                                 CLRA                   ; A = 0
 $38DC  C3 00 01            Sub_38DC:      ADDD #$0001           
 $38DF  DD 5E                              STD <$5E              
 $38E1  17 05 F4                           LBSR Sub_3ED8          ; call Sub_3ED8
-$38E4  0F                                 ???                   
+$38E4  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $38E5  5D                                 TSTB                  
 $38E6  17 05 C8                           LBSR Sub_3EB1          ; call Sub_3EB1
 $38E9  17 F2 A8            Sub_38E9:      LBSR Sub_2B94          ; call Sub_2B94
@@ -5862,18 +5958,16 @@ $3910  35 01               Sub_3910:      PULS CC
 $3912  24 B9                              BCC Sub_38CD           ; C=0 (BHS)
 $3914  86 0D                              LDA #$0D               ; A = CR
 $3916  97 AC                              STA <$AC              
-$3918  16 00 C0                           LBRA Sub_39DB         
-
-; --------------------------------------------------------------
-$391B  0D                  Sub_391B:      ???                   
+$3918  16 00 C0            Insn_3918:     LBRA Sub_39DB         
+$391B  0D                  Sub_391B:      EQU    Insn_3918+3      ; [*26] branch target 3 byte(s) inside Insn_3918 — see [*26]
 $391C  6A 26                              DEC 6,Y               
-$391E  1B                                 ???                   
-$391F  0D                                 ???                   
+$391E  1B                                 FCB    $1B                ; undefined opcode $1B -- not a valid 6809 instruction
+$391F  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $3920  6D 27                              TST 7,Y               
 $3922  AA 0F                              ORA 15,X              
 $3924  6D 17                              TST -9,X              
-$3926  05                                 ???                   
-$3927  51                                 ???                   
+$3926  05                                 FCB    $05                ; undefined opcode $05 -- not a valid 6809 instruction
+$3927  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
 $3928  20 BF                              BRA Sub_38E9          
 
 ; --------------------------------------------------------------
@@ -5884,27 +5978,27 @@ $3932  17 FE 23                           LBSR Sub_3758          ; call Sub_3758
 $3935  17 05 45                           LBSR Sub_3E7D          ; call Sub_3E7D
 $3938  20 AF                              BRA Sub_38E9          
          FCB    $0D,$52,$27,$3D,$17,$05,$3C,$17,$00,$F5,$34,$01,$0D,$6A,$27,$AE,$35,$01,$0F,$6A,$34,$40,$0D,$57,$26,$16,$DC,$66,$26,$04,$DC,$68,$27,$0E,$96,$4F,$C6,$02,$9E,$66,$10,$9E,$68,$1F,$23,$10,$3F,$8E,$35,$40,$96,$4F,$10,$3F,$8F,$86,$0D,$97,$AC,$17,$05,$01,$16,$FE,$C8  ; unreachable padding
-$397B  0F                  Sub_397B:      ???                   
+$397B  0F                  Sub_397B:      EQU    $397B            ; [*27] undefined opcode at $397B — see [*27]
 $397C  6A 17                              DEC -9,X              
-$397E  04                                 ???                   
+$397E  04                                 FCB    $04                ; undefined opcode $04 -- not a valid 6809 instruction
 $397F  F9 7F 0C                           ADCB $7F0C            
 $3980  7F 0C AA            Sub_3980:      CLR $0CAA             
 $3983  17 E5 F7                           LBSR Sub_1F7D          ; call Sub_1F7D
-$3986  0D                                 ???                   
-$3987  52                                 ???                   
+$3986  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3987  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3988  26 05                              BNE Sub_398F          
 $398A  96 4F                              LDA <$4F              
 $398C  10 3F 8F                           OS9 I$Close            ; path=A
 $398F  17 DA 04            Sub_398F:      LBSR Sub_1396          ; call Sub_1396
 $3992  17 E5 BE                           LBSR Sub_1F53          ; call Sub_1F53
-$3995  0F                                 ???                   
-$3996  51                                 ???                   
-$3997  0F                                 ???                   
-$3998  52                                 ???                   
+$3995  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$3996  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
+$3997  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$3998  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3999  96 37                              LDA <$37              
 $399B  97 4F                              STA <$4F              
 $399D  2B 02                              BMI Sub_39A1          
-$399F  0C                                 ???                   
+$399F  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $39A0  57                                 ASRB                  
 $39A1  35 06               Sub_39A1:      PULS A,B              
 $39A3  B7 0C C5                           STA $0CC5             
@@ -5986,12 +6080,12 @@ $3A39  34 30               Sub_3A39:      PSHS X,Y
 $3A3B  CC 00 00                           LDD #$0000            
 $3A3E  DD 58                              STD <$58              
 $3A40  DD 53                              STD <$53              
-$3A42  0F                                 ???                   
+$3A42  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3A43  6D 0F                              TST 15,X              
 $3A45  5A                                 DECB                  
-$3A46  0F                                 ???                   
+$3A46  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $3A47  6A 17                              DEC -9,X              
-$3A49  01                                 ???                   
+$3A49  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
 $3A4A  81 8E                              CMPA #$8E             
 $3A4B  8E 00 EC            Sub_3A4B:      LDX #$00EC            
 $3A4E  17 01 94            Sub_3A4E:      LBSR Sub_3BE5          ; call Sub_3BE5
@@ -6032,8 +6126,8 @@ $3A9A  10 8E 00 EF                        LDY #$00EF
 $3A9E  31 AB                              LEAY D,Y              
 $3AA0  10 9F 5B                           STY <$5B              
 $3AA3  CA 04                              ORB #$04              
-$3AA5  0D                                 ???                   
-$3AA6  65                                 ???                   
+$3AA5  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3AA6  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $3AA7  27 02                              BEQ Sub_3AAB          
 $3AA9  CA 01                              ORB #$01              
 $3AAB  DD 60               Sub_3AAB:      STD <$60              
@@ -6067,7 +6161,7 @@ $3AE5  16 FF 43            Sub_3AE5:      LBRA Sub_3A2B
 $3AE8  5A                  Sub_3AE8:      DECB                  
 $3AE9  F1 00 ED                           CMPB $00ED            
 $3AEC  26 F7                              BNE Sub_3AE5          
-$3AEE  0C                                 ???                   
+$3AEE  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $3AEF  6D 20                              TST 0,Y               
 $3AF1  ED 17                              STD -9,X              
 $3AF2  17 00 D7            Sub_3AF2:      LBSR Sub_3BCC          ; call Sub_3BCC
@@ -6079,8 +6173,8 @@ $3B00  AD 9F 0C B3                        JSR [$0CB3]            ; call via inde
 $3B04  25 EF                              BCS Sub_3AF5           ; C=1 (BLO)
 $3B06  1F 20                              TFR Y,D               
 $3B08  17 00 C1                           LBSR Sub_3BCC          ; call Sub_3BCC
-$3B0B  0D                                 ???                   
-$3B0C  65                                 ???                   
+$3B0B  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3B0C  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $3B0D  26 05                              BNE Sub_3B14          
 $3B0F  17 03 2F                           LBSR Sub_3E41          ; call Sub_3E41
 $3B12  20 03                              BRA Sub_3B17          
@@ -6094,8 +6188,8 @@ $3B1C  10 93 60                           CMPD <$60
 $3B1F  25 DD                              BCS Sub_3AFE           ; C=1 (BLO)
 $3B21  9E 5B                              LDX <$5B              
 $3B23  DC 53                              LDD <$53              
-$3B25  0D                                 ???                   
-$3B26  65                                 ???                   
+$3B25  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3B26  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $3B27  27 09                              BEQ Sub_3B32          
 $3B29  10 A3 84                           CMPD ,X               
 $3B2C  10 26 FE F4         Sub_3B2C:      LBNE Sub_3A24         
@@ -6103,10 +6197,8 @@ $3B30  20 04                              BRA Sub_3B36
 
 ; --------------------------------------------------------------
 $3B32  A1 84               Sub_3B32:      CMPA ,X               
-$3B34  20 F6                              BRA Sub_3B2C          
-
-; --------------------------------------------------------------
-$3B36  0D                  Sub_3B36:      ???                   
+$3B34  20 F6               Insn_3B34:     BRA Sub_3B2C          
+$3B36  0D                  Sub_3B36:      EQU    Insn_3B34+2      ; [*28] branch target 2 byte(s) inside Insn_3B34 — see [*28]
 $3B37  6D 26                              TST 6,Y               
 $3B39  59                                 ROLB                  
 $3B3A  DC 5E                              LDD <$5E              
@@ -6122,7 +6214,7 @@ $3B4C  10 83 00 01                        CMPD #$0001
 $3B50  26 3C                              BNE Sub_3B8E          
 $3B52  DC 62                              LDD <$62              
 $3B54  17 05 F8                           LBSR Sub_414F          ; call Sub_414F
-$3B57  0D                                 ???                   
+$3B57  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $3B58  57                                 ASRB                  
 $3B59  27 33                              BEQ Sub_3B8E          
 $3B5B  34 32                              PSHS A,X,Y            
@@ -6147,10 +6239,8 @@ $3B8E  DC 62               Sub_3B8E:      LDD <$62
 $3B90  17 0A FE                           LBSR Sub_4691          ; call Sub_4691
 $3B93  5F                                 CLRB                   ; B = 0
 $3B94  35 30               Sub_3B94:      PULS X,Y              
-$3B96  39                                 RTS                    ; return from subroutine
-
-; --------------------------------------------------------------
-$3B97  0C                  Sub_3B97:      ???                   
+$3B96  39                  Insn_3B96:     RTS                    ; return from subroutine
+$3B97  0C                  Sub_3B97:      EQU    Insn_3B96+1      ; [*29] branch target 1 byte(s) inside Insn_3B96 — see [*29]
 $3B98  5D                                 TSTB                  
 $3B99  17 03 26                           LBSR Sub_3EC2          ; call Sub_3EC2
 $3B9C  17 E3 CC                           LBSR Sub_1F6B          ; call Sub_1F6B
@@ -6166,22 +6256,20 @@ $3BB2  86 01                              LDA #$01
 $3BB4  10 8E 00 14                        LDY #$0014            
 $3BB8  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $3BBB  53                  Sub_3BBB:      COMB                  
-$3BBC  20 D6                              BRA Sub_3B94          
-
-; --------------------------------------------------------------
-$3BBE  0C                  Sub_3BBE:      ???                   
+$3BBC  20 D6               Insn_3BBC:     BRA Sub_3B94          
+$3BBE  0C                  Sub_3BBE:      EQU    Insn_3BBC+2      ; [*30] branch target 2 byte(s) inside Insn_3BBC — see [*30]
 $3BBF  6A 17                              DEC -9,X              
-$3BC1  0A                                 ???                   
+$3BC1  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
 $3BC2  67 20                              ASR 0,Y               
-$3BC4  CF                                 ???                   
+$3BC4  CF                                 FCB    $CF                ; undefined opcode $CF -- not a valid 6809 instruction
 $3BC5  86 0A               Sub_3BC5:      LDA #$0A               ; A = LF
 $3BC7  97 5D                              STA <$5D              
 $3BC9  16 FE 66                           LBRA Sub_3A32         
 
 ; --------------------------------------------------------------
 $3BCC  34 16               Sub_3BCC:      PSHS A,B,X            
-$3BCE  0D                                 ???                   
-$3BCF  7B                                 ???                   
+$3BCE  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3BCF  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $3BD0  27 07                              BEQ Sub_3BD9          
 $3BD2  4F                                 CLRA                   ; A = 0
 $3BD3  D6 7C                              LDB <$7C              
@@ -6197,8 +6285,8 @@ $3BE3  35 96                              PULS A,B,X,PC          ; return from s
 
 ; --------------------------------------------------------------
 $3BE5  34 14               Sub_3BE5:      PSHS B,X              
-$3BE7  0D                                 ???                   
-$3BE8  7B                                 ???                   
+$3BE7  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3BE8  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $3BE9  27 10                              BEQ Sub_3BFB          
 $3BEB  86 01                              LDA #$01              
 $3BED  D6 7C                              LDB <$7C              
@@ -6219,7 +6307,7 @@ $3C0B  90 6B                              SUBA <$6B
 $3C0D  81 3C                              CMPA #$3C              ; compare A with '<'
 
 CrcTable
-; CRC-16/CCITT lookup table — 256 entries x 2 bytes = 512 bytes
+; CRC-16/CCITT lookup table â€” 256 entries x 2 bytes = 512 bytes
 ; ── 4 bytes  ($3C0F—$3C12) ──
          FDB    $2502
          FDB    $803C
@@ -6232,6 +6320,7 @@ Dat_3C13
 Dat_3C15
 ; Referenced by: $3E24
 ; ── 512 bytes  ($3C15—$3E14) ──
+         FCB    $00               ; NUL
          FCB    $00               ; NUL
          FCB    $10               ; $10
          FCC    "! B0c@"
@@ -6791,11 +6880,9 @@ $3EFC  39                                 RTS                    ; return from s
 ; --------------------------------------------------------------
 $3EFD  86 30               Sub_3EFD:      LDA #$30               ; A = '0'
 $3EFF  A7 85                              STA B,X               
-$3F01  39                                 RTS                    ; return from subroutine
-
-; --------------------------------------------------------------
-$3F02  0D                  Sub_3F02:      ???                   
-$3F03  52                                 ???                   
+$3F01  39                  Insn_3F01:     RTS                    ; return from subroutine
+$3F02  0D                  Sub_3F02:      EQU    Insn_3F01+1      ; [*31] branch target 1 byte(s) inside Insn_3F01 — see [*31]
+$3F03  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3F04  27 0C                              BEQ Sub_3F12          
 $3F06  17 EC EB                           LBSR Sub_2BF4          ; call Sub_2BF4
 $3F08  EB 0D               Sub_3F08:      ADDB 13,X             
@@ -6817,12 +6904,12 @@ $3F33  86 01                              LDA #$01
 $3F35  8E 00 AC                           LDX #$00AC            
 $3F38  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $3F3B  24 0A                              BCC $3F47              ; C=0 (BHS)
-$3F3D  0D                                 ???                   
-$3F3E  52                                 ???                   
+$3F3D  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3F3E  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3F3F  10 27 FA 4C                        LBEQ Sub_398F         
-$3F43  0C                                 ???                   
-$3F44  74 20 1B                           LSR $201B             
-$3F46  1B                  Sub_3F46:      ???                   
+$3F43  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$3F44  74 20 1B            Insn_3F44:     LSR $201B             
+$3F46  1B                  Sub_3F46:      EQU    Insn_3F44+2      ; [*32] branch target 2 byte(s) inside Insn_3F44 — see [*32]
 $3F47  97 4F                              STA <$4F              
 $3F49  8E 00 EC                           LDX #$00EC            
 $3F4C  10 8E 00 7F                        LDY #$007F            
@@ -6852,20 +6939,20 @@ $3F9B  17 DF 2E                           LBSR Sub_1ECC          ; call Sub_1ECC
 $3F9E  A7 02                              STA 2,X               
 $3FA0  10 8E 00 03                        LDY #$0003            
 $3FA4  86 01                              LDA #$01              
-$3FA6  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$3FA9  0F                  Sub_3FA9:      ???                   
-$3FAA  65                                 ???                   
+$3FA6  10 3F 8A            Insn_3FA6:     OS9 I$Write            ; path=A  count=Y  buf→X
+$3FA9  0F                  Sub_3FA9:      EQU    Insn_3FA6+3      ; [*33] branch target 3 byte(s) inside Insn_3FA6 — see [*33]
+$3FAA  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $3FAB  CC 00 80                           LDD #$0080            
 $3FAE  DD 62                              STD <$62              
 $3FB0  C3 00 04                           ADDD #$0004           
 $3FB3  DD 60                              STD <$60              
-$3FB5  0D                                 ???                   
-$3FB6  52                                 ???                   
+$3FB5  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3FB6  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3FB7  10 26 00 FE                        LBNE Sub_40B9         
 $3FBB  8E 13 C3                           LDX #$13C3            
 $3FBE  17 ED F5                           LBSR Sub_2DB6          ; call Sub_2DB6
-$3FC1  0D                                 ???                   
-$3FC2  51                                 ???                   
+$3FC1  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3FC2  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
 $3FC3  27 0A                              BEQ Sub_3FCF          
 $3FC5  CC 04 00                           LDD #$0400            
 $3FC8  DD 62                              STD <$62              
@@ -6877,8 +6964,8 @@ $3FD4  17 FF 01                           LBSR Sub_3ED8          ; call Sub_3ED8
 $3FD7  17 FE D7                           LBSR Sub_3EB1          ; call Sub_3EB1
 $3FDA  17 F7 7B                           LBSR Sub_3758          ; call Sub_3758
 $3FDD  17 E6 73                           LBSR Sub_2653          ; call Sub_2653
-$3FE0  0D                                 ???                   
-$3FE1  52                                 ???                   
+$3FE0  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$3FE1  52                                 FCB    $52                ; undefined opcode $52 -- not a valid 6809 instruction
 $3FE2  27 08                              BEQ Sub_3FEC          
 $3FE4  DC 5E                              LDD <$5E              
 $3FE6  10 83 00 01                        CMPD #$0001           
@@ -6908,10 +6995,8 @@ $4017  81 06                              CMPA #$06
 $4019  27 32                              BEQ Sub_404D          
 $401B  81 18                              CMPA #$18             
 $401D  10 27 00 95                        LBEQ Sub_40B6         
-$4021  20 C9                              BRA Sub_3FEC          
-
-; --------------------------------------------------------------
-$4023  0C                  Sub_4023:      ???                   
+$4021  20 C9               Insn_4021:     BRA Sub_3FEC          
+$4023  0C                  Sub_4023:      EQU    Insn_4021+2      ; [*34] branch target 2 byte(s) inside Insn_4021 — see [*34]
 $4024  5D                                 TSTB                  
 $4025  96 5D                              LDA <$5D              
 $4027  81 09                              CMPA #$09             
@@ -6927,25 +7012,23 @@ $403F  10 9E 60            Sub_403F:      LDY <$60
 $4042  96 38                              LDA <$38              
 $4044  8E 00 EC                           LDX #$00EC            
 $4047  AD 9F 0C B5                        JSR [$0CB5]            ; call via indexed pointer
-$404B  20 BF                              BRA Sub_400C          
-
-; --------------------------------------------------------------
-$404D  0F                  Sub_404D:      ???                   
+$404A  B5 20 BF            Insn_404A:     BITA $20BF            
+$404D  0F                  Sub_404D:      EQU    Insn_404A+3      ; [*35] branch target 3 byte(s) inside Insn_404A — see [*35]
 $404E  5D                                 TSTB                  
 $404F  17 FE 5F                           LBSR Sub_3EB1          ; call Sub_3EB1
-$4052  0D                                 ???                   
+$4052  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $4053  6A 26                              DEC 6,Y               
 $4055  3A                                 ABX                   
 $4056  DC 5E                              LDD <$5E              
 $4058  C3 00 01                           ADDD #$0001           
 $405B  DD 5E                              STD <$5E              
-$405D  0D                                 ???                   
-$405E  51                                 ???                   
+$405D  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$405E  51                                 FCB    $51                ; undefined opcode $51 -- not a valid 6809 instruction
 $405F  27 13                              BEQ Sub_4074          
 $4061  CC 04 00                           LDD #$0400            
 $4064  DD 62                              STD <$62              
-$4066  0D                                 ???                   
-$4067  65                                 ???                   
+$4066  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$4067  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $4068  27 05                              BEQ Sub_406F          
 $406A  C3 00 05                           ADDD #$0005           
 $406D  20 03                              BRA Sub_4072          
@@ -6955,7 +7038,7 @@ $406F  C3 00 04            Sub_406F:      ADDD #$0004
 $4072  DD 60               Sub_4072:      STD <$60              
 $4074  17 FE 61            Sub_4074:      LBSR Sub_3ED8          ; call Sub_3ED8
 $4077  17 E5 D9                           LBSR Sub_2653          ; call Sub_2653
-$407A  0D                                 ???                   
+$407A  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $407B  6A 26                              DEC 6,Y               
 $407D  12                                 NOP                   
 $407E  17 E6 5A                           LBSR Sub_26DB          ; call Sub_26DB
@@ -6970,8 +7053,8 @@ $40B9  17 EB 00            Sub_40B9:      LBSR Sub_2BBC          ; call Sub_2BBC
 $40BC  25 F8                              BCS Sub_40B6           ; C=1 (BLO)
 $40BE  81 43                              CMPA #$43              ; compare A with 'C'
 $40C0  26 F7                              BNE Sub_40B9          
-$40C2  0C                                 ???                   
-$40C3  65                                 ???                   
+$40C2  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$40C3  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
 $40C4  DC 62                              LDD <$62              
 $40C6  C3 00 05                           ADDD #$0005           
 $40C9  DD 60                              STD <$60              
@@ -6983,7 +7066,7 @@ $40D6  8E 00 EC                           LDX #$00EC
 $40D9  10 8E 13 C3                        LDY #$13C3            
 $40DD  C6 86                              LDB #$86              
 $40DF  AD 9F 0C AF                        JSR [$0CAF]            ; call via indexed pointer
-$40E3  0D                                 ???                   
+$40E3  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $40E4  74 26 10                           LSR $2610             
 $40E7  CC 00 01                           LDD #$0001            
 $40EA  DD 5E                              STD <$5E              
@@ -7001,21 +7084,19 @@ $4108  81 06                              CMPA #$06
 $410A  27 14                              BEQ Sub_4120          
 $410C  81 15                              CMPA #$15             
 $410E  26 F3                              BNE Sub_4103          
-$4110  0C                                 ???                   
+$4110  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $4111  5D                                 TSTB                  
 $4112  96 5D                              LDA <$5D              
 $4114  81 09                              CMPA #$09             
 $4116  22 9E                              BHI Sub_40B6          
 $4118  17 FD A7                           LBSR Sub_3EC2          ; call Sub_3EC2
 $411B  17 DE 4D                           LBSR Sub_1F6B          ; call Sub_1F6B
-$411E  20 D7                              BRA Sub_40F7          
-
-; --------------------------------------------------------------
-$4120  0D                  Sub_4120:      ???                   
+$411E  20 D7               Insn_411E:     BRA Sub_40F7          
+$4120  0D                  Sub_4120:      EQU    Insn_411E+2      ; [*36] branch target 2 byte(s) inside Insn_411E — see [*36]
 $4121  74 10 26                           LSR $1026             
 $4124  F8 69 CC                           EORB $69CC            
-$4127  00                                 ???                   
-$4128  01                                 ???                   
+$4127  00                                 FCB    $00                ; undefined opcode $00 -- not a valid 6809 instruction
+$4128  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
 $4129  DD 5E                              STD <$5E              
 $412B  17 FD AA                           LBSR Sub_3ED8          ; call Sub_3ED8
 $412E  DC 62                              LDD <$62              
@@ -7035,7 +7116,7 @@ $414C  16 FE BD                           LBRA Sub_400C
 $414F  34 16               Sub_414F:      PSHS A,B,X            
 $4151  7D 0C C2                           TST $0CC2             
 $4154  27 25                              BEQ Sub_417B          
-$4156  0C                                 ???                   
+$4156  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $4157  57                                 ASRB                  
 $4158  4D                                 TSTA                  
 $4159  26 03                              BNE Sub_415E          
@@ -7055,10 +7136,8 @@ $4172  81 09                              CMPA #$09
 $4174  26 05                              BNE Sub_417B          
 $4176  5A                  Sub_4176:      DECB                  
 $4177  26 E7                              BNE Sub_4160          
-$4179  35 96                              PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
-
-; --------------------------------------------------------------
-$417B  0F                  Sub_417B:      ???                   
+$4179  35 96               Insn_4179:     PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+$417B  0F                  Sub_417B:      EQU    Insn_4179+2      ; [*37] branch target 2 byte(s) inside Insn_4179 — see [*37]
 $417C  57                                 ASRB                  
 $417D  35 96                              PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
 
@@ -7078,7 +7157,7 @@ $41A3  30 8D C3 9B                        LEAX Dat_0542          ; X → Dat_054
 $41A7  17 DB EB                           LBSR Sub_1D95          ; call Sub_1D95
 $41AA  30 8D C3 03                        LEAX Dat_04B1          ; X → Dat_04B1
 $41AE  17 DB E4                           LBSR Sub_1D95          ; call Sub_1D95
-$41B1  0D                                 ???                   
+$41B1  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $41B2  34 27                              PSHS CC,A,B,Y         
 $41B4  54                                 LSRB                  
 $41B5  30 8D C8 6A                        LEAX Dat_0A23          ; X → Dat_0A23
@@ -7110,9 +7189,9 @@ $41F4  10 25 00 9B                        LBCS Sub_4293
 $41F8  86 FF                              LDA #$FF              
 $41FA  97 37                              STA <$37              
 $41FC  97 4F                              STA <$4F              
-$41FE  0F                                 ???                   
+$41FE  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $41FF  57                                 ASRB                  
-$4200  0F                                 ???                   
+$4200  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $4201  34 0F                              PSHS CC,A,B,DP        
 $4203  35 17                              PULS CC,A,B,X         
 $4205  E3 9B                              ADDD ?$9B             
@@ -7139,14 +7218,14 @@ $4258  81 0D                              CMPA #$0D              ; compare A wit
 $425A  27 2B                              BEQ Sub_4287          
 $425C  20 ED               Sub_425C:      BRA Sub_424B          
 $425E  97 37               Sub_425E:      STA <$37              
-$4260  97 4F                              STA <$4F              
-$4262  0C                  Sub_4262:      ???                   
+$4260  97 4F               Insn_4260:     STA <$4F              
+$4262  0C                  Sub_4262:      EQU    Insn_4260+2      ; [*38] branch target 2 byte(s) inside Insn_4260 — see [*38]
 $4263  34 0C                              PSHS B,DP             
 $4265  57                  Sub_4265:      ASRB                  
-$4266  0D                                 ???                   
+$4266  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $4267  33 26                              LEAU 6,Y              
 $4269  1D                                 SEX                    ; sign-extend B into A
-$426A  0C                                 ???                   
+$426A  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $426B  35 17                              PULS CC,A,B,X         
 $426D  E3 31                              ADDD -15,Y            
 $426F  D6 1B                              LDB <$1B              
@@ -7161,11 +7240,11 @@ $427D  C6 20               Sub_427D:      LDB #$20               ; B = SS.ScSiz 
 $427F  3D                                 MUL                    ; D = A×B unsigned
 $4280  E3 E1                              ADDD ,S++             
 $4282  DD 08                              STD <$08              
-$4284  17 01 7C                           LBSR Sub_4403          ; call Sub_4403
-$4287  0F                  Sub_4287:      ???                   
+$4284  17 01 7C            Insn_4284:     LBSR Sub_4403          ; call Sub_4403
+$4287  0F                  Sub_4287:      EQU    Insn_4284+3      ; [*39] branch target 3 byte(s) inside Insn_4284 — see [*39]
 $4288  33 17                              LEAU -9,X             
 $428A  DC C7                              LDD <$C7              
-$428C  0D                                 ???                   
+$428C  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $428D  2F 10                              BLE Sub_429F          
 $428F  27 CB                              BEQ Sub_425C          
 $4291  98 39                              EORA <$39             
@@ -7232,9 +7311,9 @@ $430C  27 03                              BEQ Sub_4311
 $430E  17 00 F2                           LBSR Sub_4403          ; call Sub_4403
 $4311  35 B6               Sub_4311:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $4313  34 36               Sub_4313:      PSHS A,B,X,Y          
-$4315  0F                                 ???                   
+$4315  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $4316  33 9E                              LEAU ?$9E             
-$4318  00                                 ???                   
+$4318  00                                 FCB    $00                ; undefined opcode $00 -- not a valid 6809 instruction
 $4319  A6 80               Sub_4319:      LDA ,X+               
 $431B  81 0D                              CMPA #$0D              ; compare A with CR
 $431D  27 37                              BEQ Sub_4356          
@@ -7247,7 +7326,7 @@ $4329  81 20                              CMPA #$20              ; compare A wit
 $432B  27 06                              BEQ Sub_4333          
 $432D  81 2D                              CMPA #$2D              ; compare A with '-'
 $432F  26 E8                              BNE Sub_4319          
-$4331  0C                                 ???                   
+$4331  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $4332  33 A6                              LEAU A,Y              
 $4333  A6 80               Sub_4333:      LDA ,X+               
 $4335  81 3D                              CMPA #$3D              ; compare A with '='
@@ -7263,12 +7342,12 @@ $4347  C1 20                              CMPB #$20              ; compare B wit
 $4349  25 F3                              BCS Sub_433E           ; C=1 (BLO)
 $434B  4F                  Sub_434B:      CLRA                   ; A = 0
 $434C  DD 2D                              STD <$2D              
-$434E  0C                                 ???                   
+$434E  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $434F  2F 7C                              BLE Sub_43CD          
-$4351  0C                                 ???                   
+$4351  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $4352  AA 17                              ORA -9,X              
-$4354  FE 29 0F                           LDU $290F             
-$4356  0F                  Sub_4356:      ???                   
+$4354  FE 29 0F            Insn_4354:     LDU $290F             
+$4356  0F                  Sub_4356:      EQU    Insn_4354+2      ; [*40] branch target 2 byte(s) inside Insn_4354 — see [*40]
 $4357  2F 35                              BLE Sub_438E          
 $4359  B6 30 8D                           LDA $308D             
 $435A  30 8D C6 B0         Sub_435A:      LEAX Dat_0A0E          ; X → Dat_0A0E
@@ -7279,9 +7358,9 @@ $4368  30 8D C2 19                        LEAX Dat_0585          ; X → Dat_058
 $436C  17 DA 26                           LBSR Sub_1D95          ; call Sub_1D95
 $436F  C6 1E                              LDB #$1E              
 $4371  17 DA 7C                           LBSR Sub_1DF0          ; call Sub_1DF0
-$4374  0D                                 ???                   
+$4374  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $4375  30 26                              LEAX 6,Y              
-$4377  5B                                 ???                   
+$4377  5B                                 FCB    $5B                ; undefined opcode $5B -- not a valid 6809 instruction
 $4378  8E 06 1B                           LDX #$061B            
 $437B  10 8E 13 C3                        LDY #$13C3            
 $437F  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
@@ -7310,9 +7389,9 @@ $43B7  24 1F                              BCC Sub_43D8           ; C=0 (BHS)
 $43B9  16 CA 6E            Sub_43B9:      LBRA Sub_0E2A         
          FCB    $8E,$00,$04,$17,$CD,$B6,$17,$D1,$E3,$24,$F2,$20,$D5  ; unreachable padding
 $43C9  96 39               Sub_43C9:      LDA <$39              
-$43CB  10 3F 8F                           OS9 I$Close            ; path=A
-$43CD  8F                  Sub_43CD:      ???                   
-$43CE  0F                                 ???                   
+$43CB  10 3F 8F            Insn_43CB:     OS9 I$Close            ; path=A
+$43CD  8F                  Sub_43CD:      EQU    Insn_43CB+2      ; [*41] branch target 2 byte(s) inside Insn_43CB — see [*41]
+$43CE  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $43CF  32 16                              LEAS -10,X            
 $43D0  16 CA 57            Sub_43D0:      LBRA Sub_0E2A         
 $43D3  17 DB 7D            Sub_43D3:      LBSR Sub_1F53          ; call Sub_1F53
@@ -7334,7 +7413,7 @@ $43ED  ED 84                              STD ,X
 $43EF  CC 20 20                           LDD #$2020            
 $43F2  ED 02                              STD 2,X               
 $43F4  ED 04                              STD 4,X               
-$43F6  ED 06                              STD 6,X               
+$43F6  ED 06               Insn_43F6:     STD 6,X               
 
 Dat_43F7
 ; ── 12 bytes  ($43F7—$4402) ──
@@ -7434,7 +7513,7 @@ $449E  26 02                              BNE Sub_44A2
 $44A0  9E 0C                              LDX <$0C              
 $44A2  9C 10               Sub_44A2:      CMPX <$10             
 $44A4  26 F0                              BNE Sub_4496          
-$44A6  0F                                 ???                   
+$44A6  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
 $44A7  A8 35                              EORA -11,Y            
 $44A9  B6 A6 01                           LDA $A601             
 $44AA  A6 01               Sub_44AA:      LDA 1,X               
@@ -7477,13 +7556,13 @@ $44E9  20 E7                              BRA Sub_44D2
 ; --------------------------------------------------------------
 $44EB  86 0D               Sub_44EB:      LDA #$0D               ; A = CR
 $44ED  A7 A4                              STA ,Y                
-$44EF  0C                                 ???                   
+$44EF  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $44F0  A8 20                              EORA 0,Y              
-$44F2  B5 0F 1D                           BITA $0F1D            
-$44F3  0F                  Sub_44F3:      ???                   
+$44F2  B5 0F 1D            Insn_44F2:     BITA $0F1D            
+$44F3  0F                  Sub_44F3:      EQU    Insn_44F2+1      ; [*42] branch target 1 byte(s) inside Insn_44F2 — see [*42]
 $44F4  1D                                 SEX                    ; sign-extend B into A
-$44F5  0D                                 ???                   
-$44F6  7B                                 ???                   
+$44F5  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$44F6  7B                                 FCB    $7B                ; undefined opcode $7B -- not a valid 6809 instruction
 $44F7  10 27 00 C2                        LBEQ Sub_45BD         
 $44FB  9E 00                              LDX <$00              
 $44FD  A6 80               Sub_44FD:      LDA ,X+               
@@ -7586,7 +7665,7 @@ $45B0  DF 19                              STU <$19
 $45B2  33 C9 20 00                        LEAU 8192,U           
 $45B6  DF 1B                              STU <$1B              
 $45B8  35 40                              PULS U                
-$45BA  0C                                 ???                   
+$45BA  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
 $45BB  1D                                 SEX                    ; sign-extend B into A
 $45BC  39                                 RTS                    ; return from subroutine
 
@@ -7621,7 +7700,7 @@ $45F1  16 00 9B                           LBRA Sub_468F
 
 ; --------------------------------------------------------------
 $45F4  34 76               Sub_45F4:      PSHS A,B,X,Y,U        
-$45F6  0D                                 ???                   
+$45F6  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $45F7  1D                                 SEX                    ; sign-extend B into A
 $45F8  27 CE                              BEQ Sub_45C8          
 $45FA  96 16                              LDA <$16              
@@ -7655,7 +7734,7 @@ $4629  39                                 RTS                    ; return from s
 
 ; --------------------------------------------------------------
 $462A  34 76               Sub_462A:      PSHS A,B,X,Y,U        
-$462C  0D                                 ???                   
+$462C  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $462D  1D                                 SEX                    ; sign-extend B into A
 $462E  10 27 FF 96                        LBEQ Sub_45C8         
 $4632  B6 0C C5                           LDA $0CC5             
@@ -7723,16 +7802,14 @@ $46AF  4F                                 CLRA                   ; A = 0
 $46B0  5F                                 CLRB                   ; B = 0
 $46B1  ED 62                              STD 2,S               
 $46B3  10 9E 19            Sub_46B3:      LDY <$19              
-$46B6  0D                                 ???                   
+$46B6  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
 $46B7  57                                 ASRB                  
 $46B8  27 04                              BEQ Sub_46BE          
 $46BA  8D 3E                              BSR Sub_46FA           ; call Sub_46FA
-$46BC  20 0A                              BRA Sub_46C8          
-
-; --------------------------------------------------------------
-$46BE  0D                  Sub_46BE:      ???                   
+$46BC  20 0A               Insn_46BC:     BRA Sub_46C8          
+$46BE  0D                  Sub_46BE:      EQU    Insn_46BC+2      ; [*43] branch target 2 byte(s) inside Insn_46BC — see [*43]
 $46BF  28 27                              BVC Sub_46E8          
-$46C1  04                                 ???                   
+$46C1  04                                 FCB    $04                ; undefined opcode $04 -- not a valid 6809 instruction
 $46C2  8D 20                              BSR Sub_46E4           ; call Sub_46E4
 $46C4  20 02                              BRA Sub_46C8          
          FCB    $8D,$0E  ; unreachable padding
@@ -7775,3 +7852,802 @@ $4713  39                                 RTS                    ; return from s
 ; ==============================================================
 ModEnd
 ModSize  EQU    ModEnd-$0000
+
+; ══════════════════════════════════════════════════════════════
+; ANALYST NOTES
+; ══════════════════════════════════════════════════════════════
+
+; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $0D4A is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_0D48).
+;      Byte $09 at $0D4A is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $09 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $09 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_0D4A EQU Insn_0D48+2' resolves
+;      to $0D4A at assembly time. Branches to Sub_0D4A
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*2] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $0E71 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_0E70).
+;      Byte $07 at $0E71 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $07 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $07 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_0E71 EQU Insn_0E70+1' resolves
+;      to $0E71 at assembly time. Branches to Sub_0E71
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*3] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $10FA is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_10F7).
+;      Byte $0D at $10FA is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_10FA EQU Insn_10F7+3' resolves
+;      to $10FA at assembly time. Branches to Sub_10FA
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*4] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $1154 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $03 at $1154 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $03 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $03 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*5] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $122E is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_122B).
+;      Byte $0D at $122E is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_122E EQU Insn_122B+3' resolves
+;      to $122E at assembly time. Branches to Sub_122E
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*6] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $123E is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_123D).
+;      Byte $0D at $123E is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_123E EQU Insn_123D+1' resolves
+;      to $123E at assembly time. Branches to Sub_123E
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*7] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $129F is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_129C).
+;      Byte $0F at $129F is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_129F EQU Insn_129C+3' resolves
+;      to $129F at assembly time. Branches to Sub_129F
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*8] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $19AD is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $0D at $19AD is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*9] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $19BD is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_19BA).
+;      Byte $0C at $19BD is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_19BD EQU Sub_19BA+3' resolves
+;      to $19BD at assembly time. Branches to Sub_19BD
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*10] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $1BDB is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_1BDA).
+;      Byte $0D at $1BDB is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_1BDB EQU Insn_1BDA+1' resolves
+;      to $1BDB at assembly time. Branches to Sub_1BDB
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*11] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $1E22 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_1E21).
+;      Byte $05 at $1E22 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $05 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $05 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_1E22 EQU Sub_1E21+1' resolves
+;      to $1E22 at assembly time. Branches to Sub_1E22
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*12] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $20A3 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_20A2).
+;      Byte $0C at $20A3 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_20A3 EQU Insn_20A2+1' resolves
+;      to $20A3 at assembly time. Branches to Sub_20A3
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*13] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $20E8 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_20E5).
+;      Byte $05 at $20E8 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $05 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $05 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_20E8 EQU Insn_20E5+3' resolves
+;      to $20E8 at assembly time. Branches to Sub_20E8
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*14] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $248B is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_2488).
+;      Byte $0C at $248B is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_248B EQU Insn_2488+3' resolves
+;      to $248B at assembly time. Branches to Sub_248B
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*15] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $25F2 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $0D at $25F2 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*16] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $26AE is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_26AC).
+;      Byte $0D at $26AE is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_26AE EQU Sub_26AC+2' resolves
+;      to $26AE at assembly time. Branches to Sub_26AE
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*17] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $270D is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $00 at $270D is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $00 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $00 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*18] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $27AB is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_27A8).
+;      Byte $0F at $27AB is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_27AB EQU Insn_27A8+3' resolves
+;      to $27AB at assembly time. Branches to Sub_27AB
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*19] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $2832 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_2830).
+;      Byte $0D at $2832 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_2832 EQU Sub_2830+2' resolves
+;      to $2832 at assembly time. Branches to Sub_2832
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*20] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $28C7 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_28C5).
+;      Byte $0F at $28C7 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_28C7 EQU Sub_28C5+2' resolves
+;      to $28C7 at assembly time. Branches to Sub_28C7
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*21] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $2C92 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Sub_2C90).
+;      Byte $0D at $2C92 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_2C92 EQU Sub_2C90+2' resolves
+;      to $2C92 at assembly time. Branches to Sub_2C92
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*22] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $2D87 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $0D at $2D87 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*23] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $30ED is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_30EB).
+;      Byte $0C at $30ED is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_30ED EQU Insn_30EB+2' resolves
+;      to $30ED at assembly time. Branches to Sub_30ED
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*24] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3563 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3560).
+;      Byte $0D at $3563 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3563 EQU Insn_3560+3' resolves
+;      to $3563 at assembly time. Branches to Sub_3563
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*25] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3741 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3740).
+;      Byte $0E at $3741 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0E is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0E may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3741 EQU Insn_3740+1' resolves
+;      to $3741 at assembly time. Branches to Sub_3741
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*26] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $391B is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3918).
+;      Byte $0D at $391B is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_391B EQU Insn_3918+3' resolves
+;      to $391B at assembly time. Branches to Sub_391B
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*27] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $397B is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (unknown).
+;      Byte $0F at $397B is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*28] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3B36 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3B34).
+;      Byte $0D at $3B36 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3B36 EQU Insn_3B34+2' resolves
+;      to $3B36 at assembly time. Branches to Sub_3B36
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*29] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3B97 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3B96).
+;      Byte $0C at $3B97 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3B97 EQU Insn_3B96+1' resolves
+;      to $3B97 at assembly time. Branches to Sub_3B97
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*30] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3BBE is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3BBC).
+;      Byte $0C at $3BBE is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3BBE EQU Insn_3BBC+2' resolves
+;      to $3BBE at assembly time. Branches to Sub_3BBE
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*31] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3F02 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3F01).
+;      Byte $0D at $3F02 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3F02 EQU Insn_3F01+1' resolves
+;      to $3F02 at assembly time. Branches to Sub_3F02
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*32] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3F46 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3F44).
+;      Byte $1B at $3F46 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $1B is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $1B may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3F46 EQU Insn_3F44+2' resolves
+;      to $3F46 at assembly time. Branches to Sub_3F46
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*33] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $3FA9 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_3FA6).
+;      Byte $0F at $3FA9 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_3FA9 EQU Insn_3FA6+3' resolves
+;      to $3FA9 at assembly time. Branches to Sub_3FA9
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*34] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $4023 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_4021).
+;      Byte $0C at $4023 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_4023 EQU Insn_4021+2' resolves
+;      to $4023 at assembly time. Branches to Sub_4023
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*35] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $404D is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_404A).
+;      Byte $0F at $404D is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_404D EQU Insn_404A+3' resolves
+;      to $404D at assembly time. Branches to Sub_404D
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*36] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $4120 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_411E).
+;      Byte $0D at $4120 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_4120 EQU Insn_411E+2' resolves
+;      to $4120 at assembly time. Branches to Sub_4120
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*37] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $417B is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_4179).
+;      Byte $0F at $417B is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_417B EQU Insn_4179+2' resolves
+;      to $417B at assembly time. Branches to Sub_417B
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*38] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $4262 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_4260).
+;      Byte $0C at $4262 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0C may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_4262 EQU Insn_4260+2' resolves
+;      to $4262 at assembly time. Branches to Sub_4262
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*39] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $4287 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_4284).
+;      Byte $0F at $4287 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_4287 EQU Insn_4284+3' resolves
+;      to $4287 at assembly time. Branches to Sub_4287
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*40] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $4356 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_4354).
+;      Byte $0F at $4356 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_4356 EQU Insn_4354+2' resolves
+;      to $4356 at assembly time. Branches to Sub_4356
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*41] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $43CD is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_43CB).
+;      Byte $8F at $43CD is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $8F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $8F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_43CD EQU Insn_43CB+2' resolves
+;      to $43CD at assembly time. Branches to Sub_43CD
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*42] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $44F3 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_44F2).
+;      Byte $0F at $44F3 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0F may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_44F3 EQU Insn_44F2+1' resolves
+;      to $44F3 at assembly time. Branches to Sub_44F3
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; [*43] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $46BE is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_46BC).
+;      Byte $0D at $46BE is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $0D may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_46BE EQU Insn_46BC+2' resolves
+;      to $46BE at assembly time. Branches to Sub_46BE
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; ══════════════════════════════════════════════════════════════

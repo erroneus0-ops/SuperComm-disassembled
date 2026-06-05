@@ -1,6 +1,6 @@
 {
-  "binary": "/home/claude/supercomm23",
-  "output": "/home/claude/supercomm23_proj.asm",
+  "binary": "supercomm23",
+  "output": "supercomm23_proj.asm",
 
   "module_notes": [
     "SuperComm v2.3 (16550 UART variant) — OS-9 Level II terminal program",

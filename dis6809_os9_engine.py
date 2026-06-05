@@ -207,6 +207,68 @@ O.Write  EQU    $02
 O.RdWr   EQU    $03
 O.Exec   EQU    $04
 O.Dir    EQU    $05
+
+; OS-9 I/O system calls
+I$Attach EQU    $80
+I$Detach EQU    $81
+I$Dup    EQU    $82
+I$Create EQU    $83
+I$Open   EQU    $84
+I$MakDir EQU    $85
+I$ChgDir EQU    $86
+I$Delete EQU    $87
+I$Seek   EQU    $88
+I$Read   EQU    $89
+I$Write  EQU    $8A
+I$ReadLn EQU    $8B
+I$WritLn EQU    $8C
+I$GetStt EQU    $8D
+I$SetStt EQU    $8E
+I$Close  EQU    $8F
+I$DupS   EQU    $90
+
+; OS-9 F$ system calls
+F$Link   EQU    $00
+F$Load   EQU    $01
+F$UnLink EQU    $02
+F$Fork   EQU    $03
+F$Wait   EQU    $04
+F$Chain  EQU    $05
+F$Exit   EQU    $06
+F$Mem    EQU    $07
+F$Send   EQU    $08
+F$Icpt   EQU    $09
+F$Sleep  EQU    $0A
+F$SSpd   EQU    $0B
+F$ID     EQU    $0C
+F$SPrior EQU    $0D
+F$SSWI   EQU    $0E
+F$PErr   EQU    $0F
+F$PrsNam EQU    $10
+F$CmpNam EQU    $11
+F$SchBit EQU    $12
+F$AllBit EQU    $13
+F$DelBit EQU    $14
+F$Time   EQU    $15
+F$STime  EQU    $16
+F$CRC    EQU    $17
+F$GPrDsc EQU    $18
+F$GBlkMp EQU    $19
+F$GModDr EQU    $1A
+F$CpyMem EQU    $1B
+F$SUser  EQU    $1C
+F$UnLoad EQU    $1D
+F$RTE    EQU    $1E
+F$GPrDBT EQU    $1F
+F$Julian EQU    $20
+F$TLink  EQU    $21
+F$DFork  EQU    $22
+F$DExec  EQU    $23
+F$DExit  EQU    $24
+F$DaTim  EQU    $25
+F$ALARM  EQU    $26
+F$SigMask EQU   $27
+F$NMLink EQU    $28
 ; ================================================================
 """
 
@@ -230,6 +292,9 @@ class Project:
         self.line_comments= {}        # int_addr -> comment_str
         self.block_comments={}        # int_addr -> [lines] before instruction
         self.custom_equates=[]        # extra EQU lines to prepend
+        self.footnotes    = {}        # int -> {inline, detail:[lines]}
+        self.patches      = {}        # int_addr -> [bytes_to_insert_before_addr]
+        self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
 
     @classmethod
     def from_json(cls, path):
@@ -272,6 +337,24 @@ class Project:
         # block_comments: "HHHH" -> ["line1","line2",...]
         p.block_comments = {int(k,16): v if isinstance(v,list) else [v]
                             for k,v in d.get('block_comments', {}).items()}
+        # forced_equs: {"HHHH": "comment"} — mid-instruction overlap addresses
+        p.forced_equs = {int(k, 16): v 
+                         for k, v in d.get('forced_equs', {}).items()}
+
+        # patches: {"HHHH": {"insert":["$xx",...], "comment":"..."}}
+        p.patches = {}
+        for k, v in d.get('patches', {}).items():
+            addr = int(k, 16)
+            bytes_list = [int(b.strip().lstrip('$'), 16) for b in v.get('insert', [])]
+            p.patches[addr] = {'bytes': bytes_list, 'comment': v.get('comment', '')}
+
+        # footnotes: {"1": {inline:"...", detail:["line1","line2"]}}
+        p.footnotes = {}
+        for k, v in d.get('footnotes', {}).items():
+            p.footnotes[int(k)] = {
+                'inline': v.get('inline', ''),
+                'detail': v.get('detail', []),
+            }
         return p
 
     def to_json(self, path):
@@ -295,6 +378,7 @@ class Project:
                                for k,v in sorted(self.line_comments.items())},
             'block_comments': {f'{k:04X}': v
                                for k,v in sorted(self.block_comments.items())},
+            'footnotes':     {str(k): v for k,v in sorted(p.footnotes.items()) if hasattr(p,'footnotes')},
         }
         with open(path, 'w') as f:
             json.dump(d, f, indent=2)
@@ -335,6 +419,7 @@ class Engine:
         self.regions  = {}        # addr -> KIND_CODE | KIND_DATA
         self.xrefs    = {}        # data_addr -> [code_addrs that LEA to it]
         self._output  = []        # rendered lines
+        self.insn_spans = {}      # addr -> end_addr for each decoded instruction
 
     def load(self, data: bytes):
         self.data = bytearray(data)
@@ -423,6 +508,7 @@ class Engine:
             pos = start
             while pos < crc_off and pos not in visited:
                 visited.add(pos)
+                insn_start = pos
                 try:
                     op = d[pos]; pos += 1
                 except IndexError:
@@ -527,6 +613,9 @@ class Engine:
                     0xFE,0xFF,0x70,0x73,0x74,0x76,0x77,0x78,0x79,0x7A,
                     0x7C,0x7D,0x7E,0x7F): pos += 2
                 # single-byte ops: nothing to advance
+
+                # Record instruction span: insn_start -> pos
+                self.insn_spans[insn_start] = pos
 
                 if stop: break
 
@@ -1058,9 +1147,18 @@ class Engine:
         i    = start
         last_printable = False
 
+        patches = self.project.patches if hasattr(self.project, 'patches') else {}
+
         while i < end:
             if i > start and i in lbs:
                 out.append(""); out.append(f"{lbs[i]}")
+
+            # Apply any patch insertions before this address
+            if i in patches:
+                patch = patches[i]
+                cmt = f"  ; {patch['comment']}" if patch.get('comment') else ''
+                args = ','.join(f"${b:02X}" for b in patch['bytes'])
+                out.append(f"         FCB    {args}{cmt}")
 
             b = d[i]
 
@@ -1109,7 +1207,8 @@ class Engine:
                         g = min(6, run-k)
                         out.append(f"         FCB    {','.join([nm]*g)}  ; {nm}×{g}")
                 else:
-                    out.append(f"         FCB    ${b:02X}               ; {desc}")
+                    for _ in range(run):
+                        out.append(f"         FCB    ${b:02X}               ; {desc}")
                 i = j; last_printable = False; continue
 
             # Printable run → FCC (minimum 2 chars; single printable → FCB)
@@ -1165,12 +1264,49 @@ class Engine:
         mod_size = hdr['mod_size']
         name     = hdr['mod_name']
         out      = []
+        footnote_used   = {}   # addr -> footnote_number
+        footnote_detail = {}   # footnote_number -> [detail lines]
+
+        # ── Pre-scan: also register containing-instruction labels for forced_equs
+        for addr in proj.forced_equs:
+            if addr >= exec_off and addr < crc_off:
+                for istart, iend in sorted(self.insn_spans.items()):
+                    if istart < addr <= iend:
+                        if not lbs.get(istart):
+                            lbs[istart] = f"Insn_{istart:04X}"
+                        break
+
+        # ── Pre-scan: find ??? bytes that are branch targets and register
+        # containing-instruction labels BEFORE render walks forward ──────
+        for addr, lbl in list(lbs.items()):
+            if addr >= exec_off and addr < crc_off:
+                byte_at = d[addr]
+                # Check if this address decodes as ??? (undefined opcode)
+                try:
+                    mn_test, _, _, _, _ = self.decode_one(addr)
+                except Exception:
+                    mn_test = '???'
+                if mn_test == '???':
+                    # Find containing instruction
+                    for istart, iend in sorted(self.insn_spans.items()):
+                        if istart < addr <= iend:
+                            if not lbs.get(istart):
+                                cont_lbl = f"Insn_{istart:04X}"
+                                lbs[istart] = cont_lbl
+                            break
 
         # ── File header ───────────────────────────────────────────────
         out.append(EQUATES_BLOCK)
         if proj.custom_equates:
             out.append("; ── Project-specific equates ──")
             out.extend(proj.custom_equates)
+            out.append("")
+
+        if proj.bss:
+            out.append("; ── BSS Variable Equates ─────────────────────────────────────")
+            for off in sorted(proj.bss.keys()):
+                name_str = proj.bss[off]
+                out.append(f"{name_str:<14}EQU    {off:<9}; BSS offset ${off:04X}")
             out.append("")
 
         out += [
@@ -1236,6 +1372,13 @@ class Engine:
                 first_lbl_addr = pre_sub[0][0]
                 if first_lbl_addr > pre_data_start:
                     out.extend(self.emit_data(pre_data_start, first_lbl_addr, {}))
+                # Build pre-exec format override map from data_regions
+                pre_fmt_map = {}  # addr -> fmt string for sub-regions
+                for r in proj.data_regions:
+                    if r['start'] < exec_off:
+                        pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
+                                                    r.get('comment',''))
+
                 # Emit each labeled block with its xref comment
                 for pi, (paddr, plbl) in enumerate(pre_sub):
                     pend = pre_sub[pi+1][0] if pi+1 < len(pre_sub) else exec_off
@@ -1249,7 +1392,26 @@ class Engine:
                             caller_strs.append(cl)
                         out.append(f"; Referenced by: {', '.join(caller_strs)}")
                     sub = {k:v for k,v in dict(pre_sub).items() if paddr < k < pend}
-                    out.extend(self.emit_data(paddr, pend, sub))
+                    # Check if any sub-region within this span has a format override
+                    cur = paddr
+                    while cur < pend:
+                        if cur in pre_fmt_map:
+                            rend, rfmt, rcmt = pre_fmt_map[cur]
+                            rend = min(rend, pend)
+                            if cur > paddr:
+                                out.extend(self.emit_data(paddr, cur, 
+                                    {k:v for k,v in sub.items() if paddr <= k < cur}))
+                            if rcmt:
+                                out.append(f"; {rcmt}")
+                            out.extend(self.emit_data(cur, rend,
+                                {k:v for k,v in sub.items() if cur <= k < rend}, rfmt))
+                            cur = rend
+                            paddr = cur  # update start for remainder
+                        else:
+                            cur += 1
+                    if paddr < pend:
+                        out.extend(self.emit_data(paddr, pend,
+                            {k:v for k,v in sub.items() if paddr <= k < pend}))
             out.append("")
 
         # ── Code section: span-based walk ────────────────────────────
@@ -1326,6 +1488,47 @@ class Engine:
                 for bcline in proj.block_comments.get(pos, []):
                     out.append(f"; {bcline}")
 
+                # Check if this address is a forced EQU (mid-instruction overlap)
+                if pos in proj.forced_equs:
+                    equ_comment = proj.forced_equs[pos]
+                    byte_val = d[pos]
+                    hx_forced = f"{byte_val:02X}"
+                    # Find containing instruction
+                    cont_lbl_f = None
+                    offset_f = 0
+                    for istart, iend in sorted(self.insn_spans.items()):
+                        if istart < pos <= iend:
+                            cont_lbl_f = lbs.get(istart, f"Insn_{istart:04X}")
+                            offset_f = pos - istart
+                            break
+                    lbl_here_f = lbs.get(pos, '')
+                    ls_f = f"{lbl_here_f}:" if lbl_here_f else ''
+                    # Use direct address constant -- avoids lwasm forward-reference
+                    # issues with label+N arithmetic (e.g. Insn_0B8C+1 can cause
+                    # lwasm to emit an extra byte in the full build).
+                    equ_expr_f = f"${pos:04X}"
+                    if cont_lbl_f:
+                        equ_comment_full = f"{cont_lbl_f}+{offset_f} -- {equ_comment}"
+                    else:
+                        equ_comment_full = equ_comment
+                    out.append(f"${pos:04X}  {hx_forced:<18s}  {ls_f:<14s}"
+                               f" EQU    {equ_expr_f:<16s}"
+                               f" ; mid-instruction overlap: {equ_comment_full}")
+                    # Advance pos to end of containing instruction.
+                    # The containing instruction already emits all its bytes --
+                    # we just skip past them to avoid double-decoding.
+                    if cont_lbl_f:
+                        cont_start_f = next((s for s,e2 in self.insn_spans.items() 
+                                            if s < pos and e2 > pos), None)
+                        if cont_start_f is not None:
+                            pos = self.insn_spans[cont_start_f]
+                        else:
+                            pos += 1
+                    else:
+                        pos += 1
+                    prev_ret = False
+                    continue
+
                 try:
                     mn, op_str, cm, raw, pos2 = self.decode_one(pos)
                 except (IndexError, Exception) as e:
@@ -1342,6 +1545,92 @@ class Engine:
                 ins = f"{mn} {op_str}".strip()
                 cmt = f" ; {cm}" if cm else ''
                 out.append(f"${pos:04X}  {hx:<18s}  {ls:<14s} {ins:<22s}{cmt}")
+
+                # ── Undefined/illegal opcode: EQU offset from containing instruction ──
+                # The byte falls inside the operand of the preceding instruction.
+                # We emit an EQU pointing into that instruction using label+offset,
+                # so branches to this address assemble with the correct target
+                # and NO extra byte is generated. Binary will match original.
+                if mn == '???':
+                    byte_val = raw[0]
+
+                    # Only apply EQU treatment if this byte is a branch target (has a label)
+                    if not lbl_here:
+                        # Not a branch target -- just emit as FCB with warning comment
+                        out[-1] = (f"${pos:04X}  {hx:<18s}  {ls:<14s}"
+                                   f" FCB    ${byte_val:02X}               "
+                                   f" ; undefined opcode ${byte_val:02X} -- not a valid 6809 instruction")
+                        pos = pos2
+                        continue
+
+                    # Auto-assign footnote number
+                    used_nums = set(footnote_used.values())
+                    next_num = 1
+                    while next_num in used_nums:
+                        next_num += 1
+                    footnote_used[pos] = next_num
+                    fn_num = next_num
+
+                    # Find the containing instruction by scanning insn_spans backwards
+                    containing_start = None
+                    containing_end   = None
+                    for istart, iend in sorted(self.insn_spans.items()):
+                        if istart < pos <= iend:
+                            containing_start = istart
+                            containing_end   = iend
+                            # do not break — take the last match
+                    
+                    if containing_start is not None:
+                        offset_into = pos - containing_start
+                        # Get or create a label for the containing instruction
+                        cont_lbl = lbs.get(containing_start)
+                        if not cont_lbl:
+                            # Generate a label for the containing instruction
+                            cont_lbl = f"Insn_{containing_start:04X}"
+                            lbs[containing_start] = cont_lbl
+                        # Use direct address -- avoids lwasm label+N arithmetic issues
+                        equ_expr = f"${pos:04X}"
+                        equ_expr_full = f"{cont_lbl}+{offset_into}"
+                        inline_txt = (f"branch target {offset_into} byte(s) inside "
+                                      f"{cont_lbl} -- see [*{fn_num}]")
+                        # Replace the rendered instruction line with EQU form
+                        out[-1] = (f"${pos:04X}  {hx:<18s}  {ls:<14s}"
+                                   f" EQU    {equ_expr:<16s}"
+                                   f" ; [*{fn_num}] {inline_txt}")
+                        equ_label = lbl_here  # e.g. Sub_0C57
+                        detail_extra = [
+                            f"The EQU expression '{equ_label} EQU {equ_expr_full}' resolves",
+                            f"to ${pos:04X} at assembly time. Branches to {equ_label}",
+                            f"will target the correct address and the assembled binary",
+                            f"WILL match the original at those branch sites.",
+                        ]
+                    else:
+                        # Fallback: no containing instruction found
+                        equ_expr = f"${pos:04X}"
+                        inline_txt = f"undefined opcode at ${pos:04X} — see [*{fn_num}]"
+                        out[-1] = (f"${pos:04X}  {hx:<18s}  {ls:<14s}"
+                                   f" EQU    {equ_expr:<16s}"
+                                   f" ; [*{fn_num}] {inline_txt}")
+                        detail_extra = []
+
+                    # Build footnote detail
+                    proj_fn = proj.footnotes.get(fn_num, {})
+                    detail = proj_fn.get('detail', [
+                        f"${pos:04X} is referenced as a branch target but falls",
+                        f"inside the operand of a preceding instruction ({cont_lbl if containing_start else 'unknown'}).",
+                        f"Byte ${byte_val:02X} at ${pos:04X} is not a valid 6809 opcode.",
+                        f"",
+                        f"On 6809 / 6309-emulation mode: ${byte_val:02X} is a harmless undefined",
+                        f"opcode — execution falls through to the next instruction.",
+                        f"On 6309 native mode: ${byte_val:02X} may be interpreted as a 6309",
+                        f"instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.",
+                        f"",
+                    ] + detail_extra + [
+                        f"",
+                        f"Probable cause: the branch target address is off by one byte",
+                        f"(a bug in the original code, or a deliberate overlapping-code trick).",
+                    ])
+                    footnote_detail[fn_num] = detail
 
                 is_ret = (mn in ('RTS','RTI','LBRA','BRA') or
                           (mn=='PULS' and 'PC' in op_str) or
@@ -1366,6 +1655,17 @@ class Engine:
             "ModEnd",
             "ModSize  EQU    ModEnd-$0000",
         ]
+
+        # ── Analyst footnotes ──────────────────────────────────────────────
+        if footnote_detail:
+            out += ["", f"; {'═'*62}", "; ANALYST NOTES", f"; {'═'*62}"]
+            for fn_num in sorted(footnote_detail.keys()):
+                out.append("")
+                out.append(f"; [*{fn_num}] UNRESOLVABLE DISASSEMBLY CONDITION")
+                out.append(f"; {'─'*62}")
+                for line in footnote_detail[fn_num]:
+                    out.append(f";      {line}" if line else ";")
+            out += ["", f"; {'═'*62}"]
 
         return '\n'.join(out)
 

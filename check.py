@@ -1,0 +1,5 @@
+a=open('sc22_assembled.bin','rb').read()
+b=open('supercomm22','rb').read()
+print('Sizes:', len(a), len(b))
+print('Assembled 0x9FC-0xA06:', a[0x9FC:0xA06].hex())
+print('Original  0x9FC-0xA06:', b[0x9FC:0xA06].hex())

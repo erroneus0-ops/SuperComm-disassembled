@@ -122,7 +122,7 @@ def main():
     asm = eng.render()
 
     out_path = proj.output or (proj.binary + '.asm')
-    with open(out_path, 'w') as f:
+    with open(out_path, 'w', encoding='utf-8') as f:
         f.write(asm)
     print(f"Written: {out_path}  ({len(asm.splitlines())} lines)", file=sys.stderr)
 

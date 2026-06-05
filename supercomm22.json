@@ -1,6 +1,6 @@
 {
-  "binary": "/home/claude/supercomm22",
-  "output": "/home/claude/supercomm22_proj.asm",
+  "binary": "supercomm22",
+  "output": "supercomm22_proj.asm",
   "module_notes": [
     "SuperComm v2.2 \u2014 OS-9 Level II terminal / communications program",
     "Author: Dave Philipsen  Copyright (c) 1988, 1989",
@@ -50,7 +50,9 @@
     "0A71": "Init",
     "3C0F": "CrcTable",
     "1B03": "WriteBlock",
-    "1B05": "WriteBlockPath"
+    "1B05": "WriteBlockPath",
+    "0000": "ModHeader",
+    "000D": "ModName"
   },
   "data_regions": [
     {
@@ -59,6 +61,27 @@
       "label": "CrcTable",
       "comment": "CRC-16/CCITT lookup table \u2014 256 entries x 2 bytes = 512 bytes\nUsed by file transfer protocol routines for fast CRC calculation.\nDave Philipsen added this in v2.2; v2.1 used OS9 F$CRC syscall instead.\nTable polynomial: $1021 (CRC-CCITT / CRC-16-IBM-SDLC)",
       "format": "fdb"
+    },
+    {
+      "start": "08E9",
+      "end": "08EB",
+      "label": "",
+      "comment": "& and quote chars \u2014 emitted as FCB to avoid FCC string embedding issues",
+      "format": "raw"
+    },
+    {
+      "start": "0F18",
+      "end": "0F1F",
+      "label": "Dat_0F18",
+      "comment": "7-byte data block referenced by LEAX at $0B26 \u2014 appears after OS9 F$Exit",
+      "format": "raw"
+    },
+    {
+      "start": "1750",
+      "end": "175C",
+      "label": "Dat_1750",
+      "comment": "12-byte orphaned string copy loop (unreferenced from branch analysis)",
+      "format": "raw"
     }
   ],
   "block_comments": {
@@ -86,5 +109,18 @@
     ]
   },
   "line_comments": {},
-  "custom_equates": []
+  "custom_equates": [],
+  "patches": {
+    "03A6": {
+      "insert": [
+        "$02"
+      ],
+      "comment": "second CurXY byte in Dat_03A4 (two consecutive $02 bytes)"
+    }
+  },
+  "forced_equs": {
+    "0B8D": "mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C",
+    "364E": "mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D",
+    "19EC": "mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write"
+  }
 }
