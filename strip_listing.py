@@ -111,13 +111,29 @@ def process(infile, outfile):
             elif len(hex_bytes) >= 2:
                 key = (hex_bytes[0], hex_bytes[1])
                 # Post-byte $8D anywhere (not first byte) = PCR relative
-                has_pcr_postbyte = (len(hex_bytes) >= 2 and 
+                # Exclude: short branches, PSHS/PULS/PSHU/PULU (post-byte is register mask)
+                # Also exclude if ,PC or ,PCR already in operand
+                already_pcr = ',PCR' in rest or ',PC' in rest
+                is_stack_op = hex_bytes[0] in (0x34, 0x35, 0x36, 0x37)
+                # Only indexed-capable opcodes have a post-byte as byte 2
+                # Direct-page ops ($90-$9F, $D0-$DF) use byte 2 as address, not post-byte
+                is_indexed_capable = hex_bytes[0] in (
+                    0x30,0x31,0x32,0x33,          # LEA ops
+                    0x60,0x63,0x64,0x66,0x67,0x68,0x69,0x6A,0x6C,0x6D,0x6E,0x6F,  # indexed unary
+                    0xA0,0xA1,0xA2,0xA3,0xA4,0xA5,0xA6,0xA7,  # indexed ALU
+                    0xA8,0xA9,0xAA,0xAB,0xAC,0xAD,0xAE,0xAF,
+                    0xE0,0xE1,0xE2,0xE3,0xE4,0xE5,0xE6,0xE7,
+                    0xE8,0xE9,0xEA,0xEB,0xEC,0xED,0xEE,0xEF,
+                )
+                has_pcr_postbyte = (len(hex_bytes) >= 2 and
                                     hex_bytes[0] not in (0x20,0x21,0x22,0x23,0x24,0x25,
                                                          0x26,0x27,0x28,0x29,0x2a,0x2b,
                                                          0x2c,0x2d,0x2e,0x2f,0x8D) and
                                     hex_bytes[1] == 0x8D and
-                                    ',PCR' not in rest)
-                if key in PCR_LEAS:
+                                    not already_pcr and
+                                    not is_stack_op and
+                                    is_indexed_capable)
+                if key in PCR_LEAS and not already_pcr:
                     mne = PCR_LEAS[key]
                     rest = re.sub(
                         rf"({mne}\s+)(\S+?)(\s|$)",

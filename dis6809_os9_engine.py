@@ -420,6 +420,7 @@ class Engine:
         self.xrefs    = {}        # data_addr -> [code_addrs that LEA to it]
         self._output  = []        # rendered lines
         self.insn_spans = {}      # addr -> end_addr for each decoded instruction
+        self.found_6309 = False   # set True if any 6309-specific instruction found
 
     def load(self, data: bytes):
         self.data = bytearray(data)
@@ -475,6 +476,10 @@ class Engine:
         elif md in (0x08,0x18): return pos+1, None
         elif md in (0x09,0x19): return pos+2, None
         elif md == 0x1F:        return pos+2, None
+        # 6309 extended indirect modes
+        elif md == 0x0E:        return pos+1, None  # [n8,PC] indirect
+        elif md == 0x0F:        return pos+2, None  # [n16,PC] indirect
+        elif md == 0x1E:        return pos+2, None  # [addr] extended indirect
         else:                   return pos, None
 
     def pass1(self):
@@ -564,7 +569,35 @@ class Engine:
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
                         t = pos + off; add(t, KIND_CODE); worklist.append(t)
                         if op2 == 0x16: stop = True
+                    elif op2 == 0x16:  # 6309 LBRA
+                        off = s16((d[pos]<<8)|d[pos+1]); pos += 2
+                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
+                    elif op2 == 0x17:  # 6309 LBSR
+                        off = s16((d[pos]<<8)|d[pos+1]); pos += 2
+                        t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    elif op2 == 0x20:  # 6309 LBRA variant
+                        off = s16((d[pos]<<8)|d[pos+1]); pos += 2
+                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
                     elif op2 == 0x3F:   pos += 1
+                    # 6309 register-register (1 post-byte)
+                    elif op2 in (0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x3D,0x3E,0x3F): pos += 1
+                    # 6309 PSHSW/PULSW/PSHUW/PULUW (no operand)
+                    elif op2 in (0x38,0x39,0x3A,0x3B): pass
+                    # 6309 inherent D/W ops (no operand)
+                    elif op2 in (0x43,0x44,0x46,0x47,0x48,0x49,0x4A,0x4C,0x4D,0x4F,
+                                 0x53,0x54,0x56,0x59,0x5A,0x5C,0x5D,0x5F): pass
+                    # 6309 W immediate (2 bytes)
+                    elif op2 in (0x80,0x81,0x86,0xCC): pos+=2
+                    # 6309 W direct (1 byte)
+                    elif op2 in (0x90,0x91,0x97,0xC6,0xD6,0xD7): pos+=1
+                    # 6309 W indexed
+                    elif op2 in (0xA6,0xA7,0xA9):
+                        pos, t = self._decode_indexed_pb(pos)
+                        if t is not None: add(t, KIND_DATA)
+                    # 6309 W extended (2 bytes)
+                    elif op2 in (0xB6,0xB7,0xBF,0xF6,0xF7,0xFD): pos+=2
+                    # 6309 LDQ immediate (4 bytes)
+                    elif op2 == 0xCC: pos+=4
                     elif op2 in (0x83,0x8C,0x8E,0xCE,0xB3,0xBC,0xFE,0xFF): pos+=2
                     elif op2 in (0x93,0x9C,0x9E,0x9F): pos += 1
                     elif op2 in (0xAE,0xAF,0xA3,0xAC):
@@ -580,6 +613,8 @@ class Engine:
                     elif op2 in (0xA3,0xAC):
                         pos, t = self._decode_indexed_pb(pos)
                         if t is not None: add(t, KIND_DATA)
+                    # 6309 page 2 ops
+                    elif op2 in (0x38,0x39): pos += 1  # BITMD/LDMD #imm
 
                 # ── indexed ───────────────────────────────────────────
                 elif op in (
@@ -749,20 +784,34 @@ class Engine:
                 if bn: return f"{bn},U", pos
             return w(f"{off},{rn}"), pos
         elif md == 0x0B: return w(f"D,{rn}"), pos
-        elif md == 0x0C:
+        elif md == 0x0C or md == 0x1C:  # 8-bit PCR (direct or indirect)
             off = s8(d[pos]); pos += 1; tgt = pos+off
             lb = self.labels.get(tgt,'')
-            return w(lb if lb else f"{off:+d},PC"), pos
-        elif md == 0x0D:
+            return w(f"{lb},PC" if lb else f"{off:+d},PC"), pos
+        elif md == 0x0D or md == 0x1D:  # 16-bit PCR (direct or indirect)
             off = s16((d[pos]<<8)|d[pos+1]); pos += 2; tgt = pos+off
             lb = self.labels.get(tgt,'')
-            return w(lb if lb else f"{off:+d},PC"), pos
+            return w(f"{lb},PC" if lb else f"{off:+d},PC"), pos
         elif md == 0x11: return w(f",{rn}++"), pos
         elif md == 0x13: return w(f",--{rn}"), pos
         elif md == 0x14: return w(f",{rn}"),   pos
+        elif md == 0x15: return w(f"B,{rn}"),  pos   # 6309
+        elif md == 0x16: return w(f"A,{rn}"),  pos   # 6309
+        elif md == 0x17: return w(f"E,{rn}"),  pos   # 6309
         elif md == 0x18: off=s8(d[pos]);  pos+=1; return w(f"{off},{rn}"), pos
         elif md == 0x19: off=s16((d[pos]<<8)|d[pos+1]); pos+=2; return w(f"{off},{rn}"), pos
+        elif md == 0x1A: return w(f"F,{rn}"),  pos   # 6309
+        elif md == 0x1B: return w(f"D,{rn}"),  pos   # 6309
+        elif md == 0x1D: return w(f"W,{rn}"),  pos   # 6309
         elif md == 0x1F: a=(d[pos]<<8)|d[pos+1]; pos+=2; return f"[${a:04X}]", pos
+        # 6309 PC-relative indirect modes
+        elif md == 0x0E or md == 0x1E:
+            off = s8(d[pos]); pos += 1; tgt = pos+off
+            lb = self.labels.get(tgt,'')
+            return f"[{lb},PC]" if lb else f"[{off:+d},PC]", pos
+        elif md == 0x0F or md == 0x1F:
+            a=(d[pos]<<8)|d[pos+1]; pos+=2
+            return f"[${a:04X}]", pos
         else: return f"?${pb:02X}", pos
 
     def _lea_pc(self, pos):
@@ -773,7 +822,8 @@ class Engine:
             pos += 1
             off = s16((d[pos]<<8)|d[pos+1]); pos += 2; tgt = pos+off
             lb = self.labels.get(tgt,'')
-            return (lb if lb else f'{off:+d},PC'), tgt, pos
+            # Always include ,PC so assembler knows to use PCR mode
+            return (f"{lb},PC" if lb else f'{off:+d},PC'), tgt, pos
         else:
             s2, pos = self._idx_full(pos)
             return s2, None, pos
@@ -792,16 +842,20 @@ class Engine:
             nonlocal pos; v=d[pos]; pos+=1; return v
         def rw():
             nonlocal pos; v=(d[pos]<<8)|d[pos+1]; pos+=2; return v
+        def rq():
+            nonlocal pos; v=(d[pos]<<24)|(d[pos+1]<<16)|(d[pos+2]<<8)|d[pos+3]; pos+=4; return v
         def rel8():
-            o=s8(rb()); t=pos+o; return lbs.get(t,f'${t:04X}'), t
+            o=s8(rb()); t=(pos+o)&0xFFFF; return lbs.get(t,f'${t:04X}'), t
         def rel16():
-            o=s16(rw()); t=pos+o; return lbs.get(t,f'${t:04X}'), t
+            o=s16(rw()); t=(pos+o)&0xFFFF; return lbs.get(t,f'${t:04X}'), t
         def idx():
             nonlocal pos; s2,pos=self._idx_full(pos); return s2
         def lea():
             nonlocal pos; s2,tgt,pos=self._lea_pc(pos); return s2, tgt
 
-        IREG16={0:'D',1:'X',2:'Y',3:'U',4:'S',5:'PC',8:'A',9:'B',10:'CC',11:'DP'}
+        IREG16={0:'D',1:'X',2:'Y',3:'U',4:'S',5:'PC',
+                6:'W',7:'V',8:'A',9:'B',10:'CC',11:'DP',
+                14:'E',15:'F'}  # 6309 extensions: W,V,E,F
 
         op = rb()
 
@@ -809,7 +863,8 @@ class Engine:
             op2=rb()
             LB={0x21:'LBRN',0x22:'LBHI',0x23:'LBLS',0x24:'LBCC',0x25:'LBCS',
                 0x26:'LBNE',0x27:'LBEQ',0x28:'LBVC',0x29:'LBVS',0x2A:'LBPL',
-                0x2B:'LBMI',0x2C:'LBGE',0x2D:'LBLT',0x2E:'LBGT',0x2F:'LBLE'}
+                0x2B:'LBMI',0x2C:'LBGE',0x2D:'LBLT',0x2E:'LBGT',0x2F:'LBLE',
+                0x16:'LBRA',0x17:'LBSR',0x20:'LBRA'}  # 6309 page1 variants
             if op2 in LB: l,t=rel16(); mn=LB[op2]; op_str=l
             elif op2==0x3F:
                 sc=rb(); nm,conv=OS9_SYSCALLS.get(sc,(f'${sc:02X}',''))
@@ -832,7 +887,68 @@ class Engine:
             elif op2==0xFF: v=rw(); mn='STS'; op_str=f'${v:04X}'
             elif op2==0xB3: v=rw(); mn='CMPD'; op_str=f'${v:04X}'
             elif op2==0xBC: v=rw(); mn='CMPY'; op_str=f'${v:04X}'
-            else: mn=f'10{op2:02X}?'
+            # ── 6309 page 1 ops ──────────────────────────────────────
+            # Register-register ops (1 post-byte)
+            elif op2 in (0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F):
+                names6309 = {0x30:'ADDR',0x31:'ADCR',0x32:'SUBR',0x33:'SBCR',
+                             0x34:'ANDR',0x35:'ORR',0x36:'EORR',0x37:'CMPR',
+                             0x38:'PSHSW',0x39:'PULSW',0x3A:'PSHUW',0x3B:'PULUW',
+                             0x3D:'MULD',0x3E:'DIVD',0x3F:'DIVQ'}
+                if op2 in (0x38,0x39,0x3A,0x3B): mn=names6309[op2]; self.found_6309=True
+                elif op2 in (0x3D,0x3E,0x3F): mn=names6309[op2]; self.found_6309=True
+                else:
+                    pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
+                    mn=names6309.get(op2,f'10{op2:02X}?'); op_str=f'{s2},{d2}'
+                    self.found_6309=True
+            # Inherent D/W register ops
+            elif op2==0x43: mn='COMD'; self.found_6309=True
+            elif op2==0x44: mn='LSRD'; self.found_6309=True
+            elif op2==0x46: mn='RORD'; self.found_6309=True
+            elif op2==0x47: mn='ASRD'; self.found_6309=True
+            elif op2==0x48: mn='ASLD'; self.found_6309=True
+            elif op2==0x49: mn='ROLD'; self.found_6309=True
+            elif op2==0x4A: mn='DECD'; self.found_6309=True
+            elif op2==0x4C: mn='INCD'; self.found_6309=True
+            elif op2==0x4D: mn='TSTD'; self.found_6309=True
+            elif op2==0x4F: mn='CLRD'; self.found_6309=True
+            elif op2==0x53: mn='COMW'; self.found_6309=True
+            elif op2==0x54: mn='LSRW'; self.found_6309=True
+            elif op2==0x56: mn='RORW'; self.found_6309=True
+            elif op2==0x59: mn='ROLW'; self.found_6309=True
+            elif op2==0x5A: mn='DECW'; self.found_6309=True
+            elif op2==0x5C: mn='INCW'; self.found_6309=True
+            elif op2==0x5D: mn='TSTW'; self.found_6309=True
+            elif op2==0x5F: mn='CLRW'; self.found_6309=True
+            # W register memory ops
+            elif op2==0x80: v=rw(); mn='SUBW'; op_str=f'#${v:04X}'; self.found_6309=True
+            elif op2==0x81: v=rw(); mn='CMPW'; op_str=f'#${v:04X}'; self.found_6309=True
+            elif op2==0x86: v=rw(); mn='LDW';  op_str=f'#${v:04X}'; self.found_6309=True
+            elif op2==0x90: v=rb(); mn='SUBW'; op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0x91: v=rb(); mn='CMPW'; op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0x97: v=rb(); mn='STW';  op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0xA6: op_str=idx(); mn='LDW'; self.found_6309=True
+            elif op2==0xA7: op_str=idx(); mn='STW'; self.found_6309=True
+            elif op2==0xA9: op_str=idx(); mn='ADCW'; self.found_6309=True
+            elif op2==0xB6: v=rw(); mn='LDW'; op_str=f'${v:04X}'; self.found_6309=True
+            elif op2==0xB7: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
+            elif op2==0xBF: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
+            elif op2==0xC6: v=rb(); mn='LDW'; op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0xCC: v=rq(); mn='LDQ'; op_str=f'#${v:08X}'; self.found_6309=True
+            elif op2==0xD6: v=rb(); mn='LDW'; op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0xD7: v=rb(); mn='STW'; op_str=f'<${v:02X}'; self.found_6309=True
+            elif op2==0xF6: v=rw(); mn='LDW'; op_str=f'${v:04X}'; self.found_6309=True
+            elif op2==0xF7: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
+            elif op2==0xFD: v=rw(); mn='STQ'; op_str=f'${v:04X}'; self.found_6309=True
+            # TFM -- block transfer (4 variants, 1 post-byte)
+            elif op2 in (0x38,0x39,0x3A,0x3B):
+                tfm_modes = {0x38:'TFM r+,r+',0x39:'TFM r-,r-',0x3A:'TFM r+,r',0x3B:'TFM r,r+'}
+                pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
+                mn=tfm_modes.get(op2,'TFM'); op_str=f'{s2},{d2}'; self.found_6309=True
+            # page 1 LBRA variant
+            elif op2==0x16: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
+            elif op2==0x17: l,t=rel16(); mn='LBSR'; op_str=l
+            elif op2==0x20: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
+            else: mn=f'FCB'; op_str=f'$10,${op2:02X}'; cm=f'unknown opcode $10{op2:02X}'
         elif op==0x11:
             op2=rb()
             if op2==0x3F:
@@ -846,7 +962,11 @@ class Engine:
             elif op2==0xAC: op_str=idx(); mn='CMPS'
             elif op2==0xB3: v=rw(); mn='CMPU'; op_str=f'${v:04X}'
             elif op2==0xBC: v=rw(); mn='CMPS'; op_str=f'${v:04X}'
-            else: mn=f'11{op2:02X}?'
+            # 6309 page 2 ops
+            elif op2==0x38: v=rb(); mn='BITMD'; op_str=f'#${v:02X}'; cm='6309: test MD register bits'; self.found_6309=True
+            elif op2==0x39: v=rb(); mn='LDMD';  op_str=f'#${v:02X}'; cm='6309: load MD register'; self.found_6309=True
+            else:
+                mn='FCB'; op_str=f'$11,${op2:02X}'; cm=f'unknown opcode $11{op2:02X}'
         elif op==0x12: mn='NOP'
         elif op==0x13: mn='SYNC'; cm='wait for interrupt'
         elif op==0x16: l,t=rel16(); mn='LBRA'; op_str=l
@@ -859,10 +979,18 @@ class Engine:
         elif op==0x1D: mn='SEX'; cm='sign-extend B into A'
         elif op==0x1E:
             pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-            mn='EXG'; op_str=f'{s2},{d2}'
+            if '?' in (s2, d2):
+                mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'EXG with unknown register code ${pb:02X}'
+            else:
+                mn='EXG'; op_str=f'{s2},{d2}'
+                if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
         elif op==0x1F:
             pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-            mn='TFR'; op_str=f'{s2},{d2}'
+            if '?' in (s2, d2):
+                mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'TFR with unknown register code ${pb:02X}'
+            else:
+                mn='TFR'; op_str=f'{s2},{d2}'
+                if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
         elif op==0x20: l,t=rel8(); mn='BRA'; op_str=l
         elif op==0x21: l,t=rel8(); mn='BRN'; op_str=l
         elif op==0x22: l,t=rel8(); mn='BHI'; op_str=l
@@ -901,7 +1029,7 @@ class Engine:
         elif op==0x3B: mn='RTI'; cm='return from interrupt'
         elif op==0x3C: v=rb(); mn='CWAI'; op_str=f'#${v:02X}'
         elif op==0x3D: mn='MUL'; cm='D = A×B unsigned'
-        elif op==0x3F: v=rb(); mn='SWI'; op_str=f'${v:02X}'
+        elif op==0x3F: mn='SWI'
         elif op==0x40: mn='NEGA'
         elif op==0x43: mn='COMA'
         elif op==0x44: mn='LSRA'
@@ -1348,6 +1476,14 @@ class Engine:
             out.append(";")
             for note in proj.module_notes:
                 out.append(f"; {note}")
+        if self.found_6309:
+            out += [
+                ";",
+                "; ── PROCESSOR: Motorola 6309 required ──────────────────────────",
+                "; This module uses 6309-specific instructions and registers.",
+                "; It will NOT run on a stock CoCo 3 with a 6809 processor.",
+                "; ────────────────────────────────────────────────────────────────",
+            ]
         out += [
             f"; {'='*62}",
             "",
@@ -1560,6 +1696,8 @@ class Engine:
             if in_data_region:
                 prev_ret = False
                 continue
+
+            # (auto-detect of mid-instruction labels removed - handled by forced_equs)
 
             pos = span_start
             first = True

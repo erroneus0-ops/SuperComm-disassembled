@@ -31,6 +31,7 @@ INHERENT = {
     'NOP':0x12, 'ROLA':0x49, 'ROLB':0x59, 'RORA':0x46, 'RORB':0x56,
     'RTI':0x3B, 'RTS':0x39, 'SEX':0x1D, 'SWI':0x3F,
     'TSTA':0x4D, 'TSTB':0x5D,
+    'SYNC':0x13,
 }
 
 # SWI2 (OS-9 system calls) and SWI3
@@ -64,6 +65,8 @@ REG_PAIR = {'TFR':0x1F, 'EXG':0x1E}
 REG_NUM = {
     'D':0,'X':1,'Y':2,'U':3,'S':4,'PC':5,
     'A':8,'B':9,'CC':10,'DP':11,
+    # 6309 extensions
+    'W':6,'V':7,'E':14,'F':15,
 }
 
 # PSHS/PULS/PSHU/PULU
@@ -150,6 +153,12 @@ JSR_OPS = {'JSR': (0x9D, 0xAD, 0xBD)}
 # ANDCC / ORCC
 CCOPS = {'ANDCC': 0x1C, 'ORCC': 0x1A, 'CWAI': 0x3C}
 
+# 6309 specific opcodes (page 2, $11 prefix)
+PAGE2_6309 = {
+    'BITMD': (0x11, 0x38),
+    'LDMD':  (0x11, 0x39),
+}
+
 # OS-9 system call table
 OS9_CALLS = {
     # F$ calls
@@ -223,7 +232,7 @@ def encode_indexed(operand: str, pc: int, symbols: dict, pass2: bool):
     if op in (',U', '0,U'): return ([0xC4|ib], [])
     if op in (',S', '0,S'): return ([0xE4|ib], [])
 
-    # Accumulator offset
+    # Accumulator offset (6809)
     if op == 'A,X': return ([0x86|ib], [])
     if op == 'B,X': return ([0x85|ib], [])
     if op == 'D,X': return ([0x8B|ib], [])
@@ -236,9 +245,22 @@ def encode_indexed(operand: str, pc: int, symbols: dict, pass2: bool):
     if op == 'A,S': return ([0xE6|ib], [])
     if op == 'B,S': return ([0xE5|ib], [])
     if op == 'D,S': return ([0xEB|ib], [])
+    # 6309 accumulator offsets (E, F, W)
+    if op == 'E,X': return ([0x87|ib], [])
+    if op == 'F,X': return ([0x8A|ib], [])
+    if op == 'W,X': return ([0x8E|ib], [])  # note: W,X is 8E not 8F
+    if op == 'E,Y': return ([0xA7|ib], [])
+    if op == 'F,Y': return ([0xAA|ib], [])
+    if op == 'W,Y': return ([0xAE|ib], [])
+    if op == 'E,U': return ([0xC7|ib], [])
+    if op == 'F,U': return ([0xCA|ib], [])
+    if op == 'W,U': return ([0xCE|ib], [])
+    if op == 'E,S': return ([0xE7|ib], [])
+    if op == 'F,S': return ([0xEA|ib], [])
+    if op == 'W,S': return ([0xEE|ib], [])  # W,S = $EE post-byte
 
-    # PCR-relative
-    pcr_m = re.match(r'^(.*),PCR$', op, re.IGNORECASE)
+    # PCR-relative: handles "label,PCR", "+N,PC", "-N,PC", "N,PC"
+    pcr_m = re.match(r'^(.*),PC[R]?$', op, re.IGNORECASE)
     if pcr_m:
         expr = pcr_m.group(1).strip()
         if expr == '':
@@ -489,9 +511,18 @@ def assemble_line(mne: str, operand: str, pc: int, symbols: dict,
 
     # ANDCC / ORCC / CWAI
     if mne in CCOPS:
-        val = resolve_expr(op, symbols, pass2, pc)
+        expr = op[1:] if op.startswith('#') else op
+        val = resolve_expr(expr, symbols, pass2, pc)
         if val is None: val = 0
         return bytes([CCOPS[mne], val & 0xFF])
+
+    # 6309 BITMD/LDMD
+    if mne in PAGE2_6309:
+        prefix, op2 = PAGE2_6309[mne]
+        expr = op[1:] if op.startswith('#') else op
+        val = resolve_expr(expr, symbols, pass2, pc)
+        if val is None: val = 0
+        return bytes([prefix, op2, val & 0xFF])
 
     # LEA ops
     if mne in LEA:
@@ -590,6 +621,8 @@ def _is_indexed(op: str) -> bool:
         r'^[\-]+,[XYUS]',
         r',[XYUS]$',
         r',PCR',
+        r',PC$',
+        r',PC[^R]',
         r'^[ABCD],[XYUS]$',
         r'^\[',
         r',[XYUS]$',
@@ -599,6 +632,9 @@ def _is_indexed(op: str) -> bool:
             return True
     # Numeric offset from register
     if re.match(r'^-?\d+,[XYUS]$', op, re.IGNORECASE):
+        return True
+    # 6309 accumulator offsets
+    if re.match(r'^[ABDEFW],[XYUS]$', op, re.IGNORECASE):
         return True
     return False
 
