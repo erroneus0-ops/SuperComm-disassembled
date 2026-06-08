@@ -156,7 +156,7 @@ BSS.FlowState EQU    3703     ; BSS offset $0E77
 BSS.IoBuf     EQU    6613     ; BSS offset $19D5
 
 ; ==============================================================
-; Disassembly:  supercomm22
+; Disassembly:  /mnt/user-data/uploads/supercomm22
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $45C5  (17861 bytes)
@@ -6663,7 +6663,7 @@ CrcTable
 Used by file transfer protocol routines for fast CRC calculation.
 Dave Philipsen added this in v2.2; v2.1 used OS9 F$CRC syscall instead.
 Table polynomial: $1021 (CRC-CCITT / CRC-16-IBM-SDLC)
-; ── 91 bytes  ($3C0F—$3C69) ──
+; ── 512 bytes  ($3C0F—$3E0E) ──
          FDB    $0000
          FDB    $1021
          FDB    $2042
@@ -6709,402 +6709,225 @@ Table polynomial: $1021 (CRC-CCITT / CRC-16-IBM-SDLC)
          FDB    $8528
          FDB    $9509
          FDB    $E5EE
-         FCS    "u"
-
-Dat_3C6A
-; ── 73 bytes  ($3C6A—$3CB2) ──
-         FCS    "O"
-         FCS    "E"
-         FCS    ","
-         FCS    "U"
-         FCB    $8D
-         FCC    "6S&r"
-         FCB    $16               ; SYN insert-line
-         FCB    $11               ; DC1/XON
-         FCB    $06               ; $06
-         FCC    "0v"
-         FCS    "W"
-         FCC    "f"
-         FCS    "v"
-         FCB    $56               ; 'V'
-         FCB    $95
-         FCC    "F"
-         FCS    "4"
-         FCS    "7"
-         FCC    "["
-         FCS    "'"
-         FCB    $7A               ; 'z'
-         FCB    $97
-         FCB    $19               ; EM home
-         FCB    $87
-         FCC    "8"
-         FCS    "w"
-         FCS    "_"
-         FCS    "g"
-         FCS    "~"
-         FCS    "W"
-         FCB    $9D
-         FCS    "G"
-         FCS    "<"
-         FCC    "H"
-         FCS    "D"
-         FCC    "X"
-         FCS    "e"
-         FCB    $68               ; 'h'
-         FCB    $86
-         FCC    "x"
-         FCS    "'"
-         FCB    $08               ; BS
-         FCB    $40               ; '@'
-         FCB    $18               ; CAN erase-BOL
-         FCC    "a("
-         FCB    CurXY,$38,$23     ; CurXY(row=24,col=3)
-         FCS    "I"
-         FCS    "L"
-         FCS    "Y"
-         FCS    "m"
-         FCS    "i"
-         FCB    $8E
-         FCS    "y"
-         FCS    "/"
-         FCB    $89
-         FCB    $48               ; 'H'
-         FCB    $99
-         FCC    "i"
-         FCS    ")"
-         FCB    $0A               ; LF
-         FCS    "9"
-         FCC    "+Z"
-         FCS    "u"
-         FCC    "J"
-         FCS    "T"
+         FDB    $F5CF
+         FDB    $C5AC
+         FDB    $D58D
+         FDB    $3653
+         FDB    $2672
+         FDB    $1611
+         FDB    $0630
+         FDB    $76D7
+         FDB    $66F6
+         FDB    $5695
+         FDB    $46B4
+         FDB    $B75B
+         FDB    $A77A
+         FDB    $9719
+         FDB    $8738
+         FDB    $F7DF
+         FDB    $E7FE
+         FDB    $D79D
+         FDB    $C7BC
+         FDB    $48C4
+         FDB    $58E5
+         FDB    $6886
+         FDB    $78A7
+         FDB    $0840
+         FDB    $1861
+         FDB    $2802
+         FDB    $3823
+         FDB    $C9CC
+         FDB    $D9ED
+         FDB    $E98E
+         FDB    $F9AF
+         FDB    $8948
+         FDB    $9969
+         FDB    $A90A
+         FDB    $B92B
+         FDB    $5AF5
+         FDB    $4AD4
 
 Dat_3CB3
-; ── 50 bytes  ($3CB3—$3CE4) ──
-         FCC    "z"
-         FCS    "7"
-         FCB    $6A               ; 'j'
-         FCB    $96
-         FCB    $1A               ; SUB clear+home
-         FCB    $71               ; 'q'
-         FCB    $0A               ; LF
-         FCC    "P:3*"
-         FCB    $12               ; $12
-         FCS    "["
-         FCS    "}"
-         FCS    "K"
-         FCS    "\"
-         FCS    "{"
-         FCS    "?"
-         FCS    "k"
-         FCB    $9E
-         FCB    $9B
-         FCB    $79               ; 'y'
-         FCB    $8B
-         FCC    "X"
-         FCS    ";"
-         FCC    ";"
-         FCS    "+"
-         FCB    $1A               ; SUB clear+home
-         FCC    "l"
-         FCS    "&"
-         FCB    $7C               ; '|'
-         FCB    $87
-         FCC    "L"
-         FCS    "d"
-         FCC    "\"
-         FCS    "E"
-         FCC    ","<"
-         FCB    $03               ; ETX
-         FCB    $0C               ; FF clear+home
-         FCB    $60               ; '`'
-         FCB    $1C               ; $1C
-         FCC    "A"
-         FCS    "m"
-         FCS    "."
-         FCS    "}"
-         FCB    $8F
-         FCS    "M"
-         FCS    "l"
+         FDB    $7AB7
+         FDB    $6A96
+         FDB    $1A71
+         FDB    $0A50
+         FDB    $3A33
+         FDB    $2A12
+         FDB    $DBFD
+         FDB    $CBDC
+         FDB    $FBBF
+         FDB    $EB9E
+         FDB    $9B79
+         FDB    $8B58
+         FDB    $BB3B
+         FDB    $AB1A
+         FDB    $6CA6
+         FDB    $7C87
+         FDB    $4CE4
+         FDB    $5CC5
+         FDB    $2C22
+         FDB    $3C03
+         FDB    $0C60
+         FDB    $1C41
+         FDB    $EDAE
+         FDB    $FD8F
+         FDB    $CDEC
 
 Dat_3CE5
-; ── 49 bytes  ($3CE5—$3D15) ──
-         FCS    "]"
-         FCS    "M"
-         FCS    "-"
-         FCC    "*"
-         FCS    "="
-         FCB    $0B               ; VT cursor-up
-         FCB    $8D
-         FCB    $68               ; 'h'
-         FCB    $9D
-         FCC    "I~"
-         FCB    $97
-         FCC    "n"
-         FCS    "6"
-         FCC    "^"
-         FCS    "U"
-         FCC    "N"
-         FCS    "t"
-         FCB    $3E               ; '>'
-         FCB    $13               ; DC3/XOFF
-         FCC    ".2"
-         FCB    $1E               ; $1E
-         FCB    $51               ; 'Q'
-         FCB    $0E               ; SO cursor-right
-         FCB    $70               ; 'p'
-         FCS    ""
-         FCB    $9F
-         FCS    "o"
-         FCS    ">"
-         FCS    "_"
-         FCS    "]"
-         FCS    "O"
-         FCS    "|"
-         FCS    "?"
-         FCB    $1B               ; ESC windowing cmd
-         FCS    "/"
-         FCB    $3A               ; ':'
-         FCB    $9F
-         FCB    $59               ; 'Y'
-         FCB    $8F
-         FCB    $78               ; 'x'
-         FCB    $91
-         FCB    $88
-         FCB    $81
-         FCS    ")"
-         FCS    "1"
-         FCS    "J"
-         FCS    "!"
-
-Dat_3D16
-; ── 27 bytes  ($3D16—$3D30) ──
-         FCS    "k"
-         FCS    "Q"
-         FCB    $0C               ; FF clear+home
-         FCS    "A"
-         FCC    "-"
-         FCS    "q"
-         FCC    "N"
-         FCS    "a"
-         FCB    $6F               ; 'o'
-         FCB    $10               ; $10
-         FCB    $80
-         FCB    $00               ; NUL
-         FCS    "!"
-         FCC    "0"
-         FCS    "B"
-         FCC    " "
-         FCS    "c"
-         FCB    $50               ; 'P'
-         FCB    $04               ; EOT
-         FCC    "@%pF`g"
-         FCB    $83
-         FCS    "9"
+         FDB    $DDCD
+         FDB    $AD2A
+         FDB    $BD0B
+         FDB    $8D68
+         FDB    $9D49
+         FDB    $7E97
+         FDB    $6EB6
+         FDB    $5ED5
+         FDB    $4EF4
+         FDB    $3E13
+         FDB    $2E32
+         FDB    $1E51
+         FDB    $0E70
+         FDB    $FF9F
+         FDB    $EFBE
+         FDB    $DFDD
+         FDB    $CFFC
+         FDB    $BF1B
+         FDB    $AF3A
+         FDB    $9F59
+         FDB    $8F78
+         FDB    $9188
+         FDB    $81A9
+         FDB    $B1CA
+         FDB    $A1EB
+         FDB    $D10C
+         FDB    $C12D
+         FDB    $F14E
+         FDB    $E16F
+         FDB    $1080
+         FDB    $00A1
+         FDB    $30C2
+         FDB    $20E3
+         FDB    $5004
+         FDB    $4025
+         FDB    $7046
+         FDB    $6067
+         FDB    $83B9
 
 Dat_3D31
-; ── 7 bytes  ($3D31—$3D37) ──
-         FCB    $93
-         FCB    $98
-         FCS    "#"
-         FCS    "{"
-         FCS    "3"
-         FCS    "Z"
-         FCS    "C"
-
-Dat_3D38
-; ── 28 bytes  ($3D38—$3D53) ──
-         FCC    "="
-         FCS    "S"
-         FCB    $1C               ; $1C
-         FCS    "c"
-         FCB    $7F
-         FCS    "s"
-         FCB    $5E               ; '^'
-         FCB    CurXY,$B1,$12     ; CurXY(row=145,col=-14)
-         FCB    $90
-         FCC    """
-         FCS    "s"
-         FCC    "2"
-         FCS    "R"
-         FCC    "B5R"
-         FCB    $14               ; DC4 erase-EOL
-         FCC    "bwrV"
-         FCS    "5"
-         FCS    "j"
-         FCS    "%"
-         FCS    "K"
-         FCB    $95
-
-Dat_3D54
-; ── 26 bytes  ($3D54—$3D6D) ──
-         FCS    "("
-         FCB    $85
-         FCB    $89
-         FCS    "u"
-         FCC    "n"
-         FCS    "e"
-         FCC    "O"
-         FCS    "U"
-         FCC    ","
-         FCS    "E"
-         FCB    $0D               ; CR
-         FCC    "4"
-         FCS    "b"
-         FCC    "$"
-         FCS    "C"
-         FCB    $14               ; DC4 erase-EOL
-         FCS    " "
-         FCB    $04               ; EOT
-         FCB    $81
-         FCC    "tfdGT$D"
-
-Dat_3D6E
-; ── 18 bytes  ($3D6E—$3D7F) ──
-         FCB    $05               ; $05
-         FCS    "'"
-         FCS    "["
-         FCS    "7"
-         FCS    "z"
-         FCB    $87
-         FCB    $99
-         FCB    $97
-         FCS    "8"
-         FCS    "g"
-         FCC    "_"
-         FCS    "w"
-         FCC    "~"
-         FCS    "G"
-         FCB    $1D               ; $1D
-         FCS    "W"
-         FCC    "<&"
-
-Dat_3D80
-; ── 28 bytes  ($3D80—$3D9B) ──
-         FCS    "S"
-         FCC    "6"
-         FCS    "r"
-         FCB    $06               ; $06
-         FCB    $91
-         FCB    $16               ; SYN insert-line
-         FCS    "0"
-         FCC    "fWvvF"
-         FCB    $15               ; NAK erase-EOS
-         FCC    "V4"
-         FCS    "Y"
-         FCC    "L"
-         FCS    "I"
-         FCC    "m"
-         FCS    "y"
-         FCB    $0E               ; SO cursor-right
-         FCS    "i"
-         FCB    $2F               ; '/'
-         FCB    $99
-         FCS    "H"
-         FCB    $89
-         FCS    "i"
-         FCS    "9"
-
-Dat_3D9C
-; ── 33 bytes  ($3D9C—$3DBC) ──
-         FCB    $8A
-         FCS    ")"
-         FCS    "+"
-         FCC    "XDHex"
-         FCB    $06               ; $06
-         FCC    "h'"
-         FCB    $18               ; CAN erase-BOL
-         FCS    "@"
-         FCB    $08               ; BS
-         FCS    "a"
-         FCB    $38               ; '8'
-         FCB    $82
-         FCC    "("
-         FCS    "#"
-         FCS    "K"
-         FCC    "}"
-         FCS    "["
-         FCC    "\"
-         FCS    "k"
-         FCC    "?"
-         FCS    "{"
-         FCB    $1E               ; $1E
-         FCB    $8B
-         FCS    "y"
-         FCB    $9B
-         FCS    "X"
-         FCS    "+"
-         FCS    ";"
-$3DBD  BB 9A 4A            Insn_3DBD:     ADDB $9A4A            
+         FDB    $9398
+         FDB    $A3FB
+         FDB    $B3DA
+         FDB    $C33D
+         FDB    $D31C
+         FDB    $E37F
+         FDB    $F35E
+         FDB    $02B1
+         FDB    $1290
+         FDB    $22F3
+         FDB    $32D2
+         FDB    $4235
+         FDB    $5214
+         FDB    $6277
+         FDB    $7256
+         FDB    $B5EA
+         FDB    $A5CB
+         FDB    $95A8
+         FDB    $8589
+         FDB    $F56E
+         FDB    $E54F
+         FDB    $D52C
+         FDB    $C50D
+         FDB    $34E2
+         FDB    $24C3
+         FDB    $14A0
+         FDB    $0481
+         FDB    $7466
+         FDB    $6447
+         FDB    $5424
+         FDB    $4405
+         FDB    $A7DB
+         FDB    $B7FA
+         FDB    $8799
+         FDB    $97B8
+         FDB    $E75F
+         FDB    $F77E
+         FDB    $C71D
+         FDB    $D73C
+         FDB    $26D3
+         FDB    $36F2
+         FDB    $0691
+         FDB    $16B0
+         FDB    $6657
+         FDB    $7676
+         FDB    $4615
+         FDB    $5634
+         FDB    $D94C
+         FDB    $C96D
+         FDB    $F90E
+         FDB    $E92F
+         FDB    $99C8
+         FDB    $89E9
+         FDB    $B98A
+         FDB    $A9AB
+         FDB    $5844
+         FDB    $4865
+         FDB    $7806
+         FDB    $6827
+         FDB    $18C0
+         FDB    $08E1
+         FDB    $3882
+         FDB    $28A3
+         FDB    $CB7D
+         FDB    $DB5C
+         FDB    $EB3F
+         FDB    $FB1E
+         FDB    $8BF9
+         FDB    $9BD8
+         FDB    $ABBB
+         FDB    $BB9A
 
 Dat_3DBF
-; ── 1 bytes  ($3DBF—$3DBF) ──
-         FCB    $4A               ; 'J'
-
-Dat_3DC0
-; ── 79 bytes  ($3DC0—$3E0E) ──
-         FCC    "uZTj7z"
-         FCB    $16               ; SYN insert-line
-         FCB    $0A               ; LF
-         FCS    "q"
-         FCB    $1A               ; SUB clear+home
-         FCS    "P"
-         FCC    "*"
-         FCS    "3"
-         FCB    $3A               ; ':'
-         FCB    $92
-         FCS    "}"
-         FCC    "."
-         FCS    "m"
-         FCB    $0F               ; SI cursor-left
-         FCS    "]"
-         FCC    "l"
-         FCS    "M"
-         FCC    "M"
-         FCS    "="
-         FCS    "*"
-         FCS    "-"
-         FCB    $8B
-         FCB    $9D
-         FCS    "h"
-         FCB    $8D
-         FCS    "I"
-         FCC    "|&l"
-         FCB    $07               ; BEL
-         FCC    "\dLE<"
-         FCS    """
-         FCB    $2C               ; ','
-         FCB    $83
-         FCB    $1C               ; $1C
-         FCS    "`"
-         FCB    $0C               ; FF clear+home
-         FCS    "A"
-         FCS    "o"
-         FCB    $1F               ; $1F
-         FCS    ""
-         FCC    ">"
-         FCS    "O"
-         FCC    "]"
-         FCS    "_"
-         FCC    "|"
-         FCS    "/"
-         FCB    $9B
-         FCS    "?"
-         FCS    ":"
-         FCB    $8F
-         FCS    "Y"
-         FCB    $9F
-         FCS    "x"
-         FCB    $6E               ; 'n'
-         FCB    $17               ; ETB delete-line
-         FCC    "~6NU^t."
-         FCB    $93
-         FCC    ">"
-         FCS    "2"
-         FCB    $0E               ; SO cursor-right
-         FCS    "Q"
-         FCB    $1E               ; $1E
-         FCS    "p"
+         FDB    $4A75
+         FDB    $5A54
+         FDB    $6A37
+         FDB    $7A16
+         FDB    $0AF1
+         FDB    $1AD0
+         FDB    $2AB3
+         FDB    $3A92
+         FDB    $FD2E
+         FDB    $ED0F
+         FDB    $DD6C
+         FDB    $CD4D
+         FDB    $BDAA
+         FDB    $AD8B
+         FDB    $9DE8
+         FDB    $8DC9
+         FDB    $7C26
+         FDB    $6C07
+         FDB    $5C64
+         FDB    $4C45
+         FDB    $3CA2
+         FDB    $2C83
+         FDB    $1CE0
+         FDB    $0CC1
+         FDB    $EF1F
+         FDB    $FF3E
+         FDB    $CF5D
+         FDB    $DF7C
+         FDB    $AF9B
+         FDB    $BFBA
+         FDB    $8FD9
+         FDB    $9FF8
+         FDB    $6E17
+         FDB    $7E36
+         FDB    $4E55
+         FDB    $5E74
+         FDB    $2E93
+         FDB    $3EB2
+         FDB    $0ED1
+         FDB    $1EF0
 $3E0F  34 36               Sub_3E0F:      PSHS A,B,X,Y          
 $3E11  31 8B                              LEAY D,X              
 $3E13  34 20                              PSHS Y                
@@ -7136,8 +6959,8 @@ $3E43  AC C8 50                           CMPX 80,U
 $3E46  27 0E                              BEQ Sub_3E56          
 $3E48  A6 C8 48                           LDA 72,U              
 $3E4B  AB 80               Sub_3E4B:      ADDA ,X+              
-$3E4D  AC C8 50                           CMPX 80,U             
-$3E4E  C8 50               Sub_3E4E:      EORB #$50             
+$3E4D  AC C8 50            Insn_3E4D:     CMPX 80,U             
+$3E4E  C8                  Sub_3E4E:      EQU    $3E4E            ; mid-instruction overlap: Insn_3E4D+1 -- mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0
 $3E50  27 04                              BEQ Sub_3E56          
 $3E52  AC E4                              CMPX ,S               
 $3E54  25 F5                              BCS Sub_3E4B           ; C=1 (BLO)
@@ -7208,7 +7031,23 @@ $3EC7  30 C9 14 39                        LEAX 5177,U
 $3ECB  8D 1D                              BSR Sub_3EEA           ; call Sub_3EEA
 $3ECD  17 DC 33                           LBSR WriteBlock        ; call WriteBlock
 $3ED0  35 B2                              PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
-         FCB    $34,$32,$30,$C9,$14,$49,$17,$DC,$28,$35,$B2  ; unreachable padding
+
+; --------------------------------------------------------------
+
+Dat_3ED2
+; 11-byte orphaned code between subroutines (unreferenced)
+; ── 11 bytes  ($3ED2—$3EDC) ──
+         FCB    $34
+         FCB    $32
+         FCB    $30
+         FCB    $C9
+         FCB    $14
+         FCB    $49
+         FCB    $17
+         FCB    $DC
+         FCB    $28
+         FCB    $35
+         FCB    $B2
 $3EDD  34 32               Sub_3EDD:      PSHS A,X,Y            
 $3EDF  30 C9 14 49                        LEAX 5193,U           
 $3EE3  8D 05                              BSR Sub_3EEA           ; call Sub_3EEA
