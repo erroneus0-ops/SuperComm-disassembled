@@ -1162,10 +1162,16 @@ class Engine:
 
             b = d[i]
 
-            if fmt == 'fdb' and i+1 < end:
-                v = (d[i]<<8)|d[i+1]
-                out.append(f"         FDB    ${v:04X}")
-                i += 2; last_printable = False; continue
+            if fmt == 'fdb':
+                if i+1 < end:
+                    v = (d[i]<<8)|d[i+1]
+                    out.append(f"         FDB    ${v:04X}")
+                    i += 2
+                else:
+                    # Odd byte at end of fdb region -- emit as FCB
+                    out.append(f"         FCB    ${d[i]:02X}")
+                    i += 1
+                last_printable = False; continue
 
             if fmt == 'raw':
                 out.append(f"         FCB    ${b:02X}")
@@ -1267,19 +1273,38 @@ class Engine:
         footnote_used   = {}   # addr -> footnote_number
         footnote_detail = {}   # footnote_number -> [detail lines]
 
-        # ── Pre-scan: also register containing-instruction labels for forced_equs
+        # ── Pre-scan: register containing-instruction labels for forced_equs ──
+        # Ensures the containing instruction gets an Insn_XXXX label so it
+        # appears in code_pts and gets rendered. Without this, the bytes of
+        # the containing instruction would fall in a gap.
+        # Skip cases where the containing instruction start is itself inside
+        # another rendered instruction (cascading overlap).
         for addr in proj.forced_equs:
             if addr >= exec_off and addr < crc_off:
                 for istart, iend in sorted(self.insn_spans.items()):
                     if istart < addr <= iend:
-                        if not lbs.get(istart):
+                        # Only label if istart is not strictly inside another span
+                        is_nested = any(
+                            s < istart < e
+                            for s, e in self.insn_spans.items()
+                            if s != istart
+                        )
+                        if not is_nested and not lbs.get(istart):
                             lbs[istart] = f"Insn_{istart:04X}"
                         break
 
         # ── Pre-scan: find ??? bytes that are branch targets and register
         # containing-instruction labels BEFORE render walks forward ──────
+        # Build set of addresses inside declared data_regions (skip those)
+        data_region_addrs = set()
+        for r in proj.data_regions:
+            for a2 in range(r['start'], r['end']):
+                data_region_addrs.add(a2)
+
         for addr, lbl in list(lbs.items()):
             if addr >= exec_off and addr < crc_off:
+                if addr in data_region_addrs:
+                    continue  # skip addresses inside declared data regions
                 byte_at = d[addr]
                 # Check if this address decodes as ??? (undefined opcode)
                 try:
@@ -1427,6 +1452,16 @@ class Engine:
         for r in proj.data_regions:
             proj_data[r['start']] = r
 
+        # Ensure data_region starts have labels in lbs
+        for r in proj.data_regions:
+            rs = r['start']
+            if exec_off <= rs < crc_off and rs not in lbs:
+                lbl = r.get('label', '') or f'Dat_{rs:04X}'
+                lbs[rs] = lbl
+            # Also ensure KIND_DATA for data_region starts
+            if rs not in reg:
+                reg[rs] = KIND_DATA
+
         # Sorted label points in code section
         code_pts = sorted(
             [(a, lbs[a], reg.get(a, KIND_CODE))
@@ -1450,28 +1485,82 @@ class Engine:
 
             # ── DATA span ─────────────────────────────────────────────
             if span_kind == KIND_DATA:
+                # Find applicable data_region (exact match or parent region)
+                proj_r = proj_data.get(span_start, {})
+                is_parent_region_start = bool(proj_r)
+                if not proj_r:
+                    for r in proj.data_regions:
+                        if r['start'] <= span_start < r['end']:
+                            proj_r = r
+                            break
+
+                fmt = proj_r.get('format', 'auto')
+
+                # For fdb/raw regions: if this is the START of the declared region,
+                # render the ENTIRE region at once to avoid sub-span alignment issues.
+                # Sub-labels within the region are passed as 'sub' to emit_data.
+                if is_parent_region_start and fmt in ('fdb', 'raw'):
+                    region_end = proj_r['end']
+                    out.append(""); out.append(f"{span_lbl}")
+                    callers = self.xrefs.get(span_start, [])
+                    if callers:
+                        caller_strs = [lbs.get(ca, f'${ca:04X}') for ca in sorted(callers)]
+                        out.append(f"; Referenced by: {', '.join(caller_strs)}")
+                    if proj_r.get('comment'):
+                        out.append(f"; {proj_r['comment']}")
+                    out.append(f"; ── {region_end-span_start} bytes"
+                               f"  (${span_start:04X}—${region_end-1:04X}) ──")
+                    sub = {k:v for k,v in lbs.items()
+                           if span_start < k < region_end}
+                    out.extend(self.emit_data(span_start, region_end, sub, fmt))
+                    prev_ret = False
+                    # Skip all code_pts that fall within this region
+                    # (handled by the outer loop's span_start check below)
+                    # We use a flag to skip sub-spans
+                    _skip_until = region_end
+                    # We can't break the outer loop easily, so we'll track via span_start
+                    continue
+
+                # Check if this span is INSIDE an already-rendered parent region
+                # (i.e., it's a sub-span of an fdb/raw region we already rendered above)
+                inside_parent = False
+                if not is_parent_region_start:
+                    for r in proj.data_regions:
+                        if (r['format'] in ('fdb', 'raw') and
+                                r['start'] < span_start < r['end']):
+                            inside_parent = True
+                            break
+                if inside_parent:
+                    # Already rendered as part of parent region -- skip
+                    prev_ret = False
+                    continue
+
                 out.append(""); out.append(f"{span_lbl}")
-                # Cross-reference: which code addresses reference this label?
-                # Tells the analyst which subroutine(s) use this data block
-                # so they can infer the correct format (WriteBlock=FORMAT B, etc.)
                 callers = self.xrefs.get(span_start, [])
                 if callers:
                     caller_strs = [lbs.get(ca, f'${ca:04X}') for ca in sorted(callers)]
                     out.append(f"; Referenced by: {', '.join(caller_strs)}")
-                # check for project override comment/format
-                proj_r = proj_data.get(span_start, {})
-                if proj_r.get('comment'):
+                if proj_r.get('comment') and span_start == proj_r.get('start'):
                     out.append(f"; {proj_r['comment']}")
                 out.append(f"; ── {span_end-span_start} bytes"
                            f"  (${span_start:04X}—${span_end-1:04X}) ──")
                 sub = {k:v for k,v in lbs.items()
                        if span_start < k < span_end}
-                fmt = proj_r.get('format', 'auto')
                 out.extend(self.emit_data(span_start, span_end, sub, fmt))
                 prev_ret = False
                 continue
 
             # ── CODE span ─────────────────────────────────────────────
+            # Skip code spans that fall inside a declared fdb/raw data_region
+            in_data_region = False
+            for r in proj.data_regions:
+                if r.get('format') in ('fdb','raw') and r['start'] <= span_start < r['end']:
+                    in_data_region = True
+                    break
+            if in_data_region:
+                prev_ret = False
+                continue
+
             pos = span_start
             first = True
 

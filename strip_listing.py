@@ -105,13 +105,30 @@ def process(infile, outfile):
                 else:
                     rest = f"{mne} {expr}{comment}"
 
-            # Handle PC-relative LEA missing ,PCR
+            # Handle PC-relative instructions missing ,PCR
+            # Post-byte $8D = PCR-relative indexed addressing
+            # Applies to LEA ops AND any load/store with PCR post-byte
             elif len(hex_bytes) >= 2:
                 key = (hex_bytes[0], hex_bytes[1])
+                # Post-byte $8D anywhere (not first byte) = PCR relative
+                has_pcr_postbyte = (len(hex_bytes) >= 2 and 
+                                    hex_bytes[0] not in (0x20,0x21,0x22,0x23,0x24,0x25,
+                                                         0x26,0x27,0x28,0x29,0x2a,0x2b,
+                                                         0x2c,0x2d,0x2e,0x2f,0x8D) and
+                                    hex_bytes[1] == 0x8D and
+                                    ',PCR' not in rest)
                 if key in PCR_LEAS:
                     mne = PCR_LEAS[key]
                     rest = re.sub(
                         rf"({mne}\s+)(\S+?)(\s|$)",
+                        lambda mo: mo.group(1) + mo.group(2) + ",PCR" + mo.group(3),
+                        rest,
+                        count=1
+                    )
+                elif has_pcr_postbyte:
+                    # Add ,PCR to the operand of any other PCR-relative instruction
+                    rest = re.sub(
+                        r'(\b\w+\s+)(\S+?)(\s|$)',
                         lambda mo: mo.group(1) + mo.group(2) + ",PCR" + mo.group(3),
                         rest,
                         count=1

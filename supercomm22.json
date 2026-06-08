@@ -82,6 +82,13 @@
       "label": "Dat_1750",
       "comment": "12-byte orphaned string copy loop (unreferenced from branch analysis)",
       "format": "raw"
+    },
+    {
+      "start": "3ED2",
+      "end": "3EDD",
+      "label": "Dat_3ED2",
+      "comment": "11-byte orphaned code between subroutines (unreferenced)",
+      "format": "raw"
     }
   ],
   "block_comments": {
@@ -121,6 +128,7 @@
   "forced_equs": {
     "0B8D": "mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C",
     "364E": "mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D",
-    "19EC": "mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write"
+    "19EC": "mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write",
+    "3E4E": "mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0"
   }
 }
