@@ -1514,7 +1514,7 @@ class Engine:
             "; ----- Module Header -----",
             "ModHeader",
             "         FDB    $87CD             ; OS-9 module sync bytes",
-            "         FDB    ModEnd+3-$0000    ; module size (content + 3 CRC bytes)",
+            "         FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)",
             "         FDB    ModName           ; name offset",
             f"         FCB    ${hdr['mod_type']:02X}               ; type: {hdr['type_name']}",
             f"         FCB    ${hdr['lang']:02X}               ; language",
@@ -1927,7 +1927,10 @@ class Engine:
             "; ModEnd — CRC-24 appended by fixmod (not in source)",
             f"; {'='*62}",
             "ModEnd",
-            "ModSize  EQU    ModEnd+3-$0000    ; includes 3 CRC bytes"
+            "; CRC-24 (3 bytes) appended here by fixmod",
+            "         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod",
+            "ModCRC",
+            "ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes"
         ]
 
         # ── Analyst footnotes ──────────────────────────────────────────────
