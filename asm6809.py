@@ -568,7 +568,7 @@ def assemble_line(mne: str, operand: str, pc: int, symbols: dict,
         if _is_indexed(op):
             if idx_op is None:
                 raise ValueError(f"{mne} has no indexed mode")
-            pb, extra = encode_indexed(op, pc + len(_opcode_bytes(idx_op)) + 1, symbols, pass2)
+            pb, extra = encode_indexed(op, pc + len(_opcode_bytes(idx_op)), symbols, pass2)
             return bytes(_opcode_bytes(idx_op) + pb + extra)
 
         # Direct or Extended

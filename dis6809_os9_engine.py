@@ -421,6 +421,7 @@ class Engine:
         self._output  = []        # rendered lines
         self.insn_spans = {}      # addr -> end_addr for each decoded instruction
         self.found_6309 = False   # set True if any 6309-specific instruction found
+        self.data_hints = {}      # data_addr -> dict with format hints (e.g. 'iwrite')
 
     def load(self, data: bytes):
         self.data = bytearray(data)
@@ -511,6 +512,11 @@ class Engine:
             if not (exec_off <= start < crc_off): continue
 
             pos = start
+            # Context window for syscall-aware data characterisation
+            # Tracks the most recent LEAX→X target and LDY immediate within
+            # a linear trace sequence, reset at each new worklist entry.
+            ctx_leax_x  = None   # last PC-relative LEAX into X → data addr
+            ctx_ldy_imm = None   # last LDY #n immediate value
             while pos < crc_off and pos not in visited:
                 visited.add(pos)
                 insn_start = pos
@@ -558,9 +564,12 @@ class Engine:
                         pos += 1
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
                         t = pos + off; add(t, KIND_DATA)
+                        if op == 0x30: ctx_leax_x = t   # LEAX ,PC → track X
                     else:
                         pos, t = self._decode_indexed_pb(pos)
-                        if t is not None: add(t, KIND_DATA)
+                        if t is not None:
+                            add(t, KIND_DATA)
+                            if op == 0x30: ctx_leax_x = t  # LEAX indexed → track X
 
                 # ── Page 1 ($10) ──────────────────────────────────────
                 elif op == 0x10:
@@ -578,7 +587,13 @@ class Engine:
                     elif op2 == 0x20:  # 6309 LBRA variant
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
                         t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
-                    elif op2 == 0x3F:   pos += 1
+                    elif op2 == 0x3F:   # OS9 syscall
+                        sc = d[pos]; pos += 1
+                        if sc == 0x8A and ctx_leax_x is not None:  # I$Write
+                            hint = {'syscall': 'I$Write', 'caller': insn_start}
+                            if ctx_ldy_imm is not None:
+                                hint['count'] = ctx_ldy_imm
+                            self.data_hints[ctx_leax_x] = hint
                     # 6309 register-register (1 post-byte)
                     elif op2 in (0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x3D,0x3E,0x3F): pos += 1
                     # 6309 PSHSW/PULSW/PSHUW/PULUW (no operand)
@@ -598,7 +613,10 @@ class Engine:
                     elif op2 in (0xB6,0xB7,0xBF,0xF6,0xF7,0xFD): pos+=2
                     # 6309 LDQ immediate (4 bytes)
                     elif op2 == 0xCC: pos+=4
-                    elif op2 in (0x83,0x8C,0x8E,0xCE,0xB3,0xBC,0xFE,0xFF): pos+=2
+                    elif op2 in (0x83,0x8C,0xCE,0xB3,0xBC,0xFE,0xFF): pos+=2
+                    elif op2 == 0x8E:   # LDY immediate — track for I$Write context
+                        v = (d[pos]<<8)|d[pos+1]; pos += 2
+                        ctx_ldy_imm = v
                     elif op2 in (0x93,0x9C,0x9E,0x9F): pos += 1
                     elif op2 in (0xAE,0xAF,0xA3,0xAC):
                         pos, t = self._decode_indexed_pb(pos)
@@ -1290,6 +1308,20 @@ class Engine:
 
             b = d[i]
 
+            if fmt == 'iwrite':
+                # Self-describing display message block:
+                # First word is a self-referencing byte count → emit as label arithmetic.
+                # Remaining bytes use auto heuristics (CurXY, FCC, FCS, etc.)
+                if i == start:
+                    end_lbl = self.labels.get(end, f'${end:04X}')
+                    start_lbl = self.labels.get(start, f'${start:04X}')
+                    out.append(f"         FDB    {end_lbl}-{start_lbl}"
+                               f"   ; # bytes this message")
+                    i += 2
+                    last_printable = False; continue
+                # Body — fall through to auto heuristics below
+                fmt = 'auto'
+
             if fmt == 'fdb':
                 if i+1 < end:
                     v = (d[i]<<8)|d[i+1]
@@ -1323,11 +1355,6 @@ class Engine:
                 out.append(f"         FCB    CurXY,${rb2:02X},${cb2:02X}     ; CurXY(row={row},col={col})")
                 i += 3; last_printable = False; continue
 
-            # Hi-bit terminated (FCS)
-            if b&0x80 and (b&0x7F)>=0x20:
-                out.append(f"         FCS    \"{chr(b&0x7F)}\"")
-                i += 1; last_printable = False; continue
-
             # Control byte
             if b < 0x20:
                 j = i
@@ -1355,16 +1382,13 @@ class Engine:
             # Check for hi-bit terminator extending the run
             if j < end and d[j]&0x80 and 0x20 <= (d[j]&0x7F) < 0x7F:
                 hi_ch = chr(d[j]&0x7F)
-                full_run = s + [hi_ch]
-                if len(full_run) >= 2:
-                    # Emit plain chars as FCC then hi-bit char as FCS
-                    if s:
-                        txt = ''.join(s)
-                        for k in range(0, len(txt), 72):
-                            out.append(f"         FCC    \"{txt[k:k+72]}\"")
-                    out.append(f"         FCS    \"{hi_ch}\"")
+                if len(s) >= 2:   # minimum 2 plain + 1 hi-bit = 3 bytes total
+                    # Emit entire string as single FCS (plain chars + hi-bit terminator)
+                    txt = ''.join(s) + hi_ch
+                    for k in range(0, len(txt), 72):
+                        out.append(f"         FCS    \"{txt[k:k+72]}\"")
                     last_printable = True; i = j+1; continue
-                # else fall through to single-byte handling below
+                # else fall through — hi-bit byte treated as FCB below
             if len(s) >= 2:
                 txt = ''.join(s)
                 for k in range(0, len(txt), 72):
@@ -1490,7 +1514,7 @@ class Engine:
             "; ----- Module Header -----",
             "ModHeader",
             "         FDB    $87CD             ; OS-9 module sync bytes",
-            "         FDB    ModEnd-$0000      ; module size",
+            "         FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)",
             "         FDB    ModName           ; name offset",
             f"         FCB    ${hdr['mod_type']:02X}               ; type: {hdr['type_name']}",
             f"         FCB    ${hdr['lang']:02X}               ; language",
@@ -1571,8 +1595,15 @@ class Engine:
                         else:
                             cur += 1
                     if paddr < pend:
+                        _is_iwrite = (
+                            paddr in self.data_hints
+                            and self.data_hints[paddr].get('syscall') == 'I$Write'
+                            and paddr + 1 < len(self.data)
+                            and ((self.data[paddr]<<8)|self.data[paddr+1]) == (pend - paddr)
+                        )
+                        _pfmt = 'iwrite' if _is_iwrite else 'auto'
                         out.extend(self.emit_data(paddr, pend,
-                            {k:v for k,v in sub.items() if paddr <= k < pend}))
+                            {k:v for k,v in sub.items() if paddr <= k < pend}, _pfmt))
             out.append("")
 
         # ── Code section: span-based walk ────────────────────────────
@@ -1631,6 +1662,14 @@ class Engine:
                             break
 
                 fmt = proj_r.get('format', 'auto')
+                # Apply syscall-derived format hint if no explicit project format
+                if fmt == 'auto' and span_start in self.data_hints:
+                    hint = self.data_hints[span_start]
+                    if (hint.get('syscall') == 'I$Write'
+                            and span_start + 1 < len(self.data)
+                            and ((self.data[span_start]<<8)|self.data[span_start+1])
+                                == (proj_r.get('end', span_start) - span_start)):
+                        fmt = 'iwrite'
 
                 # For fdb/raw regions: if this is the START of the declared region,
                 # render the ENTIRE region at once to avoid sub-span alignment issues.
@@ -1682,7 +1721,15 @@ class Engine:
                            f"  (${span_start:04X}—${span_end-1:04X}) ──")
                 sub = {k:v for k,v in lbs.items()
                        if span_start < k < span_end}
-                out.extend(self.emit_data(span_start, span_end, sub, fmt))
+                # Apply syscall hint if no project format override
+                span_fmt = fmt if fmt != 'auto' else (
+                    'iwrite' if (
+                        span_start in self.data_hints
+                        and self.data_hints[span_start].get('syscall') == 'I$Write'
+                        and span_start + 1 < len(self.data)
+                        and ((self.data[span_start]<<8)|self.data[span_start+1]) == (span_end - span_start)
+                    ) else 'auto')
+                out.extend(self.emit_data(span_start, span_end, sub, span_fmt))
                 prev_ret = False
                 continue
 
@@ -1880,7 +1927,10 @@ class Engine:
             "; ModEnd — CRC-24 appended by fixmod (not in source)",
             f"; {'='*62}",
             "ModEnd",
-            "ModSize  EQU    ModEnd-$0000",
+            "; CRC-24 (3 bytes) appended here by fixmod",
+            "         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod",
+            "ModCRC",
+            "ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes"
         ]
 
         # ── Analyst footnotes ──────────────────────────────────────────────
