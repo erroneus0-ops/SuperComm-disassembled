@@ -1514,7 +1514,7 @@ class Engine:
             "; ----- Module Header -----",
             "ModHeader",
             "         FDB    $87CD             ; OS-9 module sync bytes",
-            "         FDB    ModEnd-$0000      ; module size",
+            "         FDB    ModEnd+3-$0000    ; module size (content + 3 CRC bytes)",
             "         FDB    ModName           ; name offset",
             f"         FCB    ${hdr['mod_type']:02X}               ; type: {hdr['type_name']}",
             f"         FCB    ${hdr['lang']:02X}               ; language",
@@ -1595,9 +1595,13 @@ class Engine:
                         else:
                             cur += 1
                     if paddr < pend:
-                        _pfmt = ('iwrite' if paddr in self.data_hints
-                                 and self.data_hints[paddr].get('syscall') == 'I$Write'
-                                 else 'auto')
+                        _is_iwrite = (
+                            paddr in self.data_hints
+                            and self.data_hints[paddr].get('syscall') == 'I$Write'
+                            and paddr + 1 < len(self.data)
+                            and ((self.data[paddr]<<8)|self.data[paddr+1]) == (pend - paddr)
+                        )
+                        _pfmt = 'iwrite' if _is_iwrite else 'auto'
                         out.extend(self.emit_data(paddr, pend,
                             {k:v for k,v in sub.items() if paddr <= k < pend}, _pfmt))
             out.append("")
@@ -1661,7 +1665,10 @@ class Engine:
                 # Apply syscall-derived format hint if no explicit project format
                 if fmt == 'auto' and span_start in self.data_hints:
                     hint = self.data_hints[span_start]
-                    if hint.get('syscall') == 'I$Write':
+                    if (hint.get('syscall') == 'I$Write'
+                            and span_start + 1 < len(self.data)
+                            and ((self.data[span_start]<<8)|self.data[span_start+1])
+                                == (proj_r.get('end', span_start) - span_start)):
                         fmt = 'iwrite'
 
                 # For fdb/raw regions: if this is the START of the declared region,
@@ -1716,9 +1723,12 @@ class Engine:
                        if span_start < k < span_end}
                 # Apply syscall hint if no project format override
                 span_fmt = fmt if fmt != 'auto' else (
-                    'iwrite' if span_start in self.data_hints
-                    and self.data_hints[span_start].get('syscall') == 'I$Write'
-                    else 'auto')
+                    'iwrite' if (
+                        span_start in self.data_hints
+                        and self.data_hints[span_start].get('syscall') == 'I$Write'
+                        and span_start + 1 < len(self.data)
+                        and ((self.data[span_start]<<8)|self.data[span_start+1]) == (span_end - span_start)
+                    ) else 'auto')
                 out.extend(self.emit_data(span_start, span_end, sub, span_fmt))
                 prev_ret = False
                 continue
@@ -1917,7 +1927,7 @@ class Engine:
             "; ModEnd — CRC-24 appended by fixmod (not in source)",
             f"; {'='*62}",
             "ModEnd",
-            "ModSize  EQU    ModEnd-$0000",
+            "ModSize  EQU    ModEnd+3-$0000    ; includes 3 CRC bytes"
         ]
 
         # ── Analyst footnotes ──────────────────────────────────────────────
