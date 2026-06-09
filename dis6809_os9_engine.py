@@ -286,8 +286,10 @@ def crc24(data):
     return f'{crc & 0xFFFFFF:06X}'
 
 def binary_crc(path):
-    """Compute CRC-24 of a binary file. Returns 6-char uppercase hex string."""
-    return crc24(open(path, 'rb').read())
+    """Compute a unique fingerprint of a binary file for change detection.
+    Uses SHA-256 truncated to 16 hex chars — sufficient for mismatch detection."""
+    import hashlib
+    return hashlib.sha256(open(path, 'rb').read()).hexdigest()[:16].upper()
 
 
 class Project:
