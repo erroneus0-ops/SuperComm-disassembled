@@ -2356,6 +2356,22 @@ Examples:
                 if not new_name.endswith('.json'):
                     new_name += '.json'
 
+                # Warn if target already exists
+                if os.path.exists(new_name):
+                    print()
+                    print(f"  WARNING: {new_name} already exists.")
+                    if not args.no_confirm:
+                        try:
+                            answer = input("  Overwrite it? [y/N]: ").strip().lower()
+                        except (EOFError, KeyboardInterrupt):
+                            answer = ''
+                        if answer != 'y':
+                            print("  Aborted.")
+                            sys.exit(0)
+                    else:
+                        print("  Aborted. (-n set, will not overwrite existing file)")
+                        sys.exit(1)
+
                 print()
                 proj = _import_project(proj, json_path, new_name, actual_crc)
                 json_path = new_name
