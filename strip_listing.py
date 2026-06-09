@@ -179,12 +179,16 @@ def process(infile, outfile, target='asm6809'):
             out.append(line)
 
     # ── lwasm dialect: convert ,PC to ,PCR throughout ────────────────────
+    # Only convert ,PC that is an addressing mode suffix (LEA/load/store)
+    # NOT ,PC in PULS/PSHS/PULU/PSHU register lists where PC is a register name
+    STACK_OPS = re.compile(r'\b(PULS|PSHS|PULU|PSHU)\b', re.IGNORECASE)
     if target == 'lwasm':
         converted = []
         for line in out:
-            # Only convert in non-comment lines, avoid touching string contents
             if ',PC' in line and not line.strip().startswith(';'):
-                line = re.sub(r',PC\b(?!R)', ',PCR', line)
+                # Skip if this is a stack op — PC is a register, not an addr mode
+                if not STACK_OPS.search(line):
+                    line = re.sub(r',PC\b(?!R)', ',PCR', line)
             converted.append(line)
         out = converted
 
