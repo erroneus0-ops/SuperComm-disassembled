@@ -274,6 +274,22 @@ F$NMLink EQU    $28
 
 # ── Project: binary-specific knowledge ────────────────────────────────────────
 
+def crc24(data):
+    """Compute OS-9 CRC-24 over a byte sequence. Returns 6-char uppercase hex string."""
+    crc = 0xFFFFFF
+    for b in data:
+        crc ^= (b << 16)
+        for _ in range(8):
+            crc <<= 1
+            if crc & 0x1000000:
+                crc ^= 0x800063
+    return f'{crc & 0xFFFFFF:06X}'
+
+def binary_crc(path):
+    """Compute CRC-24 of a binary file. Returns 6-char uppercase hex string."""
+    return crc24(open(path, 'rb').read())
+
+
 class Project:
     """
     All binary-specific knowledge for a disassembly project.
@@ -282,6 +298,7 @@ class Project:
 
     def __init__(self):
         self.binary       = None      # path to binary file
+        self.binary_crc   = None      # CRC-24 hex string of binary at project creation
         self.cpu          = '6809'    # '6809' or '6309'
         self.output       = None      # path for output ASM
         self.entry        = None      # override entry point (int hex)
@@ -295,6 +312,8 @@ class Project:
         self.footnotes    = {}        # int -> {inline, detail:[lines]}
         self.patches      = {}        # int_addr -> [bytes_to_insert_before_addr]
         self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
+        self.substitutions= {}        # int_addr -> {replace_lines, with_lines}
+        self.routines     = []        # [{name, start, end}] routine boundaries
 
     @classmethod
     def from_json(cls, path):
@@ -304,6 +323,7 @@ class Project:
             d = json.load(f)
 
         p.binary        = d.get('binary', '')
+        p.binary_crc    = d.get('binary_crc', None)
         p.cpu           = d.get('cpu', '6809')  # '6809' or '6309'
         p.output        = d.get('output', None)
         p.module_notes  = d.get('module_notes', [])
@@ -355,13 +375,32 @@ class Project:
                 'inline': v.get('inline', ''),
                 'detail': v.get('detail', []),
             }
+
+        # substitutions: {"HHHH": {replace_lines:[...], with:[...]}}
+        p.substitutions = {}
+        for k, v in d.get('substitutions', {}).items():
+            p.substitutions[int(k, 16)] = {
+                'replace_lines': v.get('replace_lines', []),
+                'with_lines':    v.get('with', []),
+            }
+
+        # routines: [{name, start, end}]
+        p.routines = []
+        for r in d.get('routines', []):
+            p.routines.append({
+                'name':  r['name'],
+                'start': int(r['start'], 16),
+                'end':   int(r['end'],   16),
+            })
+
         return p
 
     def to_json(self, path):
         """Save project to JSON file."""
         d = {
-            'binary':  self.binary,
-            'cpu':     self.cpu,
+            'binary':      self.binary,
+            'binary_crc':  self.binary_crc,
+            'cpu':         self.cpu,
             'output':  self.output,
             'entry':   f'{self.entry:04X}' if self.entry else None,
             'module_notes':   self.module_notes,
@@ -371,14 +410,29 @@ class Project:
             'data_regions':   [
                 {'start': f'{r["start"]:04X}', 'end': f'{r["end"]:04X}',
                  'label': r['label'], 'comment': r['comment'],
-                 'format': r.get('format','auto')}
+                 'format': r.get('format','auto'),
+                 'end_label': r.get('end_label', False)}
                 for r in self.data_regions
             ],
             'line_comments':  {f'{k:04X}': v
                                for k,v in sorted(self.line_comments.items())},
             'block_comments': {f'{k:04X}': v
                                for k,v in sorted(self.block_comments.items())},
-            'footnotes':     {str(k): v for k,v in sorted(p.footnotes.items()) if hasattr(p,'footnotes')},
+            'substitutions':  {f'{k:04X}': {'replace_lines': v['replace_lines'],
+                                             'with': v['with_lines']}
+                               for k,v in sorted(self.substitutions.items())},
+            'routines':       [{'name': r['name'],
+                                'start': f'{r["start"]:04X}',
+                                'end':   f'{r["end"]:04X}'}
+                               for r in self.routines],
+            'footnotes':      {str(k): v
+                               for k,v in sorted(self.footnotes.items())
+                               if hasattr(self, 'footnotes')},
+            'forced_equs':    {f'{k:04X}': v
+                               for k,v in sorted(self.forced_equs.items())},
+            'patches':        {f'{k:04X}': {'insert': [f'${b:02X}' for b in v['bytes']],
+                                            'comment': v.get('comment','')}
+                               for k,v in sorted(self.patches.items())},
         }
         with open(path, 'w') as f:
             json.dump(d, f, indent=2)
@@ -388,9 +442,12 @@ class Project:
         """Create a minimal project scaffold for a new binary."""
         p = cls()
         p.binary = binary_path
-        p.output = output_path or binary_path + '.asm'
+        p.output = output_path or binary_path + '_proj.asm'
         p.module_notes = ["Add notes about this module here."]
         p.cpu = '6809'  # change to '6309' for Hitachi HD6309 binaries
+        # Compute and store binary CRC for future mismatch detection
+        if os.path.exists(binary_path):
+            p.binary_crc = binary_crc(binary_path)
         return p
 
 
@@ -2138,3 +2195,254 @@ def decode_6309(data, pos, labels=None, bss_names=None):
 
     raw = bytes(data[start:pos])
     return mn, op_str.strip(), cm, raw, pos
+
+
+# ── CLI entry point ───────────────────────────────────────────────────────────
+
+def _import_project(old_proj, old_json_path, new_json_path, actual_crc):
+    """
+    Create a new project JSON for a different binary, importing analyst
+    work from old_proj. Binary-specific fields are not carried over.
+    """
+    new = Project.scaffold(old_proj.binary, old_proj.output)
+    new.binary_crc    = actual_crc
+
+    # Fields that carry over cleanly
+    new.cpu            = old_proj.cpu
+    new.module_notes   = list(old_proj.module_notes)
+    new.custom_equates = list(old_proj.custom_equates)
+    new.labels         = dict(old_proj.labels)
+    new.bss            = dict(old_proj.bss)
+    new.line_comments  = dict(old_proj.line_comments)
+    new.block_comments = dict(old_proj.block_comments)
+    new.data_regions   = list(old_proj.data_regions)
+    new.routines       = list(old_proj.routines)
+
+    # Substitutions carry over with a warning
+    if old_proj.substitutions:
+        new.substitutions = dict(old_proj.substitutions)
+        print(f"  WARNING: {len(old_proj.substitutions)} substitution(s) imported.")
+        print(f"           These reference specific binary bytes — verify they")
+        print(f"           still apply to the new binary before assembling.")
+
+    # forced_equs and patches do NOT carry over
+    if old_proj.forced_equs:
+        print(f"  NOTE: {len(old_proj.forced_equs)} forced_equ(s) NOT imported "
+              f"(binary corruption workarounds)")
+    if old_proj.patches:
+        print(f"  NOTE: {len(old_proj.patches)} patch(es) NOT imported "
+              f"(binary-specific)")
+
+    import shutil
+    backup = old_json_path + '.bak'
+    shutil.copy2(old_json_path, backup)
+    print(f"  Old JSON backed up: {backup}")
+
+    new.to_json(new_json_path)
+    print(f"  New JSON created:   {new_json_path}")
+    return new
+
+
+def main():
+    import argparse, sys, os
+
+    parser = argparse.ArgumentParser(
+        prog='dis6809_os9_engine.py',
+        description='OS-9 6809/6309 disassembler',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  First run (creates new project JSON):
+    python dis6809_os9_engine.py --source supercomm22 --proj supercomm22_proj.json
+
+  Subsequent runs:
+    python dis6809_os9_engine.py --source supercomm22 --proj supercomm22_proj.json
+
+  Stats only:
+    python dis6809_os9_engine.py --source supercomm22 --proj supercomm22_proj.json --stats
+""")
+
+    parser.add_argument('--source', metavar='BINARY',
+        help='Path to the OS-9 binary to disassemble')
+    parser.add_argument('--proj',   metavar='JSON',
+        help='Path to the project JSON file')
+    parser.add_argument('--stats',  action='store_true',
+        help='Show pass-1 classification stats only, no output written')
+    parser.add_argument('--update-labels', action='store_true',
+        help='Merge auto-generated labels into the project JSON '
+             '(preserves existing names, adds only new ones)')
+    args = parser.parse_args()
+
+    # ── --source is always required ───────────────────────────────────────
+    if not args.source:
+        parser.print_usage()
+        print("error: --source BINARY is required")
+        sys.exit(1)
+
+    source = args.source
+    if not os.path.exists(source):
+        print(f"ERROR: binary not found: {source!r}")
+        sys.exit(1)
+
+    actual_crc = binary_crc(source)
+
+    # ── Resolve --proj ────────────────────────────────────────────────────
+    if args.proj:
+        json_path = args.proj
+
+        if not os.path.exists(json_path):
+            # --proj given but file doesn't exist → create scaffold
+            print(f"Project file not found. Creating: {json_path}")
+            stem = json_path
+            for suffix in ('_proj.json', '.json'):
+                if stem.endswith(suffix):
+                    stem = stem[:-len(suffix)]
+                    break
+            proj = Project.scaffold(source, stem + '_proj.asm')
+            proj.to_json(json_path)
+            print(f"  Binary:     {source}")
+            print(f"  Binary CRC: {proj.binary_crc}")
+            print(f"  Output:     {proj.output}")
+            print()
+
+        else:
+            # --proj exists → load and verify CRC
+            proj = Project.from_json(json_path)
+
+            # Update binary path to match --source (analyst may have moved files)
+            proj.binary = source
+
+            if proj.binary_crc is None:
+                # Old JSON without CRC — record it silently
+                proj.binary_crc = actual_crc
+                proj.to_json(json_path)
+
+            elif proj.binary_crc.upper() != actual_crc.upper():
+                print()
+                print("  WARNING: Binary CRC mismatch")
+                print(f"    --source {source}")
+                print(f"      Current CRC:  {actual_crc.upper()}")
+                print(f"    --proj   {json_path}")
+                print(f"      Recorded CRC: {proj.binary_crc.upper()}")
+                print()
+                print("  Did you specify the wrong files?")
+                print("  If this is intentional, enter a name for the new project")
+                print("  JSON file that will be created for this binary.")
+                print("  Press Enter to quit.")
+                print()
+
+                try:
+                    new_name = input("  New JSON filename: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    new_name = ''
+
+                if not new_name:
+                    print("  Aborted.")
+                    sys.exit(0)
+
+                if not new_name.endswith('.json'):
+                    new_name += '.json'
+
+                print()
+                proj = _import_project(proj, json_path, new_name, actual_crc)
+                json_path = new_name
+                print()
+                print("  Analyst work imported. To disassemble run:")
+                print()
+                print(f"    python dis6809_os9_engine.py --source {source} --proj {new_name}")
+                print()
+                sys.exit(0)
+
+    else:
+        # --proj not given
+        # Check if an inferrable JSON exists — if so, tell the analyst
+        stem = os.path.splitext(source)[0]
+        inferred = stem + '_proj.json'
+
+        if os.path.exists(inferred):
+            print()
+            print(f"  --proj not specified.")
+            print(f"  Found an existing project file: {inferred}")
+            print(f"  If that is the correct project, run:")
+            print()
+            print(f"    python dis6809_os9_engine.py --source {source} --proj {inferred}")
+            print()
+            sys.exit(1)
+
+        else:
+            # No JSON anywhere — prompt for a name
+            print(f"  --proj not specified and no project file found.")
+            print(f"  Enter a name for the new project JSON file,")
+            print(f"  or press Enter to use the default ({inferred}):")
+            print()
+
+            try:
+                new_name = input("  Project JSON name: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                new_name = ''
+
+            if not new_name:
+                new_name = inferred
+            if not new_name.endswith('.json'):
+                new_name += '.json'
+
+            json_path = new_name
+            stem = json_path
+            for suffix in ('_proj.json', '.json'):
+                if stem.endswith(suffix):
+                    stem = stem[:-len(suffix)]
+                    break
+
+            proj = Project.scaffold(source, stem + '_proj.asm')
+            proj.to_json(json_path)
+            print()
+            print(f"  Created: {json_path}")
+            print(f"  Binary CRC: {proj.binary_crc}")
+            print()
+
+    # ── Run engine ────────────────────────────────────────────────────────
+    eng = Engine(proj)
+    eng.load(open(source, 'rb').read())
+    eng.run()
+
+    # ── --stats ───────────────────────────────────────────────────────────
+    if args.stats:
+        exec_off = eng.exec_off
+        n_code = sum(1 for k in eng.regions.values() if k == KIND_CODE)
+        n_data = sum(1 for a,k in eng.regions.items()
+                     if k == KIND_DATA and a >= exec_off)
+        n_pre  = sum(1 for a,k in eng.regions.items()
+                     if k == KIND_DATA and a < exec_off)
+        print(f"; Pass 1: {len(eng.labels)} labels  "
+              f"({n_code} code  {n_data} data in code section)")
+        print(f"Binary:         {source}")
+        print(f"Module:         {eng.hdr['mod_name']}")
+        print(f"Entry:          ${exec_off:04X}")
+        print(f"Total labels:   {len(eng.labels)}")
+        print(f"  Code:         {n_code}")
+        print(f"  Data (code):  {n_data}")
+        print(f"  Data (pre):   {n_pre}")
+        return
+
+    # ── --update-labels ───────────────────────────────────────────────────
+    if args.update_labels:
+        added = 0
+        for addr, lbl in eng.labels.items():
+            if addr not in proj.labels:
+                proj.labels[addr] = lbl
+                added += 1
+        proj.to_json(json_path)
+        print(f"Added {added} labels to {json_path}")
+        return
+
+    # ── Render and write ──────────────────────────────────────────────────
+    asm = eng.render()
+    out_path = proj.output or (stem + '_proj.asm')
+    with open(out_path, 'w', encoding='utf-8') as f:
+        f.write(asm)
+    print(f"Written: {out_path}  ({len(asm.splitlines())} lines)",
+          file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()

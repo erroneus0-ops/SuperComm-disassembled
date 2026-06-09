@@ -1,7 +1,0 @@
-     008F             (     test_equ.asm):00001         I$Close  EQU   $8F
-                      (     test_equ.asm):00002         
-                      (     test_equ.asm):00003                  ORG   $0B8C
-0B8C 103F8F           (     test_equ.asm):00004         Insn_0B8C:     OS9   I$Close
-     0B8D             (     test_equ.asm):00005         Sub_0B8D       EQU   Insn_0B8C+1
-0B8F 6FC872           (     test_equ.asm):00006                        CLR   $72,U
-0B92 39               (     test_equ.asm):00007                        RTS
