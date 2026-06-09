@@ -13,18 +13,39 @@ The analyst never edits the JSON file directly.
 
 ## The workflow
 
+**First run** (no JSON exists yet):
+
+```
+python3 dis_project.py appname
+
+→ JSON not found — scaffold created automatically (appname_proj.json)
+→ Binary CRC recorded in JSON
+→ Disassembly runs immediately
+→ appname_proj.asm written
+```
+
 **Work stage** (repeat as needed):
 
 ```
-binary + appname_proj.json
+appname_proj.json + binary
         ↓
-    disassembler
+    dis_project.py          ← verifies binary CRC matches JSON
         ↓
-appname_proj.asm          ← analyst adds directives here
+appname_proj.asm            ← analyst adds directives here
         ↓
-edits_to_json.py          ← reads directives, updates appname_proj.json
+edits_to_json.py            ← reads directives, updates appname_proj.json
         ↓
     repeat
+```
+
+**If the binary changes** (e.g. a patched or restored version):
+
+```
+dis_project.py detects CRC mismatch and offers:
+  [1] Create new JSON importing analyst work — labels, comments,
+      routines carry over; binary-specific workarounds do not
+  [2] Proceed anyway
+  [3] Abort
 ```
 
 **Product stage** (when satisfied):

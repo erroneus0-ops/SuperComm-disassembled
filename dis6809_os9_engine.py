@@ -274,6 +274,22 @@ F$NMLink EQU    $28
 
 # ── Project: binary-specific knowledge ────────────────────────────────────────
 
+def crc24(data):
+    """Compute OS-9 CRC-24 over a byte sequence. Returns 6-char uppercase hex string."""
+    crc = 0xFFFFFF
+    for b in data:
+        crc ^= (b << 16)
+        for _ in range(8):
+            crc <<= 1
+            if crc & 0x1000000:
+                crc ^= 0x800063
+    return f'{crc & 0xFFFFFF:06X}'
+
+def binary_crc(path):
+    """Compute CRC-24 of a binary file. Returns 6-char uppercase hex string."""
+    return crc24(open(path, 'rb').read())
+
+
 class Project:
     """
     All binary-specific knowledge for a disassembly project.
@@ -282,6 +298,7 @@ class Project:
 
     def __init__(self):
         self.binary       = None      # path to binary file
+        self.binary_crc   = None      # CRC-24 hex string of binary at project creation
         self.cpu          = '6809'    # '6809' or '6309'
         self.output       = None      # path for output ASM
         self.entry        = None      # override entry point (int hex)
@@ -295,6 +312,8 @@ class Project:
         self.footnotes    = {}        # int -> {inline, detail:[lines]}
         self.patches      = {}        # int_addr -> [bytes_to_insert_before_addr]
         self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
+        self.substitutions= {}        # int_addr -> {replace_lines, with_lines}
+        self.routines     = []        # [{name, start, end}] routine boundaries
 
     @classmethod
     def from_json(cls, path):
@@ -304,6 +323,7 @@ class Project:
             d = json.load(f)
 
         p.binary        = d.get('binary', '')
+        p.binary_crc    = d.get('binary_crc', None)
         p.cpu           = d.get('cpu', '6809')  # '6809' or '6309'
         p.output        = d.get('output', None)
         p.module_notes  = d.get('module_notes', [])
@@ -355,13 +375,32 @@ class Project:
                 'inline': v.get('inline', ''),
                 'detail': v.get('detail', []),
             }
+
+        # substitutions: {"HHHH": {replace_lines:[...], with:[...]}}
+        p.substitutions = {}
+        for k, v in d.get('substitutions', {}).items():
+            p.substitutions[int(k, 16)] = {
+                'replace_lines': v.get('replace_lines', []),
+                'with_lines':    v.get('with', []),
+            }
+
+        # routines: [{name, start, end}]
+        p.routines = []
+        for r in d.get('routines', []):
+            p.routines.append({
+                'name':  r['name'],
+                'start': int(r['start'], 16),
+                'end':   int(r['end'],   16),
+            })
+
         return p
 
     def to_json(self, path):
         """Save project to JSON file."""
         d = {
-            'binary':  self.binary,
-            'cpu':     self.cpu,
+            'binary':      self.binary,
+            'binary_crc':  self.binary_crc,
+            'cpu':         self.cpu,
             'output':  self.output,
             'entry':   f'{self.entry:04X}' if self.entry else None,
             'module_notes':   self.module_notes,
@@ -371,14 +410,29 @@ class Project:
             'data_regions':   [
                 {'start': f'{r["start"]:04X}', 'end': f'{r["end"]:04X}',
                  'label': r['label'], 'comment': r['comment'],
-                 'format': r.get('format','auto')}
+                 'format': r.get('format','auto'),
+                 'end_label': r.get('end_label', False)}
                 for r in self.data_regions
             ],
             'line_comments':  {f'{k:04X}': v
                                for k,v in sorted(self.line_comments.items())},
             'block_comments': {f'{k:04X}': v
                                for k,v in sorted(self.block_comments.items())},
-            'footnotes':     {str(k): v for k,v in sorted(p.footnotes.items()) if hasattr(p,'footnotes')},
+            'substitutions':  {f'{k:04X}': {'replace_lines': v['replace_lines'],
+                                             'with': v['with_lines']}
+                               for k,v in sorted(self.substitutions.items())},
+            'routines':       [{'name': r['name'],
+                                'start': f'{r["start"]:04X}',
+                                'end':   f'{r["end"]:04X}'}
+                               for r in self.routines],
+            'footnotes':      {str(k): v
+                               for k,v in sorted(self.footnotes.items())
+                               if hasattr(self, 'footnotes')},
+            'forced_equs':    {f'{k:04X}': v
+                               for k,v in sorted(self.forced_equs.items())},
+            'patches':        {f'{k:04X}': {'insert': [f'${b:02X}' for b in v['bytes']],
+                                            'comment': v.get('comment','')}
+                               for k,v in sorted(self.patches.items())},
         }
         with open(path, 'w') as f:
             json.dump(d, f, indent=2)
@@ -388,9 +442,12 @@ class Project:
         """Create a minimal project scaffold for a new binary."""
         p = cls()
         p.binary = binary_path
-        p.output = output_path or binary_path + '.asm'
+        p.output = output_path or binary_path + '_proj.asm'
         p.module_notes = ["Add notes about this module here."]
         p.cpu = '6809'  # change to '6309' for Hitachi HD6309 binaries
+        # Compute and store binary CRC for future mismatch detection
+        if os.path.exists(binary_path):
+            p.binary_crc = binary_crc(binary_path)
         return p
 
 
