@@ -457,6 +457,34 @@ class Project:
 
 # ── Engine: generalized disassembler ─────────────────────────────────────────
 
+def _count_data_bytes(lines):
+    """Count how many binary bytes a list of FCB/FCC/FDB/FCS assembly lines represent."""
+    total = 0
+    for line in lines:
+        s = line.strip()
+        if not s or s.startswith(';'):
+            continue
+        if ';' in s:
+            s = s[:s.index(';')].strip()
+        upper = s.upper()
+        if upper.startswith('FCB'):
+            args = s[3:].strip()
+            total += len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FDB'):
+            args = s[3:].strip()
+            total += 2 * len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FCC') or upper.startswith('FCS'):
+            m = re.search(r'["\'](.+?)["\']', s)
+            if m:
+                total += len(m.group(1))
+        elif upper.startswith('RMB'):
+            try:
+                total += int(s[3:].strip())
+            except ValueError:
+                pass
+    return total
+
+
 class Engine:
     """
     Two-pass recursive-descent disassembler for OS-9 6809 binaries.
@@ -1367,6 +1395,20 @@ class Engine:
                 args = ','.join(f"${b:02X}" for b in patch['bytes'])
                 out.append(f"         FCB    {args}{cmt}")
 
+            # ── Substitution: analyst-supplied replacement for these bytes ──
+            subs = self.project.substitutions if hasattr(self.project, 'substitutions') else {}
+            if i in subs:
+                sub = subs[i]
+                # Emit the analyst's replacement lines verbatim
+                for wline in sub.get('with_lines', []):
+                    out.append(wline)
+                # Advance past the bytes covered by the replace block
+                # Count bytes from the replace_lines
+                replace_bytes = _count_data_bytes(sub.get('replace_lines', []))
+                i += max(replace_bytes, 1)
+                last_printable = False
+                continue
+
             b = d[i]
 
             if fmt == 'iwrite':
@@ -1619,11 +1661,13 @@ class Engine:
                 if first_lbl_addr > pre_data_start:
                     out.extend(self.emit_data(pre_data_start, first_lbl_addr, {}))
                 # Build pre-exec format override map from data_regions
-                pre_fmt_map = {}  # addr -> fmt string for sub-regions
+                pre_fmt_map = {}  # addr -> (end, fmt, comment, end_label, label)
                 for r in proj.data_regions:
                     if r['start'] < exec_off:
                         pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
-                                                    r.get('comment',''))
+                                                    r.get('comment',''),
+                                                    r.get('end_label', False),
+                                                    r.get('label', ''))
 
                 # Emit each labeled block with its xref comment
                 for pi, (paddr, plbl) in enumerate(pre_sub):
@@ -1642,15 +1686,20 @@ class Engine:
                     cur = paddr
                     while cur < pend:
                         if cur in pre_fmt_map:
-                            rend, rfmt, rcmt = pre_fmt_map[cur]
+                            rend, rfmt, rcmt, r_end_label, r_label = pre_fmt_map[cur]
                             rend = min(rend, pend)
                             if cur > paddr:
                                 out.extend(self.emit_data(paddr, cur, 
                                     {k:v for k,v in sub.items() if paddr <= k < cur}))
                             if rcmt:
-                                out.append(f"; {rcmt}")
+                                for cline in rcmt.split('\n'):
+                                    out.append(f"; {cline}")
                             out.extend(self.emit_data(cur, rend,
                                 {k:v for k,v in sub.items() if cur <= k < rend}, rfmt))
+                            # Emit end_label if declared for this region
+                            if r_end_label:
+                                end_lbl = r_label or f'Dat_{cur:04X}'
+                                out.append(f"{end_lbl}end")
                             cur = rend
                             paddr = cur  # update start for remainder
                         else:
@@ -1749,6 +1798,10 @@ class Engine:
                     sub = {k:v for k,v in lbs.items()
                            if span_start < k < region_end}
                     out.extend(self.emit_data(span_start, region_end, sub, fmt))
+                    # Emit end label if declared
+                    if proj_r.get('end_label'):
+                        end_lbl = proj_r.get('label', f'Dat_{span_start:04X}')
+                        out.append(f"{end_lbl}end")
                     prev_ret = False
                     # Skip all code_pts that fall within this region
                     # (handled by the outer loop's span_start check below)
