@@ -2271,6 +2271,8 @@ Examples:
     parser.add_argument('--update-labels', action='store_true',
         help='Merge auto-generated labels into the project JSON '
              '(preserves existing names, adds only new ones)')
+    parser.add_argument('-n', action='store_true', dest='no_confirm',
+        help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
 
     # ── --source is always required ───────────────────────────────────────
@@ -2291,8 +2293,16 @@ Examples:
         json_path = args.proj
 
         if not os.path.exists(json_path):
-            # --proj given but file doesn't exist → create scaffold
-            print(f"Project file not found. Creating: {json_path}")
+            # --proj given but file doesn't exist → confirm before creating
+            print(f"  Project file not found: {json_path}")
+            if not args.no_confirm:
+                try:
+                    answer = input("  Create new project JSON? [y/N]: ").strip().lower()
+                except (EOFError, KeyboardInterrupt):
+                    answer = ''
+                if answer != 'y':
+                    print("  Aborted.")
+                    sys.exit(0)
             stem = json_path
             for suffix in ('_proj.json', '.json'):
                 if stem.endswith(suffix):
@@ -2300,6 +2310,7 @@ Examples:
                     break
             proj = Project.scaffold(source, stem + '_proj.asm')
             proj.to_json(json_path)
+            print(f"  Created:    {json_path}")
             print(f"  Binary:     {source}")
             print(f"  Binary CRC: {proj.binary_crc}")
             print(f"  Output:     {proj.output}")
@@ -2370,19 +2381,21 @@ Examples:
             sys.exit(1)
 
         else:
-            # No JSON anywhere — prompt for a name
-            print(f"  --proj not specified and no project file found.")
-            print(f"  Enter a name for the new project JSON file,")
-            print(f"  or press Enter to use the default ({inferred}):")
-            print()
-
-            try:
-                new_name = input("  Project JSON name: ").strip()
-            except (EOFError, KeyboardInterrupt):
-                new_name = ''
-
-            if not new_name:
+            # No JSON anywhere — prompt for a name or use default with -n
+            if args.no_confirm:
                 new_name = inferred
+                print(f"  Creating default project: {new_name}")
+            else:
+                print(f"  --proj not specified and no project file found.")
+                print(f"  Enter a name for the new project JSON file,")
+                print(f"  or press Enter to use the default ({inferred}):")
+                print()
+                try:
+                    new_name = input("  Project JSON name: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    new_name = ''
+                if not new_name:
+                    new_name = inferred
             if not new_name.endswith('.json'):
                 new_name += '.json'
 
