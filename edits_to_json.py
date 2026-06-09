@@ -198,25 +198,51 @@ def parse_directives(lines, json_path=None):
         # Also build from auto-generated names visible in the listing
         # by scanning for Dat_XXXX / Sub_XXXX patterns
     # Additionally scan the listing itself for bare labels with addresses on nearby lines
-    listing_labels = {}  # label_name -> addr from the listing
-    _last_addr = None
-    for _line in lines:
-        _a = extract_addr(_line.rstrip())
-        if _a is not None:
-            _last_addr = _a
-        elif LABEL_LINE_RE.match(_line.rstrip()):
-            _lbl = _line.strip()
-            if _last_addr is not None and _lbl not in listing_labels:
-                # label precedes an address — store it
-                pass
-    # Simpler: scan forward from each bare label to find its address
+    # Build label→address map from LEAX/LEAY/LEAU xref lines in the listing.
+    # Pre-exec data labels have no $XXXX prefix on their own line, but
+    # code that references them has lines like:
+    #   $0BCC  30 8D F4 9F   LEAX Dat_006F,PC   ; X → Dat_006F
+    # We extract the target label and look up the instruction's PC-relative target.
+    # Simpler: parse "; X → Label" or "; Y → Label" comments which give us the label
+    # name, then find the LEAX instruction's address and operand to compute target.
+    # Even simpler: scan for lines where a known label appears as a bare label
+    # preceded by an address in the LISTING hex dump format:
+    # $HHHH  HH ...   Label:   mnemonic
+    LABELED_INSN_RE = re.compile(
+        r'^\$([0-9A-Fa-f]{4})\s+(?:[0-9A-Fa-f]{2}\s+)+\s*([A-Za-z_][A-Za-z0-9_]*):\s')
+    # Also scan for xref comments: "; X → Label" or "; Y → Label"
+    XREF_RE = re.compile(r';\s*[XYUS]\s*→\s*([A-Za-z_][A-Za-z0-9_]*)')
+    # And LEAX/LEAY with PCR: $HHHH  30 8D xx xx   LEAX Label,PC
+    LEAX_RE = re.compile(
+        r'^\$([0-9A-Fa-f]{4})\s+30 8D ([0-9A-Fa-f]{2}) ([0-9A-Fa-f]{2})\s')
+
+    listing_labels = {}
+
     for _idx, _raw in enumerate(lines):
         _line = _raw.rstrip()
-        if LABEL_LINE_RE.match(_line):
-            _lbl = _line.strip()
-            _addr = next_addr_from_lines(lines, _idx + 1)
-            if _addr is not None:
-                listing_labels[_lbl] = _addr
+
+        # Labeled instruction: $HHHH  xx xx  Label:  mnemonic
+        m = LABELED_INSN_RE.match(_line)
+        if m:
+            listing_labels[m.group(2)] = int(m.group(1), 16)
+            continue
+
+        # LEAX/LEAY PC-relative — compute target from offset
+        m = LEAX_RE.match(_line)
+        if m:
+            insn_addr = int(m.group(1), 16)
+            hi = int(m.group(2), 16)
+            lo = int(m.group(3), 16)
+            raw_off = (hi << 8) | lo
+            signed_off = raw_off - 0x10000 if raw_off >= 0x8000 else raw_off
+            target = insn_addr + 4 + signed_off  # PC after 4-byte LEAX ,PCR
+            # Find the label name from the xref comment on this line
+            xm = XREF_RE.search(_line)
+            if xm:
+                lbl = xm.group(1)
+                if lbl not in listing_labels:
+                    listing_labels[lbl] = target
+
     label_to_addr.update(listing_labels)
 
     while i < len(lines):
@@ -300,10 +326,23 @@ def parse_directives(lines, json_path=None):
         elif line == '/end-label/':
             lbl = current_data_label(lines, i)
             if lbl:
+                # end_addr = address of next bare label after this directive
+                end_addr = None
+                for j in range(i + 1, len(lines)):
+                    nl = lines[j].rstrip()
+                    if nl.startswith('/') or nl.startswith(';') or nl == '':
+                        continue
+                    if LABEL_LINE_RE.match(nl):
+                        end_lbl = nl.strip()
+                        end_addr = label_to_addr.get(end_lbl)
+                        break
+                    if extract_addr(nl):
+                        break
                 changes['data_regions'].append({
-                    'action':    'end_label',
-                    'label':     lbl,
-                    'end_addr':  current_addr,
+                    'action':     'end_label',
+                    'label':      lbl,
+                    'end_addr':   end_addr,
+                    'label_addr': label_to_addr.get(lbl),
                 })
             else:
                 changes['warnings'].append(
@@ -445,6 +484,9 @@ def merge_into_json(json_path, changes, warn):
             r['end_label'] = True
             if 'end' not in r and action.get('end_addr') is not None:
                 r['end'] = f"{action['end_addr']:04X}"
+            # Populate start from label address if known
+            if 'start' not in r and action.get('label_addr') is not None:
+                r['start'] = f"{action['label_addr']:04X}"
         elif action['action'] == 'format':
             r['format'] = action['format']
         elif action['action'] == 'comment':

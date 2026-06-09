@@ -344,9 +344,11 @@ class Project:
 
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
+            if 'start' not in r: continue
             p.data_regions.append({
                 'start':   int(r['start'], 16),
-                'end':     int(r['end'],   16),
+                'end':     int(r['end'], 16) if 'end' in r else None,
+                'end_label': r.get('end_label', False),
                 'label':   r.get('label', f"Dat_{r['start']}"),
                 'comment': r.get('comment', ''),
                 'format':  r.get('format', 'auto'),  # 'auto','fdb','raw'
