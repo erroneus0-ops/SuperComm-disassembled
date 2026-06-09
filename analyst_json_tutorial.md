@@ -1,31 +1,213 @@
-# Analyst's Guide: Refining Disassembly Output via the JSON Project File
+# Analyst's Guide: Annotating a Disassembly
 
 ## Overview
 
-The disassembler produces generalized output from the binary alone. The JSON project
-file is where the analyst adds program-specific knowledge — meaningful label names,
-data region formats, comments, and structural annotations. The disassembler never
-modifies the binary interpretation; it only refines how that interpretation is presented.
+The disassembler produces generalized output from the binary alone. The analyst
+refines that output by adding directives directly to the `appname_proj.asm` file.
+When ready, a script reads those directives and updates the project JSON. The next
+disassembly run reflects all changes.
 
-The pipeline is:
+The analyst never edits the JSON file directly.
+
+---
+
+## The workflow
+
+**Work stage** (repeat as needed):
 
 ```
-binary → disassembler → proj.asm  (generalized output)
-                            ↓
-                    analyst edits JSON
-                            ↓
-                binary → disassembler → proj.asm  (refined output)
-                            ↓
-                    strip_listing.py → clean.asm
-                            ↓
-                    assembler → binary  (must match original)
+binary + appname_proj.json
+        ↓
+    disassembler
+        ↓
+appname_proj.asm          ← analyst adds directives here
+        ↓
+edits_to_json.py          ← reads directives, updates appname_proj.json
+        ↓
+    repeat
+```
+
+**Product stage** (when satisfied):
+
+```
+appname_proj.asm
+        ↓
+strip_listing.py → appname_clean.asm
+        ↓
+assembler → appname_assembled.bin
+        ↓
+compare_bins.py ← original binary   (must match)
 ```
 
 ---
 
-## Case Study: Dat_006F — the SuperComm Splash Screen block
+## Directive syntax
 
-### What the disassembler produces (before analyst work):
+All directives begin with `/` in column 1. They are invisible to the assembler —
+`strip_listing.py` removes them before assembly. Directives remain in the proj.asm
+until the analyst regenerates from the disassembler, at which point they are
+replaced by the clean output that the updated JSON now drives.
+
+---
+
+### Assign a label
+
+```
+/label/ ShowSplash
+$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC
+```
+
+Assigns the name `ShowSplash` to address `$0BCC`. All references to that address
+throughout the listing — branch targets, "Referenced by" comments, LEAX targets —
+will use `ShowSplash` on the next disassembly run.
+
+Applying `/label/` to an address that already has a name replaces it. All
+references update automatically.
+
+---
+
+### Add a block comment
+
+```
+/comment/
+Displays the SuperComm splash screen.
+Part of Init — loads Dat_006F into X then calls WriteBlock.
+/end-comment/
+$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC
+```
+
+Adds comment lines above the address on the next disassembly run.
+
+---
+
+### Override an inline comment
+
+```
+$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC  /; load splash block into X/
+```
+
+The `/; ... /` at the end of a listing line replaces the auto-generated inline
+comment for that address.
+
+---
+
+### Substitute disassembler output
+
+Replaces one or more lines of disassembler output with analyst-supplied content:
+
+```
+Dat_006F
+; Referenced by: $0BCC
+/replace/
+         FCB    $00               ; NUL
+         FCB    $55               ; 'U'
+/with/
+         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content (excl. this word)
+/end-replace/
+         FCB    $0C               ; FF clear+home
+         ...
+```
+
+The `/replace/` block contains the exact lines as the disassembler produced them.
+The `/with/` block contains the analyst's replacement. The script records the
+substitution in the JSON; the disassembler applies it on future runs.
+
+---
+
+### Mark a data region end
+
+```
+         FCC    "Dave Philipsen"
+/end-label/
+
+Dat_00C6
+```
+
+The `/end-label/` directive marks the current position as the end of the preceding
+named data region. On future disassembly runs a `Dat_006Fend` label is emitted at
+this address, enabling length arithmetic such as `Dat_006Fend-Dat_006F-2`.
+
+Place `/end-label/` after the last line of the data block, before the next label.
+
+---
+
+### Declare a data region format
+
+```
+Dat_006F
+/format/ writeblock
+```
+
+Sets the rendering format for the named data region immediately above. Known
+formats: `auto`, `fdb`, `raw`, `writeblock`, `iwrite`.
+
+---
+
+### Add a data region comment
+
+```
+Dat_006F
+/region-comment/
+Splash screen display block — passed to WriteBlock.
+First word is byte count of display content (excl. this word).
+/end-region-comment/
+```
+
+Adds a descriptive comment block above the data region on future disassembly runs.
+
+---
+
+### Declare a routine boundary
+
+```
+/routine/ Init
+$0A71  9F 00                              STX <$00
+         ...
+$0BFF  39                                 RTS
+/routine-end/ Init
+```
+
+**`/routine/`** — place immediately before the first instruction of the routine.
+Assigns `Init` as the label for that address.
+
+**`/routine-end/`** — place immediately after the last instruction of the routine.
+The last instruction may be `RTS`, `PULS ...,PC`, a tail-call `LBRA`, or any other
+exit form — the analyst decides, not the script.
+
+**Effect:** All anonymous auto-generated labels (`Sub_XXXX`, `Dat_XXXX`) within
+the routine boundary are renamed `Init_01`, `Init_02`, etc. in address order.
+Analyst-assigned labels within the range are left untouched.
+
+A `Initend` label is emitted at the `/routine-end/` address.
+
+---
+
+## Running the script
+
+```
+python3 edits_to_json.py appname_proj.asm
+```
+
+The JSON file is inferred from the ASM filename. Or specify it explicitly:
+
+```
+python3 edits_to_json.py appname_proj.asm appname_proj.json
+```
+
+The script is safe to run multiple times. Applying the same directive twice
+updates the JSON entry rather than duplicating it.
+
+After running the script, regenerate the disassembly to see the changes:
+
+```
+python3 dis_project.py appname_proj.json
+```
+
+---
+
+## A complete example
+
+Starting from this disassembler output:
 
 ```asm
 Dat_006F
@@ -35,7 +217,13 @@ Dat_006F
          FCB    $0C               ; FF clear+home
          FCB    CurXY,$23,$21     ; CurXY(row=3,col=1)
          FCC    "SuperComm   v2.2"
-         ...
+         FCB    CurXY,$24,$23     ; CurXY(row=4,col=3)
+         FCC    "Copyright (c)"
+         FCB    CurXY,$23,$24     ; CurXY(row=3,col=4)
+         FCC    "1988, 1989, 1992"
+         FCB    CurXY,$26,$26     ; CurXY(row=6,col=6)
+         FCC    "written by"
+         FCB    CurXY,$24,$27     ; CurXY(row=4,col=7)
          FCC    "Dave Philipsen"
 
 Dat_00C6
@@ -44,211 +232,93 @@ $0BCC  30 8D F4 9F                        LEAX Dat_006F,PC       ; X → Dat_006
 $0BD0  17 0F 30                           LBSR WriteBlock
 ```
 
-### What the analyst knows:
+The analyst adds directives:
 
-1. `$0BCC` is the entry point of the splash screen display routine
-2. The first two bytes (`$00 $55`) are a 16-bit length word — the byte count of the
-   display content that follows (not including the length word itself)
-3. `$55` = 85 = `Dat_00C6 - Dat_006F - 2` — exactly the display content byte count
-4. The length word format is used by `WriteBlock` — a custom display subroutine
+```asm
+Dat_006F
+; Referenced by: $0BCC
+/region-comment/
+Splash screen display block — passed to WriteBlock.
+First word is byte count of display content, not including itself.
+/end-region-comment/
+/replace/
+         FCB    $00               ; NUL
+         FCB    $55               ; 'U'
+/with/
+         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content
+/end-replace/
+         FCB    $0C               ; FF clear+home
+         FCB    CurXY,$23,$21     ; CurXY(row=3,col=1)
+         FCC    "SuperComm   v2.2"
+         FCB    CurXY,$24,$23     ; CurXY(row=4,col=3)
+         FCC    "Copyright (c)"
+         FCB    CurXY,$23,$24     ; CurXY(row=3,col=4)
+         FCC    "1988, 1989, 1992"
+         FCB    CurXY,$26,$26     ; CurXY(row=6,col=6)
+         FCC    "written by"
+         FCB    CurXY,$24,$27     ; CurXY(row=4,col=7)
+         FCC    "Dave Philipsen"
+/end-label/
 
-### What the analyst wants the output to look like:
+Dat_00C6
+...
+/label/ ShowSplash
+/comment/
+Part of Init. Displays the SuperComm splash screen.
+X is loaded with the Dat_006F display block, then WriteBlock is called.
+/end-comment/
+$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC  /; load splash block into X/
+$0BD0  17 0F 30                           LBSR WriteBlock
+```
+
+Run the script:
+
+```
+python3 edits_to_json.py supercomm22_proj.asm
+```
+
+Regenerate:
+
+```
+python3 dis_project.py supercomm22_proj.json
+```
+
+The next disassembly run produces:
 
 ```asm
 Dat_006F
 ; Referenced by: ShowSplash
-; Splash screen display block — passed to WriteBlock at ShowSplash+$04
-         FDB    Dat_00C6-Dat_006F-2  ; byte count of display content (excl. this word)
+; Splash screen display block — passed to WriteBlock.
+; First word is byte count of display content, not including itself.
+         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content
          FCB    $0C               ; FF clear+home
          FCB    CurXY,$23,$21     ; CurXY(row=3,col=1)
          FCC    "SuperComm   v2.2"
          ...
          FCC    "Dave Philipsen"
+Dat_006Fend
 
 Dat_00C6
 ...
+; Part of Init. Displays the SuperComm splash screen.
+; X is loaded with the Dat_006F display block, then WriteBlock is called.
 ShowSplash
-$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC       ; X → Dat_006F
-$0BD0  17 0F 30                           LBSR WriteBlock
+$0BCC  30 8D F4 9F    ShowSplash:    LEAX Dat_006F,PC       ; load splash block into X
+$0BD0  17 0F 30                      LBSR WriteBlock
 ```
 
 ---
 
-## JSON Edits Required
+## Appendix: JSON field reference
 
-Open `supercomm22.json` and make the following additions:
+The following fields in `appname_proj.json` are managed by `edits_to_json.py`.
+This is provided for reference only — the analyst does not edit these directly.
 
-### 1. Name the code label at `$0BCC`
-
-Add to the `"labels"` section:
-
-```json
-"labels": {
-    "0A71": "Init",
-    "0BCC": "ShowSplash"
-}
-```
-
-**Effect:** "Referenced by: $0BCC" becomes "Referenced by: ShowSplash" in the data
-region header. When all callers are named, no raw addresses appear in "Referenced by"
-lines.
-
----
-
-### 2. Declare `Dat_006F` as an analyst-formatted data region
-
-Add to the `"data_regions"` array:
-
-```json
-{
-    "start": "006F",
-    "end":   "00C6",
-    "label": "Dat_006F",
-    "end_label": true,
-    "comment": "Splash screen display block — passed to WriteBlock at ShowSplash+$04\nFirst word is byte count of display content (excl. this word): Dat_00C6-Dat_006F-2",
-    "format": "writeblock"
-}
-```
-
-**Fields explained:**
-
-| Field | Purpose |
-|-------|---------|
-| `"start"` | Address of first byte of the region (hex, no `$`) |
-| `"end"` | Address of first byte AFTER the region — matches the next label |
-| `"label"` | Label name to assign. If blank, uses auto-generated name |
-| `"end_label": true` | Instructs the disassembler to emit a `Dat_006Fend` label at the end address, enabling `end-start` arithmetic in the source |
-| `"comment"` | Block comment emitted above the region. Use `\n` for multiple lines |
-| `"format"` | Rendering format. See format options below |
-
----
-
-### 3. Format options for `"format"`
-
-| Value | Description |
-|-------|-------------|
-| `"auto"` | Default — disassembler chooses FCC/FCS/FCB/CurXY heuristically |
-| `"fdb"` | Emit every 2-byte pair as FDB — used for lookup tables |
-| `"raw"` | Emit every byte as FCB $xx — used for binary/non-text data |
-| `"writeblock"` | *(to be implemented)* First word as `FDB end-start-2`, remainder as `auto` |
-
-> **Note:** `"writeblock"` format is a program-specific convention for `WriteBlock`
-> calls. It is not the same as the OS9 `I$Write` format (which uses the full block
-> size including the length word). The analyst declares which regions use it;
-> the disassembler cannot auto-detect it from the binary alone.
-
----
-
-### 4. Add a `line_comment` override for the FDB line
-
-If you want a specific comment on the length word line, add to `"line_comments"`:
-
-```json
-"line_comments": {
-    "006F": "byte count of display content (excl. this word)"
-}
-```
-
-**Effect:** The FDB line will read:
-```asm
-         FDB    Dat_00C6-Dat_006F-2  ; byte count of display content (excl. this word)
-```
-
----
-
-### 5. The `end_label` convention
-
-When `"end_label": true` is set on a data region, the disassembler emits a label
-at the end address in the form `<label>end`:
-
-```asm
-Dat_006F
-         FDB    Dat_006Fend-Dat_006F-2
-         ...display content...
-Dat_006Fend          ; ← auto-generated when end_label: true
-```
-
-This enables self-describing length arithmetic throughout the source. The analyst
-never hardcodes a byte count; the assembler always computes the correct value.
-
-**Rule:** Any named data region that has a length word as its first field should
-have `"end_label": true` set in the JSON.
-
----
-
-### 6. The `block_comments` field
-
-For multi-line comments above any address (code or data):
-
-```json
-"block_comments": {
-    "0BCC": [
-        "Display the SuperComm splash screen.",
-        "X → Dat_006F (display block), calls WriteBlock to render via I$Write."
-    ]
-}
-```
-
-**Effect:**
-```asm
-; Display the SuperComm splash screen.
-; X → Dat_006F (display block), calls WriteBlock to render via I$Write.
-ShowSplash
-$0BCC  30 8D F4 9F                        LEAX Dat_006F,PC
-```
-
----
-
-## Summary: Full JSON additions for this case
-
-```json
-"labels": {
-    "0A71": "Init",
-    "0BCC": "ShowSplash"
-},
-
-"data_regions": [
-    {
-        "start":     "006F",
-        "end":       "00C6",
-        "label":     "Dat_006F",
-        "end_label": true,
-        "comment":   "Splash screen display block — passed to WriteBlock at ShowSplash+$04\nFirst word is byte count of display content (excl. this word): Dat_00C6-Dat_006F-2",
-        "format":    "writeblock"
-    }
-],
-
-"block_comments": {
-    "0BCC": [
-        "Display the SuperComm splash screen.",
-        "X → Dat_006F (display block), calls WriteBlock to render via I$Write."
-    ]
-},
-
-"line_comments": {
-    "006F": "byte count of display content (excl. this word)"
-}
-```
-
----
-
-## What still requires analyst judgment
-
-The disassembler cannot determine from the binary alone:
-
-- Whether `$00 $55` is a length word or two independent bytes
-- Whether the calling convention is `WriteBlock` vs `I$Write` vs something else
-- What a subroutine does (only where it's called from)
-- Whether a data region is a splash screen, an error message, or a lookup table
-
-These distinctions live in the JSON. The JSON is the analyst's contribution —
-the program-specific layer that transforms a correct disassembly into an
-intelligible one.
-
----
-
-## Implementation note: `end_label` and `writeblock` format
-
-These two features (`end_label: true` and `format: "writeblock"`) are not yet
-implemented in the engine. They are the next items for the development backlog.
-The tutorial describes the intended interface; the implementation follows.
+| Field | Type | Purpose |
+|-------|------|---------|
+| `labels` | `{"HHHH": "Name"}` | Address-to-name mappings |
+| `block_comments` | `{"HHHH": ["line1","line2"]}` | Comments above an address |
+| `line_comments` | `{"HHHH": "text"}` | Inline comment override |
+| `substitutions` | `{"HHHH": {replace_lines, with}}` | Output substitutions |
+| `data_regions` | `[{start, end, label, format, comment, end_label}]` | Data region declarations |
+| `routines` | `[{name, start, end}]` | Routine boundary declarations |
