@@ -541,7 +541,7 @@ def main():
     print(f"Reading:  {asm_path}")
     print(f"Updating: {json_path}")
 
-    with open(asm_path) as f:
+    with open(asm_path, encoding='utf-8', errors='replace') as f:
         lines = f.readlines()
 
     warnings = []
