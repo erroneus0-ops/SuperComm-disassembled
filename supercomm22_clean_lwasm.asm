@@ -1148,7 +1148,7 @@ Sub_0AA2:      LDA ,X+
 	BRA *+6
 
 ; --------------------------------------------------------------
-Sub_0AB6:      LEAX Dat_035A,PC       ; X → Dat_035A
+Sub_0AB6:      LEAX Dat_035A,PCR       ; X → Dat_035A
 Sub_0ABA:      LEAY BSS.Counter1,U   
 	LDB #$0A               ; B = SS.DevNm  (GetStt/SetStt subcode)
 Sub_0ABF:      LDA ,X+               
@@ -1174,21 +1174,21 @@ Sub_0ACA:      STA ,Y+
 	STB 3204,U            
 	ORA 3204,U            
 	STA BSS.BufPtr3,U     
-	LEAX Dat_0A24,PC       ; X → Dat_0A24
+	LEAX Dat_0A24,PCR       ; X → Dat_0A24
 	LEAY 3237,U           
 	LDB #$4D               ; B = 'M'
 	LBSR Sub_2D1E          ; call Sub_2D1E
 	LDA #$03              
-	LEAX Dat_0A51,PC       ; X → Dat_0A51
+	LEAX Dat_0A51,PCR       ; X → Dat_0A51
 	OS9 I$ChgDir           ; mode=B  name→X
-	LEAX Dat_0366,PC       ; X → Dat_0366
+	LEAX Dat_0366,PCR       ; X → Dat_0366
 	LEAY 119,U            
 	LDB #$0B               ; B = SS.FD  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
 Sub_0B1D:      LBSR Sub_1BDF          ; call Sub_1BDF
 	LBSR Sub_1C57          ; call Sub_1C57
 	LBSR Sub_1BC7          ; call Sub_1BC7
-	LEAX Dat_0F18,PC       ; X → Dat_0F18
+	LEAX Dat_0F18,PCR       ; X → Dat_0F18
 	OS9 F$Icpt             ; handler→X  data→U
 	LEAX 223,U            
 	LDD #$0000            
@@ -1203,7 +1203,7 @@ Sub_0B1D:      LBSR Sub_1BDF          ; call Sub_1BDF
 	LEAU 25,U             
 	OS9 F$CpyMem           ; src→X  dst→Y  count=D
 	PULS U                
-	LEAX Dat_0360,PC       ; X → Dat_0360
+	LEAX Dat_0360,PCR       ; X → Dat_0360
 	LDA #$03              
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	BCS *+58  ; C=1 (BLO)
@@ -1239,16 +1239,16 @@ Sub_0B92:      LEAX 1295,U
 	STA 3354,U            
 	LDD #$1B32             ; D=ESC+'2'  → W.FColor: Foreground Color
 	STD 156,U             
-	LEAX Dat_045E,PC       ; X → Dat_045E
+	LEAX Dat_045E,PCR       ; X → Dat_045E
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1A04            
 	STD 3215,U            
 	LDD #$1609            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_006F,PC       ; X → Dat_006F
+	LEAX Dat_006F,PCR       ; X → Dat_006F
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1AE8          ; call Sub_1AE8
 	LDX #$001C            
@@ -1258,7 +1258,7 @@ Sub_0B92:      LEAX 1295,U
 	LDD #$1304            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_00C6,PC       ; X → Dat_00C6
+	LEAX Dat_00C6,PCR       ; X → Dat_00C6
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_3BBC          ; call Sub_3BBC
 Sub_0BF7:      CLRA                   ; A = 0
@@ -1274,14 +1274,14 @@ Sub_0BF7:      CLRA                   ; A = 0
 Sub_0C08:      LBSR Sub_2AC5          ; call Sub_2AC5
 Sub_0C0B:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$03              
 	LEAX BSS.Counter1,U   
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	LBCS Sub_0F15         
 	STA 43,U              
-	LEAX Dat_045E,PC       ; X → Dat_045E
+	LEAX Dat_045E,PCR       ; X → Dat_045E
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_117F          ; call Sub_117F
 	LBSR Sub_2B86          ; call Sub_2B86
@@ -1292,7 +1292,7 @@ Sub_0C0B:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LBSR Sub_134D          ; call Sub_134D
 	LBSR Sub_12B5          ; call Sub_12B5
 	LDA #$00               ; A = NUL
-	LEAX Dat_031A,PC       ; X → Dat_031A
+	LEAX Dat_031A,PCR       ; X → Dat_031A
 	STX 108,U             
 	LEAX 1550,U           
 Insn_0C54:     LDY #$0001            
@@ -1452,7 +1452,7 @@ Sub_0D62:      INC 3210,U
 Sub_0D92:      PSHS Y                
 	LEAY 2829,U           
 	STY 3213,U            
-	PULS Y,PC              ; return from subroutine  (PULS PC = RTS)
+	PULS Y,PCR              ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_0D9F:      PSHS Y                
@@ -1570,7 +1570,7 @@ Sub_0EA6:      PULS A,B,X
 
 ; --------------------------------------------------------------
 Sub_0EAB:      PSHS X                
-	LEAX Dat_03E6,PC       ; X → Dat_03E6
+	LEAX Dat_03E6,PCR       ; X → Dat_03E6
 	BRA *+50
 
 ; --------------------------------------------------------------
@@ -1581,7 +1581,7 @@ Sub_0EB3:      LDB BSS.BufPtr3,U
 	BCS *-50  ; C=1 (BLO)
 	SUBA #$1E             
 	PSHS X                
-	LEAX Dat_040E,PC       ; X → Dat_040E
+	LEAX Dat_040E,PCR       ; X → Dat_040E
 	BRA *+29
 
 ; --------------------------------------------------------------
@@ -1592,12 +1592,12 @@ Sub_0EC8:      LDB BSS.BufPtr3,U
 	BCS *-71  ; C=1 (BLO)
 	SUBA #$28             
 	PSHS X                
-	LEAX Dat_0436,PC       ; X → Dat_0436
+	LEAX Dat_0436,PCR       ; X → Dat_0436
 	BRA *+8
 
 ; --------------------------------------------------------------
 Sub_0EDD:      PSHS X                
-	LEAX Dat_03D6,PC       ; X → Dat_03D6
+	LEAX Dat_03D6,PCR       ; X → Dat_03D6
 Sub_0EE3:      LDB #$05               ; B = SS.Pos  (GetStt/SetStt subcode)
 	MUL                    ; D = A×B unsigned
 	LEAX B,X              
@@ -1650,7 +1650,7 @@ Sub_0F20:      PSHS A,X,Y
 	LDA 62,U              
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_0F56:      PSHS A                
@@ -1713,7 +1713,7 @@ Sub_0FA5:      LDA #$30               ; A = '0'
 Sub_0FAC:      LDA 62,U              
 	LDY #$000B            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_0FB8:      CLRA                   ; A = 0
@@ -1805,7 +1805,7 @@ Sub_1084:      LDA ,X+
 	CLR 113,U             
 Sub_108C:      CMPA ,Y               
 	BEQ *+28
-Sub_1090:      LEAY Dat_031A,PC       ; Y → Dat_031A
+Sub_1090:      LEAY Dat_031A,PCR       ; Y → Dat_031A
 	STY 108,U             
 	TST 113,U             
 	BNE *+7
@@ -1816,13 +1816,13 @@ Sub_1090:      LEAY Dat_031A,PC       ; Y → Dat_031A
 Sub_10A2:      CLR 113,U             
 	TSTB                  
 	BNE *-34
-Sub_10A8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_10A8:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_10AA:      LEAY 1,Y              
 	STY 108,U             
 	TST ,Y                
 	BNE *-16
 	INC 107,U             
-	LEAY Dat_031A,PC       ; Y → Dat_031A
+	LEAY Dat_031A,PCR       ; Y → Dat_031A
 	STY 108,U             
 	BRA *-79
 
@@ -1852,17 +1852,17 @@ Sub_10E2:      PSHS A,B,X
 	LDA ,X                
 	CMPA #$02              ; compare A with CurXY
 	BEQ *+11
-	LEAX Dat_0464,PC       ; X → Dat_0464
+	LEAX Dat_0464,PCR       ; X → Dat_0464
 	BSR *-32  ; call Sub_10D2
 Sub_10F4:      LBRA Sub_0EA6         
-Sub_10F7:      LEAX Dat_045E,PC       ; X → Dat_045E
+Sub_10F7:      LEAX Dat_045E,PCR       ; X → Dat_045E
 	BSR *-41  ; call Sub_10D2
 	LBSR Sub_1422          ; call Sub_1422
 	BRA *-12
 
 ; --------------------------------------------------------------
 Sub_1102:      PSHS A,B,X            
-	LEAX Dat_0461,PC       ; X → Dat_0461
+	LEAX Dat_0461,PCR       ; X → Dat_0461
 	BSR *-54  ; call Sub_10D2
 	LBRA Sub_0EA6         
 
@@ -1872,9 +1872,9 @@ Sub_110D:      LDD #$1A01
 	LDD #$340D            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0109,PC       ; X → Dat_0109
+	LEAX Dat_0109,PCR       ; X → Dat_0109
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 Sub_112C:      LBSR Sub_2AC5          ; call Sub_2AC5
 	CMPA #$20              ; compare A with ' '
@@ -1889,8 +1889,8 @@ Sub_113B:      ADDA #$80
 ; --------------------------------------------------------------
 Sub_113F:      CMPA #$0A              ; compare A with LF
 	BEQ *-6
-	LDB Dat_0A15,PC       
-	LEAX Dat_0A16,PC       ; X → Dat_0A16
+	LDB Dat_0A15,PCR       
+	LEAX Dat_0A16,PCR       ; X → Dat_0A16
 Sub_114B:      CMPA ,X+              
 	BEQ *+7
 	DECB                  
@@ -1900,18 +1900,18 @@ Sub_114B:      CMPA ,X+
 ; --------------------------------------------------------------
 Sub_1154:      ADDA #$A0             
 Sub_1156:      PSHS A                
-	LEAX Dat_03C4,PC       ; X → Dat_03C4
+	LEAX Dat_03C4,PCR       ; X → Dat_03C4
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	PULS A                
 	LBRA Sub_1597         
 
 ; --------------------------------------------------------------
-Sub_116B:      LEAX Dat_03C4,PC       ; X → Dat_03C4
+Sub_116B:      LEAX Dat_03C4,PCR       ; X → Dat_03C4
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1BAD          ; call Sub_1BAD
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LBRA Sub_0C5E         
 
@@ -1921,7 +1921,7 @@ Sub_117F:      PSHS A,B,X,Y
 	LDB #$00               ; B = SS.Opt  (GetStt/SetStt subcode)
 	LEAX 3118,U           
 	OS9 I$GetStt           ; path=A  subcode=B  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_118F:      PSHS A,B,X,Y          
@@ -1964,7 +1964,7 @@ Sub_11C8:      CLR ,X+
 	ANDA #$07             
 	LDB #$05               ; B = SS.Pos  (GetStt/SetStt subcode)
 	MUL                    ; D = A×B unsigned
-	LEAX Dat_0652,PC       ; X → Dat_0652
+	LEAX Dat_0652,PCR       ; X → Dat_0652
 	LEAX B,X              
 	LDY #$0005            
 	LDA 62,U              
@@ -1997,29 +1997,29 @@ Sub_122F:      LEAX 68,U
 	ANDA #$E0             
 	CMPA #$A0             
 	BNE *+8
-	LEAX Dat_0991,PC       ; X → Dat_0991
+	LEAX Dat_0991,PCR       ; X → Dat_0991
 	BRA *+36
 
 ; --------------------------------------------------------------
 Sub_125D:      CMPA #$E0             
 	BNE *+8
-	LEAX Dat_0995,PC       ; X → Dat_0995
+	LEAX Dat_0995,PCR       ; X → Dat_0995
 	BRA *+26
 
 ; --------------------------------------------------------------
 Sub_1267:      CMPA #$60              ; compare A with '`'
 	BNE *+8
-	LEAX Dat_099B,PC       ; X → Dat_099B
+	LEAX Dat_099B,PCR       ; X → Dat_099B
 	BRA *+16
 
 ; --------------------------------------------------------------
 Sub_1271:      CMPA #$20              ; compare A with ' '
 	BNE *+8
-	LEAX Dat_09A0,PC       ; X → Dat_09A0
+	LEAX Dat_09A0,PCR       ; X → Dat_09A0
 	BRA *+6
 
 ; --------------------------------------------------------------
-Sub_127B:      LEAX Dat_09A5,PC       ; X → Dat_09A5
+Sub_127B:      LEAX Dat_09A5,PCR       ; X → Dat_09A5
 Sub_127F:      LDA 62,U              
 	LDY #$0001            
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -2040,7 +2040,7 @@ Sub_12A7:      LEAX 68,U
 	STB ,X                
 	LDY #$0001            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-Sub_12B3:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_12B3:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_12B5:      PSHS A,B,X,Y          
 	LEAX 5033,U           
 	LEAY 3084,U           
@@ -2062,7 +2062,7 @@ Sub_12B5:      PSHS A,B,X,Y
 	LDA #$01              
 	LDB #$00               ; B = SS.Opt  (GetStt/SetStt subcode)
 	OS9 I$SetStt           ; path=A  subcode=B  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_12F5:      PSHS A,B,X            
@@ -2095,7 +2095,7 @@ Sub_12F5:      PSHS A,B,X
 	OS9 I$GetStt           ; path=A  subcode=B  buf→X
 	STA 132,U             
 	CLRB                   ; B = 0
-Sub_1346:      PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_1346:      PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_1348:      COMB                  
 	LDB #$B7              
 	BRA *-5
@@ -2106,11 +2106,11 @@ Sub_134D:      PSHS A,B,X
 	LDB #$00               ; B = SS.Opt  (GetStt/SetStt subcode)
 	LEAX 3084,U           
 	OS9 I$SetStt           ; path=A  subcode=B  buf→X
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_135C:      PSHS A,B,X,Y          
-	LEAY Dat_0469,PC       ; Y → Dat_0469
+	LEAY Dat_0469,PCR       ; Y → Dat_0469
 	LDB #$10              
 	LEAX 5033,U           
 	LBSR Sub_2D26          ; call Sub_2D26
@@ -2141,10 +2141,10 @@ Sub_135C:      PSHS A,B,X,Y
 	LDA #$01              
 	LDY #$0002            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
-Sub_13BA:      LEAX Dat_03A7,PC       ; X → Dat_03A7
+Sub_13BA:      LEAX Dat_03A7,PCR       ; X → Dat_03A7
 	LBSR WriteBlock        ; call WriteBlock
 	RTS                    ; return from subroutine
 
@@ -2170,7 +2170,7 @@ Sub_13CF:      PSHS A,B
 	BLS *+3
 	DECB                  
 Sub_13E6:      STD 3220,U            
-	PULS A,B,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_13EC:      PSHS A,B              
@@ -2182,7 +2182,7 @@ Sub_13EC:      PSHS A,B
 	BNE *+5
 	LDD #$0101            
 Sub_13FF:      STD 3220,U            
-	PULS A,B,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1405:      CLR 3220,U            
@@ -2197,7 +2197,7 @@ Sub_140E:      PSHS A,B
 	BLS *+3
 	DECB                  
 Sub_141C:      STD 3220,U            
-	PULS A,B,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1422:      CLR 3220,U            
@@ -2483,7 +2483,7 @@ Sub_16BF:      LEAX 1263,U
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_16C8:      LBRA Sub_0C5E         
 Sub_16CB:      PSHS A,X,Y            
-	LEAX Dat_03D6,PC       ; X → Dat_03D6
+	LEAX Dat_03D6,PCR       ; X → Dat_03D6
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1C57          ; call Sub_1C57
 	PULS A,X,Y            
@@ -2493,7 +2493,7 @@ Sub_16CB:      PSHS A,X,Y
 Sub_16DC:      PSHS U                
 	LBSR Sub_134D          ; call Sub_134D
 	LDB #$13               ; B = XOFF
-	LEAY Dat_03B2,PC       ; Y → Dat_03B2
+	LEAY Dat_03B2,PCR       ; Y → Dat_03B2
 	LEAX 5033,U           
 	LBSR Sub_2D26          ; call Sub_2D26
 	LEAX 5033,U           
@@ -2510,8 +2510,8 @@ Sub_1703:      STA 6,X
 	LDA #$01              
 	LDY #$0009            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAU Dat_02E5,PC       ; U → Dat_02E5
-	LEAX Dat_02E0,PC       ; X → Dat_02E0
+	LEAU Dat_02E5,PCR       ; U → Dat_02E5
+	LEAX Dat_02E0,PCR       ; X → Dat_02E0
 	CLRB                   ; B = 0
 	LDA #$11               ; A = XON
 	OS9 F$Fork             ; module→D:X  args→Y  size=D
@@ -2525,7 +2525,7 @@ Sub_172D:      LDX #$0001
 	CMPA 118,U            
 	BNE *-14
 Sub_173D:      LDA #$01              
-	LEAX Dat_03C6,PC       ; X → Dat_03C6
+	LEAX Dat_03C6,PCR       ; X → Dat_03C6
 	LDY #$0002            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	LBSR Sub_12B5          ; call Sub_12B5
@@ -2556,7 +2556,7 @@ Sub_175C:      TST 114,U
 	LBSR Sub_0F20          ; call Sub_0F20
 Sub_176C:      LBRA Sub_0C5E         
 Sub_176F:      INC 117,U             
-	LEAX Dat_0366,PC       ; X → Dat_0366
+	LEAX Dat_0366,PCR       ; X → Dat_0366
 	LEAY 119,U            
 	LDB #$0B               ; B = SS.FD  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
@@ -2574,9 +2574,9 @@ Sub_1793:      LDD #$0802
 	LDD #$400A            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_02F0,PC       ; X → Dat_02F0
+	LEAX Dat_02F0,PCR       ; X → Dat_02F0
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 5033,U           
 	LDA #$01              
@@ -2595,8 +2595,8 @@ Sub_1793:      LDD #$0802
 	OS9 I$Close            ; path=A
 	LDA 43,U              
 	OS9 I$Dup              ; path=A  → new path→A
-	LEAU Dat_02E9,PC       ; U → Dat_02E9
-	LEAX Dat_02E6,PC       ; X → Dat_02E6
+	LEAU Dat_02E9,PCR       ; U → Dat_02E9
+	LEAX Dat_02E6,PCR       ; X → Dat_02E6
 	LDY #$000A            
 	CLRB                   ; B = 0
 	LDA #$11               ; A = XON
@@ -2636,7 +2636,7 @@ Sub_1836:      OS9 F$Wait             ; → wait for child; status→D
 	BEQ *+5
 	LBSR Sub_2AC5          ; call Sub_2AC5
 Sub_1846:      LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_12B5          ; call Sub_12B5
 	LBSR Sub_1BAD          ; call Sub_1BAD
@@ -2648,7 +2648,7 @@ Sub_1859:      LDD #$0802
 	LDD #$400A            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0322,PC       ; X → Dat_0322
+	LEAX Dat_0322,PCR       ; X → Dat_0322
 	LBSR WriteBlock        ; call WriteBlock
 	LEAY 1805,U           
 	STY 72,U              
@@ -2659,7 +2659,7 @@ Sub_1859:      LDD #$0802
 	STA ,Y+               
 	LDA #$20               ; A = ' '
 	STA ,Y+               
-Sub_1887:      LEAX Dat_055F,PC       ; X → Dat_055F
+Sub_1887:      LEAX Dat_055F,PCR       ; X → Dat_055F
 	PSHS Y                
 	LBSR WriteBlock        ; call WriteBlock
 	PULS Y                
@@ -2688,7 +2688,7 @@ Sub_18B6:      LDA #$0D               ; A = CR
 	CMPD #$0007           
 	LBCS Sub_1968         
 	LBSR Sub_1EDC          ; call Sub_1EDC
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 5033,U           
 	LDA #$01              
@@ -2709,7 +2709,7 @@ Sub_18B6:      LDA #$0D               ; A = CR
 	OS9 I$Dup              ; path=A  → new path→A
 	LDY 72,U              
 	LEAU 1805,U           
-	LEAX Dat_031F,PC       ; X → Dat_031F
+	LEAX Dat_031F,PCR       ; X → Dat_031F
 	CLRB                   ; B = 0
 	LDA #$11               ; A = XON
 	OS9 F$Fork             ; module→D:X  args→Y  size=D
@@ -2749,7 +2749,7 @@ Sub_1958:      OS9 F$Wait             ; → wait for child; status→D
 	LBSR Sub_2AC5          ; call Sub_2AC5
 Sub_1968:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LBSR Sub_12B5          ; call Sub_12B5
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1BAD          ; call Sub_1BAD
 	LBRA Sub_0C5E         
@@ -2770,9 +2770,9 @@ Sub_198E:      LDD #$2105
 	LDD #$0E03            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_0349,PC       ; X → Dat_0349
+	LEAX Dat_0349,PCR       ; X → Dat_0349
 	LBSR WriteBlock        ; call WriteBlock
 	TST 3243,U            
 	BNE *+49
@@ -2801,7 +2801,7 @@ Sub_19C8:      LDX 17,U
 ; --------------------------------------------------------------
 Sub_19E2:      LDA 43,U              
 	LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
-Sub_19E7:      LEAX Dat_0981,PC       ; X → Dat_0981
+Sub_19E7:      LEAX Dat_0981,PCR       ; X → Dat_0981
 Insn_19EB:     LDY #$0001            
 Sub_19EC:      EQU    $19EC            ; mid-instruction overlap: Insn_19EB+1 -- mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -2811,11 +2811,11 @@ Sub_19EC:      EQU    $19EC            ; mid-instruction overlap: Insn_19EB+1 --
 	BNE *-18
 	LDX #$0080            
 	LBSR Sub_0F56          ; call Sub_0F56
-	LEAX Dat_02DC,PC       ; X → Dat_02DC
+	LEAX Dat_02DC,PCR       ; X → Dat_02DC
 	LDY #$0004            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_1A0C:      LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LBRA Sub_0C5E         
 
@@ -2851,7 +2851,7 @@ Sub_1A43:      LDA ,X+
 	BSR *+44  ; call Sub_1A76
 Sub_1A4C:      TSTB                  
 	BNE *-10
-Sub_1A4F:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_1A4F:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_1A51:      PSHS X                
 	LDX #$001E            
 	LBSR Sub_0F56          ; call Sub_0F56
@@ -2882,7 +2882,7 @@ Sub_1A76:      PSHS A,X,Y
 	LDY #$0001            
 	LDA 43,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1A8A:      PSHS A,X,Y            
@@ -2892,7 +2892,7 @@ Sub_1A8A:      PSHS A,X,Y
 	LDY #$0002            
 	LEAX 5033,U           
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAY Dat_0469,PC       ; Y → Dat_0469
+	LEAY Dat_0469,PCR       ; Y → Dat_0469
 	LEAX 5033,U           
 	LDB #$0C               ; B = FF
 	LBSR Sub_2D26          ; call Sub_2D26
@@ -2910,7 +2910,7 @@ Sub_1AB5:      STA 3204,U
 	STA 144,U             
 	LDA 6,X               
 	STA 145,U             
-Sub_1AD6:      PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_1AD6:      PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_1AD8:      LDA 3204,U            
 	DECA                  
 	CMPA #$0A              ; compare A with LF
@@ -2921,11 +2921,11 @@ Sub_1AD8:      LDA 3204,U
 
 ; --------------------------------------------------------------
 Sub_1AE6:      BRA *-49
-Sub_1AE8:      LEAX Dat_0467,PC       ; X → Dat_0467
+Sub_1AE8:      LEAX Dat_0467,PCR       ; X → Dat_0467
 	LDA #$02               ; A = CurXY
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	STA 62,U              
-	LEAX Dat_0477,PC       ; X → Dat_0477
+	LEAX Dat_0477,PCR       ; X → Dat_0477
 	LDY #$000A            
 	LDA 62,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -2970,17 +2970,17 @@ Sub_1B1D:      PSHS Y
 	LDD #$1603            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0499,PC       ; X → Dat_0499
+	LEAX Dat_0499,PCR       ; X → Dat_0499
 	BSR *-49  ; call WriteBlock
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	BSR *-55  ; call WriteBlock
 	LBSR Sub_2ABC          ; call Sub_2ABC
 	PSHS A                
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	BSR *-66  ; call WriteBlock
 	LBSR Sub_1CDE          ; call Sub_1CDE
 	PULS A                
-	PULS Y,PC              ; return from subroutine  (PULS PC = RTS)
+	PULS Y,PCR              ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1B4E:      PSHS B,X              
@@ -2989,7 +2989,7 @@ Sub_1B4E:      PSHS B,X
 	LDA 5,X               
 	LDX #$0002            
 	OS9 F$Sleep            ; ticks→X  (0=forever)
-	PULS B,X,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS B,X,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1B61:      PSHS A,B,X,Y          
@@ -3030,7 +3030,7 @@ Sub_1BA2:      CMPA #$0D              ; compare A with CR
 	BNE *-52
 	STA ,X                
 	INC 29,U              
-Sub_1BAB:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_1BAB:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_1BAD:      LDA #$00               ; A = NUL
 	LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 	OS9 I$GetStt           ; path=A  subcode=B  buf→X
@@ -3055,20 +3055,20 @@ Sub_1BD1:      STA ,X
 	LEAX 128,X            
 	DECB                  
 	BNE *-9
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1BDE:      RTS                    ; return from subroutine
 Sub_1BDF:      LDA BSS.BufPtr3,U     
 	CMPA #$02              ; compare A with CurXY
 	BNE *+8
-	LEAY Dat_0371,PC       ; Y → Dat_0371
+	LEAY Dat_0371,PCR       ; Y → Dat_0371
 	BRA *+44
 
 ; --------------------------------------------------------------
 Sub_1BEC:      TST 3238,U            
 	BNE *+34
-	LEAY Dat_0391,PC       ; Y → Dat_0391
+	LEAY Dat_0391,PCR       ; Y → Dat_0391
 	LDD #$0601            
 	STD 133,U             
 	LDD #$0002            
@@ -3080,7 +3080,7 @@ Sub_1BEC:      TST 3238,U
 	BRA *+32
 
 ; --------------------------------------------------------------
-Sub_1C12:      LEAY Dat_0381,PC       ; Y → Dat_0381
+Sub_1C12:      LEAY Dat_0381,PCR       ; Y → Dat_0381
 Sub_1C16:      LDD #$0504            
 	STD 133,U             
 	LDD #$0700            
@@ -3114,18 +3114,18 @@ Sub_1C57:      PSHS A,X
 	BEQ *+14
 	TST 3238,U            
 	BNE *+8
-	LEAX Dat_03A4,PC       ; X → Dat_03A4
+	LEAX Dat_03A4,PCR       ; X → Dat_03A4
 	BRA *+6
 
 ; --------------------------------------------------------------
-Sub_1C6C:      LEAX Dat_03A1,PC       ; X → Dat_03A1
+Sub_1C6C:      LEAX Dat_03A1,PCR       ; X → Dat_03A1
 Sub_1C70:      LDA ,X                
 	LBSR Sub_2347          ; call Sub_2347
 	LDA 1,X               
 	LBSR Sub_233B          ; call Sub_233B
 	LDA 2,X               
 	LBSR Sub_2341          ; call Sub_2341
-	PULS A,X,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1C81:      PSHS A,B,X,Y          
@@ -3162,7 +3162,7 @@ Sub_1C81:      PSHS A,B,X,Y
 	LDA #$01              
 	LDY #$000A            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1CDE:      PSHS A,B,X,Y          
@@ -3173,7 +3173,7 @@ Sub_1CDE:      PSHS A,B,X,Y
 	LDY #$0002            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1CF7:      PSHS A,B,X,Y          
@@ -3182,7 +3182,7 @@ Sub_1CF7:      PSHS A,B,X,Y
 Sub_1D00:      LDA #$01              
 	LDB #$98              
 	OS9 I$SetStt           ; path=A  subcode=B  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1D09:      PSHS A,B,X,Y          
@@ -3202,25 +3202,25 @@ Sub_1D14:      PSHS A,B,X
 	STA 2,X               
 	ANDA <$F3             
 	STA 2,X               
-Sub_1D2D:      PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_1D2D:      PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_1D2F:      PSHS A,B,X,Y          
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1E03            
 	STD 3215,U            
 	LDD #$1203            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_063D,PC       ; X → Dat_063D
+	LEAX Dat_063D,PCR       ; X → Dat_063D
 	LBSR WriteBlock        ; call WriteBlock
 	LDB 3237,U            
 	ANDB #$07             
 Sub_1D56:      STB 3204,U            
-	LEAX Dat_03CA,PC       ; X → Dat_03CA
+	LEAX Dat_03CA,PCR       ; X → Dat_03CA
 	LDY #$0005            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_0652,PC       ; X → Dat_0652
+	LEAX Dat_0652,PCR       ; X → Dat_0652
 	LDA #$05              
 	LDB 3204,U            
 	MUL                    ; D = A×B unsigned
@@ -3249,9 +3249,9 @@ Sub_1D9B:      LDB 3237,U
 	STB 3237,U            
 	LBSR Sub_1CDE          ; call Sub_1CDE
 	LBSR Sub_118F          ; call Sub_118F
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1DB8:      PSHS A,X,Y            
@@ -3273,10 +3273,10 @@ Sub_1DB8:      PSHS A,X,Y
 Sub_1DE6:      CLRA                   ; A = 0
 	INCB                  
 	TFR D,Y               
-	LEAX Dat_0688,PC       ; X → Dat_0688
+	LEAX Dat_0688,PCR       ; X → Dat_0688
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_0693,PC       ; X → Dat_0693
+	LEAX Dat_0693,PCR       ; X → Dat_0693
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_1DFE:      LBSR Sub_2AC5          ; call Sub_2AC5
@@ -3310,7 +3310,7 @@ Sub_1E2B:      LDB 3204,U
 	DECB                  
 Sub_1E37:      BRA *-18
 Sub_1E39:      LDB 3204,U            
-Sub_1E3D:      PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_1E3D:      PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_1E3F:      LDB 5022,U            
 	INCB                  
 	STB 3204,U            
@@ -3322,22 +3322,22 @@ Sub_1E4A:      INC 153,U
 
 ; --------------------------------------------------------------
 Sub_1E50:      PSHS A,B,X,Y          
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1C03            
 	STD 3215,U            
 	LDD #$1703            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0696,PC       ; X → Dat_0696
+	LEAX Dat_0696,PCR       ; X → Dat_0696
 	LBSR WriteBlock        ; call WriteBlock
 	LDB 3238,U            
 Sub_1E75:      STB 3204,U            
-	LEAX Dat_03CA,PC       ; X → Dat_03CA
+	LEAX Dat_03CA,PCR       ; X → Dat_03CA
 	LDA #$01              
 	LDY #$0005            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_06B0,PC       ; X → Dat_06B0
+	LEAX Dat_06B0,PCR       ; X → Dat_06B0
 	LDA #$05              
 	LDB 3204,U            
 	MUL                    ; D = A×B unsigned
@@ -3370,15 +3370,15 @@ Sub_1EBA:      LDB 3204,U
 	NEGA                  
 	BEQ *+4
 	BSR *+20  ; call Sub_1EE5
-Sub_1ED3:      LEAX Dat_048B,PC       ; X → Dat_048B
+Sub_1ED3:      LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1EDC:      PSHS A                
 	LDA #$0C               ; A = FF
 	LBSR Sub_1F0B          ; call Sub_1F0B
-	PULS A,PC              ; return from subroutine  (PULS PC = RTS)
+	PULS A,PCR              ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1EE5:      PSHS A,B,X,Y          
@@ -3403,18 +3403,18 @@ Sub_1F0B:      PSHS A,B,X,Y
 	LDY #$0001            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_1F1D:      PSHS A,B,X,Y          
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1F03            
 	STD 3215,U            
 	LDD #$160E            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0821,PC       ; X → Dat_0821
+	LEAX Dat_0821,PCR       ; X → Dat_0821
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_20DB          ; call Sub_20DB
 	LBSR Sub_2108          ; call Sub_2108
@@ -3589,9 +3589,9 @@ Sub_20C1:      LBSR Sub_2138          ; call Sub_2138
 
 ; --------------------------------------------------------------
 Sub_20CF:      LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_20DB:      PSHS A,B,X            
@@ -3599,12 +3599,12 @@ Sub_20DB:      PSHS A,B,X
 	LBSR Sub_2294          ; call Sub_2294
 	LDA 3239,U            
 	BNE *+11
-Sub_20E9:      LEAX Dat_0985,PC       ; X → Dat_0985
+Sub_20E9:      LEAX Dat_0985,PCR       ; X → Dat_0985
 Sub_20ED:      LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
-Sub_20F2:      LEAX Dat_098B,PC       ; X → Dat_098B
+Sub_20F2:      LEAX Dat_098B,PCR       ; X → Dat_098B
 	BRA *-9
 
 ; --------------------------------------------------------------
@@ -3661,11 +3661,11 @@ Sub_2158:      PSHS A,B,X
 	LBSR Sub_2294          ; call Sub_2294
 	LDA 3243,U            
 	BNE *+9
-	LEAX Dat_0979,PC       ; X → Dat_0979
+	LEAX Dat_0979,PCR       ; X → Dat_0979
 	LBRA Sub_20ED         
 
 ; --------------------------------------------------------------
-Sub_216D:      LEAX Dat_097F,PC       ; X → Dat_097F
+Sub_216D:      LEAX Dat_097F,PCR       ; X → Dat_097F
 	LBRA Sub_20ED         
 
 ; --------------------------------------------------------------
@@ -3676,33 +3676,33 @@ Sub_2174:      PSHS A,B,X,Y
 	ANDA #$E0             
 	CMPA #$A0             
 	BNE *+8
-	LEAX Dat_0990,PC       ; X → Dat_0990
+	LEAX Dat_0990,PCR       ; X → Dat_0990
 	BRA *+36
 
 ; --------------------------------------------------------------
 Sub_218C:      CMPA #$E0             
 	BNE *+8
-	LEAX Dat_0995,PC       ; X → Dat_0995
+	LEAX Dat_0995,PCR       ; X → Dat_0995
 	BRA *+26
 
 ; --------------------------------------------------------------
 Sub_2196:      CMPA #$60              ; compare A with '`'
 	BNE *+8
-	LEAX Dat_099A,PC       ; X → Dat_099A
+	LEAX Dat_099A,PCR       ; X → Dat_099A
 	BRA *+16
 
 ; --------------------------------------------------------------
 Sub_21A0:      CMPA #$20              ; compare A with ' '
 	BNE *+8
-	LEAX Dat_099F,PC       ; X → Dat_099F
+	LEAX Dat_099F,PCR       ; X → Dat_099F
 	BRA *+6
 
 ; --------------------------------------------------------------
-Sub_21AA:      LEAX Dat_09A4,PC       ; X → Dat_09A4
+Sub_21AA:      LEAX Dat_09A4,PCR       ; X → Dat_09A4
 Sub_21AE:      LDA #$01              
 	LDY #$0005            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_21B9:      PSHS A,B,X            
@@ -3717,7 +3717,7 @@ Sub_21B9:      PSHS A,B,X
 ; --------------------------------------------------------------
 Sub_21CE:      LDA #$31               ; A = '1'
 	LBSR Sub_1F0B          ; call Sub_1F0B
-Sub_21D3:      PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_21D3:      PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_21D5:      PSHS A,B,X            
 	LDD #$1206            
 	LBSR Sub_2294          ; call Sub_2294
@@ -3730,7 +3730,7 @@ Sub_21D5:      PSHS A,B,X
 ; --------------------------------------------------------------
 Sub_21E9:      LDA #$37               ; A = '7'
 Sub_21EB:      LBSR Sub_1F0B          ; call Sub_1F0B
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_21F0:      CMPA #$8C             
@@ -3838,7 +3838,7 @@ Sub_2294:      PSHS A,B,X,Y
 	LDA #$01              
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_22B1:      PSHS A,B,X,Y          
@@ -3847,7 +3847,7 @@ Sub_22B1:      PSHS A,B,X,Y
 	LDD #$2507            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_051C,PC       ; X → Dat_051C
+	LEAX Dat_051C,PCR       ; X → Dat_051C
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$0102            
 	BSR *-58  ; call Sub_2294
@@ -3856,7 +3856,7 @@ Sub_22B1:      PSHS A,B,X,Y
 	LDY #$0020            
 	OS9 I$WritLn           ; path=A  buf→X
 	LDB #$1F              
-	LEAX Dat_09A9,PC       ; X → Dat_09A9
+	LEAX Dat_09A9,PCR       ; X → Dat_09A9
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1B61          ; call Sub_1B61
 	TST 33,U              
@@ -3873,7 +3873,7 @@ Sub_22B1:      PSHS A,B,X,Y
 	LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
 Sub_230E:      LBSR Sub_1CDE          ; call Sub_1CDE
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2313:      LDA #$07              
@@ -3881,13 +3881,13 @@ Sub_2313:      LDA #$07
 	PSHS B                
 	LDD #$0D02            
 	LBSR Sub_2294          ; call Sub_2294
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	PULS B                
 	OS9 F$PErr             ; path=A  error=B
 	LDX #$003C            
 	LBSR Sub_0F56          ; call Sub_0F56
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	BRA *-43
 
@@ -3911,7 +3911,7 @@ Sub_234B:      LEAX 5033,U
 	LDA #$01              
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2360:      BRA *+30
@@ -3921,7 +3921,7 @@ Sub_2364:      PSHS A,B
 	BEQ *+9
 	CLR 38,U              
 	BSR *-12  ; call Sub_2362
-Sub_2370:      PULS A,B,PC            ; return from subroutine  (PULS PC = RTS)
+Sub_2370:      PULS A,B,PCR            ; return from subroutine  (PULS PC = RTS)
 Sub_2372:      TST 37,U              
 	BEQ *-5
 	INC 38,U              
@@ -3932,7 +3932,7 @@ Sub_2372:      TST 37,U
 Sub_237E:      PSHS A,B,X,Y          
 	TST 38,U              
 	BNE *+39
-	LEAY Dat_096D,PC       ; Y → Dat_096D
+	LEAY Dat_096D,PCR       ; Y → Dat_096D
 	LEAX 5033,U           
 	PSHS X                
 	LDB #$0C               ; B = FF
@@ -3944,8 +3944,8 @@ Sub_237E:      PSHS A,B,X,Y
 	STA 11,X              
 	LDA 62,U              
 	LBSR WriteBlockPath    ; call WriteBlockPath
-Sub_23A8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
-Sub_23AA:      LEAY Dat_0960,PC       ; Y → Dat_0960
+Sub_23A8:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
+Sub_23AA:      LEAY Dat_0960,PCR       ; Y → Dat_0960
 	LEAX 5033,U           
 	PSHS X                
 	LDB #$0D               ; B = CR
@@ -3986,7 +3986,7 @@ Sub_23E5:      ADDB #$08
 	LDY #$0003            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2408:      PSHS A,B,X,Y          
@@ -4035,7 +4035,7 @@ Sub_2463:      LDA #$01
 ; --------------------------------------------------------------
 Sub_2469:      LDA #$02               ; A = CurXY
 	STA ,X                
-Sub_246D:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_246D:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_246F:      TST 105,U             
 	BEQ *+15
 	LEAX 226,U            
@@ -4074,7 +4074,7 @@ Sub_249F:      PSHS A,B,X,Y
 	LEAX D,X              
 	LDA 72,U              
 	STA ,X                
-Sub_24C3:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_24C3:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_24C5:      LBSR Sub_3E0F          ; call Sub_3E0F
 	LEAX D,X              
 	LDD 72,U              
@@ -4088,7 +4088,7 @@ Sub_24D1:      PSHS A,B,X,Y
 Sub_24DB:      CLR ,X+               
 	LEAY -1,Y             
 	BNE *-4
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_24E3:      LDA -2,X              
@@ -4173,7 +4173,7 @@ Sub_255D:      CMPA ,Y
 Sub_2582:      CLR 113,U             
 	TSTB                  
 	BNE *-49
-Sub_2588:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_2588:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_258A:      LEAY 1,Y              
 	STY 5020,U            
 	TST ,Y                
@@ -4217,7 +4217,7 @@ Sub_25DB:      LDA ,X+
 	LBSR Sub_1A76          ; call Sub_1A76
 Sub_25E5:      TSTB                  
 	BNE *-11
-Sub_25E8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_25E8:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_25EA:      PSHS X                
 	LDX #$001E            
 	LBSR Sub_0F56          ; call Sub_0F56
@@ -4250,7 +4250,7 @@ Sub_2612:      TST 64,U
 	BRA *+16
 
 ; --------------------------------------------------------------
-Sub_2620:      LEAX Dat_0469,PC       ; X → Dat_0469
+Sub_2620:      LEAX Dat_0469,PCR       ; X → Dat_0469
 	LEAY 5033,U           
 	LDB #$0C               ; B = FF
 	LBSR Sub_2D1E          ; call Sub_2D1E
@@ -4271,7 +4271,7 @@ Sub_262E:      LEAX 5033,U
 	LDY #$000B            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	LDA #$02               ; A = CurXY
-	LEAX Dat_0467,PC       ; X → Dat_0467
+	LEAX Dat_0467,PCR       ; X → Dat_0467
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	BCS *-76  ; C=1 (BLO)
 	STA 63,U              
@@ -4312,17 +4312,17 @@ Sub_26A9:      STA ,X+
 	LDY #$0003            
 	LDA 63,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_09EF,PC       ; X → Dat_09EF
+	LEAX Dat_09EF,PCR       ; X → Dat_09EF
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	LBSR Sub_284E          ; call Sub_284E
-	LEAX Dat_09E8,PC       ; X → Dat_09E8
+	LEAX Dat_09E8,PCR       ; X → Dat_09E8
 	LDA 62,U              
 	LDY #$0007            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-Sub_26EC:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_26EC:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_26EE:      CLR 64,U              
-	LEAX Dat_0475,PC       ; X → Dat_0475
+	LEAX Dat_0475,PCR       ; X → Dat_0475
 	LDA 63,U              
 	LDY #$0002            
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -4341,7 +4341,7 @@ Sub_26EE:      CLR 64,U
 	LDA #$01              
 	LDY #$000B            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_09E1,PC       ; X → Dat_09E1
+	LEAX Dat_09E1,PCR       ; X → Dat_09E1
 	LDA 62,U              
 	LDY #$0007            
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -4460,7 +4460,7 @@ Sub_2835:      LEAX 1550,U
 	BSR *+3  ; call Sub_284E
 Sub_284D:      RTS                    ; return from subroutine
 Sub_284E:      LDA 63,U              
-	LEAX Dat_0493,PC       ; X → Dat_0493
+	LEAX Dat_0493,PCR       ; X → Dat_0493
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	RTS                    ; return from subroutine
@@ -4544,7 +4544,7 @@ Sub_28EE:      LBSR Sub_2D1E          ; call Sub_2D1E
 	STA ,Y                
 	LEAX 1,X              
 	BSR *+113  ; call Sub_2968
-	LEAX Dat_056B,PC       ; X → Dat_056B
+	LEAX Dat_056B,PCR       ; X → Dat_056B
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 159,U            
 	LDA ,X                
@@ -4554,7 +4554,7 @@ Sub_28EE:      LBSR Sub_2D1E          ; call Sub_2D1E
 	LDA #$01              
 	LDY #$0020            
 	OS9 I$WritLn           ; path=A  buf→X
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDD BSS.BufPtr1,U     
 	BNE *+37
@@ -4566,7 +4566,7 @@ Sub_2926:      LEAX 159,U
 	OS9 I$Create           ; mode=B  name→X  → path→A
 	BCS *+7  ; C=1 (BLO)
 	STA 66,U              
-Sub_2936:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_2936:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_2938:      LDA #$FF              
 	STA 66,U              
 	LDA #$0A               ; A = LF
@@ -4574,7 +4574,7 @@ Sub_2938:      LDA #$FF
 	BRA *-12
 
 ; --------------------------------------------------------------
-Sub_2944:      LEAX Dat_0577,PC       ; X → Dat_0577
+Sub_2944:      LEAX Dat_0577,PCR       ; X → Dat_0577
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 5034,U           
 	LDY #$0007            
@@ -4622,13 +4622,13 @@ Sub_2998:      STA ,-Y
 	CMPB #$01             
 	BNE *-5
 	LEAY 5033,U           
-	LEAX Dat_09F5,PC       ; X → Dat_09F5
+	LEAX Dat_09F5,PCR       ; X → Dat_09F5
 	CLRB                   ; B = 0
 Sub_29A8:      BSR *+9  ; call Sub_29B1
 	INCB                  
 	CMPB #$08              ; compare B with BS
 	BNE *-5
-Sub_29AF:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_29AF:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_29B1:      PSHS B,X              
 	LDA #$04              
 	MUL                    ; D = A×B unsigned
@@ -4654,7 +4654,7 @@ Sub_29C2:      PSHS B
 	PULS B                
 	DECB                  
 	BNE *-37
-Sub_29E9:      PULS B,X,PC            ; return from subroutine  (PULS PC = RTS)
+Sub_29E9:      PULS B,X,PCR            ; return from subroutine  (PULS PC = RTS)
 Sub_29EB:      PSHS A,B,X,Y          
 	LBSR Sub_13C2          ; call Sub_13C2
 	BCS *+31  ; C=1 (BLO)
@@ -4672,11 +4672,11 @@ Sub_2A06:      LDA ,X+
 	DECB                  
 	BNE *-7
 Sub_2A0F:      CLRB                   ; B = 0
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2A12:      COMB                  
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2A15:      PSHS B,X,Y            
@@ -4701,11 +4701,11 @@ Sub_2A31:      LDY #$0001
 	LDA 1263,U            
 	CLR 1263,U            
 Sub_2A49:      CLRB                   ; B = 0
-	PULS B,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS B,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2A4C:      COMB                  
-	PULS B,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS B,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2A4F:      CLRA                   ; A = 0
@@ -4713,7 +4713,7 @@ Sub_2A4F:      CLRA                   ; A = 0
 
 ; --------------------------------------------------------------
 Sub_2A52:      PSHS A,B,X,Y          
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	CLRB                   ; B = 0
 	LEAX 1805,U           
@@ -4728,16 +4728,16 @@ Sub_2A60:      PSHS B,X
 	INCB                  
 	CMPB #$20              ; compare B with ' '
 	BNE *-22
-Sub_2A78:      LEAX Dat_048F,PC       ; X → Dat_048F
+Sub_2A78:      LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2A81:      LDA #$20               ; A = ' '
 	MUL                    ; D = A×B unsigned
 	LEAX D,X              
 	PSHS X                
-	LEAX Dat_055F,PC       ; X → Dat_055F
+	LEAX Dat_055F,PCR       ; X → Dat_055F
 	LBSR WriteBlock        ; call WriteBlock
 	LDB #$1E              
 	LBSR Sub_1B61          ; call Sub_1B61
@@ -4758,7 +4758,7 @@ Sub_2AA0:      PSHS A,B,X,Y
 	LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
 	INC 106,U             
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2ABC:      PSHS B,X,Y            
@@ -4788,7 +4788,7 @@ Sub_2AD7:      TSTB
 	CMPA #$60              ; compare A with '`'
 	BCS *+4  ; C=1 (BLO)
 	SUBA #$20             
-Sub_2AF3:      PULS B,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_2AF3:      PULS B,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 Sub_2AF5:      CLR 26,U              
 	LDA 43,U              
 	LDB #$2B               ; B = SS.CtlSg  (GetStt/SetStt subcode)
@@ -4843,10 +4843,10 @@ Sub_2B78:      LEAX BSS.Counter1,U
 	TFR D,Y               
 	LDA 62,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
-Sub_2B86:      LEAY Dat_0481,PC       ; Y → Dat_0481
+Sub_2B86:      LEAY Dat_0481,PCR       ; Y → Dat_0481
 	LEAX 5033,U           
 	PSHS X                
 	LDB #$07              
@@ -4862,10 +4862,10 @@ Sub_2B86:      LEAY Dat_0481,PC       ; Y → Dat_0481
 	TST 64,U              
 	BEQ *+16
 	LDA 62,U              
-	LEAX Dat_09E8,PC       ; X → Dat_09E8
+	LEAX Dat_09E8,PCR       ; X → Dat_09E8
 	LDY #$0007            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-Sub_2BC0:      LEAY Dat_00EB,PC       ; Y → Dat_00EB
+Sub_2BC0:      LEAY Dat_00EB,PCR       ; Y → Dat_00EB
 	LEAX 5033,U           
 	LDB #$1E              
 	LBSR Sub_2D26          ; call Sub_2D26
@@ -4900,7 +4900,7 @@ Sub_2C14:      LBSR Sub_0F20          ; call Sub_0F20
 ; --------------------------------------------------------------
 Sub_2C18:      TST 64,U              
 	BEQ *+86
-	LEAX Dat_09EF,PC       ; X → Dat_09EF
+	LEAX Dat_09EF,PCR       ; X → Dat_09EF
 	LEAY 5033,U           
 	LDB #$06               ; B = SS.EOF  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
@@ -4912,7 +4912,7 @@ Sub_2C18:      TST 64,U
 	LDY #$0006            
 	LDA 63,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAY Dat_0481,PC       ; Y → Dat_0481
+	LEAY Dat_0481,PCR       ; Y → Dat_0481
 	LEAX 5033,U           
 	PSHS X                
 	LDB #$07              
@@ -4925,7 +4925,7 @@ Sub_2C18:      TST 64,U
 	LDA 63,U              
 	LDY #$0007            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_09EF,PC       ; X → Dat_09EF
+	LEAX Dat_09EF,PCR       ; X → Dat_09EF
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_2C71:      RTS                    ; return from subroutine
@@ -4949,7 +4949,7 @@ Sub_2C8D:      LDD #$0000
 
 ; --------------------------------------------------------------
 Sub_2C98:      LDX 2,S               
-	LEAY Dat_09F5,PC       ; Y → Dat_09F5
+	LEAY Dat_09F5,PCR       ; Y → Dat_09F5
 	PSHS X                
 	LDA #$30               ; A = '0'
 	LDB #$07              
@@ -4965,7 +4965,7 @@ Sub_2CAC:      PSHS A,B,X,Y
 	CMPB #$08              ; compare B with BS
 	BNE *-9
 	PSHS X                
-	LEAX Dat_0577,PC       ; X → Dat_0577
+	LEAX Dat_0577,PCR       ; X → Dat_0577
 	LBSR WriteBlock        ; call WriteBlock
 	PULS X                
 	LDY #$0007            
@@ -4980,7 +4980,7 @@ Sub_2CC6:      LDA ,X
 ; --------------------------------------------------------------
 Sub_2CD4:      LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-Sub_2CD9:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_2CD9:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_2CDB:      LEAX B,X              
 	LDA #$04              
 	MUL                    ; D = A×B unsigned
@@ -5040,7 +5040,7 @@ Sub_2D41:      LDX 17,U
 Sub_2D46:      ANDA #$20             
 	BEQ *+5
 	CLRB                   ; B = 0
-Sub_2D4B:      PULS A,X,PC            ; return from subroutine  (PULS PC = RTS)
+Sub_2D4B:      PULS A,X,PCR            ; return from subroutine  (PULS PC = RTS)
 Sub_2D4D:      COMB                  
 	BRA *-3
 
@@ -5063,7 +5063,7 @@ Sub_2D50:      PSHS A,B,X
 	LDA 43,U              
 	OS9 I$Read             ; path=A  count=Y  buf→X
 	CLRB                   ; B = 0
-Sub_2D7E:      PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+Sub_2D7E:      PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
          FCB    $C6,$10,$A6,$80,$5A,$26,$04,$C6,$01,$20,$3C,$81,$30,$25,$F3,$81,$39,$22,$EF,$1F,$12,$31,$3F,$A6,$80,$81,$30,$25,$06,$81,$39,$22,$02,$20,$F4,$30,$1F,$CC,$20,$20,$ED,$84,$86,$A0,$A7,$24,$30,$8D,$D8,$A0,$5F,$34,$34,$C6,$05,$10,$3F,$11,$35,$34,$24,$09,$30,$05,$5C,$C1,$08,$26,$EE,$20,$15,$A6,$C9,$0C,$A5,$84,$F8,$A7,$C9,$0C,$A5,$EA,$C9,$0C,$A5,$E7,$C9,$0C,$A5,$17,$E3,$B3,$39  ; unreachable padding
 Sub_2DDD:      PSHS A,B,X,Y          
 	LBSR Sub_2D50          ; call Sub_2D50
@@ -5073,7 +5073,7 @@ Sub_2DDD:      PSHS A,B,X,Y
 	LDB 3209,U            
 	SUBB #$07             
 Sub_2DF3:      PSHS B,X              
-	LEAY Dat_02D1,PC       ; Y → Dat_02D1
+	LEAY Dat_02D1,PCR       ; Y → Dat_02D1
 	LDB #$07              
 	OS9 F$CmpNam           ; name→X  len=Y  name2→D
 	PULS B,X              
@@ -5089,7 +5089,7 @@ Sub_2E09:      LDB 3209,U
 	LEAY 223,U            
 	LBSR Sub_2D1E          ; call Sub_2D1E
 	CLRB                   ; B = 0
-Sub_2E19:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_2E19:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_2E1B:      COMB                  
 	BRA *-3
 
@@ -5098,7 +5098,7 @@ Sub_2E1E:      PSHS A,B,X,Y
 	LEAX 5033,U           
 	LDB #$0E              
 Sub_2E26:      PSHS B,X              
-	LEAY Dat_02D8,PC       ; Y → Dat_02D8
+	LEAY Dat_02D8,PCR       ; Y → Dat_02D8
 	LDB #$04              
 	OS9 F$CmpNam           ; name→X  len=Y  name2→D
 	PULS B,X              
@@ -5109,9 +5109,9 @@ Sub_2E26:      PSHS B,X
 	BRA *+2
 
 ; --------------------------------------------------------------
-Sub_2E3C:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_2E3C:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_2E3E:      PSHS A,B,X,Y,U        
-	LEAX ModHeader,PC     
+	LEAX ModHeader,PCR     
 	LDY 2,X               
 	STX 21,U              
 	LEAY -3,Y             
@@ -5128,7 +5128,7 @@ Sub_2E3E:      PSHS A,B,X,Y,U
 	COM BSS.ParamStr,U    
 	PULS A,B,X,Y,U        
 	LDA #$07              
-	LEAX ModName,PC        ; X → ModName
+	LEAX ModName,PCR        ; X → ModName
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	BCS *+17  ; C=1 (BLO)
 	LDX 21,U              
@@ -5138,7 +5138,7 @@ Sub_2E3E:      PSHS A,B,X,Y,U
 	OS9 I$Close            ; path=A
 Sub_2E82:      RTS                    ; return from subroutine
 Sub_2E83:      PSHS A,B,X,Y          
-	LEAX Dat_0A24,PC       ; X → Dat_0A24
+	LEAX Dat_0A24,PCR       ; X → Dat_0A24
 	LEAY 3237,U           
 	LDB #$4D               ; B = 'M'
 	LBSR Sub_2D26          ; call Sub_2D26
@@ -5147,22 +5147,22 @@ Sub_2E83:      PSHS A,B,X,Y
 	LDD #$1D04            
 	STD 3215,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_08B6,PC       ; X → Dat_08B6
+	LEAX Dat_08B6,PCR       ; X → Dat_08B6
 	LBSR WriteBlock        ; call WriteBlock
 	BSR *-115  ; call Sub_2E3E
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_1CDE          ; call Sub_1CDE
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2EBF:      PSHS A,B,X,Y          
 	TST 114,U             
 	BEQ *+20
 	CLR 117,U             
-	LEAX Dat_0366,PC       ; X → Dat_0366
+	LEAX Dat_0366,PCR       ; X → Dat_0366
 	LEAY 119,U            
 	LDB #$0B               ; B = SS.FD  (GetStt/SetStt subcode)
 	LBSR Sub_2D1E          ; call Sub_2D1E
@@ -5183,7 +5183,7 @@ Sub_2EE3:      LDD #$0000
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
 	LDA #$81              
-	LEAX Dat_0A31,PC       ; X → Dat_0A31
+	LEAX Dat_0A31,PCR       ; X → Dat_0A31
 	OS9 I$Open             ; mode=B  name→X  → path→A
 	LBCS Sub_2F9A         
 	STA 61,U              
@@ -5223,14 +5223,14 @@ Sub_2F4C:      LDA 100,U
 	LDD #$0000            
 	STD 4892,U            
 	LBSR Sub_1EDC          ; call Sub_1EDC
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_314B          ; call Sub_314B
 Sub_2F79:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LBSR Sub_1BDF          ; call Sub_1BDF
 	LBSR Sub_1C57          ; call Sub_1C57
 	LBSR Sub_1EDC          ; call Sub_1EDC
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	PULS A,B,X,Y          
 	LDY 3208,U            
@@ -5268,7 +5268,7 @@ Sub_2FC8:      INC 100,U
 	LDY 147,U             
 	LEAY 32,Y             
 	STY 147,U             
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_2FDE:      PSHS A,B,X,Y          
@@ -5291,7 +5291,7 @@ Sub_2FFA:      STA ,Y+
 	LDY #$001E            
 	LEAX 5033,U           
 	OS9 I$WritLn           ; path=A  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_300E:      PSHS A,B,X,Y          
@@ -5313,11 +5313,11 @@ Sub_3023:      STA 1,X
 	LDY #$0003            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3038:      PSHS A,B,X,Y          
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$01              
 	STA 146,U             
@@ -5349,7 +5349,7 @@ Sub_3073:      STA 1,X
 	LDA #$01              
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_0693,PC       ; X → Dat_0693
+	LEAX Dat_0693,PCR       ; X → Dat_0693
 	LDY #$0003            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_3090:      LBSR Sub_2AC5          ; call Sub_2AC5
@@ -5401,9 +5401,9 @@ Sub_30E1:      LDA #$01
 ; --------------------------------------------------------------
 Sub_30E9:      CMPA #$0D              ; compare A with CR
 	BNE *+11
-Sub_30ED:      LEAX Dat_048B,PC       ; X → Dat_048B
+Sub_30ED:      LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_30F6:      CMPA #$05             
@@ -5418,10 +5418,10 @@ Sub_3100:      STA 146,U
 ; --------------------------------------------------------------
 Sub_3107:      PSHS A,X,Y            
 	LDA #$01              
-	LEAX Dat_0682,PC       ; X → Dat_0682
+	LEAX Dat_0682,PCR       ; X → Dat_0682
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3118:      PSHS A,B,X,Y          
@@ -5451,7 +5451,7 @@ Sub_3130:      LDA ,X+
 	CMPA #$E6             
 	BNE *-24
 	CLRB                   ; B = 0
-Sub_3146:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_3146:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_3148:      COMB                  
 	BRA *-3
 
@@ -5466,7 +5466,7 @@ Sub_314B:      PSHS A,B,X,Y
 	STX 147,U             
 	PSHS X                
 	LEAX 5033,U           
-	LEAY Dat_0A31,PC       ; Y → Dat_0A31
+	LEAY Dat_0A31,PCR       ; Y → Dat_0A31
 Sub_3169:      LDA ,Y+               
 	BMI *+6
 	STA ,X+               
@@ -5518,14 +5518,14 @@ Sub_31C1:      LDA 61,U
 	LBRA Sub_33E0         
 
 ; --------------------------------------------------------------
-Sub_31CD:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_31CD:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_31CF:      OS9 F$PErr             ; path=A  error=B
 	BRA *-5
 
 ; --------------------------------------------------------------
 Sub_31D4:      PSHS A,B,X,Y          
 	CLRA                   ; A = 0
-	LEAY Dat_06D1,PC       ; Y → Dat_06D1
+	LEAY Dat_06D1,PCR       ; Y → Dat_06D1
 Sub_31DB:      LEAX 5033,U           
 	LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 	INCA                  
@@ -5580,7 +5580,7 @@ Sub_31ED:      CMPA #$1F
 	LBEQ Sub_3392         
 	CMPA #$21              ; compare A with '!'
 	LBEQ Sub_33A1         
-Sub_326F:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_326F:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_3271:      LEAY 3314,U           
 	LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 Sub_3277:      LDA ,X+               
@@ -5781,13 +5781,13 @@ Sub_33ED:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LDD #$2808            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_04B1,PC       ; X → Dat_04B1
+	LEAX Dat_04B1,PCR       ; X → Dat_04B1
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_23D0          ; call Sub_23D0
-	LEAX Dat_04DB,PC       ; X → Dat_04DB
+	LEAX Dat_04DB,PCR       ; X → Dat_04DB
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_2FDE          ; call Sub_2FDE
-	LEAX Dat_04E5,PC       ; X → Dat_04E5
+	LEAX Dat_04E5,PCR       ; X → Dat_04E5
 	LBSR WriteBlock        ; call WriteBlock
 	LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 	STB 5023,U            
@@ -5809,7 +5809,7 @@ Sub_3434:      DECB
 Sub_343E:      CLRA                   ; A = 0
 	TFR D,Y               
 	STY 3233,U            
-Sub_3446:      LEAX Dat_02DC,PC       ; X → Dat_02DC
+Sub_3446:      LEAX Dat_02DC,PCR       ; X → Dat_02DC
 	LDY #$0004            
 	LDA 43,U              
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -5861,14 +5861,14 @@ Sub_34BC:      LBSR Sub_1B4E          ; call Sub_1B4E
 	CMPA 3235,U           
 	BEQ *-46
 	INC 3236,U            
-	LEAX Dat_04EA,PC       ; X → Dat_04EA
+	LEAX Dat_04EA,PCR       ; X → Dat_04EA
 	LBSR WriteBlock        ; call WriteBlock
 	LDB 3236,U            
 	BSR *+119  ; call Sub_354B
 	CMPB 3354,U           
 	BCS *-76  ; C=1 (BLO)
 Sub_34DC:      INC 5023,U            
-	LEAX Dat_04E5,PC       ; X → Dat_04E5
+	LEAX Dat_04E5,PCR       ; X → Dat_04E5
 	LBSR WriteBlock        ; call WriteBlock
 	LDB 5023,U            
 	BSR *+96  ; call Sub_354B
@@ -5934,10 +5934,10 @@ Sub_3569:      ADDA #$30
 	LDY #$0003            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
-Sub_3580:      LEAX Dat_048F,PC       ; X → Dat_048F
+Sub_3580:      LEAX Dat_048F,PCR       ; X → Dat_048F
 	INC 3232,U            
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1C05            
@@ -5945,14 +5945,14 @@ Sub_3580:      LEAX Dat_048F,PC       ; X → Dat_048F
 	LDD #$1907            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_0734,PC       ; X → Dat_0734
+	LEAX Dat_0734,PCR       ; X → Dat_0734
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$04              
 	STA 5022,U            
 	LDB 75,U              
 	LBSR Sub_1DB8          ; call Sub_1DB8
 	LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	CLR BSS.EchoFlag,U    
 	LDB 3204,U            
@@ -5972,7 +5972,7 @@ Sub_35D6:      STB 75,U
 
 ; --------------------------------------------------------------
 Sub_35DC:      LBRA Sub_0C5E         
-Sub_35DF:      LEAX Dat_048F,PC       ; X → Dat_048F
+Sub_35DF:      LEAX Dat_048F,PCR       ; X → Dat_048F
 	CLR 3232,U            
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$1C05            
@@ -5980,14 +5980,14 @@ Sub_35DF:      LEAX Dat_048F,PC       ; X → Dat_048F
 	LDD #$1908            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_07A5,PC       ; X → Dat_07A5
+	LEAX Dat_07A5,PCR       ; X → Dat_07A5
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$05              
 	STA 5022,U            
 	LDB BSS.FlowCtrl,U    
 	LBSR Sub_1DB8          ; call Sub_1DB8
 	LBSR Sub_1CDE          ; call Sub_1CDE
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	CLR BSS.EchoFlag,U    
 	CLR 69,U              
@@ -6070,7 +6070,7 @@ Sub_36D2:      LDA 43,U
 	LBSR Sub_3BDA          ; call Sub_3BDA
 	CMPA #$02              ; compare A with CurXY
 	BCS *-15  ; C=1 (BLO)
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_36E5:      CLRA                   ; A = 0
@@ -6082,22 +6082,22 @@ Sub_36E5:      CLRA                   ; A = 0
 
 ; --------------------------------------------------------------
 Sub_36F4:      LBSR Sub_364D          ; call Sub_364D
-	LEAX Dat_04EF,PC       ; X → Dat_04EF
+	LEAX Dat_04EF,PCR       ; X → Dat_04EF
 	LBSR WriteBlock        ; call WriteBlock
 	TST BSS.EchoFlag,U    
 	BEQ *+9
-	LEAX Dat_0511,PC       ; X → Dat_0511
+	LEAX Dat_0511,PCR       ; X → Dat_0511
 	LBSR WriteBlock        ; call WriteBlock
-Sub_370A:      LEAX Dat_052F,PC       ; X → Dat_052F
+Sub_370A:      LEAX Dat_052F,PCR       ; X → Dat_052F
 	LBSR WriteBlock        ; call WriteBlock
 	TST BSS.EchoFlag,U    
 	BEQ *+11
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	BRA *+77
 
 ; --------------------------------------------------------------
-Sub_371F:      LEAX Dat_055F,PC       ; X → Dat_055F
+Sub_371F:      LEAX Dat_055F,PCR       ; X → Dat_055F
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_455D          ; call Sub_455D
 	TST 155,U             
@@ -6112,13 +6112,13 @@ Sub_3742:      LDB #$1E
 	LBSR Sub_1B61          ; call Sub_1B61
 	TST 33,U              
 	LBNE Sub_3954         
-	LEAX Dat_045E,PC       ; X → Dat_045E
+	LEAX Dat_045E,PCR       ; X → Dat_045E
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_04EF,PC       ; X → Dat_04EF
+	LEAX Dat_04EF,PCR       ; X → Dat_04EF
 	LBSR WriteBlock        ; call WriteBlock
 	TST BSS.EchoFlag,U    
 	BEQ *+19
-	LEAX Dat_0511,PC       ; X → Dat_0511
+	LEAX Dat_0511,PCR       ; X → Dat_0511
 	LBSR WriteBlock        ; call WriteBlock
 	BRA *+10
 
@@ -6141,13 +6141,13 @@ Sub_378F:      TST 3232,U
 	LBEQ Sub_3F08         
 	TST BSS.EchoFlag,U    
 	BNE *+47
-	LEAX Dat_056B,PC       ; X → Dat_056B
+	LEAX Dat_056B,PCR       ; X → Dat_056B
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$01              
 	LEAX 159,U            
 	LDY #$0020            
 	OS9 I$WritLn           ; path=A  buf→X
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$02               ; A = CurXY
 	LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
@@ -6157,11 +6157,11 @@ Sub_378F:      TST 3232,U
 	STA 66,U              
 Sub_37C9:      LDD BSS.ParamBase,U   
 	STD BSS.RxBufPtr,U    
-	LEAX Dat_0593,PC       ; X → Dat_0593
+	LEAX Dat_0593,PCR       ; X → Dat_0593
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_05B7,PC       ; X → Dat_05B7
+	LEAX Dat_05B7,PCR       ; X → Dat_05B7
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_052F,PC       ; X → Dat_052F
+	LEAX Dat_052F,PCR       ; X → Dat_052F
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_3E83          ; call Sub_3E83
 	LBSR Sub_3E9B          ; call Sub_3E9B
@@ -6176,11 +6176,11 @@ Sub_37ED:      LBSR Sub_3E83          ; call Sub_3E83
 Sub_37F8:      LBSR Sub_3EDD          ; call Sub_3EDD
 	LDD #$0001            
 Sub_37FE:      STD 83,U              
-	LEAX Dat_06C7,PC       ; X → Dat_06C7
+	LEAX Dat_06C7,PCR       ; X → Dat_06C7
 	LBSR WriteBlock        ; call WriteBlock
 	LDD #$0D07            
 	LBSR Sub_2294          ; call Sub_2294
-	LEAX Dat_05C7,PC       ; X → Dat_05C7
+	LEAX Dat_05C7,PCR       ; X → Dat_05C7
 	LDA #$01              
 	LDY #$0014            
 	OS9 I$Write            ; path=A  count=Y  buf→X
@@ -6328,13 +6328,13 @@ Sub_3965:      LDA #$07
 	LBSR Sub_2294          ; call Sub_2294
 	LDA #$03              
 	LBSR Sub_1F0B          ; call Sub_1F0B
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	PULS B                
 	OS9 F$PErr             ; path=A  error=B
 	LDX #$003C            
 	LBSR Sub_0F56          ; call Sub_0F56
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	BRA *-60
 
@@ -6535,7 +6535,7 @@ Sub_3B2F:      LEAX 226,U
 	LDY #$0003            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_06BF,PC       ; X → Dat_06BF
+	LEAX Dat_06BF,PCR       ; X → Dat_06BF
 	LDY #$0008            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	LDA 135,U             
@@ -6561,7 +6561,7 @@ Sub_3B83:      INC 82,U
 	LDA 79,U              
 	BEQ *+18
 	MUL                    ; D = A×B unsigned
-	LEAX Dat_05C7,PC       ; X → Dat_05C7
+	LEAX Dat_05C7,PCR       ; X → Dat_05C7
 	LEAX D,X              
 	LDA #$01              
 	LDY #$0014            
@@ -6586,14 +6586,14 @@ Sub_3BBC:      PSHS A,B,X
 	CLRA                   ; A = 0
 	LDB 115,U             
 	STD 96,U              
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3BCC:      LEAX 3225,U           
 	OS9 F$Time             ; buf→X  → 6-byte time
 	LDA 5,X               
 	STA 96,U              
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3BDA:      PSHS B,X              
@@ -6605,7 +6605,7 @@ Sub_3BDA:      PSHS B,X
 	TFR B,A               
 	LDX #$0001            
 	LBSR Sub_0F56          ; call Sub_0F56
-	PULS B,X,PC            ; return from subroutine  (PULS PC = RTS)
+	PULS B,X,PCR            ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3BF3:      LEAX 3225,U           
@@ -6618,7 +6618,7 @@ Sub_3BF3:      LEAX 3225,U
 	CMPA #$3C              ; compare A with '<'
 	BCS *+4  ; C=1 (BLO)
 	SUBA #$3C             
-Sub_3C0D:      PULS B,X,PC            ; return from subroutine  (PULS PC = RTS)
+Sub_3C0D:      PULS B,X,PCR            ; return from subroutine  (PULS PC = RTS)
 ; CrcTable — CRC-16/CCITT lookup table  (256 × FDB = 512 bytes)
 ; Indexed as: LEAY CrcTable,PC  then LDD B,Y to fetch entry.
 ; Added in v2.2 to replace the slower OS9 F$CRC syscall.
@@ -6907,7 +6907,7 @@ Sub_3E0F:      PSHS A,B,X,Y
 	PSHS Y                
 	CMPX 80,U             
 	BCC *+27  ; C=0 (BHS)
-	LEAY CrcTable,PC       ; Y → CrcTable
+	LEAY CrcTable,PCR       ; Y → CrcTable
 Sub_3E24:      LDB <$48              
 	CLRA                   ; A = 0
 	EORB ,X+              
@@ -6921,7 +6921,7 @@ Sub_3E24:      LDB <$48
 	CMPX 2,S              
 	BCS *-19  ; C=1 (BLO)
 Sub_3E39:      LEAS 4,S              
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3E3D:      PSHS A,B,X,Y          
@@ -6938,7 +6938,7 @@ Sub_3E4E:      EQU    $3E4E            ; mid-instruction overlap: Insn_3E4D+1 --
 	BCS *-9  ; C=1 (BLO)
 Sub_3E56:      STA 72,U              
 	LEAS 2,S              
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3E5D:      PSHS A,X,Y            
@@ -6946,7 +6946,7 @@ Sub_3E5D:      PSHS A,X,Y
 	LDA 43,U              
 	LDY #$0001            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3E6E:      STA 68,U              
@@ -6970,23 +6970,23 @@ Sub_3E7F:      LDA #$15
 
 ; --------------------------------------------------------------
 Sub_3E83:      PSHS A,B,X,Y          
-	LEAX Dat_062B,PC       ; X → Dat_062B
+	LEAX Dat_062B,PCR       ; X → Dat_062B
 	LEAY 5193,U           
 	LDB #$09              
 	LBSR Sub_2D1E          ; call Sub_2D1E
 	LEAX 5193,U           
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3E9B:      PSHS A,B,X,Y          
-	LEAX Dat_0634,PC       ; X → Dat_0634
+	LEAX Dat_0634,PCR       ; X → Dat_0634
 	LEAY 5177,U           
 	LDB #$09              
 	LBSR Sub_2D1E          ; call Sub_2D1E
 	LEAX 5177,U           
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3EB3:      PSHS A,B,X,Y          
@@ -6995,14 +6995,14 @@ Sub_3EB3:      PSHS A,B,X,Y
 	STD 5,X               
 	STD 7,X               
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3EC5:      PSHS A,X,Y            
 	LEAX 5177,U           
 	BSR *+31  ; call Sub_3EEA
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 
@@ -7024,7 +7024,7 @@ Sub_3EDD:      PSHS A,X,Y
 	LEAX 5193,U           
 	BSR *+7  ; call Sub_3EEA
 	LBSR WriteBlock        ; call WriteBlock
-	PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,X,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_3EEA:      PSHS B                
@@ -7034,7 +7034,7 @@ Sub_3EEE:      BSR *+11  ; call Sub_3EF9
 	BNE *+5
 	DECB                  
 	BCC *-7  ; C=0 (BHS)
-Sub_3EF7:      PULS B,PC              ; return from subroutine  (PULS PC = RTS)
+Sub_3EF7:      PULS B,PCR              ; return from subroutine  (PULS PC = RTS)
 Sub_3EF9:      LDA B,X               
 	INCA                  
 	CMPA #$39              ; compare A with '9'
@@ -7054,15 +7054,15 @@ Sub_3F08:      TST BSS.EchoFlag,U
 	TST 33,U              
 	LBNE Sub_3954         
 Sub_3F17:      LBSR Sub_2AA0          ; call Sub_2AA0
-Sub_3F1A:      LEAX Dat_0583,PC       ; X → Dat_0583
+Sub_3F1A:      LEAX Dat_0583,PCR       ; X → Dat_0583
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 159,U            
 	LDA #$01              
 	LDY #$0020            
 	OS9 I$WritLn           ; path=A  buf→X
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_06C7,PC       ; X → Dat_06C7
+	LEAX Dat_06C7,PCR       ; X → Dat_06C7
 	LBSR WriteBlock        ; call WriteBlock
 	LDA #$01              
 	LEAX 159,U            
@@ -7084,9 +7084,9 @@ Sub_3F53:      STA 66,U
 	LDA 66,U              
 	LDX #$0000            
 	OS9 I$Seek             ; path=A  mode=B  offset→X:D
-Sub_3F71:      LEAX Dat_0593,PC       ; X → Dat_0593
+Sub_3F71:      LEAX Dat_0593,PCR       ; X → Dat_0593
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_052F,PC       ; X → Dat_052F
+	LEAX Dat_052F,PCR       ; X → Dat_052F
 	LBSR WriteBlock        ; call WriteBlock
 	LBSR Sub_3E83          ; call Sub_3E83
 	LBSR Sub_3E9B          ; call Sub_3E9B
@@ -7098,7 +7098,7 @@ Sub_3F71:      LEAX Dat_0593,PC       ; X → Dat_0593
 	LDY #$0003            
 	LDA #$01              
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_06BF,PC       ; X → Dat_06BF
+	LEAX Dat_06BF,PCR       ; X → Dat_06BF
 	LDY #$0008            
 	OS9 I$Write            ; path=A  count=Y  buf→X
 	LEAX 156,U            
@@ -7310,7 +7310,7 @@ Sub_41A6:      LDD ,X++
 	BEQ *+4
 	LEAY -1,Y             
 Sub_41B7:      STY BSS.RxBufPtr,U    
-	PULS A,B,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_41BC:      LDD ,X++              
@@ -7335,7 +7335,7 @@ Sub_41DA:      LDD ,S
 	BEQ *+4
 	LEAY -1,Y             
 Sub_41E7:      STY BSS.RxBufPtr,U    
-	PULS A,B,Y,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,Y,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_41EC:      PSHS X                
@@ -7349,7 +7349,7 @@ Sub_41EC:      PSHS X
 	OS9 I$Write            ; path=A  count=Y  buf→X
 Sub_4200:      LDD BSS.ParamBase,U   
 	STD BSS.RxBufPtr,U    
-	PULS X,PC              ; return from subroutine  (PULS PC = RTS)
+	PULS X,PCR              ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_4206:      PSHS A,B,X            
@@ -7370,11 +7370,11 @@ Sub_4213:      LDA ,X+
 	BNE *+7
 Sub_4229:      DECB                  
 	BNE *-23
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_422E:      CLR 76,U              
-	PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,PCR          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_4233:      LDD #$1504            
@@ -7382,26 +7382,26 @@ Sub_4233:      LDD #$1504
 	LDD #$2507            
 	STD 3217,U            
 	LBSR Sub_1C81          ; call Sub_1C81
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	TST 3232,U            
 	LBEQ Sub_444C         
-	LEAX Dat_08CF,PC       ; X → Dat_08CF
+	LEAX Dat_08CF,PCR       ; X → Dat_08CF
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_051C,PC       ; X → Dat_051C
+	LEAX Dat_051C,PCR       ; X → Dat_051C
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	TST 37,U              
 	BEQ *+83
-	LEAX Dat_0925,PC       ; X → Dat_0925
+	LEAX Dat_0925,PCR       ; X → Dat_0925
 	LBSR WriteBlock        ; call WriteBlock
 	LEAX 191,U            
 	LDA #$01              
 	LDY BSS.CurrChar,U    
 	LEAY -1,Y             
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	LEAX Dat_08E8,PC       ; X → Dat_08E8
+	LEAX Dat_08E8,PCR       ; X → Dat_08E8
 	LBSR WriteBlock        ; call WriteBlock
 Sub_428A:      LBSR Sub_2AC5          ; call Sub_2AC5
 	CMPA #$59              ; compare A with 'Y'
@@ -7428,7 +7428,7 @@ Sub_42A3:      LBSR Sub_43CA          ; call Sub_43CA
 ; --------------------------------------------------------------
 Sub_42BE:      TST BSS.StateFlag,U   
 	BNE *+38
-	LEAX Dat_055F,PC       ; X → Dat_055F
+	LEAX Dat_055F,PCR       ; X → Dat_055F
 	LBSR WriteBlock        ; call WriteBlock
 	LDB #$1E              
 	LBSR Sub_1B61          ; call Sub_1B61
@@ -7450,7 +7450,7 @@ Sub_42E7:      LEAX 191,U
 	BCC *+32  ; C=0 (BHS)
 	CMPB #$DA             
 	BNE *+63
-	LEAX Dat_092B,PC       ; X → Dat_092B
+	LEAX Dat_092B,PCR       ; X → Dat_092B
 	LBSR WriteBlock        ; call WriteBlock
 Sub_4305:      LBSR Sub_2AC5          ; call Sub_2AC5
 	CMPA #$41              ; compare A with 'A'
@@ -7482,13 +7482,13 @@ Sub_433B:      LDA #$07
 	PSHS B                
 	LDD #$0D02            
 	LBSR Sub_2294          ; call Sub_2294
-	LEAX Dat_048F,PC       ; X → Dat_048F
+	LEAX Dat_048F,PCR       ; X → Dat_048F
 	LBSR WriteBlock        ; call WriteBlock
 	PULS B                
 	OS9 F$PErr             ; path=A  error=B
 	LDX #$003C            
 	LBSR Sub_0F56          ; call Sub_0F56
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
 	BRA *-47
 
@@ -7539,7 +7539,7 @@ Sub_43BA:      TSTB
 	CMPA BSS.TxBufPtr,U   
 	BEQ *+5
 	LBSR Sub_44FF          ; call Sub_44FF
-Sub_43C8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_43C8:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_43CA:      PSHS A,B,X,Y          
 	LDD BSS.RxBufPtr,U    
 	STD 9,U               
@@ -7561,7 +7561,7 @@ Sub_43E1:      LDD BSS.RxBufPtr,U
 	LBSR Sub_3E5D          ; call Sub_3E5D
 Sub_43FD:      LDD BSS.ParamBase,U   
 	STD BSS.RxBufPtr,U    
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_4403:      PSHS A,B,X,Y          
@@ -7597,14 +7597,14 @@ Sub_443D:      CLRA                   ; A = 0
 	INC BSS.StateFlag,U   
 	LBSR Sub_4233          ; call Sub_4233
 Sub_4447:      CLR BSS.StateFlag,U   
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
-Sub_444C:      LEAX Dat_0910,PC       ; X → Dat_0910
+Sub_444C:      LEAX Dat_0910,PCR       ; X → Dat_0910
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_048B,PC       ; X → Dat_048B
+	LEAX Dat_048B,PCR       ; X → Dat_048B
 	LBSR WriteBlock        ; call WriteBlock
-	LEAX Dat_055F,PC       ; X → Dat_055F
+	LEAX Dat_055F,PCR       ; X → Dat_055F
 	LBSR WriteBlock        ; call WriteBlock
 	LDB #$1E              
 	LBSR Sub_1B61          ; call Sub_1B61
@@ -7669,7 +7669,7 @@ Sub_44E1:      PSHS A,B,X,Y
 	LDA 62,U              
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_44FF:      PSHS A,B,X,Y          
@@ -7702,7 +7702,7 @@ Sub_451E:      STB 3,X
 	LDA 62,U              
 	LDY #$0006            
 	OS9 I$Write            ; path=A  count=Y  buf→X
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_453B:      PSHS A,B,X,Y          
@@ -7718,7 +7718,7 @@ Sub_4548:      LDA ,X+
 Sub_4555:      TSTB                  
 	BNE *-14
 	STY 15,U              
-	PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+	PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 Sub_455D:      PSHS A,B,X,Y          
@@ -7732,7 +7732,7 @@ Sub_4567:      CMPX 13,U
 Sub_456D:      CMPX 15,U             
 	BNE *-14
 	CLR 155,U             
-Sub_4575:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
+Sub_4575:      PULS A,B,X,Y,PCR        ; return from subroutine  (PULS PC = RTS)
 Sub_4577:      LDA 1,X               
 	CMPA #$2E              ; compare A with '.'
 	BCS *-20  ; C=1 (BLO)

@@ -66,7 +66,7 @@ def fix_fcc_quotes(raw):
         return indent + "FCB    $22" + ("  " + comment if comment else "")
     return raw
 
-def process(infile, outfile):
+def process(infile, outfile, target='asm6809'):
     with open(infile, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
@@ -110,9 +110,7 @@ def process(infile, outfile):
             # Applies to LEA ops AND any load/store with PCR post-byte
             elif len(hex_bytes) >= 2:
                 key = (hex_bytes[0], hex_bytes[1])
-                # Post-byte $8D anywhere (not first byte) = PCR relative
-                # Exclude: short branches, PSHS/PULS/PSHU/PULU (post-byte is register mask)
-                # Also exclude if ,PC or ,PCR already in operand
+                # already_pcr: suppress further PCR processing if ,PC or ,PCR present
                 already_pcr = ',PCR' in rest or ',PC' in rest
                 is_stack_op = hex_bytes[0] in (0x34, 0x35, 0x36, 0x37)
                 # Only indexed-capable opcodes have a post-byte as byte 2
@@ -180,13 +178,29 @@ def process(infile, outfile):
 
             out.append(line)
 
+    # ── lwasm dialect: convert ,PC to ,PCR throughout ────────────────────
+    if target == 'lwasm':
+        converted = []
+        for line in out:
+            # Only convert in non-comment lines, avoid touching string contents
+            if ',PC' in line and not line.strip().startswith(';'):
+                line = re.sub(r',PC\b(?!R)', ',PCR', line)
+            converted.append(line)
+        out = converted
+
     with open(outfile, "w", encoding="utf-8") as f:
         f.writelines(out)
 
     print(f"Processed {len(lines)} lines -> {outfile}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python strip_listing.py input.asm output.asm")
-        sys.exit(1)
-    process(sys.argv[1], sys.argv[2])
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Strip disassembler listing to assembleable source')
+    parser.add_argument('input',  help='Input proj.asm file')
+    parser.add_argument('output', help='Output clean.asm file')
+    parser.add_argument('--target', choices=['asm6809', 'lwasm'], default='asm6809',
+        help='Target assembler dialect (default: asm6809). '
+             'Use --target lwasm to convert ,PC to ,PCR for lwasm compatibility.')
+    args = parser.parse_args()
+    process(args.input, args.output, target=args.target)
