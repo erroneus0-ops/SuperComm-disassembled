@@ -203,8 +203,7 @@ ModName
 
 Dat_006F
 ; Referenced by: $0BCC
-         FCB    $00               ; NUL
-         FCB    $55               ; 'U'
+         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content (excl. this word)
          FCB    $0C               ; FF clear+home
          FCB    CurXY,$23,$21     ; CurXY(row=3,col=1)
          FCC    "SuperComm   v2.2"
@@ -216,6 +215,7 @@ Dat_006F
          FCC    "written by"
          FCB    CurXY,$24,$27     ; CurXY(row=4,col=7)
          FCC    "Dave Philipsen"
+Dat_006Fend
 
 Dat_00C6
 ; Referenced by: $0BED

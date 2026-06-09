@@ -286,8 +286,10 @@ def crc24(data):
     return f'{crc & 0xFFFFFF:06X}'
 
 def binary_crc(path):
-    """Compute CRC-24 of a binary file. Returns 6-char uppercase hex string."""
-    return crc24(open(path, 'rb').read())
+    """Compute a unique fingerprint of a binary file for change detection.
+    Uses SHA-256 truncated to 16 hex chars — sufficient for mismatch detection."""
+    import hashlib
+    return hashlib.sha256(open(path, 'rb').read()).hexdigest()[:16].upper()
 
 
 class Project:
@@ -342,9 +344,11 @@ class Project:
 
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
+            if 'start' not in r: continue
             p.data_regions.append({
                 'start':   int(r['start'], 16),
-                'end':     int(r['end'],   16),
+                'end':     int(r['end'], 16) if 'end' in r else None,
+                'end_label': r.get('end_label', False),
                 'label':   r.get('label', f"Dat_{r['start']}"),
                 'comment': r.get('comment', ''),
                 'format':  r.get('format', 'auto'),  # 'auto','fdb','raw'
@@ -452,6 +456,34 @@ class Project:
 
 
 # ── Engine: generalized disassembler ─────────────────────────────────────────
+
+def _count_data_bytes(lines):
+    """Count how many binary bytes a list of FCB/FCC/FDB/FCS assembly lines represent."""
+    total = 0
+    for line in lines:
+        s = line.strip()
+        if not s or s.startswith(';'):
+            continue
+        if ';' in s:
+            s = s[:s.index(';')].strip()
+        upper = s.upper()
+        if upper.startswith('FCB'):
+            args = s[3:].strip()
+            total += len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FDB'):
+            args = s[3:].strip()
+            total += 2 * len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FCC') or upper.startswith('FCS'):
+            m = re.search(r'["\'](.+?)["\']', s)
+            if m:
+                total += len(m.group(1))
+        elif upper.startswith('RMB'):
+            try:
+                total += int(s[3:].strip())
+            except ValueError:
+                pass
+    return total
+
 
 class Engine:
     """
@@ -1363,6 +1395,20 @@ class Engine:
                 args = ','.join(f"${b:02X}" for b in patch['bytes'])
                 out.append(f"         FCB    {args}{cmt}")
 
+            # ── Substitution: analyst-supplied replacement for these bytes ──
+            subs = self.project.substitutions if hasattr(self.project, 'substitutions') else {}
+            if i in subs:
+                sub = subs[i]
+                # Emit the analyst's replacement lines verbatim
+                for wline in sub.get('with_lines', []):
+                    out.append(wline)
+                # Advance past the bytes covered by the replace block
+                # Count bytes from the replace_lines
+                replace_bytes = _count_data_bytes(sub.get('replace_lines', []))
+                i += max(replace_bytes, 1)
+                last_printable = False
+                continue
+
             b = d[i]
 
             if fmt == 'iwrite':
@@ -1615,11 +1661,13 @@ class Engine:
                 if first_lbl_addr > pre_data_start:
                     out.extend(self.emit_data(pre_data_start, first_lbl_addr, {}))
                 # Build pre-exec format override map from data_regions
-                pre_fmt_map = {}  # addr -> fmt string for sub-regions
+                pre_fmt_map = {}  # addr -> (end, fmt, comment, end_label, label)
                 for r in proj.data_regions:
                     if r['start'] < exec_off:
                         pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
-                                                    r.get('comment',''))
+                                                    r.get('comment',''),
+                                                    r.get('end_label', False),
+                                                    r.get('label', ''))
 
                 # Emit each labeled block with its xref comment
                 for pi, (paddr, plbl) in enumerate(pre_sub):
@@ -1638,15 +1686,20 @@ class Engine:
                     cur = paddr
                     while cur < pend:
                         if cur in pre_fmt_map:
-                            rend, rfmt, rcmt = pre_fmt_map[cur]
+                            rend, rfmt, rcmt, r_end_label, r_label = pre_fmt_map[cur]
                             rend = min(rend, pend)
                             if cur > paddr:
                                 out.extend(self.emit_data(paddr, cur, 
                                     {k:v for k,v in sub.items() if paddr <= k < cur}))
                             if rcmt:
-                                out.append(f"; {rcmt}")
+                                for cline in rcmt.split('\n'):
+                                    out.append(f"; {cline}")
                             out.extend(self.emit_data(cur, rend,
                                 {k:v for k,v in sub.items() if cur <= k < rend}, rfmt))
+                            # Emit end_label if declared for this region
+                            if r_end_label:
+                                end_lbl = r_label or f'Dat_{cur:04X}'
+                                out.append(f"{end_lbl}end")
                             cur = rend
                             paddr = cur  # update start for remainder
                         else:
@@ -1745,6 +1798,10 @@ class Engine:
                     sub = {k:v for k,v in lbs.items()
                            if span_start < k < region_end}
                     out.extend(self.emit_data(span_start, region_end, sub, fmt))
+                    # Emit end label if declared
+                    if proj_r.get('end_label'):
+                        end_lbl = proj_r.get('label', f'Dat_{span_start:04X}')
+                        out.append(f"{end_lbl}end")
                     prev_ret = False
                     # Skip all code_pts that fall within this region
                     # (handled by the outer loop's span_start check below)
@@ -2271,6 +2328,8 @@ Examples:
     parser.add_argument('--update-labels', action='store_true',
         help='Merge auto-generated labels into the project JSON '
              '(preserves existing names, adds only new ones)')
+    parser.add_argument('-n', action='store_true', dest='no_confirm',
+        help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
 
     # ── --source is always required ───────────────────────────────────────
@@ -2291,8 +2350,16 @@ Examples:
         json_path = args.proj
 
         if not os.path.exists(json_path):
-            # --proj given but file doesn't exist → create scaffold
-            print(f"Project file not found. Creating: {json_path}")
+            # --proj given but file doesn't exist → confirm before creating
+            print(f"  Project file not found: {json_path}")
+            if not args.no_confirm:
+                try:
+                    answer = input("  Create new project JSON? [y/N]: ").strip().lower()
+                except (EOFError, KeyboardInterrupt):
+                    answer = ''
+                if answer != 'y':
+                    print("  Aborted.")
+                    sys.exit(0)
             stem = json_path
             for suffix in ('_proj.json', '.json'):
                 if stem.endswith(suffix):
@@ -2300,6 +2367,7 @@ Examples:
                     break
             proj = Project.scaffold(source, stem + '_proj.asm')
             proj.to_json(json_path)
+            print(f"  Created:    {json_path}")
             print(f"  Binary:     {source}")
             print(f"  Binary CRC: {proj.binary_crc}")
             print(f"  Output:     {proj.output}")
@@ -2343,6 +2411,22 @@ Examples:
                 if not new_name.endswith('.json'):
                     new_name += '.json'
 
+                # Warn if target already exists
+                if os.path.exists(new_name):
+                    print()
+                    print(f"  WARNING: {new_name} already exists.")
+                    if not args.no_confirm:
+                        try:
+                            answer = input("  Overwrite it? [y/N]: ").strip().lower()
+                        except (EOFError, KeyboardInterrupt):
+                            answer = ''
+                        if answer != 'y':
+                            print("  Aborted.")
+                            sys.exit(0)
+                    else:
+                        print("  Aborted. (-n set, will not overwrite existing file)")
+                        sys.exit(1)
+
                 print()
                 proj = _import_project(proj, json_path, new_name, actual_crc)
                 json_path = new_name
@@ -2370,19 +2454,21 @@ Examples:
             sys.exit(1)
 
         else:
-            # No JSON anywhere — prompt for a name
-            print(f"  --proj not specified and no project file found.")
-            print(f"  Enter a name for the new project JSON file,")
-            print(f"  or press Enter to use the default ({inferred}):")
-            print()
-
-            try:
-                new_name = input("  Project JSON name: ").strip()
-            except (EOFError, KeyboardInterrupt):
-                new_name = ''
-
-            if not new_name:
+            # No JSON anywhere — prompt for a name or use default with -n
+            if args.no_confirm:
                 new_name = inferred
+                print(f"  Creating default project: {new_name}")
+            else:
+                print(f"  --proj not specified and no project file found.")
+                print(f"  Enter a name for the new project JSON file,")
+                print(f"  or press Enter to use the default ({inferred}):")
+                print()
+                try:
+                    new_name = input("  Project JSON name: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    new_name = ''
+                if not new_name:
+                    new_name = inferred
             if not new_name.endswith('.json'):
                 new_name += '.json'
 

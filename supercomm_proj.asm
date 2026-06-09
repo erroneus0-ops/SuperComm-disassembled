@@ -123,58 +123,16 @@ F$SigMask EQU   $27
 F$NMLink EQU    $28
 ; ================================================================
 
-; ── BSS Variable Equates ─────────────────────────────────────
-BSS.ParamStr  EQU    2        ; BSS offset $0002
-BSS.ParamBase EQU    4        ; BSS offset $0004
-BSS.RxBufPtr  EQU    6        ; BSS offset $0006
-BSS.TxBufPtr  EQU    8        ; BSS offset $0008
-BSS.Var000B   EQU    11       ; BSS offset $000B
-BSS.CurrChar  EQU    30       ; BSS offset $001E
-BSS.PrevChar  EQU    31       ; BSS offset $001F
-BSS.StateFlag EQU    32       ; BSS offset $0020
-BSS.Counter1  EQU    45       ; BSS offset $002D
-BSS.TermMode  EQU    51       ; BSS offset $0033
-BSS.EchoFlag  EQU    70       ; BSS offset $0046
-BSS.FlowCtrl  EQU    74       ; BSS offset $004A
-BSS.Counter2  EQU    77       ; BSS offset $004D
-BSS.Counter3  EQU    78       ; BSS offset $004E
-BSS.ConnState EQU    90       ; BSS offset $005A
-BSS.ConnWord  EQU    91       ; BSS offset $005B
-BSS.BufPtr1   EQU    93       ; BSS offset $005D
-BSS.BufCount  EQU    95       ; BSS offset $005F
-BSS.BufPtr2   EQU    99       ; BSS offset $0063
-BSS.BufPtr3   EQU    101      ; BSS offset $0065
-BSS.Counter4  EQU    103      ; BSS offset $0067
-BSS.CommPtr   EQU    3660     ; BSS offset $0E4C
-BSS.CommState EQU    3665     ; BSS offset $0E51
-BSS.CommSz1   EQU    3671     ; BSS offset $0E57
-BSS.CommSz2   EQU    3673     ; BSS offset $0E59
-BSS.CommOff   EQU    3676     ; BSS offset $0E5C
-BSS.CommFlag  EQU    3693     ; BSS offset $0E6D
-BSS.BaudState EQU    3699     ; BSS offset $0E73
-BSS.FlowState EQU    3703     ; BSS offset $0E77
-BSS.IoBuf     EQU    6613     ; BSS offset $19D5
-
 ; ==============================================================
-; Disassembly:  supercomm22-restored\sc22_restored.bin
+; Disassembly:  supercomm22
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $45C5  (17861 bytes)
 ; Entry:        $0A71
 ; BSS:          $2000  (8192 bytes)
-; CRC-24:       $15E38F
+; CRC-24:       $F5ADE1
 ;
-; SuperComm v2.2 — OS-9 Level II terminal / communications program
-; Author: Dave Philipsen  Copyright (c) 1988, 1989
-; v2.2 updates (1992) by Randy K. Wilson
-; 
-; New in v2.2 vs v2.1:
-;   + CRC-16/CCITT lookup table (L3C0F / CrcTable) for file transfer
-;   + ZModem support (External ZModem Send/Receive, Auto Zmodem)
-;   + 16550 UART support variant (supercomm23_16550)
-;   + Module is 3693 bytes larger than v2.1
-; 
-; Same config-patch-and-reseal design as v2.1.
+; Add notes about this module here.
 ; ==============================================================
 
 ; ----- Module Header -----
@@ -834,10 +792,7 @@ Dat_0734
          FCC    "o SuperComm File Receive"
          FDB    $0D0A             ; CRLF
          FCB    $0A               ; LF
-         FCC    "     ASCII R"
-
-Dat_075C
-         FCC    "eceive"
+         FCC    "     ASCII Receive"
          FDB    $0D0A             ; CRLF
          FCC    "     XModem (and X-1k)"
          FDB    $0D0A             ; CRLF
@@ -910,11 +865,7 @@ Dat_08CF
 Dat_08E8
 ; Referenced by: $4283
          FCB    $00               ; NUL
-
-
-; & and quote chars — emitted as FCB to avoid FCC string embedding issues
-         FCB    $26
-         FCB    $22
+         FCC    "&""
          FCB    CurXY,$21,$24     ; CurXY(row=1,col=4)
          FCC    "is already open.  Close it? (Y/n) "
 
@@ -1117,13 +1068,13 @@ Dat_0A51
 
 $0A71  AF C4               Init:          STX ,U                
 $0A73  30 88 C0                           LEAX -64,X            
-$0A76  AF 42                              STX BSS.ParamStr,U    
+$0A76  AF 42                              STX 2,U               
 $0A78  32 7F                              LEAS -1,S             
 $0A7A  30 C9 16 B9                        LEAX 5817,U           
-$0A7E  AF 44                              STX BSS.ParamBase,U   
-$0A80  AF 46                              STX BSS.RxBufPtr,U    
+$0A7E  AF 44                              STX 4,U               
+$0A80  AF 46                              STX 6,U               
 $0A82  30 1F                              LEAX -1,X             
-$0A84  AF 4B                              STX BSS.Var000B,U     
+$0A84  AF 4B                              STX 11,U              
 $0A86  30 C9 14 B9                        LEAX 5305,U           
 $0A8A  AF 4D                              STX 13,U              
 $0A8C  AF 4F                              STX 15,U              
@@ -1131,7 +1082,7 @@ $0A8E  CC 00 00                           LDD #$0000
 $0A91  ED 49                              STD 9,U               
 $0A93  30 C8 19                           LEAX 25,U             
 $0A96  6F 80               Sub_0A96:      CLR ,X+               
-$0A98  AC 42                              CMPX BSS.ParamStr,U   
+$0A98  AC 42                              CMPX 2,U              
 $0A9A  25 FA                              BCS Sub_0A96           ; C=1 (BLO)
 $0A9C  AE C4                              LDX ,U                
 $0A9E  86 20                              LDA #$20               ; A = ' '
@@ -1149,7 +1100,7 @@ $0AB4  20 04                              BRA Sub_0ABA
 
 ; --------------------------------------------------------------
 $0AB6  30 8D F8 A0         Sub_0AB6:      LEAX Dat_035A,PC       ; X → Dat_035A
-$0ABA  31 C8 2D            Sub_0ABA:      LEAY BSS.Counter1,U   
+$0ABA  31 C8 2D            Sub_0ABA:      LEAY 45,U             
 $0ABD  C6 0A                              LDB #$0A               ; B = SS.DevNm  (GetStt/SetStt subcode)
 $0ABF  A6 80               Sub_0ABF:      LDA ,X+               
 $0AC1  81 0D                              CMPA #$0D              ; compare A with CR
@@ -1163,7 +1114,7 @@ $0ACF  10 25 04 42                        LBCS Sub_0F15
 $0AD3  17 0F B4                           LBSR Sub_1A8A          ; call Sub_1A8A
 $0AD6  10 25 04 3B                        LBCS Sub_0F15         
 $0ADA  86 01                              LDA #$01              
-$0ADC  A7 C8 65                           STA BSS.BufPtr3,U     
+$0ADC  A7 C8 65                           STA 101,U             
 $0ADF  8E 00 01                           LDX #$0001            
 $0AE2  10 3F 0A                           OS9 F$Sleep            ; ticks→X  (0=forever)
 $0AE5  86 01                              LDA #$01              
@@ -1173,7 +1124,7 @@ $0AEC  25 2F                              BCS Sub_0B1D           ; C=1 (BLO)
 $0AEE  1F 10                              TFR X,D               
 $0AF0  E7 C9 0C 84                        STB 3204,U            
 $0AF4  AA C9 0C 84                        ORA 3204,U            
-$0AF8  A7 C8 65                           STA BSS.BufPtr3,U     
+$0AF8  A7 C8 65                           STA 101,U             
 $0AFB  30 8D FF 25                        LEAX Dat_0A24,PC       ; X → Dat_0A24
 $0AFF  31 C9 0C A5                        LEAY 3237,U           
 $0B03  C6 4D                              LDB #$4D               ; B = 'M'
@@ -1228,8 +1179,6 @@ $0B87  20 09                              BRA Sub_0B92
 ; --------------------------------------------------------------
 $0B89  A6 C8 72            Sub_0B89:      LDA 114,U             
 $0B8C  10 3F 8F                           OS9 I$Close            ; path=A
-$0B8D  3F                  Sub_0B8D:      SWI                   
-$0B8E  8F                                 FCB    $8F                ; undefined opcode $8F -- not a valid 6809 instruction
 $0B8F  6F C8 72                           CLR 114,U             
 $0B92  30 C9 05 0F         Sub_0B92:      LEAX 1295,U           
 $0B96  AF C8 66                           STX 102,U             
@@ -1241,16 +1190,16 @@ $0BA2  A7 C9 0D 1A                        STA 3354,U
 $0BA6  CC 1B 32                           LDD #$1B32             ; D=ESC+'2'  → W.FColor: Foreground Color
 $0BA9  ED C9 00 9C                        STD 156,U             
 $0BAD  30 8D F8 AD                        LEAX Dat_045E,PC       ; X → Dat_045E
-$0BB1  17 0F 4F                           LBSR WriteBlock        ; call WriteBlock
+$0BB1  17 0F 4F                           LBSR Sub_1B03          ; call Sub_1B03
 $0BB4  30 8D F8 D7                        LEAX Dat_048F,PC       ; X → Dat_048F
-$0BB8  17 0F 48                           LBSR WriteBlock        ; call WriteBlock
+$0BB8  17 0F 48                           LBSR Sub_1B03          ; call Sub_1B03
 $0BBB  CC 1A 04                           LDD #$1A04            
 $0BBE  ED C9 0C 8F                        STD 3215,U            
 $0BC2  CC 16 09                           LDD #$1609            
 $0BC5  ED C9 0C 91                        STD 3217,U            
 $0BC9  17 10 B5                           LBSR Sub_1C81          ; call Sub_1C81
 $0BCC  30 8D F4 9F                        LEAX Dat_006F,PC       ; X → Dat_006F
-$0BD0  17 0F 30                           LBSR WriteBlock        ; call WriteBlock
+$0BD0  17 0F 30                           LBSR Sub_1B03          ; call Sub_1B03
 $0BD3  17 0F 12                           LBSR Sub_1AE8          ; call Sub_1AE8
 $0BD6  8E 00 1C                           LDX #$001C            
 $0BD9  17 03 7A                           LBSR Sub_0F56          ; call Sub_0F56
@@ -1260,7 +1209,7 @@ $0BE3  CC 13 04                           LDD #$1304
 $0BE6  ED C9 0C 91                        STD 3217,U            
 $0BEA  17 10 94                           LBSR Sub_1C81          ; call Sub_1C81
 $0BED  30 8D F4 D5                        LEAX Dat_00C6,PC       ; X → Dat_00C6
-$0BF1  17 0F 0F                           LBSR WriteBlock        ; call WriteBlock
+$0BF1  17 0F 0F                           LBSR Sub_1B03          ; call Sub_1B03
 $0BF4  17 2F C5                           LBSR Sub_3BBC          ; call Sub_3BBC
 $0BF7  4F                  Sub_0BF7:      CLRA                   ; A = 0
 $0BF8  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
@@ -1276,14 +1225,14 @@ $0C08  17 1E BA            Sub_0C08:      LBSR Sub_2AC5          ; call Sub_2AC5
 $0C0B  17 10 D0            Sub_0C0B:      LBSR Sub_1CDE          ; call Sub_1CDE
 $0C0E  17 10 CD                           LBSR Sub_1CDE          ; call Sub_1CDE
 $0C11  30 8D F8 76                        LEAX Dat_048B,PC       ; X → Dat_048B
-$0C15  17 0E EB                           LBSR WriteBlock        ; call WriteBlock
+$0C15  17 0E EB                           LBSR Sub_1B03          ; call Sub_1B03
 $0C18  86 03                              LDA #$03              
-$0C1A  30 C8 2D                           LEAX BSS.Counter1,U   
+$0C1A  30 C8 2D                           LEAX 45,U             
 $0C1D  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $0C20  10 25 02 F1                        LBCS Sub_0F15         
 $0C24  A7 C8 2B                           STA 43,U              
 $0C27  30 8D F8 33                        LEAX Dat_045E,PC       ; X → Dat_045E
-$0C2B  17 0E D5                           LBSR WriteBlock        ; call WriteBlock
+$0C2B  17 0E D5                           LBSR Sub_1B03          ; call Sub_1B03
 $0C2E  17 05 4E                           LBSR Sub_117F          ; call Sub_117F
 $0C31  17 1F 52                           LBSR Sub_2B86          ; call Sub_2B86
 $0C34  17 37 CC                           LBSR Sub_4403          ; call Sub_4403
@@ -1296,7 +1245,8 @@ $0C47  86 00                              LDA #$00               ; A = NUL
 $0C49  30 8D F6 CD                        LEAX Dat_031A,PC       ; X → Dat_031A
 $0C4D  AF C8 6C                           STX 108,U             
 $0C50  30 C9 06 0E                        LEAX 1550,U           
-$0C54  10 8E 00 01                        LDY #$0001            
+$0C54  10 8E 00 01         Insn_0C54:     LDY #$0001            
+$0C57  01                  Sub_0C57:      EQU    $0C57            ; [*1] branch target 3 byte(s) inside Insn_0C54 -- see [*1]
 $0C58  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $0C5B  16 09 1D                           LBRA Sub_157B         
 
@@ -1574,7 +1524,7 @@ $0EAD  30 8D F5 35                        LEAX Dat_03E6,PC       ; X → Dat_03E
 $0EB1  20 30                              BRA Sub_0EE3          
 
 ; --------------------------------------------------------------
-$0EB3  E6 C8 65            Sub_0EB3:      LDB BSS.BufPtr3,U     
+$0EB3  E6 C8 65            Sub_0EB3:      LDB 101,U             
 $0EB6  C1 02                              CMPB #$02              ; compare B with CurXY
 $0EB8  27 D0                              BEQ Sub_0E8A          
 $0EBA  81 1E                              CMPA #$1E             
@@ -1585,7 +1535,7 @@ $0EC2  30 8D F5 48                        LEAX Dat_040E,PC       ; X → Dat_040
 $0EC6  20 1B                              BRA Sub_0EE3          
 
 ; --------------------------------------------------------------
-$0EC8  E6 C8 65            Sub_0EC8:      LDB BSS.BufPtr3,U     
+$0EC8  E6 C8 65            Sub_0EC8:      LDB 101,U             
 $0ECB  C1 02                              CMPB #$02              ; compare B with CurXY
 $0ECD  27 BB                              BEQ Sub_0E8A          
 $0ECF  81 28                              CMPA #$28              ; compare A with '('
@@ -1624,15 +1574,14 @@ $0F15  10 3F 06            Sub_0F15:      OS9 F$Exit             ; status=B
 
 Dat_0F18
 ; Referenced by: $0B26
-; 7-byte data block referenced by LEAX at $0B26 — appears after OS9 F$Exit
 ; ── 7 bytes  ($0F18—$0F1E) ──
          FCB    $C1
          FCB    $80
-         FCB    $26
-         FCB    $03
-         FCB    $6C
+         FCB    $26               ; '&'
+         FCB    $03               ; ETX
+         FCB    $6C               ; 'l'
          FCB    $C8
-         FCB    $73
+         FCB    $73               ; 's'
 $0F1F  3B                  Sub_0F1F:      RTI                    ; return from interrupt
 $0F20  34 32               Sub_0F20:      PSHS A,X,Y            
 $0F22  30 C9 00 9C                        LEAX 156,U            
@@ -1873,9 +1822,9 @@ $1114  CC 34 0D                           LDD #$340D
 $1117  ED C9 0C 91                        STD 3217,U            
 $111B  17 0B 63                           LBSR Sub_1C81          ; call Sub_1C81
 $111E  30 8D EF E7                        LEAX Dat_0109,PC       ; X → Dat_0109
-$1122  17 09 DE                           LBSR WriteBlock        ; call WriteBlock
+$1122  17 09 DE                           LBSR Sub_1B03          ; call Sub_1B03
 $1125  30 8D F3 66                        LEAX Dat_048F,PC       ; X → Dat_048F
-$1129  17 09 D7                           LBSR WriteBlock        ; call WriteBlock
+$1129  17 09 D7                           LBSR Sub_1B03          ; call Sub_1B03
 $112C  17 19 96            Sub_112C:      LBSR Sub_2AC5          ; call Sub_2AC5
 $112F  81 20                              CMPA #$20              ; compare A with ' '
 $1131  27 38                              BEQ Sub_116B          
@@ -1901,18 +1850,18 @@ $1152  20 D8                              BRA Sub_112C
 $1154  8B A0               Sub_1154:      ADDA #$A0             
 $1156  34 02               Sub_1156:      PSHS A                
 $1158  30 8D F2 68                        LEAX Dat_03C4,PC       ; X → Dat_03C4
-$115C  17 09 A4                           LBSR WriteBlock        ; call WriteBlock
+$115C  17 09 A4                           LBSR Sub_1B03          ; call Sub_1B03
 $115F  30 8D F3 28                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1163  17 09 9D                           LBSR WriteBlock        ; call WriteBlock
+$1163  17 09 9D                           LBSR Sub_1B03          ; call Sub_1B03
 $1166  35 02                              PULS A                
 $1168  16 04 2C                           LBRA Sub_1597         
 
 ; --------------------------------------------------------------
 $116B  30 8D F2 55         Sub_116B:      LEAX Dat_03C4,PC       ; X → Dat_03C4
-$116F  17 09 91                           LBSR WriteBlock        ; call WriteBlock
+$116F  17 09 91                           LBSR Sub_1B03          ; call Sub_1B03
 $1172  17 0A 38                           LBSR Sub_1BAD          ; call Sub_1BAD
 $1175  30 8D F3 12                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1179  17 09 87                           LBSR WriteBlock        ; call WriteBlock
+$1179  17 09 87                           LBSR Sub_1B03          ; call Sub_1B03
 $117C  16 FA DF                           LBRA Sub_0C5E         
 
 ; --------------------------------------------------------------
@@ -2145,7 +2094,7 @@ $13B8  35 B6                              PULS A,B,X,Y,PC        ; return from s
 
 ; --------------------------------------------------------------
 $13BA  30 8D EF E9         Sub_13BA:      LEAX Dat_03A7,PC       ; X → Dat_03A7
-$13BE  17 07 42                           LBSR WriteBlock        ; call WriteBlock
+$13BE  17 07 42                           LBSR Sub_1B03          ; call Sub_1B03
 $13C1  39                                 RTS                    ; return from subroutine
 
 ; --------------------------------------------------------------
@@ -2484,7 +2433,7 @@ $16C5  10 3F 8A                           OS9 I$Write            ; path=A  count
 $16C8  16 F5 93            Sub_16C8:      LBRA Sub_0C5E         
 $16CB  34 32               Sub_16CB:      PSHS A,X,Y            
 $16CD  30 8D ED 05                        LEAX Dat_03D6,PC       ; X → Dat_03D6
-$16D1  17 04 2F                           LBSR WriteBlock        ; call WriteBlock
+$16D1  17 04 2F                           LBSR Sub_1B03          ; call Sub_1B03
 $16D4  17 05 80                           LBSR Sub_1C57          ; call Sub_1C57
 $16D7  35 32                              PULS A,X,Y            
 $16D9  16 F5 82                           LBRA Sub_0C5E         
@@ -2530,24 +2479,7 @@ $1743  10 8E 00 02                        LDY #$0002
 $1747  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $174A  17 FB 68                           LBSR Sub_12B5          ; call Sub_12B5
 $174D  16 F5 0E                           LBRA Sub_0C5E         
-
-; --------------------------------------------------------------
-
-Dat_1750
-; 12-byte orphaned string copy loop (unreferenced from branch analysis)
-; ── 12 bytes  ($1750—$175B) ──
-         FCB    $A6
-         FCB    $80
-         FCB    $A7
-         FCB    $A0
-         FCB    $81
-         FCB    $20
-         FCB    $27
-         FCB    $03
-         FCB    $5A
-         FCB    $26
-         FCB    $F5
-         FCB    $39
+         FCB    $A6,$80,$A7,$A0,$81,$20,$27,$03,$5A,$26,$F5,$39  ; unreachable padding
 $175C  6D C8 72            Sub_175C:      TST 114,U             
 $175F  27 0B                              BEQ Sub_176C          
 $1761  A6 C8 75                           LDA 117,U             
@@ -2575,9 +2507,9 @@ $179A  CC 40 0A                           LDD #$400A
 $179D  ED C9 0C 91                        STD 3217,U            
 $17A1  17 04 DD                           LBSR Sub_1C81          ; call Sub_1C81
 $17A4  30 8D EB 48                        LEAX Dat_02F0,PC       ; X → Dat_02F0
-$17A8  17 03 58                           LBSR WriteBlock        ; call WriteBlock
+$17A8  17 03 58                           LBSR Sub_1B03          ; call Sub_1B03
 $17AB  30 8D EC E0                        LEAX Dat_048F,PC       ; X → Dat_048F
-$17AF  17 03 51                           LBSR WriteBlock        ; call WriteBlock
+$17AF  17 03 51                           LBSR Sub_1B03          ; call Sub_1B03
 $17B2  30 C9 13 A9                        LEAX 5033,U           
 $17B6  86 01                              LDA #$01              
 $17B8  C6 00                              LDB #$00               ; B = SS.Opt  (GetStt/SetStt subcode)
@@ -2637,7 +2569,7 @@ $1841  27 03                              BEQ Sub_1846
 $1843  17 12 7F                           LBSR Sub_2AC5          ; call Sub_2AC5
 $1846  17 04 95            Sub_1846:      LBSR Sub_1CDE          ; call Sub_1CDE
 $1849  30 8D EC 3E                        LEAX Dat_048B,PC       ; X → Dat_048B
-$184D  17 02 B3                           LBSR WriteBlock        ; call WriteBlock
+$184D  17 02 B3                           LBSR Sub_1B03          ; call Sub_1B03
 $1850  17 FA 62                           LBSR Sub_12B5          ; call Sub_12B5
 $1853  17 03 57                           LBSR Sub_1BAD          ; call Sub_1BAD
 $1856  16 F4 05                           LBRA Sub_0C5E         
@@ -2649,7 +2581,7 @@ $1860  CC 40 0A                           LDD #$400A
 $1863  ED C9 0C 91                        STD 3217,U            
 $1867  17 04 17                           LBSR Sub_1C81          ; call Sub_1C81
 $186A  30 8D EA B4                        LEAX Dat_0322,PC       ; X → Dat_0322
-$186E  17 02 92                           LBSR WriteBlock        ; call WriteBlock
+$186E  17 02 92                           LBSR Sub_1B03          ; call Sub_1B03
 $1871  31 C9 07 0D                        LEAY 1805,U           
 $1875  10 AF C8 48                        STY 72,U              
 $1879  86 2D                              LDA #$2D               ; A = '-'
@@ -2661,7 +2593,7 @@ $1883  86 20                              LDA #$20               ; A = ' '
 $1885  A7 A0                              STA ,Y+               
 $1887  30 8D EC D4         Sub_1887:      LEAX Dat_055F,PC       ; X → Dat_055F
 $188B  34 20                              PSHS Y                
-$188D  17 02 73                           LBSR WriteBlock        ; call WriteBlock
+$188D  17 02 73                           LBSR Sub_1B03          ; call Sub_1B03
 $1890  35 20                              PULS Y                
 $1892  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 $1894  17 02 CA                           LBSR Sub_1B61          ; call Sub_1B61
@@ -2689,7 +2621,7 @@ $18C2  10 83 00 07                        CMPD #$0007
 $18C6  10 25 00 9E                        LBCS Sub_1968         
 $18CA  17 06 0F                           LBSR Sub_1EDC          ; call Sub_1EDC
 $18CD  30 8D EB BE                        LEAX Dat_048F,PC       ; X → Dat_048F
-$18D1  17 02 2F                           LBSR WriteBlock        ; call WriteBlock
+$18D1  17 02 2F                           LBSR Sub_1B03          ; call Sub_1B03
 $18D4  30 C9 13 A9                        LEAX 5033,U           
 $18D8  86 01                              LDA #$01              
 $18DA  C6 00                              LDB #$00               ; B = SS.Opt  (GetStt/SetStt subcode)
@@ -2750,7 +2682,7 @@ $1965  17 11 5D                           LBSR Sub_2AC5          ; call Sub_2AC5
 $1968  17 03 73            Sub_1968:      LBSR Sub_1CDE          ; call Sub_1CDE
 $196B  17 F9 47                           LBSR Sub_12B5          ; call Sub_12B5
 $196E  30 8D EB 19                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1972  17 01 8E                           LBSR WriteBlock        ; call WriteBlock
+$1972  17 01 8E                           LBSR Sub_1B03          ; call Sub_1B03
 $1975  17 02 35                           LBSR Sub_1BAD          ; call Sub_1BAD
 $1978  16 F2 E3                           LBRA Sub_0C5E         
 
@@ -2771,9 +2703,9 @@ $1995  CC 0E 03                           LDD #$0E03
 $1998  ED C9 0C 91                        STD 3217,U            
 $199C  17 02 E2                           LBSR Sub_1C81          ; call Sub_1C81
 $199F  30 8D EA EC                        LEAX Dat_048F,PC       ; X → Dat_048F
-$19A3  17 01 5D                           LBSR WriteBlock        ; call WriteBlock
+$19A3  17 01 5D                           LBSR Sub_1B03          ; call Sub_1B03
 $19A6  30 8D E9 9F                        LEAX Dat_0349,PC       ; X → Dat_0349
-$19AA  17 01 56                           LBSR WriteBlock        ; call WriteBlock
+$19AA  17 01 56                           LBSR Sub_1B03          ; call Sub_1B03
 $19AD  6D C9 0C AB                        TST 3243,U            
 $19B1  26 2F                              BNE Sub_19E2          
 $19B3  6D C8 1A                           TST 26,U              
@@ -2816,7 +2748,7 @@ $1A05  10 8E 00 04                        LDY #$0004
 $1A09  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $1A0C  17 02 CF            Sub_1A0C:      LBSR Sub_1CDE          ; call Sub_1CDE
 $1A0F  30 8D EA 78                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1A13  17 00 ED                           LBSR WriteBlock        ; call WriteBlock
+$1A13  17 00 ED                           LBSR Sub_1B03          ; call Sub_1B03
 $1A16  16 F2 45                           LBRA Sub_0C5E         
 
 ; --------------------------------------------------------------
@@ -2930,28 +2862,10 @@ $1AF8  10 8E 00 0A                        LDY #$000A
 $1AFC  A6 C8 3E                           LDA 62,U              
 $1AFF  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $1B02  39                                 RTS                    ; return from subroutine
-; WriteBlock — write count-prefixed block to STDOUT (path=1)
-;   LEAX  DataLabel,PC    ; X → FDB count / data payload
-;   LBSR  WriteBlock      ; LDY [X]++  OS9 I$Write  path=STDOUT
-; 106 callers use this entry.
 
 ; --------------------------------------------------------------
-; WriteBlock — write count-prefixed block to STDOUT (path=1)
-;   LEAX  DataLabel,PC    ; X → FDB count / data payload
-;   LBSR  WriteBlock      ; LDY [X]++  OS9 I$Write  path=STDOUT
-; 106 callers use this entry.
-$1B03  86 01               WriteBlock:    LDA #$01              
-; WriteBlockPath — write count-prefixed block to path already in A
-;   LDA   #path           ; A = path number
-;   LEAX  DataLabel,PC
-;   LBSR  WriteBlockPath
-; 3 callers use this entry (non-STDOUT paths).
-; WriteBlockPath — write count-prefixed block to path already in A
-;   LDA   #path           ; A = path number
-;   LEAX  DataLabel,PC
-;   LBSR  WriteBlockPath
-; 3 callers use this entry (non-STDOUT paths).
-$1B05  10 AE 81            WriteBlockPath: LDY ,X++              
+$1B03  86 01               Sub_1B03:      LDA #$01              
+$1B05  10 AE 81            Sub_1B05:      LDY ,X++              
 $1B08  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $1B0B  39                                 RTS                    ; return from subroutine
 
@@ -2971,13 +2885,13 @@ $1B26  CC 16 03                           LDD #$1603
 $1B29  ED C9 0C 91                        STD 3217,U            
 $1B2D  17 01 51                           LBSR Sub_1C81          ; call Sub_1C81
 $1B30  30 8D E9 65                        LEAX Dat_0499,PC       ; X → Dat_0499
-$1B34  8D CD                              BSR WriteBlock         ; call WriteBlock
+$1B34  8D CD                              BSR Sub_1B03           ; call Sub_1B03
 $1B36  30 8D E9 55                        LEAX Dat_048F,PC       ; X → Dat_048F
-$1B3A  8D C7                              BSR WriteBlock         ; call WriteBlock
+$1B3A  8D C7                              BSR Sub_1B03           ; call Sub_1B03
 $1B3C  17 0F 7D                           LBSR Sub_2ABC          ; call Sub_2ABC
 $1B3F  34 02                              PSHS A                
 $1B41  30 8D E9 46                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1B45  8D BC                              BSR WriteBlock         ; call WriteBlock
+$1B45  8D BC                              BSR Sub_1B03           ; call Sub_1B03
 $1B47  17 01 94                           LBSR Sub_1CDE          ; call Sub_1CDE
 $1B4A  35 02                              PULS A                
 $1B4C  35 A0                              PULS Y,PC              ; return from subroutine  (PULS PC = RTS)
@@ -3059,7 +2973,7 @@ $1BDC  35 96                              PULS A,B,X,PC          ; return from s
 
 ; --------------------------------------------------------------
 $1BDE  39                  Sub_1BDE:      RTS                    ; return from subroutine
-$1BDF  A6 C8 65            Sub_1BDF:      LDA BSS.BufPtr3,U     
+$1BDF  A6 C8 65            Sub_1BDF:      LDA 101,U             
 $1BE2  81 02                              CMPA #$02              ; compare A with CurXY
 $1BE4  26 06                              BNE Sub_1BEC          
 $1BE6  31 8D E7 87                        LEAY Dat_0371,PC       ; Y → Dat_0371
@@ -3109,7 +3023,7 @@ $1C56  39                                 RTS                    ; return from s
 
 ; --------------------------------------------------------------
 $1C57  34 12               Sub_1C57:      PSHS A,X              
-$1C59  A6 C8 65                           LDA BSS.BufPtr3,U     
+$1C59  A6 C8 65                           LDA 101,U             
 $1C5C  81 02                              CMPA #$02              ; compare A with CurXY
 $1C5E  27 0C                              BEQ Sub_1C6C          
 $1C60  6D C9 0C A6                        TST 3238,U            
@@ -3205,14 +3119,14 @@ $1D2B  A7 02                              STA 2,X
 $1D2D  35 96               Sub_1D2D:      PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
 $1D2F  34 36               Sub_1D2F:      PSHS A,B,X,Y          
 $1D31  30 8D E7 5A                        LEAX Dat_048F,PC       ; X → Dat_048F
-$1D35  17 FD CB                           LBSR WriteBlock        ; call WriteBlock
+$1D35  17 FD CB                           LBSR Sub_1B03          ; call Sub_1B03
 $1D38  CC 1E 03                           LDD #$1E03            
 $1D3B  ED C9 0C 8F                        STD 3215,U            
 $1D3F  CC 12 03                           LDD #$1203            
 $1D42  ED C9 0C 91                        STD 3217,U            
 $1D46  17 FF 38                           LBSR Sub_1C81          ; call Sub_1C81
 $1D49  30 8D E8 F0                        LEAX Dat_063D,PC       ; X → Dat_063D
-$1D4D  17 FD B3                           LBSR WriteBlock        ; call WriteBlock
+$1D4D  17 FD B3                           LBSR Sub_1B03          ; call Sub_1B03
 $1D50  E6 C9 0C A5                        LDB 3237,U            
 $1D54  C4 07                              ANDB #$07             
 $1D56  E7 C9 0C 84         Sub_1D56:      STB 3204,U            
@@ -3250,7 +3164,7 @@ $1DA5  E7 C9 0C A5                        STB 3237,U
 $1DA9  17 FF 32                           LBSR Sub_1CDE          ; call Sub_1CDE
 $1DAC  17 F3 E0                           LBSR Sub_118F          ; call Sub_118F
 $1DAF  30 8D E6 D8                        LEAX Dat_048B,PC       ; X → Dat_048B
-$1DB3  17 FD 4D                           LBSR WriteBlock        ; call WriteBlock
+$1DB3  17 FD 4D                           LBSR Sub_1B03          ; call Sub_1B03
 $1DB6  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -3323,14 +3237,14 @@ $1E4E  20 E9                              BRA Sub_1E39
 ; --------------------------------------------------------------
 $1E50  34 36               Sub_1E50:      PSHS A,B,X,Y          
 $1E52  30 8D E6 39                        LEAX Dat_048F,PC       ; X → Dat_048F
-$1E56  17 FC AA                           LBSR WriteBlock        ; call WriteBlock
+$1E56  17 FC AA                           LBSR Sub_1B03          ; call Sub_1B03
 $1E59  CC 1C 03                           LDD #$1C03            
 $1E5C  ED C9 0C 8F                        STD 3215,U            
 $1E60  CC 17 03                           LDD #$1703            
 $1E63  ED C9 0C 91                        STD 3217,U            
 $1E67  17 FE 17                           LBSR Sub_1C81          ; call Sub_1C81
 $1E6A  30 8D E8 28                        LEAX Dat_0696,PC       ; X → Dat_0696
-$1E6E  17 FC 92                           LBSR WriteBlock        ; call WriteBlock
+$1E6E  17 FC 92                           LBSR Sub_1B03          ; call Sub_1B03
 $1E71  E6 C9 0C A6                        LDB 3238,U            
 $1E75  E7 C9 0C 84         Sub_1E75:      STB 3204,U            
 $1E79  30 8D E5 4D                        LEAX Dat_03CA,PC       ; X → Dat_03CA
@@ -3371,7 +3285,7 @@ $1ECE  40                                 NEGA
 $1ECF  27 02                              BEQ Sub_1ED3          
 $1ED1  8D 12                              BSR Sub_1EE5           ; call Sub_1EE5
 $1ED3  30 8D E5 B4         Sub_1ED3:      LEAX Dat_048B,PC       ; X → Dat_048B
-$1ED7  17 FC 29                           LBSR WriteBlock        ; call WriteBlock
+$1ED7  17 FC 29                           LBSR Sub_1B03          ; call Sub_1B03
 $1EDA  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -3408,14 +3322,14 @@ $1F1B  35 B6                              PULS A,B,X,Y,PC        ; return from s
 ; --------------------------------------------------------------
 $1F1D  34 36               Sub_1F1D:      PSHS A,B,X,Y          
 $1F1F  30 8D E5 6C                        LEAX Dat_048F,PC       ; X → Dat_048F
-$1F23  17 FB DD                           LBSR WriteBlock        ; call WriteBlock
+$1F23  17 FB DD                           LBSR Sub_1B03          ; call Sub_1B03
 $1F26  CC 1F 03                           LDD #$1F03            
 $1F29  ED C9 0C 8F                        STD 3215,U            
 $1F2D  CC 16 0E                           LDD #$160E            
 $1F30  ED C9 0C 91                        STD 3217,U            
 $1F34  17 FD 4A                           LBSR Sub_1C81          ; call Sub_1C81
 $1F37  30 8D E8 E6                        LEAX Dat_0821,PC       ; X → Dat_0821
-$1F3B  17 FB C5                           LBSR WriteBlock        ; call WriteBlock
+$1F3B  17 FB C5                           LBSR Sub_1B03          ; call Sub_1B03
 $1F3E  17 01 9A                           LBSR Sub_20DB          ; call Sub_20DB
 $1F41  17 01 C4                           LBSR Sub_2108          ; call Sub_2108
 $1F44  17 01 D1                           LBSR Sub_2118          ; call Sub_2118
@@ -3590,7 +3504,7 @@ $20CC  16 FE 97                           LBRA Sub_1F66
 ; --------------------------------------------------------------
 $20CF  17 FC 0C            Sub_20CF:      LBSR Sub_1CDE          ; call Sub_1CDE
 $20D2  30 8D E3 B5                        LEAX Dat_048B,PC       ; X → Dat_048B
-$20D6  17 FA 2A                           LBSR WriteBlock        ; call WriteBlock
+$20D6  17 FA 2A                           LBSR Sub_1B03          ; call Sub_1B03
 $20D9  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -3600,7 +3514,7 @@ $20E0  17 01 B1                           LBSR Sub_2294          ; call Sub_2294
 $20E3  A6 C9 0C A7                        LDA 3239,U            
 $20E7  26 09                              BNE Sub_20F2          
 $20E9  30 8D E8 98         Sub_20E9:      LEAX Dat_0985,PC       ; X → Dat_0985
-$20ED  17 FA 13            Sub_20ED:      LBSR WriteBlock        ; call WriteBlock
+$20ED  17 FA 13            Sub_20ED:      LBSR Sub_1B03          ; call Sub_1B03
 $20F0  35 96                              PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -3848,7 +3762,7 @@ $22BA  CC 25 07                           LDD #$2507
 $22BD  ED C9 0C 91                        STD 3217,U            
 $22C1  17 F9 BD                           LBSR Sub_1C81          ; call Sub_1C81
 $22C4  30 8D E2 54                        LEAX Dat_051C,PC       ; X → Dat_051C
-$22C8  17 F8 38                           LBSR WriteBlock        ; call WriteBlock
+$22C8  17 F8 38                           LBSR Sub_1B03          ; call Sub_1B03
 $22CB  CC 01 02                           LDD #$0102            
 $22CE  8D C4                              BSR Sub_2294           ; call Sub_2294
 $22D0  86 01                              LDA #$01              
@@ -3857,7 +3771,7 @@ $22D6  10 8E 00 20                        LDY #$0020
 $22DA  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $22DD  C6 1F                              LDB #$1F              
 $22DF  30 8D E6 C6                        LEAX Dat_09A9,PC       ; X → Dat_09A9
-$22E3  17 F8 1D                           LBSR WriteBlock        ; call WriteBlock
+$22E3  17 F8 1D                           LBSR Sub_1B03          ; call Sub_1B03
 $22E6  17 F8 78                           LBSR Sub_1B61          ; call Sub_1B61
 $22E9  6D C8 21                           TST 33,U              
 $22EC  26 20                              BNE Sub_230E          
@@ -3882,13 +3796,13 @@ $2318  34 04                              PSHS B
 $231A  CC 0D 02                           LDD #$0D02            
 $231D  17 FF 74                           LBSR Sub_2294          ; call Sub_2294
 $2320  30 8D E1 6B                        LEAX Dat_048F,PC       ; X → Dat_048F
-$2324  17 F7 DC                           LBSR WriteBlock        ; call WriteBlock
+$2324  17 F7 DC                           LBSR Sub_1B03          ; call Sub_1B03
 $2327  35 04                              PULS B                
 $2329  10 3F 0F                           OS9 F$PErr             ; path=A  error=B
 $232C  8E 00 3C                           LDX #$003C            
 $232F  17 EC 24                           LBSR Sub_0F56          ; call Sub_0F56
 $2332  30 8D E1 55                        LEAX Dat_048B,PC       ; X → Dat_048B
-$2336  17 F7 CA                           LBSR WriteBlock        ; call WriteBlock
+$2336  17 F7 CA                           LBSR Sub_1B03          ; call Sub_1B03
 $2339  20 D3                              BRA Sub_230E          
 
 ; --------------------------------------------------------------
@@ -3943,7 +3857,7 @@ $239A  A7 07                              STA 7,X
 $239C  A6 C9 00 87                        LDA 135,U             
 $23A0  A7 0B                              STA 11,X              
 $23A2  A6 C8 3E                           LDA 62,U              
-$23A5  17 F7 5D                           LBSR WriteBlockPath    ; call WriteBlockPath
+$23A5  17 F7 5D                           LBSR Sub_1B05          ; call Sub_1B05
 $23A8  35 B6               Sub_23A8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $23AA  31 8D E5 B2         Sub_23AA:      LEAY Dat_0960,PC       ; Y → Dat_0960
 $23AE  30 C9 13 A9                        LEAX 5033,U           
@@ -3954,9 +3868,9 @@ $23B9  35 10                              PULS X
 $23BB  A6 C9 00 87                        LDA 135,U             
 $23BF  A7 09                              STA 9,X               
 $23C1  A6 C8 3E                           LDA 62,U              
-$23C4  17 F7 3E                           LBSR WriteBlockPath    ; call WriteBlockPath
-$23C7  A6 42                              LDA BSS.ParamStr,U    
-$23C9  A0 46                              SUBA BSS.RxBufPtr,U   
+$23C4  17 F7 3E                           LBSR Sub_1B05          ; call Sub_1B05
+$23C7  A6 42                              LDA 2,U               
+$23C9  A0 46                              SUBA 6,U              
 $23CB  17 21 31                           LBSR Sub_44FF          ; call Sub_44FF
 $23CE  20 D8                              BRA Sub_23A8          
 
@@ -4001,7 +3915,7 @@ $2419  A6 C8 42                           LDA 66,U
 $241C  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $241F  24 09                              BCC Sub_242A           ; C=0 (BHS)
 $2421  10 8E 00 00                        LDY #$0000            
-$2425  6C C8 5F                           INC BSS.BufCount,U    
+$2425  6C C8 5F                           INC 95,U              
 $2428  20 06                              BRA Sub_2430          
 
 ; --------------------------------------------------------------
@@ -4068,7 +3982,7 @@ $24A7  30 C9 00 E2                        LEAX 226,U
 $24AB  EC C8 57                           LDD 87,U              
 $24AE  31 8B                              LEAY D,X              
 $24B0  10 AF C8 50                        STY 80,U              
-$24B4  6D C8 5A                           TST BSS.ConnState,U   
+$24B4  6D C8 5A                           TST 90,U              
 $24B7  26 0C                              BNE Sub_24C5          
 $24B9  17 19 81                           LBSR Sub_3E3D          ; call Sub_3E3D
 $24BC  30 8B                              LEAX D,X              
@@ -4545,7 +4459,7 @@ $28F3  A7 A4                              STA ,Y
 $28F5  30 01                              LEAX 1,X              
 $28F7  8D 6F                              BSR Sub_2968           ; call Sub_2968
 $28F9  30 8D DC 6E                        LEAX Dat_056B,PC       ; X → Dat_056B
-$28FD  17 F2 03                           LBSR WriteBlock        ; call WriteBlock
+$28FD  17 F2 03                           LBSR Sub_1B03          ; call Sub_1B03
 $2900  30 C9 00 9F                        LEAX 159,U            
 $2904  A6 84                              LDA ,X                
 $2906  27 30                              BEQ Sub_2938          
@@ -4555,10 +4469,10 @@ $290C  86 01                              LDA #$01
 $290E  10 8E 00 20                        LDY #$0020            
 $2912  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $2915  30 8D DB 76                        LEAX Dat_048F,PC       ; X → Dat_048F
-$2919  17 F1 E7                           LBSR WriteBlock        ; call WriteBlock
-$291C  EC C8 5D                           LDD BSS.BufPtr1,U     
+$2919  17 F1 E7                           LBSR Sub_1B03          ; call Sub_1B03
+$291C  EC C8 5D                           LDD 93,U              
 $291F  26 23                              BNE Sub_2944          
-$2921  EC C8 5B                           LDD BSS.ConnWord,U    
+$2921  EC C8 5B                           LDD 91,U              
 $2924  26 1E                              BNE Sub_2944          
 $2926  30 C9 00 9F         Sub_2926:      LEAX 159,U            
 $292A  86 02                              LDA #$02               ; A = CurXY
@@ -4575,7 +4489,7 @@ $2942  20 F2                              BRA Sub_2936
 
 ; --------------------------------------------------------------
 $2944  30 8D DC 2F         Sub_2944:      LEAX Dat_0577,PC       ; X → Dat_0577
-$2948  17 F1 B8                           LBSR WriteBlock        ; call WriteBlock
+$2948  17 F1 B8                           LBSR Sub_1B03          ; call Sub_1B03
 $294B  30 C9 13 AA                        LEAX 5034,U           
 $294F  10 8E 00 07                        LDY #$0007            
 $2953  A6 84               Sub_2953:      LDA ,X                
@@ -4594,8 +4508,8 @@ $2966  20 BE                              BRA Sub_2926
 ; --------------------------------------------------------------
 $2968  34 36               Sub_2968:      PSHS A,B,X,Y          
 $296A  CC 00 00                           LDD #$0000            
-$296D  ED C8 5B                           STD BSS.ConnWord,U    
-$2970  ED C8 5D                           STD BSS.BufPtr1,U     
+$296D  ED C8 5B                           STD 91,U              
+$2970  ED C8 5D                           STD 93,U              
 $2973  C6 08                              LDB #$08               ; B = BS
 $2975  A6 80               Sub_2975:      LDA ,X+               
 $2977  81 20                              CMPA #$20              ; compare A with ' '
@@ -4643,14 +4557,14 @@ $29C4  E6 03                              LDB 3,X
 $29C6  EB C8 5E                           ADDB 94,U             
 $29C9  E7 C8 5E                           STB 94,U              
 $29CC  A6 02                              LDA 2,X               
-$29CE  A9 C8 5D                           ADCA BSS.BufPtr1,U    
-$29D1  A7 C8 5D                           STA BSS.BufPtr1,U     
+$29CE  A9 C8 5D                           ADCA 93,U             
+$29D1  A7 C8 5D                           STA 93,U              
 $29D4  E6 01                              LDB 1,X               
 $29D6  E9 C8 5C                           ADCB 92,U             
 $29D9  E7 C8 5C                           STB 92,U              
 $29DC  A6 84                              LDA ,X                
-$29DE  A9 C8 5B                           ADCA BSS.ConnWord,U   
-$29E1  A7 C8 5B                           STA BSS.ConnWord,U    
+$29DE  A9 C8 5B                           ADCA 91,U             
+$29E1  A7 C8 5B                           STA 91,U              
 $29E4  35 04                              PULS B                
 $29E6  5A                                 DECB                  
 $29E7  26 D9                              BNE Sub_29C2          
@@ -4714,7 +4628,7 @@ $2A50  20 F7                              BRA Sub_2A49
 ; --------------------------------------------------------------
 $2A52  34 36               Sub_2A52:      PSHS A,B,X,Y          
 $2A54  30 8D DA 33                        LEAX Dat_048B,PC       ; X → Dat_048B
-$2A58  17 F0 A8                           LBSR WriteBlock        ; call WriteBlock
+$2A58  17 F0 A8                           LBSR Sub_1B03          ; call Sub_1B03
 $2A5B  5F                                 CLRB                   ; B = 0
 $2A5C  30 C9 07 0D                        LEAX 1805,U           
 $2A60  34 14               Sub_2A60:      PSHS B,X              
@@ -4729,7 +4643,7 @@ $2A73  5C                                 INCB
 $2A74  C1 20                              CMPB #$20              ; compare B with ' '
 $2A76  26 E8                              BNE Sub_2A60          
 $2A78  30 8D DA 13         Sub_2A78:      LEAX Dat_048F,PC       ; X → Dat_048F
-$2A7C  17 F0 84                           LBSR WriteBlock        ; call WriteBlock
+$2A7C  17 F0 84                           LBSR Sub_1B03          ; call Sub_1B03
 $2A7F  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -4738,7 +4652,7 @@ $2A83  3D                                 MUL                    ; D = A×B unsi
 $2A84  30 8B                              LEAX D,X              
 $2A86  34 10                              PSHS X                
 $2A88  30 8D DA D3                        LEAX Dat_055F,PC       ; X → Dat_055F
-$2A8C  17 F0 74                           LBSR WriteBlock        ; call WriteBlock
+$2A8C  17 F0 74                           LBSR Sub_1B03          ; call Sub_1B03
 $2A8F  C6 1E                              LDB #$1E              
 $2A91  17 F0 CD                           LBSR Sub_1B61          ; call Sub_1B61
 $2A94  35 10                              PULS X                
@@ -4830,7 +4744,7 @@ $2B5D  A7 02                              STA 2,X
 $2B5F  10 8E 00 03                        LDY #$0003            
 $2B63  A6 C8 3E                           LDA 62,U              
 $2B66  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$2B69  30 C8 2D                           LEAX BSS.Counter1,U   
+$2B69  30 C8 2D                           LEAX 45,U             
 $2B6C  5F                                 CLRB                   ; B = 0
 $2B6D  A6 80               Sub_2B6D:      LDA ,X+               
 $2B6F  5C                                 INCB                  
@@ -4838,7 +4752,7 @@ $2B70  81 21                              CMPA #$21              ; compare A wit
 $2B72  25 04                              BCS Sub_2B78           ; C=1 (BLO)
 $2B74  C1 05                              CMPB #$05             
 $2B76  25 F5                              BCS Sub_2B6D           ; C=1 (BLO)
-$2B78  30 C8 2D            Sub_2B78:      LEAX BSS.Counter1,U   
+$2B78  30 C8 2D            Sub_2B78:      LEAX 45,U             
 $2B7B  4F                                 CLRA                   ; A = 0
 $2B7C  1F 02                              TFR D,Y               
 $2B7E  A6 C8 3E                           LDA 62,U              
@@ -4879,7 +4793,7 @@ $2BE1  27 05                              BEQ Sub_2BE8
 $2BE3  86 61                              LDA #$61               ; A = 'a'
 $2BE5  A7 88 16                           STA 22,X              
 $2BE8  A6 C8 3E            Sub_2BE8:      LDA 62,U              
-$2BEB  17 EF 17                           LBSR WriteBlockPath    ; call WriteBlockPath
+$2BEB  17 EF 17                           LBSR Sub_1B05          ; call Sub_1B05
 $2BEE  17 FF 5F                           LBSR Sub_2B50          ; call Sub_2B50
 $2BF1  17 F7 6E                           LBSR Sub_2362          ; call Sub_2362
 $2BF4  6D C8 2B                           TST 43,U              
@@ -4937,14 +4851,14 @@ $2C7B  10 3F 8D                           OS9 I$GetStt           ; path=A  subco
 $2C7E  1F 32                              TFR U,Y               
 $2C80  35 40                              PULS U                
 $2C82  25 09                              BCS Sub_2C8D           ; C=1 (BLO)
-$2C84  AF C8 5B                           STX BSS.ConnWord,U    
-$2C87  10 AF C8 5D                        STY BSS.BufPtr1,U     
+$2C84  AF C8 5B                           STX 91,U              
+$2C87  10 AF C8 5D                        STY 93,U              
 $2C8B  20 0B                              BRA Sub_2C98          
 
 ; --------------------------------------------------------------
 $2C8D  CC 00 00            Sub_2C8D:      LDD #$0000            
-$2C90  ED C8 5B                           STD BSS.ConnWord,U    
-$2C93  ED C8 5D                           STD BSS.BufPtr1,U     
+$2C90  ED C8 5B                           STD 91,U              
+$2C93  ED C8 5D                           STD 93,U              
 $2C96  20 41                              BRA Sub_2CD9          
 
 ; --------------------------------------------------------------
@@ -4966,7 +4880,7 @@ $2CB3  C1 08                              CMPB #$08              ; compare B wit
 $2CB5  26 F5                              BNE Sub_2CAC          
 $2CB7  34 10                              PSHS X                
 $2CB9  30 8D D8 BA                        LEAX Dat_0577,PC       ; X → Dat_0577
-$2CBD  17 EE 43                           LBSR WriteBlock        ; call WriteBlock
+$2CBD  17 EE 43                           LBSR Sub_1B03          ; call Sub_1B03
 $2CC0  35 10                              PULS X                
 $2CC2  10 8E 00 07                        LDY #$0007            
 $2CC6  A6 84               Sub_2CC6:      LDA ,X                
@@ -4986,27 +4900,27 @@ $2CDD  86 04                              LDA #$04
 $2CDF  3D                                 MUL                    ; D = A×B unsigned
 $2CE0  31 AB                              LEAY D,Y              
 $2CE2  EC A4               Sub_2CE2:      LDD ,Y                
-$2CE4  10 A3 C8 5B                        CMPD BSS.ConnWord,U   
+$2CE4  10 A3 C8 5B                        CMPD 91,U             
 $2CE8  22 33                              BHI Sub_2D1D          
 $2CEA  25 08                              BCS Sub_2CF4           ; C=1 (BLO)
 $2CEC  EC 22                              LDD 2,Y               
-$2CEE  10 A3 C8 5D                        CMPD BSS.BufPtr1,U    
+$2CEE  10 A3 C8 5D                        CMPD 93,U             
 $2CF2  22 29                              BHI Sub_2D1D          
-$2CF4  EC C8 5B            Sub_2CF4:      LDD BSS.ConnWord,U    
+$2CF4  EC C8 5B            Sub_2CF4:      LDD 91,U              
 $2CF7  26 05                              BNE Sub_2CFE          
-$2CF9  EC C8 5D                           LDD BSS.BufPtr1,U     
+$2CF9  EC C8 5D                           LDD 93,U              
 $2CFC  27 1F                              BEQ Sub_2D1D          
 $2CFE  6C 84               Sub_2CFE:      INC ,X                
-$2D00  EC C8 5D                           LDD BSS.BufPtr1,U     
+$2D00  EC C8 5D                           LDD 93,U              
 $2D03  A3 22                              SUBD 2,Y              
-$2D05  ED C8 5D                           STD BSS.BufPtr1,U     
+$2D05  ED C8 5D                           STD 93,U              
 $2D08  24 09                              BCC Sub_2D13           ; C=0 (BHS)
-$2D0A  EC C8 5B                           LDD BSS.ConnWord,U    
+$2D0A  EC C8 5B                           LDD 91,U              
 $2D0D  83 00 01                           SUBD #$0001           
-$2D10  ED C8 5B                           STD BSS.ConnWord,U    
-$2D13  EC C8 5B            Sub_2D13:      LDD BSS.ConnWord,U    
+$2D10  ED C8 5B                           STD 91,U              
+$2D13  EC C8 5B            Sub_2D13:      LDD 91,U              
 $2D16  A3 A4                              SUBD ,Y               
-$2D18  ED C8 5B                           STD BSS.ConnWord,U    
+$2D18  ED C8 5B                           STD 91,U              
 $2D1B  20 C5                              BRA Sub_2CE2          
 
 ; --------------------------------------------------------------
@@ -5111,7 +5025,7 @@ $2E3A  20 00                              BRA Sub_2E3C
 ; --------------------------------------------------------------
 $2E3C  35 B6               Sub_2E3C:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $2E3E  34 76               Sub_2E3E:      PSHS A,B,X,Y,U        
-$2E40  30 8D D1 BC                        LEAX ModHeader,PC     
+$2E40  30 8D D1 BC                        LEAX Dat_0000,PC      
 $2E44  10 AE 02                           LDY 2,X               
 $2E47  AF C8 15                           STX 21,U              
 $2E4A  31 3D                              LEAY -3,Y             
@@ -5121,14 +5035,14 @@ $2E52  1F 20                              TFR Y,D
 $2E54  33 CB                              LEAU D,U              
 $2E56  CC FF FF                           LDD #$FFFF            
 $2E59  ED C4                              STD ,U                
-$2E5B  A7 42                              STA BSS.ParamStr,U    
+$2E5B  A7 42                              STA 2,U               
 $2E5D  10 3F 17                           OS9 F$CRC              ; buf→X  count=Y  seed=D  → CRC-24
 $2E60  63 C4                              COM ,U                
 $2E62  63 41                              COM 1,U               
-$2E64  63 42                              COM BSS.ParamStr,U    
+$2E64  63 42                              COM 2,U               
 $2E66  35 76                              PULS A,B,X,Y,U        
 $2E68  86 07                              LDA #$07              
-$2E6A  30 8D D1 9F                        LEAX ModName,PC        ; X → ModName
+$2E6A  30 8D D1 9F                        LEAX Dat_000D,PC       ; X → Dat_000D
 $2E6E  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $2E71  25 0F                              BCS Sub_2E82           ; C=1 (BLO)
 $2E73  AE C8 15                           LDX 21,U              
@@ -5148,12 +5062,12 @@ $2E99  CC 1D 04                           LDD #$1D04
 $2E9C  ED C9 0C 8F                        STD 3215,U            
 $2EA0  17 ED DE                           LBSR Sub_1C81          ; call Sub_1C81
 $2EA3  30 8D D5 E8                        LEAX Dat_048F,PC       ; X → Dat_048F
-$2EA7  17 EC 59                           LBSR WriteBlock        ; call WriteBlock
+$2EA7  17 EC 59                           LBSR Sub_1B03          ; call Sub_1B03
 $2EAA  30 8D DA 08                        LEAX Dat_08B6,PC       ; X → Dat_08B6
-$2EAE  17 EC 52                           LBSR WriteBlock        ; call WriteBlock
+$2EAE  17 EC 52                           LBSR Sub_1B03          ; call Sub_1B03
 $2EB1  8D 8B                              BSR Sub_2E3E           ; call Sub_2E3E
 $2EB3  30 8D D5 D4                        LEAX Dat_048B,PC       ; X → Dat_048B
-$2EB7  17 EC 49                           LBSR WriteBlock        ; call WriteBlock
+$2EB7  17 EC 49                           LBSR Sub_1B03          ; call Sub_1B03
 $2EBA  17 EE 21                           LBSR Sub_1CDE          ; call Sub_1CDE
 $2EBD  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
@@ -5224,14 +5138,14 @@ $2F65  CC 00 00                           LDD #$0000
 $2F68  ED C9 13 1C                        STD 4892,U            
 $2F6C  17 EF 6D                           LBSR Sub_1EDC          ; call Sub_1EDC
 $2F6F  30 8D D5 1C                        LEAX Dat_048F,PC       ; X → Dat_048F
-$2F73  17 EB 8D                           LBSR WriteBlock        ; call WriteBlock
+$2F73  17 EB 8D                           LBSR Sub_1B03          ; call Sub_1B03
 $2F76  17 01 D2                           LBSR Sub_314B          ; call Sub_314B
 $2F79  17 ED 62            Sub_2F79:      LBSR Sub_1CDE          ; call Sub_1CDE
 $2F7C  17 EC 60                           LBSR Sub_1BDF          ; call Sub_1BDF
 $2F7F  17 EC D5                           LBSR Sub_1C57          ; call Sub_1C57
 $2F82  17 EF 57                           LBSR Sub_1EDC          ; call Sub_1EDC
 $2F85  30 8D D5 02                        LEAX Dat_048B,PC       ; X → Dat_048B
-$2F89  17 EB 77                           LBSR WriteBlock        ; call WriteBlock
+$2F89  17 EB 77                           LBSR Sub_1B03          ; call Sub_1B03
 $2F8C  35 36                              PULS A,B,X,Y          
 $2F8E  10 AE C9 0C 88                     LDY 3208,U            
 $2F93  30 C9 00 DF                        LEAX 223,U            
@@ -5318,7 +5232,7 @@ $3036  35 B6                              PULS A,B,X,Y,PC        ; return from s
 ; --------------------------------------------------------------
 $3038  34 36               Sub_3038:      PSHS A,B,X,Y          
 $303A  30 8D D4 51                        LEAX Dat_048F,PC       ; X → Dat_048F
-$303E  17 EA C2                           LBSR WriteBlock        ; call WriteBlock
+$303E  17 EA C2                           LBSR Sub_1B03          ; call Sub_1B03
 $3041  86 01                              LDA #$01              
 $3043  A7 C9 00 92                        STA 146,U             
 $3047  30 C9 13 A9         Sub_3047:      LEAX 5033,U           
@@ -5402,7 +5316,7 @@ $30E7  20 17                              BRA Sub_3100
 $30E9  81 0D               Sub_30E9:      CMPA #$0D              ; compare A with CR
 $30EB  26 09                              BNE Sub_30F6          
 $30ED  30 8D D3 9A         Sub_30ED:      LEAX Dat_048B,PC       ; X → Dat_048B
-$30F1  17 EA 0F                           LBSR WriteBlock        ; call WriteBlock
+$30F1  17 EA 0F                           LBSR Sub_1B03          ; call Sub_1B03
 $30F4  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -5782,13 +5696,13 @@ $33F7  CC 28 08                           LDD #$2808
 $33FA  ED C9 0C 91                        STD 3217,U            
 $33FE  17 E8 80                           LBSR Sub_1C81          ; call Sub_1C81
 $3401  30 8D D0 AC                        LEAX Dat_04B1,PC       ; X → Dat_04B1
-$3405  17 E6 FB                           LBSR WriteBlock        ; call WriteBlock
+$3405  17 E6 FB                           LBSR Sub_1B03          ; call Sub_1B03
 $3408  17 EF C5                           LBSR Sub_23D0          ; call Sub_23D0
 $340B  30 8D D0 CC                        LEAX Dat_04DB,PC       ; X → Dat_04DB
-$340F  17 E6 F1                           LBSR WriteBlock        ; call WriteBlock
+$340F  17 E6 F1                           LBSR Sub_1B03          ; call Sub_1B03
 $3412  17 FB C9                           LBSR Sub_2FDE          ; call Sub_2FDE
 $3415  30 8D D0 CC                        LEAX Dat_04E5,PC       ; X → Dat_04E5
-$3419  17 E6 E7                           LBSR WriteBlock        ; call WriteBlock
+$3419  17 E6 E7                           LBSR Sub_1B03          ; call Sub_1B03
 $341C  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 $341E  E7 C9 13 9F                        STB 5023,U            
 $3422  17 01 26                           LBSR Sub_354B          ; call Sub_354B
@@ -5862,14 +5776,14 @@ $34BF  A1 C9 0C A3                        CMPA 3235,U
 $34C3  27 D0                              BEQ Sub_3495          
 $34C5  6C C9 0C A4                        INC 3236,U            
 $34C9  30 8D D0 1D                        LEAX Dat_04EA,PC       ; X → Dat_04EA
-$34CD  17 E6 33                           LBSR WriteBlock        ; call WriteBlock
+$34CD  17 E6 33                           LBSR Sub_1B03          ; call Sub_1B03
 $34D0  E6 C9 0C A4                        LDB 3236,U            
 $34D4  8D 75                              BSR Sub_354B           ; call Sub_354B
 $34D6  E1 C9 0D 1A                        CMPB 3354,U           
 $34DA  25 B2                              BCS Sub_348E           ; C=1 (BLO)
 $34DC  6C C9 13 9F         Sub_34DC:      INC 5023,U            
 $34E0  30 8D D0 01                        LEAX Dat_04E5,PC       ; X → Dat_04E5
-$34E4  17 E6 1C                           LBSR WriteBlock        ; call WriteBlock
+$34E4  17 E6 1C                           LBSR Sub_1B03          ; call Sub_1B03
 $34E7  E6 C9 13 9F                        LDB 5023,U            
 $34EB  8D 5E                              BSR Sub_354B           ; call Sub_354B
 $34ED  E6 C9 0D 19                        LDB 3353,U            
@@ -5939,22 +5853,22 @@ $357E  35 96                              PULS A,B,X,PC          ; return from s
 ; --------------------------------------------------------------
 $3580  30 8D CF 0B         Sub_3580:      LEAX Dat_048F,PC       ; X → Dat_048F
 $3584  6C C9 0C A0                        INC 3232,U            
-$3588  17 E5 78                           LBSR WriteBlock        ; call WriteBlock
+$3588  17 E5 78                           LBSR Sub_1B03          ; call Sub_1B03
 $358B  CC 1C 05                           LDD #$1C05            
 $358E  ED C9 0C 8F                        STD 3215,U            
 $3592  CC 19 07                           LDD #$1907            
 $3595  ED C9 0C 91                        STD 3217,U            
 $3599  17 E6 E5                           LBSR Sub_1C81          ; call Sub_1C81
 $359C  30 8D D1 94                        LEAX Dat_0734,PC       ; X → Dat_0734
-$35A0  17 E5 60                           LBSR WriteBlock        ; call WriteBlock
+$35A0  17 E5 60                           LBSR Sub_1B03          ; call Sub_1B03
 $35A3  86 04                              LDA #$04              
 $35A5  A7 C9 13 9E                        STA 5022,U            
 $35A9  E6 C8 4B                           LDB 75,U              
 $35AC  17 E8 09                           LBSR Sub_1DB8          ; call Sub_1DB8
 $35AF  17 E7 2C                           LBSR Sub_1CDE          ; call Sub_1CDE
 $35B2  30 8D CE D5                        LEAX Dat_048B,PC       ; X → Dat_048B
-$35B6  17 E5 4A                           LBSR WriteBlock        ; call WriteBlock
-$35B9  6F C8 46                           CLR BSS.EchoFlag,U    
+$35B6  17 E5 4A                           LBSR Sub_1B03          ; call Sub_1B03
+$35B9  6F C8 46                           CLR 70,U              
 $35BC  E6 C9 0C 84                        LDB 3204,U            
 $35C0  27 14                              BEQ Sub_35D6          
 $35C2  C1 03                              CMPB #$03             
@@ -5963,7 +5877,7 @@ $35C6  E7 C8 4B                           STB 75,U
 $35C9  C1 02                              CMPB #$02              ; compare B with CurXY
 $35CB  10 22 E1 C4                        LBHI Sub_1793         
 $35CF  25 77                              BCS Sub_3648           ; C=1 (BLO)
-$35D1  6C C8 46                           INC BSS.EchoFlag,U    
+$35D1  6C C8 46                           INC 70,U              
 $35D4  20 72                              BRA Sub_3648          
 
 ; --------------------------------------------------------------
@@ -5974,39 +5888,39 @@ $35D9  16 0C 57                           LBRA Sub_4233
 $35DC  16 D6 7F            Sub_35DC:      LBRA Sub_0C5E         
 $35DF  30 8D CE AC         Sub_35DF:      LEAX Dat_048F,PC       ; X → Dat_048F
 $35E3  6F C9 0C A0                        CLR 3232,U            
-$35E7  17 E5 19                           LBSR WriteBlock        ; call WriteBlock
+$35E7  17 E5 19                           LBSR Sub_1B03          ; call Sub_1B03
 $35EA  CC 1C 05                           LDD #$1C05            
 $35ED  ED C9 0C 8F                        STD 3215,U            
 $35F1  CC 19 08                           LDD #$1908            
 $35F4  ED C9 0C 91                        STD 3217,U            
 $35F8  17 E6 86                           LBSR Sub_1C81          ; call Sub_1C81
 $35FB  30 8D D1 A6                        LEAX Dat_07A5,PC       ; X → Dat_07A5
-$35FF  17 E5 01                           LBSR WriteBlock        ; call WriteBlock
+$35FF  17 E5 01                           LBSR Sub_1B03          ; call Sub_1B03
 $3602  86 05                              LDA #$05              
 $3604  A7 C9 13 9E                        STA 5022,U            
-$3608  E6 C8 4A                           LDB BSS.FlowCtrl,U    
+$3608  E6 C8 4A                           LDB 74,U              
 $360B  17 E7 AA                           LBSR Sub_1DB8          ; call Sub_1DB8
 $360E  17 E6 CD                           LBSR Sub_1CDE          ; call Sub_1CDE
 $3611  30 8D CE 76                        LEAX Dat_048B,PC       ; X → Dat_048B
-$3615  17 E4 EB                           LBSR WriteBlock        ; call WriteBlock
-$3618  6F C8 46                           CLR BSS.EchoFlag,U    
+$3615  17 E4 EB                           LBSR Sub_1B03          ; call Sub_1B03
+$3618  6F C8 46                           CLR 70,U              
 $361B  6F C8 45                           CLR 69,U              
 $361E  E6 C9 0C 84                        LDB 3204,U            
 $3622  27 1B                              BEQ Sub_363F          
 $3624  C1 04                              CMPB #$04             
 $3626  22 B4                              BHI Sub_35DC          
-$3628  E7 C8 4A                           STB BSS.FlowCtrl,U    
+$3628  E7 C8 4A                           STB 74,U              
 $362B  C1 02                              CMPB #$02              ; compare B with CurXY
 $362D  25 19                              BCS Sub_3648           ; C=1 (BLO)
 $362F  6C C8 45                           INC 69,U              
 $3632  C1 03                              CMPB #$03             
 $3634  25 12                              BCS Sub_3648           ; C=1 (BLO)
 $3636  10 22 E2 1F                        LBHI Sub_1859         
-$363A  6C C8 46                           INC BSS.EchoFlag,U    
+$363A  6C C8 46                           INC 70,U              
 $363D  20 09                              BRA Sub_3648          
 
 ; --------------------------------------------------------------
-$363F  E7 C8 4A            Sub_363F:      STB BSS.FlowCtrl,U    
+$363F  E7 C8 4A            Sub_363F:      STB 74,U              
 $3642  16 0B EE                           LBRA Sub_4233         
          FCB    $16,$D6,$16  ; unreachable padding
 $3648  34 36               Sub_3648:      PSHS A,B,X,Y          
@@ -6014,10 +5928,9 @@ $364A  16 00 A7                           LBRA Sub_36F4
 
 ; --------------------------------------------------------------
 $364D  86 FF               Sub_364D:      LDA #$FF              
-$364E  FF A7 C8            Sub_364E:      STU $A7C8             
-$3651  42                                 FCB    $42                ; undefined opcode $42 -- not a valid 6809 instruction
+$364F  A7 C8 42                           STA 66,U              
 $3652  6F C8 69                           CLR 105,U             
-$3655  6F C8 5F                           CLR BSS.BufCount,U    
+$3655  6F C8 5F                           CLR 95,U              
 $3658  6F C8 4C                           CLR 76,U              
 $365B  6F C8 6A                           CLR 106,U             
 $365E  6F C8 62                           CLR 98,U              
@@ -6083,22 +5996,22 @@ $36F2  20 DB                              BRA Sub_36CF
 ; --------------------------------------------------------------
 $36F4  17 FF 56            Sub_36F4:      LBSR Sub_364D          ; call Sub_364D
 $36F7  30 8D CD F4                        LEAX Dat_04EF,PC       ; X → Dat_04EF
-$36FB  17 E4 05                           LBSR WriteBlock        ; call WriteBlock
-$36FE  6D C8 46                           TST BSS.EchoFlag,U    
+$36FB  17 E4 05                           LBSR Sub_1B03          ; call Sub_1B03
+$36FE  6D C8 46                           TST 70,U              
 $3701  27 07                              BEQ Sub_370A          
 $3703  30 8D CE 0A                        LEAX Dat_0511,PC       ; X → Dat_0511
-$3707  17 E3 F9                           LBSR WriteBlock        ; call WriteBlock
+$3707  17 E3 F9                           LBSR Sub_1B03          ; call Sub_1B03
 $370A  30 8D CE 21         Sub_370A:      LEAX Dat_052F,PC       ; X → Dat_052F
-$370E  17 E3 F2                           LBSR WriteBlock        ; call WriteBlock
-$3711  6D C8 46                           TST BSS.EchoFlag,U    
+$370E  17 E3 F2                           LBSR Sub_1B03          ; call Sub_1B03
+$3711  6D C8 46                           TST 70,U              
 $3714  27 09                              BEQ Sub_371F          
 $3716  30 8D CD 75                        LEAX Dat_048F,PC       ; X → Dat_048F
-$371A  17 E3 E6                           LBSR WriteBlock        ; call WriteBlock
+$371A  17 E3 E6                           LBSR Sub_1B03          ; call Sub_1B03
 $371D  20 4B                              BRA Sub_376A          
 
 ; --------------------------------------------------------------
 $371F  30 8D CE 3C         Sub_371F:      LEAX Dat_055F,PC       ; X → Dat_055F
-$3723  17 E3 DD                           LBSR WriteBlock        ; call WriteBlock
+$3723  17 E3 DD                           LBSR Sub_1B03          ; call Sub_1B03
 $3726  17 0E 34                           LBSR Sub_455D          ; call Sub_455D
 $3729  6D C9 00 9B                        TST 155,U             
 $372D  27 13                              BEQ Sub_3742          
@@ -6113,13 +6026,13 @@ $3744  17 E4 1A                           LBSR Sub_1B61          ; call Sub_1B61
 $3747  6D C8 21                           TST 33,U              
 $374A  10 26 02 06                        LBNE Sub_3954         
 $374E  30 8D CD 0C                        LEAX Dat_045E,PC       ; X → Dat_045E
-$3752  17 E3 AE                           LBSR WriteBlock        ; call WriteBlock
+$3752  17 E3 AE                           LBSR Sub_1B03          ; call Sub_1B03
 $3755  30 8D CD 96                        LEAX Dat_04EF,PC       ; X → Dat_04EF
-$3759  17 E3 A7                           LBSR WriteBlock        ; call WriteBlock
-$375C  6D C8 46                           TST BSS.EchoFlag,U    
+$3759  17 E3 A7                           LBSR Sub_1B03          ; call Sub_1B03
+$375C  6D C8 46                           TST 70,U              
 $375F  27 11                              BEQ Sub_3772          
 $3761  30 8D CD AC                        LEAX Dat_0511,PC       ; X → Dat_0511
-$3765  17 E3 9B                           LBSR WriteBlock        ; call WriteBlock
+$3765  17 E3 9B                           LBSR Sub_1B03          ; call Sub_1B03
 $3768  20 08                              BRA Sub_3772          
 
 ; --------------------------------------------------------------
@@ -6139,33 +6052,33 @@ $378A  C6 20               Sub_378A:      LDB #$20               ; B = SS.ScSiz 
 $378C  17 F5 97                           LBSR Sub_2D26          ; call Sub_2D26
 $378F  6D C9 0C A0         Sub_378F:      TST 3232,U            
 $3793  10 27 07 71                        LBEQ Sub_3F08         
-$3797  6D C8 46                           TST BSS.EchoFlag,U    
+$3797  6D C8 46                           TST 70,U              
 $379A  26 2D                              BNE Sub_37C9          
 $379C  30 8D CD CB                        LEAX Dat_056B,PC       ; X → Dat_056B
-$37A0  17 E3 60                           LBSR WriteBlock        ; call WriteBlock
+$37A0  17 E3 60                           LBSR Sub_1B03          ; call Sub_1B03
 $37A3  86 01                              LDA #$01              
 $37A5  30 C9 00 9F                        LEAX 159,U            
 $37A9  10 8E 00 20                        LDY #$0020            
 $37AD  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $37B0  30 8D CC DB                        LEAX Dat_048F,PC       ; X → Dat_048F
-$37B4  17 E3 4C                           LBSR WriteBlock        ; call WriteBlock
+$37B4  17 E3 4C                           LBSR Sub_1B03          ; call Sub_1B03
 $37B7  86 02                              LDA #$02               ; A = CurXY
 $37B9  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $37BB  30 C9 00 9F                        LEAX 159,U            
 $37BF  10 3F 83                           OS9 I$Create           ; mode=B  name→X  → path→A
 $37C2  10 25 01 9F                        LBCS Sub_3965         
 $37C6  A7 C8 42                           STA 66,U              
-$37C9  EC 44               Sub_37C9:      LDD BSS.ParamBase,U   
-$37CB  ED 46                              STD BSS.RxBufPtr,U    
+$37C9  EC 44               Sub_37C9:      LDD 4,U               
+$37CB  ED 46                              STD 6,U               
 $37CD  30 8D CD C2                        LEAX Dat_0593,PC       ; X → Dat_0593
-$37D1  17 E3 2F                           LBSR WriteBlock        ; call WriteBlock
+$37D1  17 E3 2F                           LBSR Sub_1B03          ; call Sub_1B03
 $37D4  30 8D CD DF                        LEAX Dat_05B7,PC       ; X → Dat_05B7
-$37D8  17 E3 28                           LBSR WriteBlock        ; call WriteBlock
+$37D8  17 E3 28                           LBSR Sub_1B03          ; call Sub_1B03
 $37DB  30 8D CD 50                        LEAX Dat_052F,PC       ; X → Dat_052F
-$37DF  17 E3 21                           LBSR WriteBlock        ; call WriteBlock
+$37DF  17 E3 21                           LBSR Sub_1B03          ; call Sub_1B03
 $37E2  17 06 9E                           LBSR Sub_3E83          ; call Sub_3E83
 $37E5  17 06 B3                           LBSR Sub_3E9B          ; call Sub_3E9B
-$37E8  6D C8 46                           TST BSS.EchoFlag,U    
+$37E8  6D C8 46                           TST 70,U              
 $37EB  27 0B                              BEQ Sub_37F8          
 $37ED  17 06 93            Sub_37ED:      LBSR Sub_3E83          ; call Sub_3E83
 $37F0  17 06 A8                           LBSR Sub_3E9B          ; call Sub_3E9B
@@ -6177,14 +6090,14 @@ $37F8  17 06 E2            Sub_37F8:      LBSR Sub_3EDD          ; call Sub_3EDD
 $37FB  CC 00 01                           LDD #$0001            
 $37FE  ED C8 53            Sub_37FE:      STD 83,U              
 $3801  30 8D CE C2                        LEAX Dat_06C7,PC       ; X → Dat_06C7
-$3805  17 E2 FB                           LBSR WriteBlock        ; call WriteBlock
+$3805  17 E2 FB                           LBSR Sub_1B03          ; call Sub_1B03
 $3808  CC 0D 07                           LDD #$0D07            
 $380B  17 EA 86                           LBSR Sub_2294          ; call Sub_2294
 $380E  30 8D CD B5                        LEAX Dat_05C7,PC       ; X → Dat_05C7
 $3812  86 01                              LDA #$01              
 $3814  10 8E 00 14                        LDY #$0014            
 $3818  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$381B  6C C8 5A                           INC BSS.ConnState,U   
+$381B  6C C8 5A                           INC 90,U              
 $381E  C6 04                              LDB #$04              
 $3820  E7 C8 59                           STB 89,U              
 $3823  17 06 4D            Sub_3823:      LBSR Sub_3E73          ; call Sub_3E73
@@ -6201,7 +6114,7 @@ $3840  81 03                              CMPA #$03
 $3842  25 E8                              BCS Sub_382C           ; C=1 (BLO)
 $3844  6D C8 59                           TST 89,U              
 $3847  26 DA                              BNE Sub_3823          
-$3849  6F C8 5A                           CLR BSS.ConnState,U   
+$3849  6F C8 5A                           CLR 90,U              
 $384C  17 06 30            Sub_384C:      LBSR Sub_3E7F          ; call Sub_3E7F
 $384F  17 03 6A                           LBSR Sub_3BBC          ; call Sub_3BBC
 $3852  A6 C8 2B            Sub_3852:      LDA 43,U              
@@ -6263,7 +6176,7 @@ $38D3  A7 C9 00 9F                        STA 159,U
 $38D7  16 00 B8                           LBRA Sub_3992         
 
 ; --------------------------------------------------------------
-$38DA  6D C8 5F            Sub_38DA:      TST BSS.BufCount,U    
+$38DA  6D C8 5F            Sub_38DA:      TST 95,U              
 $38DD  26 1E                              BNE Sub_38FD          
 $38DF  6D C8 62                           TST 98,U              
 $38E2  27 99                              BEQ Sub_387D          
@@ -6280,22 +6193,22 @@ $38F8  17 05 84                           LBSR Sub_3E7F          ; call Sub_3E7F
 $38FB  20 A6                              BRA Sub_38A3          
 
 ; --------------------------------------------------------------
-$38FD  6D C8 46            Sub_38FD:      TST BSS.EchoFlag,U    
+$38FD  6D C8 46            Sub_38FD:      TST 70,U              
 $3900  27 3F                              BEQ Sub_3941          
 $3902  17 05 7A                           LBSR Sub_3E7F          ; call Sub_3E7F
 $3905  17 00 E9                           LBSR Sub_39F1          ; call Sub_39F1
-$3908  6F C8 5F                           CLR BSS.BufCount,U    
+$3908  6F C8 5F                           CLR 95,U              
 $390B  34 40                              PSHS U                
 $390D  6D C8 4C                           TST 76,U              
 $3910  26 1B                              BNE Sub_392D          
-$3912  EC C8 5B                           LDD BSS.ConnWord,U    
+$3912  EC C8 5B                           LDD 91,U              
 $3915  26 05                              BNE Sub_391C          
-$3917  EC C8 5D                           LDD BSS.BufPtr1,U     
+$3917  EC C8 5D                           LDD 93,U              
 $391A  27 11                              BEQ Sub_392D          
 $391C  A6 C8 42            Sub_391C:      LDA 66,U              
 $391F  C6 02                              LDB #$02               ; B = SS.Size  (GetStt/SetStt subcode)
-$3921  AE C8 5B                           LDX BSS.ConnWord,U    
-$3924  10 AE C8 5D                        LDY BSS.BufPtr1,U     
+$3921  AE C8 5B                           LDX 91,U              
+$3924  10 AE C8 5D                        LDY 93,U              
 $3928  1F 23                              TFR Y,U               
 $392A  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
 $392D  35 40               Sub_392D:      PULS U                
@@ -6307,7 +6220,7 @@ $393B  17 05 3D                           LBSR Sub_3E7B          ; call Sub_3E7B
 $393E  16 FE AC                           LBRA Sub_37ED         
 
 ; --------------------------------------------------------------
-$3941  6F C8 5F            Sub_3941:      CLR BSS.BufCount,U    
+$3941  6F C8 5F            Sub_3941:      CLR 95,U              
 $3944  17 05 34                           LBSR Sub_3E7B          ; call Sub_3E7B
 $3947  6F C9 0C A0         Sub_3947:      CLR 3232,U            
 $394B  17 E3 BB                           LBSR Sub_1D09          ; call Sub_1D09
@@ -6316,7 +6229,7 @@ $3951  10 3F 8F                           OS9 I$Close            ; path=A
 $3954  17 D8 38            Sub_3954:      LBSR Sub_118F          ; call Sub_118F
 $3957  17 E3 84                           LBSR Sub_1CDE          ; call Sub_1CDE
 $395A  6F C8 45                           CLR 69,U              
-$395D  6F C8 46                           CLR BSS.EchoFlag,U    
+$395D  6F C8 46                           CLR 70,U              
 $3960  35 36                              PULS A,B,X,Y          
 $3962  16 D2 F9                           LBRA Sub_0C5E         
 
@@ -6329,13 +6242,13 @@ $396F  17 E9 22                           LBSR Sub_2294          ; call Sub_2294
 $3972  86 03                              LDA #$03              
 $3974  17 E5 94                           LBSR Sub_1F0B          ; call Sub_1F0B
 $3977  30 8D CB 14                        LEAX Dat_048F,PC       ; X → Dat_048F
-$397B  17 E1 85                           LBSR WriteBlock        ; call WriteBlock
+$397B  17 E1 85                           LBSR Sub_1B03          ; call Sub_1B03
 $397E  35 04                              PULS B                
 $3980  10 3F 0F                           OS9 F$PErr             ; path=A  error=B
 $3983  8E 00 3C                           LDX #$003C            
 $3986  17 D5 CD                           LBSR Sub_0F56          ; call Sub_0F56
 $3989  30 8D CA FE                        LEAX Dat_048B,PC       ; X → Dat_048B
-$398D  17 E1 73                           LBSR WriteBlock        ; call WriteBlock
+$398D  17 E1 73                           LBSR Sub_1B03          ; call Sub_1B03
 $3990  20 C2                              BRA Sub_3954          
 
 ; --------------------------------------------------------------
@@ -6377,7 +6290,7 @@ $39DE  16 01 A2                           LBRA Sub_3B83
 ; --------------------------------------------------------------
 $39E1  86 02               Sub_39E1:      LDA #$02               ; A = CurXY
 $39E3  A7 C8 4F                           STA 79,U              
-$39E6  16 01 9A                           LBRA Sub_3B83         
+$39E6  16 D2 6E                           LBRA Sub_0C57         
 
 ; --------------------------------------------------------------
 $39E9  86 01               Sub_39E9:      LDA #$01              
@@ -6387,11 +6300,11 @@ $39EE  16 01 92                           LBRA Sub_3B83
 ; --------------------------------------------------------------
 $39F1  34 30               Sub_39F1:      PSHS X,Y              
 $39F3  CC 00 00                           LDD #$0000            
-$39F6  ED C8 4D                           STD BSS.Counter2,U    
+$39F6  ED C8 4D                           STD 77,U              
 $39F9  ED C8 48                           STD 72,U              
 $39FC  6F C8 62                           CLR 98,U              
 $39FF  6F C8 4F                           CLR 79,U              
-$3A02  6F C8 5F                           CLR BSS.BufCount,U    
+$3A02  6F C8 5F                           CLR 95,U              
 $3A05  17 01 B4                           LBSR Sub_3BBC          ; call Sub_3BBC
 $3A08  30 C9 00 DF         Sub_3A08:      LEAX 223,U            
 $3A0C  17 01 CB            Sub_3A0C:      LBSR Sub_3BDA          ; call Sub_3BDA
@@ -6406,7 +6319,7 @@ $3A23  A6 C8 2B                           LDA 43,U
 $3A26  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $3A29  25 E1                              BCS Sub_3A0C           ; C=1 (BLO)
 $3A2B  1F 20                              TFR Y,D               
-$3A2D  ED C8 4D                           STD BSS.Counter2,U    
+$3A2D  ED C8 4D                           STD 77,U              
 $3A30  3A                                 ABX                   
 $3A31  A6 C9 00 DF                        LDA 223,U             
 $3A35  81 02                              CMPA #$02              ; compare A with CurXY
@@ -6432,7 +6345,7 @@ $3A5D  31 C9 00 E2                        LEAY 226,U
 $3A61  31 AB                              LEAY D,Y              
 $3A63  10 AF C8 50                        STY 80,U              
 $3A67  CA 04                              ORB #$04              
-$3A69  6D C8 5A                           TST BSS.ConnState,U   
+$3A69  6D C8 5A                           TST 90,U              
 $3A6C  27 02                              BEQ Sub_3A70          
 $3A6E  CA 01                              ORB #$01              
 $3A70  ED C8 55            Sub_3A70:      STD 85,U              
@@ -6455,8 +6368,8 @@ $3A94  A6 C8 2B                           LDA 43,U
 $3A97  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $3A9A  1F 20                              TFR Y,D               
 $3A9C  3A                                 ABX                   
-$3A9D  E3 C8 4D                           ADDD BSS.Counter2,U   
-$3AA0  ED C8 4D                           STD BSS.Counter2,U    
+$3A9D  E3 C8 4D                           ADDD 77,U             
+$3AA0  ED C8 4D                           STD 77,U              
 $3AA3  EC C8 53                           LDD 83,U              
 $3AA6  E1 C9 00 E0                        CMPB 224,U            
 $3AAA  26 0A                              BNE Sub_3AB6          
@@ -6486,7 +6399,7 @@ $3ADE  10 3F 89                           OS9 I$Read             ; path=A  count
 $3AE1  25 E2                              BCS Sub_3AC5           ; C=1 (BLO)
 $3AE3  1F 20                              TFR Y,D               
 $3AE5  17 00 D4                           LBSR Sub_3BBC          ; call Sub_3BBC
-$3AE8  6D C8 5A                           TST BSS.ConnState,U   
+$3AE8  6D C8 5A                           TST 90,U              
 $3AEB  26 05                              BNE Sub_3AF2          
 $3AED  17 03 4D                           LBSR Sub_3E3D          ; call Sub_3E3D
 $3AF0  20 03                              BRA Sub_3AF5          
@@ -6494,13 +6407,13 @@ $3AF0  20 03                              BRA Sub_3AF5
 ; --------------------------------------------------------------
 $3AF2  17 03 1A            Sub_3AF2:      LBSR Sub_3E0F          ; call Sub_3E0F
 $3AF5  3A                  Sub_3AF5:      ABX                   
-$3AF6  E3 C8 4D                           ADDD BSS.Counter2,U   
-$3AF9  ED C8 4D                           STD BSS.Counter2,U    
+$3AF6  E3 C8 4D                           ADDD 77,U             
+$3AF9  ED C8 4D                           STD 77,U              
 $3AFC  10 A3 C8 55                        CMPD 85,U             
 $3B00  25 CC                              BCS Sub_3ACE           ; C=1 (BLO)
 $3B02  AE C8 50                           LDX 80,U              
 $3B05  EC C8 48                           LDD 72,U              
-$3B08  6D C8 5A                           TST BSS.ConnState,U   
+$3B08  6D C8 5A                           TST 90,U              
 $3B0B  27 09                              BEQ Sub_3B16          
 $3B0D  10 A3 84                           CMPD ,X               
 $3B10  10 26 FE C5         Sub_3B10:      LBNE Sub_39D9         
@@ -6570,7 +6483,7 @@ $3BA9  53                  Sub_3BA9:      COMB
 $3BAA  20 D4                              BRA Sub_3B80          
 
 ; --------------------------------------------------------------
-$3BAC  6C C8 5F            Sub_3BAC:      INC BSS.BufCount,U    
+$3BAC  6C C8 5F            Sub_3BAC:      INC 95,U              
 $3BAF  17 06 3A                           LBSR Sub_41EC          ; call Sub_41EC
 $3BB2  20 CC                              BRA Sub_3B80          
 
@@ -6619,287 +6532,440 @@ $3C07  81 3C                              CMPA #$3C              ; compare A wit
 $3C09  25 02                              BCS Sub_3C0D           ; C=1 (BLO)
 $3C0B  80 3C                              SUBA #$3C             
 $3C0D  35 94               Sub_3C0D:      PULS B,X,PC            ; return from subroutine  (PULS PC = RTS)
-; CrcTable — CRC-16/CCITT lookup table  (256 × FDB = 512 bytes)
-; Indexed as: LEAY CrcTable,PC  then LDD B,Y to fetch entry.
-; Added in v2.2 to replace the slower OS9 F$CRC syscall.
 
-CrcTable
+Dat_3C0F
 ; Referenced by: $3E20
-; CRC-16/CCITT lookup table — 256 entries x 2 bytes = 512 bytes
-Used by file transfer protocol routines for fast CRC calculation.
-Dave Philipsen added this in v2.2; v2.1 used OS9 F$CRC syscall instead.
-Table polynomial: $1021 (CRC-CCITT / CRC-16-IBM-SDLC)
 ; ── 512 bytes  ($3C0F—$3E0E) ──
-         FDB    $0000
-         FDB    $1021
-         FDB    $2042
-         FDB    $3063
-         FDB    $4084
-         FDB    $50A5
-         FDB    $60C6
-         FDB    $70E7
-         FDB    $8108
-         FDB    $9129
-         FDB    $A14A
-         FDB    $B16B
-         FDB    $C18C
-         FDB    $D1AD
-         FDB    $E1CE
-         FDB    $F1EF
-         FDB    $1231
-         FDB    $0210
-         FDB    $3273
-         FDB    $2252
-         FDB    $52B5
-         FDB    $4294
-         FDB    $72F7
-         FDB    $62D6
-         FDB    $9339
-         FDB    $8318
-         FDB    $B37B
-         FDB    $A35A
-         FDB    $D3BD
-         FDB    $C39C
-         FDB    $F3FF
-         FDB    $E3DE
-         FDB    $2462
-         FDB    $3443
-         FDB    $0420
-         FDB    $1401
-         FDB    $64E6
-         FDB    $74C7
-         FDB    $44A4
-         FDB    $5485
-         FDB    $A56A
-         FDB    $B54B
-         FDB    $8528
-         FDB    $9509
-         FDB    $E5EE
-
-Dat_3C69
-         FDB    $F5CF
-         FDB    $C5AC
-         FDB    $D58D
-         FDB    $3653
-         FDB    $2672
-         FDB    $1611
-         FDB    $0630
-         FDB    $76D7
-         FDB    $66F6
-         FDB    $5695
-         FDB    $46B4
-         FDB    $B75B
-         FDB    $A77A
-         FDB    $9719
-         FDB    $8738
-         FDB    $F7DF
-
-Dat_3C89
-         FDB    $E7FE
-         FDB    $D79D
-         FDB    $C7BC
-         FDB    $48C4
-         FDB    $58E5
-         FDB    $6886
-         FDB    $78A7
-         FDB    $0840
-         FDB    $1861
-         FDB    $2802
-         FDB    $3823
-
-Dat_3C9F
-         FDB    $C9CC
-         FDB    $D9ED
-         FDB    $E98E
-         FDB    $F9AF
-         FDB    $8948
-         FDB    $9969
-         FDB    $A90A
-         FDB    $B92B
-         FDB    $5AF5
-         FDB    $4AD4
-
-Dat_3CB3
-         FDB    $7AB7
-         FDB    $6A96
-         FDB    $1A71
-         FDB    $0A50
-         FDB    $3A33
-         FDB    $2A12
-         FDB    $DBFD
-         FDB    $CBDC
-         FDB    $FBBF
-         FDB    $EB9E
-         FDB    $9B79
-         FDB    $8B58
-         FDB    $BB3B
-         FDB    $AB1A
-         FDB    $6CA6
-         FDB    $7C87
-         FDB    $4CE4
-         FDB    $5CC5
-         FDB    $2C22
-         FDB    $3C03
-         FDB    $0C60
-         FDB    $1C41
-         FDB    $EDAE
-         FDB    $FD8F
-         FDB    $CDEC
-
-Dat_3CE5
-         FDB    $DDCD
-         FDB    $AD2A
-         FDB    $BD0B
-         FDB    $8D68
-         FDB    $9D49
-         FDB    $7E97
-         FDB    $6EB6
-         FDB    $5ED5
-         FDB    $4EF4
-         FDB    $3E13
-         FDB    $2E32
-         FDB    $1E51
-         FDB    $0E70
-         FDB    $FF9F
-         FDB    $EFBE
-         FDB    $DFDD
-         FDB    $CFFC
-         FDB    $BF1B
-         FDB    $AF3A
-         FDB    $9F59
-         FDB    $8F78
-         FDB    $9188
-         FDB    $81A9
-         FDB    $B1CA
-         FDB    $A1EB
-         FDB    $D10C
-         FDB    $C12D
-         FDB    $F14E
-         FDB    $E16F
-         FDB    $1080
-         FDB    $00A1
-         FDB    $30C2
-         FDB    $20E3
-         FDB    $5004
-         FDB    $4025
-         FDB    $7046
-         FDB    $6067
-         FDB    $83B9
-
-Dat_3D31
-         FDB    $9398
-         FDB    $A3FB
-         FDB    $B3DA
-         FDB    $C33D
-         FDB    $D31C
-         FDB    $E37F
-         FDB    $F35E
-         FDB    $02B1
-         FDB    $1290
-         FDB    $22F3
-         FDB    $32D2
-         FDB    $4235
-         FDB    $5214
-         FDB    $6277
-         FDB    $7256
-         FDB    $B5EA
-         FDB    $A5CB
-         FDB    $95A8
-         FDB    $8589
-         FDB    $F56E
-         FDB    $E54F
-         FDB    $D52C
-         FDB    $C50D
-         FDB    $34E2
-         FDB    $24C3
-         FDB    $14A0
-         FDB    $0481
-         FDB    $7466
-         FDB    $6447
-         FDB    $5424
-         FDB    $4405
-         FDB    $A7DB
-         FDB    $B7FA
-         FDB    $8799
-         FDB    $97B8
-         FDB    $E75F
-         FDB    $F77E
-         FDB    $C71D
-         FDB    $D73C
-         FDB    $26D3
-         FDB    $36F2
-         FDB    $0691
-         FDB    $16B0
-         FDB    $6657
-         FDB    $7676
-         FDB    $4615
-         FDB    $5634
-         FDB    $D94C
-         FDB    $C96D
-         FDB    $F90E
-         FDB    $E92F
-         FDB    $99C8
-         FDB    $89E9
-         FDB    $B98A
-         FDB    $A9AB
-         FDB    $5844
-         FDB    $4865
-         FDB    $7806
-         FDB    $6827
-         FDB    $18C0
-         FDB    $08E1
-         FDB    $3882
-         FDB    $28A3
-         FDB    $CB7D
-         FDB    $DB5C
-         FDB    $EB3F
-         FDB    $FB1E
-         FDB    $8BF9
-         FDB    $9BD8
-         FDB    $ABBB
-         FDB    $BB9A
-
-Dat_3DBF
-         FDB    $4A75
-         FDB    $5A54
-         FDB    $6A37
-         FDB    $7A16
-         FDB    $0AF1
-         FDB    $1AD0
-         FDB    $2AB3
-         FDB    $3A92
-         FDB    $FD2E
-         FDB    $ED0F
-         FDB    $DD6C
-         FDB    $CD4D
-         FDB    $BDAA
-         FDB    $AD8B
-         FDB    $9DE8
-         FDB    $8DC9
-         FDB    $7C26
-         FDB    $6C07
-         FDB    $5C64
-         FDB    $4C45
-         FDB    $3CA2
-         FDB    $2C83
-         FDB    $1CE0
-         FDB    $0CC1
-         FDB    $EF1F
-         FDB    $FF3E
-         FDB    $CF5D
-         FDB    $DF7C
-         FDB    $AF9B
-         FDB    $BFBA
-         FDB    $8FD9
-         FDB    $9FF8
-         FDB    $6E17
-         FDB    $7E36
-         FDB    $4E55
-         FDB    $5E74
-         FDB    $2E93
-         FDB    $3EB2
-         FDB    $0ED1
-         FDB    $1EF0
+         FCB    $00               ; NUL
+         FCB    $00               ; NUL
+         FCB    $10               ; $10
+         FCC    "! B0c@"
+         FCB    $84
+         FCB    $50               ; 'P'
+         FCB    $A5
+         FCB    $60               ; '`'
+         FCB    $C6
+         FCB    $70               ; 'p'
+         FCB    $E7
+         FCB    $81
+         FCB    $08               ; BS
+         FCB    $91
+         FCB    $29               ; ')'
+         FCB    $A1
+         FCB    $4A               ; 'J'
+         FCB    $B1
+         FCB    $6B               ; 'k'
+         FCB    $C1
+         FCB    $8C
+         FCB    $D1
+         FCB    $AD
+         FCB    $E1
+         FCB    $CE
+         FCB    $F1
+         FCB    $EF
+         FCB    $12               ; $12
+         FCB    $31               ; '1'
+         FCB    CurXY,$10,$32     ; CurXY(row=-16,col=18)
+         FCS    "s"RR5"
+         FCB    $42               ; 'B'
+         FCB    $94
+         FCB    $72               ; 'r'
+         FCB    $F7
+         FCB    $62               ; 'b'
+         FCB    $D6
+         FCB    $93
+         FCB    $39               ; '9'
+         FCB    $83
+         FCB    $18               ; CAN erase-BOL
+         FCB    $B3
+         FCB    $7B               ; '{'
+         FCB    $A3
+         FCB    $5A               ; 'Z'
+         FCB    $D3
+         FCB    $BD
+         FCB    $C3
+         FCB    $9C
+         FCB    $F3
+         FCB    $FF
+         FCB    $E3
+         FCB    $DE
+         FCC    "$b4C"
+         FCB    $04               ; EOT
+         FCB    $20               ; ' '
+         FCB    $14               ; DC4 erase-EOL
+         FCB    $01               ; SOH
+         FCB    $64               ; 'd'
+         FCB    $E6
+         FCB    $74               ; 't'
+         FCB    $C7
+         FCB    $44               ; 'D'
+         FCB    $A4
+         FCB    $54               ; 'T'
+         FCB    $85
+         FCB    $A5
+         FCB    $6A               ; 'j'
+         FCB    $B5
+         FCB    $4B               ; 'K'
+         FCB    $85
+         FCB    $28               ; '('
+         FCB    $95
+         FCB    $09               ; HT
+         FCB    $E5
+         FCB    $EE
+         FCB    $F5
+         FCB    $CF
+         FCB    $C5
+         FCB    $AC
+         FCB    $D5
+         FCB    $8D
+         FCC    "6S&r"
+         FCB    $16               ; SYN insert-line
+         FCB    $11               ; DC1/XON
+         FCB    $06               ; $06
+         FCS    "0vW"
+         FCB    $66               ; 'f'
+         FCB    $F6
+         FCB    $56               ; 'V'
+         FCB    $95
+         FCB    $46               ; 'F'
+         FCB    $B4
+         FCB    $B7
+         FCB    $5B               ; '['
+         FCB    $A7
+         FCB    $7A               ; 'z'
+         FCB    $97
+         FCB    $19               ; EM home
+         FCB    $87
+         FCB    $38               ; '8'
+         FCB    $F7
+         FCB    $DF
+         FCB    $E7
+         FCB    $FE
+         FCB    $D7
+         FCB    $9D
+         FCB    $C7
+         FCB    $BC
+         FCB    $48               ; 'H'
+         FCB    $C4
+         FCB    $58               ; 'X'
+         FCB    $E5
+         FCB    $68               ; 'h'
+         FCB    $86
+         FCB    $78               ; 'x'
+         FCB    $A7
+         FCB    $08               ; BS
+         FCB    $40               ; '@'
+         FCB    $18               ; CAN erase-BOL
+         FCC    "a("
+         FCB    CurXY,$38,$23     ; CurXY(row=24,col=3)
+         FCB    $C9
+         FCB    $CC
+         FCB    $D9
+         FCB    $ED
+         FCB    $E9
+         FCB    $8E
+         FCB    $F9
+         FCB    $AF
+         FCB    $89
+         FCB    $48               ; 'H'
+         FCB    $99
+         FCB    $69               ; 'i'
+         FCB    $A9
+         FCB    $0A               ; LF
+         FCB    $B9
+         FCS    "+Zu"
+         FCB    $4A               ; 'J'
+         FCB    $D4
+         FCB    $7A               ; 'z'
+         FCB    $B7
+         FCB    $6A               ; 'j'
+         FCB    $96
+         FCB    $1A               ; SUB clear+home
+         FCB    $71               ; 'q'
+         FCB    $0A               ; LF
+         FCC    "P:3*"
+         FCB    $12               ; $12
+         FCB    $DB
+         FCB    $FD
+         FCB    $CB
+         FCB    $DC
+         FCB    $FB
+         FCB    $BF
+         FCB    $EB
+         FCB    $9E
+         FCB    $9B
+         FCB    $79               ; 'y'
+         FCB    $8B
+         FCB    $58               ; 'X'
+         FCB    $BB
+         FCB    $3B               ; ';'
+         FCB    $AB
+         FCB    $1A               ; SUB clear+home
+         FCB    $6C               ; 'l'
+         FCB    $A6
+         FCB    $7C               ; '|'
+         FCB    $87
+         FCB    $4C               ; 'L'
+         FCB    $E4
+         FCB    $5C               ; '\'
+         FCB    $C5
+         FCC    ","<"
+         FCB    $03               ; ETX
+         FCB    $0C               ; FF clear+home
+         FCB    $60               ; '`'
+         FCB    $1C               ; $1C
+         FCB    $41               ; 'A'
+         FCB    $ED
+         FCB    $AE
+         FCB    $FD
+         FCB    $8F
+         FCB    $CD
+         FCB    $EC
+         FCB    $DD
+         FCB    $CD
+         FCB    $AD
+         FCB    $2A               ; '*'
+         FCB    $BD
+         FCB    $0B               ; VT cursor-up
+         FCB    $8D
+         FCB    $68               ; 'h'
+         FCB    $9D
+         FCC    "I~"
+         FCB    $97
+         FCB    $6E               ; 'n'
+         FCB    $B6
+         FCB    $5E               ; '^'
+         FCB    $D5
+         FCB    $4E               ; 'N'
+         FCB    $F4
+         FCB    $3E               ; '>'
+         FCB    $13               ; DC3/XOFF
+         FCC    ".2"
+         FCB    $1E               ; $1E
+         FCB    $51               ; 'Q'
+         FCB    $0E               ; SO cursor-right
+         FCB    $70               ; 'p'
+         FCB    $FF
+         FCB    $9F
+         FCB    $EF
+         FCB    $BE
+         FCB    $DF
+         FCB    $DD
+         FCB    $CF
+         FCB    $FC
+         FCB    $BF
+         FCB    $1B               ; ESC windowing cmd
+         FCB    $AF
+         FCB    $3A               ; ':'
+         FCB    $9F
+         FCB    $59               ; 'Y'
+         FCB    $8F
+         FCB    $78               ; 'x'
+         FCB    $91
+         FCB    $88
+         FCB    $81
+         FCB    $A9
+         FCB    $B1
+         FCB    $CA
+         FCB    $A1
+         FCB    $EB
+         FCB    $D1
+         FCB    $0C               ; FF clear+home
+         FCB    $C1
+         FCB    $2D               ; '-'
+         FCB    $F1
+         FCB    $4E               ; 'N'
+         FCB    $E1
+         FCB    $6F               ; 'o'
+         FCB    $10               ; $10
+         FCB    $80
+         FCB    $00               ; NUL
+         FCB    $A1
+         FCB    $30               ; '0'
+         FCB    $C2
+         FCB    $20               ; ' '
+         FCB    $E3
+         FCB    $50               ; 'P'
+         FCB    $04               ; EOT
+         FCC    "@%pF`g"
+         FCB    $83
+         FCB    $B9
+         FCB    $93
+         FCB    $98
+         FCB    $A3
+         FCB    $FB
+         FCB    $B3
+         FCB    $DA
+         FCB    $C3
+         FCB    $3D               ; '='
+         FCB    $D3
+         FCB    $1C               ; $1C
+         FCB    $E3
+         FCB    $7F
+         FCB    $F3
+         FCB    $5E               ; '^'
+         FCB    CurXY,$B1,$12     ; CurXY(row=145,col=-14)
+         FCB    $90
+         FCB    $22               ; '"'
+         FCB    $F3
+         FCB    $32               ; '2'
+         FCB    $D2
+         FCC    "B5R"
+         FCB    $14               ; DC4 erase-EOL
+         FCS    "bwrV5"
+         FCB    $EA
+         FCB    $A5
+         FCB    $CB
+         FCB    $95
+         FCB    $A8
+         FCB    $85
+         FCB    $89
+         FCB    $F5
+         FCB    $6E               ; 'n'
+         FCB    $E5
+         FCB    $4F               ; 'O'
+         FCB    $D5
+         FCB    $2C               ; ','
+         FCB    $C5
+         FCB    $0D               ; CR
+         FCB    $34               ; '4'
+         FCB    $E2
+         FCB    $24               ; '$'
+         FCB    $C3
+         FCB    $14               ; DC4 erase-EOL
+         FCB    $A0
+         FCB    $04               ; EOT
+         FCB    $81
+         FCC    "tfdGT$D"
+         FCB    $05               ; $05
+         FCB    $A7
+         FCB    $DB
+         FCB    $B7
+         FCB    $FA
+         FCB    $87
+         FCB    $99
+         FCB    $97
+         FCB    $B8
+         FCB    $E7
+         FCB    $5F               ; '_'
+         FCB    $F7
+         FCB    $7E               ; '~'
+         FCB    $C7
+         FCB    $1D               ; $1D
+         FCB    $D7
+         FCS    "<&S"
+         FCB    $36               ; '6'
+         FCB    $F2
+         FCB    $06               ; $06
+         FCB    $91
+         FCB    $16               ; SYN insert-line
+         FCB    $B0
+         FCC    "fWvvF"
+         FCB    $15               ; NAK erase-EOS
+         FCS    "V4Y"
+         FCB    $4C               ; 'L'
+         FCB    $C9
+         FCB    $6D               ; 'm'
+         FCB    $F9
+         FCB    $0E               ; SO cursor-right
+         FCB    $E9
+         FCB    $2F               ; '/'
+         FCB    $99
+         FCB    $C8
+         FCB    $89
+         FCB    $E9
+         FCB    $B9
+         FCB    $8A
+         FCB    $A9
+         FCB    $AB
+         FCC    "XDHex"
+         FCB    $06               ; $06
+         FCC    "h'"
+         FCB    $18               ; CAN erase-BOL
+         FCB    $C0
+         FCB    $08               ; BS
+         FCB    $E1
+         FCB    $38               ; '8'
+         FCB    $82
+         FCB    $28               ; '('
+         FCB    $A3
+         FCB    $CB
+         FCB    $7D               ; '}'
+         FCB    $DB
+         FCB    $5C               ; '\'
+         FCB    $EB
+         FCB    $3F               ; '?'
+         FCB    $FB
+         FCB    $1E               ; $1E
+         FCB    $8B
+         FCB    $F9
+         FCB    $9B
+         FCB    $D8
+         FCB    $AB
+         FCB    $BB
+         FCB    $BB
+         FCB    $9A
+         FCC    "JuZTj7z"
+         FCB    $16               ; SYN insert-line
+         FCB    $0A               ; LF
+         FCB    $F1
+         FCB    $1A               ; SUB clear+home
+         FCB    $D0
+         FCB    $2A               ; '*'
+         FCB    $B3
+         FCB    $3A               ; ':'
+         FCB    $92
+         FCB    $FD
+         FCB    $2E               ; '.'
+         FCB    $ED
+         FCB    $0F               ; SI cursor-left
+         FCB    $DD
+         FCB    $6C               ; 'l'
+         FCB    $CD
+         FCB    $4D               ; 'M'
+         FCB    $BD
+         FCB    $AA
+         FCB    $AD
+         FCB    $8B
+         FCB    $9D
+         FCB    $E8
+         FCB    $8D
+         FCB    $C9
+         FCC    "|&l"
+         FCB    $07               ; BEL
+         FCS    "\dLE<""
+         FCB    $2C               ; ','
+         FCB    $83
+         FCB    $1C               ; $1C
+         FCB    $E0
+         FCB    $0C               ; FF clear+home
+         FCB    $C1
+         FCB    $EF
+         FCB    $1F               ; $1F
+         FCB    $FF
+         FCB    $3E               ; '>'
+         FCB    $CF
+         FCB    $5D               ; ']'
+         FCB    $DF
+         FCB    $7C               ; '|'
+         FCB    $AF
+         FCB    $9B
+         FCB    $BF
+         FCB    $BA
+         FCB    $8F
+         FCB    $D9
+         FCB    $9F
+         FCB    $F8
+         FCB    $6E               ; 'n'
+         FCB    $17               ; ETB delete-line
+         FCC    "~6NU^t."
+         FCB    $93
+         FCB    $3E               ; '>'
+         FCB    $B2
+         FCB    $0E               ; SO cursor-right
+         FCB    $D1
+         FCB    $1E               ; $1E
+         FCB    $F0
 $3E0F  34 36               Sub_3E0F:      PSHS A,B,X,Y          
 $3E11  31 8B                              LEAY D,X              
 $3E13  34 20                              PSHS Y                
@@ -6907,7 +6973,7 @@ $3E15  10 AE C8 50                        LDY 80,U
 $3E19  34 20                              PSHS Y                
 $3E1B  AC C8 50                           CMPX 80,U             
 $3E1E  24 19                              BCC Sub_3E39           ; C=0 (BHS)
-$3E20  31 8D FD EB                        LEAY CrcTable,PC       ; Y → CrcTable
+$3E20  31 8D FD EB                        LEAY Dat_3C0F,PC       ; Y → Dat_3C0F
 $3E24  D6 48               Sub_3E24:      LDB <$48              
 $3E26  4F                                 CLRA                   ; A = 0
 $3E27  E8 80                              EORB ,X+              
@@ -6932,7 +6998,6 @@ $3E46  27 0E                              BEQ Sub_3E56
 $3E48  A6 C8 48                           LDA 72,U              
 $3E4B  AB 80               Sub_3E4B:      ADDA ,X+              
 $3E4D  AC C8 50                           CMPX 80,U             
-$3E4E  C8 50               Sub_3E4E:      EORB #$50             
 $3E50  27 04                              BEQ Sub_3E56          
 $3E52  AC E4                              CMPX ,S               
 $3E54  25 F5                              BCS Sub_3E4B           ; C=1 (BLO)
@@ -6975,7 +7040,7 @@ $3E89  31 C9 14 49                        LEAY 5193,U
 $3E8D  C6 09                              LDB #$09              
 $3E8F  17 EE 8C                           LBSR Sub_2D1E          ; call Sub_2D1E
 $3E92  30 C9 14 49                        LEAX 5193,U           
-$3E96  17 DC 6A                           LBSR WriteBlock        ; call WriteBlock
+$3E96  17 DC 6A                           LBSR Sub_1B03          ; call Sub_1B03
 $3E99  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -6985,7 +7050,7 @@ $3EA1  31 C9 14 39                        LEAY 5177,U
 $3EA5  C6 09                              LDB #$09              
 $3EA7  17 EE 74                           LBSR Sub_2D1E          ; call Sub_2D1E
 $3EAA  30 C9 14 39                        LEAX 5177,U           
-$3EAE  17 DC 52                           LBSR WriteBlock        ; call WriteBlock
+$3EAE  17 DC 52                           LBSR Sub_1B03          ; call Sub_1B03
 $3EB1  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -6994,36 +7059,20 @@ $3EB5  30 C9 14 39                        LEAX 5177,U
 $3EB9  CC 30 30                           LDD #$3030            
 $3EBC  ED 05                              STD 5,X               
 $3EBE  ED 07                              STD 7,X               
-$3EC0  17 DC 40                           LBSR WriteBlock        ; call WriteBlock
+$3EC0  17 DC 40                           LBSR Sub_1B03          ; call Sub_1B03
 $3EC3  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 $3EC5  34 32               Sub_3EC5:      PSHS A,X,Y            
 $3EC7  30 C9 14 39                        LEAX 5177,U           
 $3ECB  8D 1D                              BSR Sub_3EEA           ; call Sub_3EEA
-$3ECD  17 DC 33                           LBSR WriteBlock        ; call WriteBlock
+$3ECD  17 DC 33                           LBSR Sub_1B03          ; call Sub_1B03
 $3ED0  35 B2                              PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
-
-; --------------------------------------------------------------
-
-Dat_3ED2
-; 11-byte orphaned code between subroutines (unreferenced)
-; ── 11 bytes  ($3ED2—$3EDC) ──
-         FCB    $34
-         FCB    $32
-         FCB    $30
-         FCB    $C9
-         FCB    $14
-         FCB    $49
-         FCB    $17
-         FCB    $DC
-         FCB    $28
-         FCB    $35
-         FCB    $B2
+         FCB    $34,$32,$30,$C9,$14,$49,$17,$DC,$28,$35,$B2  ; unreachable padding
 $3EDD  34 32               Sub_3EDD:      PSHS A,X,Y            
 $3EDF  30 C9 14 49                        LEAX 5193,U           
 $3EE3  8D 05                              BSR Sub_3EEA           ; call Sub_3EEA
-$3EE5  17 DC 1B                           LBSR WriteBlock        ; call WriteBlock
+$3EE5  17 DC 1B                           LBSR Sub_1B03          ; call Sub_1B03
 $3EE8  35 B2                              PULS A,X,Y,PC          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -7048,27 +7097,27 @@ $3F05  A7 85                              STA B,X
 $3F07  39                                 RTS                    ; return from subroutine
 
 ; --------------------------------------------------------------
-$3F08  6D C8 46            Sub_3F08:      TST BSS.EchoFlag,U    
+$3F08  6D C8 46            Sub_3F08:      TST 70,U              
 $3F0B  27 0D                              BEQ Sub_3F1A          
 $3F0D  17 EB 42                           LBSR Sub_2A52          ; call Sub_2A52
 $3F10  6D C8 21                           TST 33,U              
 $3F13  10 26 FA 3D                        LBNE Sub_3954         
 $3F17  17 EB 86            Sub_3F17:      LBSR Sub_2AA0          ; call Sub_2AA0
 $3F1A  30 8D C6 65         Sub_3F1A:      LEAX Dat_0583,PC       ; X → Dat_0583
-$3F1E  17 DB E2                           LBSR WriteBlock        ; call WriteBlock
+$3F1E  17 DB E2                           LBSR Sub_1B03          ; call Sub_1B03
 $3F21  30 C9 00 9F                        LEAX 159,U            
 $3F25  86 01                              LDA #$01              
 $3F27  10 8E 00 20                        LDY #$0020            
 $3F2B  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $3F2E  30 8D C5 5D                        LEAX Dat_048F,PC       ; X → Dat_048F
-$3F32  17 DB CE                           LBSR WriteBlock        ; call WriteBlock
+$3F32  17 DB CE                           LBSR Sub_1B03          ; call Sub_1B03
 $3F35  30 8D C7 8E                        LEAX Dat_06C7,PC       ; X → Dat_06C7
-$3F39  17 DB C7                           LBSR WriteBlock        ; call WriteBlock
+$3F39  17 DB C7                           LBSR Sub_1B03          ; call Sub_1B03
 $3F3C  86 01                              LDA #$01              
 $3F3E  30 C9 00 9F                        LEAX 159,U            
 $3F42  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $3F45  24 0C                              BCC Sub_3F53           ; C=0 (BHS)
-$3F47  6D C8 46            Sub_3F47:      TST BSS.EchoFlag,U    
+$3F47  6D C8 46            Sub_3F47:      TST 70,U              
 $3F4A  10 27 FA 06                        LBEQ Sub_3954         
 $3F4E  6C C8 69                           INC 105,U             
 $3F51  20 1E                              BRA Sub_3F71          
@@ -7085,9 +7134,9 @@ $3F68  A6 C8 42                           LDA 66,U
 $3F6B  8E 00 00                           LDX #$0000            
 $3F6E  10 3F 88                           OS9 I$Seek             ; path=A  mode=B  offset→X:D
 $3F71  30 8D C6 1E         Sub_3F71:      LEAX Dat_0593,PC       ; X → Dat_0593
-$3F75  17 DB 8B                           LBSR WriteBlock        ; call WriteBlock
+$3F75  17 DB 8B                           LBSR Sub_1B03          ; call Sub_1B03
 $3F78  30 8D C5 B3                        LEAX Dat_052F,PC       ; X → Dat_052F
-$3F7C  17 DB 84                           LBSR WriteBlock        ; call WriteBlock
+$3F7C  17 DB 84                           LBSR Sub_1B03          ; call Sub_1B03
 $3F7F  17 FF 01                           LBSR Sub_3E83          ; call Sub_3E83
 $3F82  17 FF 16                           LBSR Sub_3E9B          ; call Sub_3E9B
 $3F85  6D C8 4C                           TST 76,U              
@@ -7106,12 +7155,12 @@ $3FAC  E6 C9 00 87                        LDB 135,U
 $3FB0  E7 02                              STB 2,X               
 $3FB2  10 8E 00 03                        LDY #$0003            
 $3FB6  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$3FB9  6F C8 5A            Sub_3FB9:      CLR BSS.ConnState,U   
+$3FB9  6F C8 5A            Sub_3FB9:      CLR 90,U              
 $3FBC  CC 00 80                           LDD #$0080            
 $3FBF  ED C8 57                           STD 87,U              
 $3FC2  C3 00 04                           ADDD #$0004           
 $3FC5  ED C8 55                           STD 85,U              
-$3FC8  6D C8 46                           TST BSS.EchoFlag,U    
+$3FC8  6D C8 46                           TST 70,U              
 $3FCB  10 26 01 1B                        LBNE Sub_40EA         
 $3FCF  30 C9 13 A9                        LEAX 5033,U           
 $3FD3  17 EC 9C                           LBSR Sub_2C72          ; call Sub_2C72
@@ -7127,7 +7176,7 @@ $3FED  17 FE ED                           LBSR Sub_3EDD          ; call Sub_3EDD
 $3FF0  17 FE C0                           LBSR Sub_3EB3          ; call Sub_3EB3
 $3FF3  17 F6 D7                           LBSR Sub_36CD          ; call Sub_36CD
 $3FF6  17 E4 0F                           LBSR Sub_2408          ; call Sub_2408
-$3FF9  6D C8 46                           TST BSS.EchoFlag,U    
+$3FF9  6D C8 46                           TST 70,U              
 $3FFC  27 09                              BEQ Sub_4007          
 $3FFE  EC C8 53                           LDD 83,U              
 $4001  10 83 00 01                        CMPD #$0001           
@@ -7141,7 +7190,7 @@ $4015  20 1A                              BRA Sub_4031
 
 ; --------------------------------------------------------------
 $4017  86 01               Sub_4017:      LDA #$01              
-$4019  A7 C8 5A                           STA BSS.ConnState,U   
+$4019  A7 C8 5A                           STA 90,U              
 $401C  17 E4 80                           LBSR Sub_249F          ; call Sub_249F
 $401F  EC C8 57                           LDD 87,U              
 $4022  C3 00 05                           ADDD #$0005           
@@ -7180,7 +7229,7 @@ $406E  20 BA                              BRA Sub_402A
 ; --------------------------------------------------------------
 $4070  6F C8 52            Sub_4070:      CLR 82,U              
 $4073  17 FE 3D                           LBSR Sub_3EB3          ; call Sub_3EB3
-$4076  6D C8 5F                           TST BSS.BufCount,U    
+$4076  6D C8 5F                           TST 95,U              
 $4079  26 43                              BNE Sub_40BE          
 $407B  EC C8 53                           LDD 83,U              
 $407E  C3 00 01                           ADDD #$0001           
@@ -7189,7 +7238,7 @@ $4084  6D C8 45                           TST 69,U
 $4087  27 16                              BEQ Sub_409F          
 $4089  CC 04 00                           LDD #$0400            
 $408C  ED C8 57                           STD 87,U              
-$408F  6D C8 5A                           TST BSS.ConnState,U   
+$408F  6D C8 5A                           TST 90,U              
 $4092  27 05                              BEQ Sub_4099          
 $4094  C3 00 05                           ADDD #$0005           
 $4097  20 03                              BRA Sub_409C          
@@ -7199,7 +7248,7 @@ $4099  C3 00 04            Sub_4099:      ADDD #$0004
 $409C  ED C8 55            Sub_409C:      STD 85,U              
 $409F  17 FE 3B            Sub_409F:      LBSR Sub_3EDD          ; call Sub_3EDD
 $40A2  17 E3 63                           LBSR Sub_2408          ; call Sub_2408
-$40A5  6D C8 5F                           TST BSS.BufCount,U    
+$40A5  6D C8 5F                           TST 95,U              
 $40A8  26 14                              BNE Sub_40BE          
 $40AA  17 E3 F2                           LBSR Sub_249F          ; call Sub_249F
 $40AD  A6 C8 2B                           LDA 43,U              
@@ -7211,8 +7260,8 @@ $40BB  16 FF 6C                           LBRA Sub_402A
 ; --------------------------------------------------------------
 $40BE  A6 C8 42            Sub_40BE:      LDA 66,U              
 $40C1  10 3F 8F                           OS9 I$Close            ; path=A
-$40C4  6F C8 5F                           CLR BSS.BufCount,U    
-$40C7  6D C8 46                           TST BSS.EchoFlag,U    
+$40C4  6F C8 5F                           CLR 95,U              
+$40C7  6D C8 46                           TST 70,U              
 $40CA  27 0C                              BEQ Sub_40D8          
 $40CC  17 FD A8                           LBSR Sub_3E77          ; call Sub_3E77
 $40CF  17 E9 43                           LBSR Sub_2A15          ; call Sub_2A15
@@ -7234,7 +7283,7 @@ $40EA  17 E9 28            Sub_40EA:      LBSR Sub_2A15          ; call Sub_2A15
 $40ED  25 F8                              BCS Sub_40E7           ; C=1 (BLO)
 $40EF  81 43                              CMPA #$43              ; compare A with 'C'
 $40F1  26 F7                              BNE Sub_40EA          
-$40F3  6C C8 5A                           INC BSS.ConnState,U   
+$40F3  6C C8 5A                           INC 90,U              
 $40F6  EC C8 57                           LDD 87,U              
 $40F9  C3 00 05                           ADDD #$0005           
 $40FC  ED C8 55                           STD 85,U              
@@ -7293,12 +7342,12 @@ $418E  16 FE 99                           LBRA Sub_402A
 
 ; --------------------------------------------------------------
 $4191  34 26               Sub_4191:      PSHS A,B,Y            
-$4193  EC 42                              LDD BSS.ParamStr,U    
+$4193  EC 42                              LDD 2,U               
 $4195  A3 E4                              SUBD ,S               
-$4197  10 A3 46                           CMPD BSS.RxBufPtr,U   
+$4197  10 A3 46                           CMPD 6,U              
 $419A  24 02                              BCC Sub_419E           ; C=0 (BHS)
 $419C  8D 4E                              BSR Sub_41EC           ; call Sub_41EC
-$419E  10 AE 46            Sub_419E:      LDY BSS.RxBufPtr,U    
+$419E  10 AE 46            Sub_419E:      LDY 6,U               
 $41A1  6D C8 4C                           TST 76,U              
 $41A4  26 16                              BNE Sub_41BC          
 $41A6  EC 81               Sub_41A6:      LDD ,X++              
@@ -7309,7 +7358,7 @@ $41AF  ED E4                              STD ,S
 $41B1  22 F3                              BHI Sub_41A6          
 $41B3  27 02                              BEQ Sub_41B7          
 $41B5  31 3F                              LEAY -1,Y             
-$41B7  10 AF 46            Sub_41B7:      STY BSS.RxBufPtr,U    
+$41B7  10 AF 46            Sub_41B7:      STY 6,U               
 $41BA  35 A6                              PULS A,B,Y,PC          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -7334,21 +7383,21 @@ $41DF  ED E4                              STD ,S
 $41E1  22 D9                              BHI Sub_41BC          
 $41E3  27 02                              BEQ Sub_41E7          
 $41E5  31 3F                              LEAY -1,Y             
-$41E7  10 AF 46            Sub_41E7:      STY BSS.RxBufPtr,U    
+$41E7  10 AF 46            Sub_41E7:      STY 6,U               
 $41EA  35 A6                              PULS A,B,Y,PC          ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 $41EC  34 10               Sub_41EC:      PSHS X                
-$41EE  AE 44                              LDX BSS.ParamBase,U   
-$41F0  EC 46                              LDD BSS.RxBufPtr,U    
-$41F2  A3 44                              SUBD BSS.ParamBase,U  
+$41EE  AE 44                              LDX 4,U               
+$41F0  EC 46                              LDD 6,U               
+$41F2  A3 44                              SUBD 4,U              
 $41F4  1F 02                              TFR D,Y               
 $41F6  A6 C8 42                           LDA 66,U              
 $41F9  81 FF                              CMPA #$FF             
 $41FB  27 03                              BEQ Sub_4200          
 $41FD  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$4200  EC 44               Sub_4200:      LDD BSS.ParamBase,U   
-$4202  ED 46                              STD BSS.RxBufPtr,U    
+$4200  EC 44               Sub_4200:      LDD 4,U               
+$4202  ED 46                              STD 6,U               
 $4204  35 90                              PULS X,PC              ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -7383,26 +7432,26 @@ $423A  CC 25 07                           LDD #$2507
 $423D  ED C9 0C 91                        STD 3217,U            
 $4241  17 DA 3D                           LBSR Sub_1C81          ; call Sub_1C81
 $4244  30 8D C2 47                        LEAX Dat_048F,PC       ; X → Dat_048F
-$4248  17 D8 B8                           LBSR WriteBlock        ; call WriteBlock
+$4248  17 D8 B8                           LBSR Sub_1B03          ; call Sub_1B03
 $424B  6D C9 0C A0                        TST 3232,U            
 $424F  10 27 01 F9                        LBEQ Sub_444C         
 $4253  30 8D C6 78                        LEAX Dat_08CF,PC       ; X → Dat_08CF
-$4257  17 D8 A9                           LBSR WriteBlock        ; call WriteBlock
+$4257  17 D8 A9                           LBSR Sub_1B03          ; call Sub_1B03
 $425A  30 8D C2 BE                        LEAX Dat_051C,PC       ; X → Dat_051C
-$425E  17 D8 A2                           LBSR WriteBlock        ; call WriteBlock
+$425E  17 D8 A2                           LBSR Sub_1B03          ; call Sub_1B03
 $4261  30 8D C2 26                        LEAX Dat_048B,PC       ; X → Dat_048B
-$4265  17 D8 9B                           LBSR WriteBlock        ; call WriteBlock
+$4265  17 D8 9B                           LBSR Sub_1B03          ; call Sub_1B03
 $4268  6D C8 25                           TST 37,U              
 $426B  27 51                              BEQ Sub_42BE          
 $426D  30 8D C6 B4                        LEAX Dat_0925,PC       ; X → Dat_0925
-$4271  17 D8 8F                           LBSR WriteBlock        ; call WriteBlock
+$4271  17 D8 8F                           LBSR Sub_1B03          ; call Sub_1B03
 $4274  30 C9 00 BF                        LEAX 191,U            
 $4278  86 01                              LDA #$01              
-$427A  10 AE C8 1E                        LDY BSS.CurrChar,U    
+$427A  10 AE C8 1E                        LDY 30,U              
 $427E  31 3F                              LEAY -1,Y             
 $4280  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $4283  30 8D C6 61                        LEAX Dat_08E8,PC       ; X → Dat_08E8
-$4287  17 D8 79                           LBSR WriteBlock        ; call WriteBlock
+$4287  17 D8 79                           LBSR Sub_1B03          ; call Sub_1B03
 $428A  17 E8 38            Sub_428A:      LBSR Sub_2AC5          ; call Sub_2AC5
 $428D  81 59                              CMPA #$59              ; compare A with 'Y'
 $428F  27 12                              BEQ Sub_42A3          
@@ -7426,16 +7475,16 @@ $42B9  17 E0 A6                           LBSR Sub_2362          ; call Sub_2362
 $42BC  20 74                              BRA Sub_4332          
 
 ; --------------------------------------------------------------
-$42BE  6D C8 20            Sub_42BE:      TST BSS.StateFlag,U   
+$42BE  6D C8 20            Sub_42BE:      TST 32,U              
 $42C1  26 24                              BNE Sub_42E7          
 $42C3  30 8D C2 98                        LEAX Dat_055F,PC       ; X → Dat_055F
-$42C7  17 D8 39                           LBSR WriteBlock        ; call WriteBlock
+$42C7  17 D8 39                           LBSR Sub_1B03          ; call Sub_1B03
 $42CA  C6 1E                              LDB #$1E              
 $42CC  17 D8 92                           LBSR Sub_1B61          ; call Sub_1B61
 $42CF  6D C8 21                           TST 33,U              
 $42D2  26 5E                              BNE Sub_4332          
 $42D4  EC C8 1C                           LDD 28,U              
-$42D7  ED C8 1E                           STD BSS.CurrChar,U    
+$42D7  ED C8 1E                           STD 30,U              
 $42DA  30 C9 06 0E                        LEAX 1550,U           
 $42DE  31 C9 00 BF                        LEAY 191,U            
 $42E2  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
@@ -7451,7 +7500,7 @@ $42F8  24 1E                              BCC Sub_4318           ; C=0 (BHS)
 $42FA  C1 DA                              CMPB #$DA             
 $42FC  26 3D                              BNE Sub_433B          
 $42FE  30 8D C6 29                        LEAX Dat_092B,PC       ; X → Dat_092B
-$4302  17 D7 FE                           LBSR WriteBlock        ; call WriteBlock
+$4302  17 D7 FE                           LBSR Sub_1B03          ; call Sub_1B03
 $4305  17 E7 BD            Sub_4305:      LBSR Sub_2AC5          ; call Sub_2AC5
 $4308  81 41                              CMPA #$41              ; compare A with 'A'
 $430A  27 57                              BEQ Sub_4363          
@@ -7468,9 +7517,9 @@ $431E  6D C8 24                           TST 36,U
 $4321  26 0F                              BNE Sub_4332          
 $4323  6C C8 26                           INC 38,U              
 $4326  17 E0 37                           LBSR Sub_2360          ; call Sub_2360
-$4329  A6 42                              LDA BSS.ParamStr,U    
-$432B  A0 46                              SUBA BSS.RxBufPtr,U   
-$432D  A7 48                              STA BSS.TxBufPtr,U    
+$4329  A6 42                              LDA 2,U               
+$432B  A0 46                              SUBA 6,U              
+$432D  A7 48                              STA 8,U               
 $432F  17 01 CD                           LBSR Sub_44FF          ; call Sub_44FF
 $4332  6F C8 24            Sub_4332:      CLR 36,U              
 $4335  17 D9 A6                           LBSR Sub_1CDE          ; call Sub_1CDE
@@ -7483,13 +7532,13 @@ $4340  34 04                              PSHS B
 $4342  CC 0D 02                           LDD #$0D02            
 $4345  17 DF 4C                           LBSR Sub_2294          ; call Sub_2294
 $4348  30 8D C1 43                        LEAX Dat_048F,PC       ; X → Dat_048F
-$434C  17 D7 B4                           LBSR WriteBlock        ; call WriteBlock
+$434C  17 D7 B4                           LBSR Sub_1B03          ; call Sub_1B03
 $434F  35 04                              PULS B                
 $4351  10 3F 0F                           OS9 F$PErr             ; path=A  error=B
 $4354  8E 00 3C                           LDX #$003C            
 $4357  17 CB FC                           LBSR Sub_0F56          ; call Sub_0F56
 $435A  30 8D C1 2D                        LEAX Dat_048B,PC       ; X → Dat_048B
-$435E  17 D7 A2                           LBSR WriteBlock        ; call WriteBlock
+$435E  17 D7 A2                           LBSR Sub_1B03          ; call Sub_1B03
 $4361  20 CF                              BRA Sub_4332          
 
 ; --------------------------------------------------------------
@@ -7521,27 +7570,27 @@ $4394  34 36               Sub_4394:      PSHS A,B,X,Y
 $4396  30 C9 07 0D                        LEAX 1805,U           
 $439A  10 AE C9 0C 88                     LDY 3208,U            
 $439F  1F 20                              TFR Y,D               
-$43A1  10 AE 46                           LDY BSS.RxBufPtr,U    
+$43A1  10 AE 46                           LDY 6,U               
 $43A4  A6 80               Sub_43A4:      LDA ,X+               
 $43A6  81 0A                              CMPA #$0A              ; compare A with LF
 $43A8  27 05                              BEQ Sub_43AF          
 $43AA  A7 A0                              STA ,Y+               
-$43AC  10 AF 46                           STY BSS.RxBufPtr,U    
+$43AC  10 AF 46                           STY 6,U               
 $43AF  5A                  Sub_43AF:      DECB                  
-$43B0  10 AC 42                           CMPY BSS.ParamStr,U   
+$43B0  10 AC 42                           CMPY 2,U              
 $43B3  25 05                              BCS Sub_43BA           ; C=1 (BLO)
 $43B5  8D 13                              BSR Sub_43CA           ; call Sub_43CA
-$43B7  10 AE 46                           LDY BSS.RxBufPtr,U    
+$43B7  10 AE 46                           LDY 6,U               
 $43BA  5D                  Sub_43BA:      TSTB                  
 $43BB  26 E7                              BNE Sub_43A4          
-$43BD  A6 42                              LDA BSS.ParamStr,U    
-$43BF  A0 46                              SUBA BSS.RxBufPtr,U   
-$43C1  A1 48                              CMPA BSS.TxBufPtr,U   
+$43BD  A6 42                              LDA 2,U               
+$43BF  A0 46                              SUBA 6,U              
+$43C1  A1 48                              CMPA 8,U              
 $43C3  27 03                              BEQ Sub_43C8          
 $43C5  17 01 37                           LBSR Sub_44FF          ; call Sub_44FF
 $43C8  35 B6               Sub_43C8:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $43CA  34 36               Sub_43CA:      PSHS A,B,X,Y          
-$43CC  EC 46                              LDD BSS.RxBufPtr,U    
+$43CC  EC 46                              LDD 6,U               
 $43CE  ED 49                              STD 9,U               
 $43D0  6D C8 25                           TST 37,U              
 $43D3  27 28                              BEQ Sub_43FD          
@@ -7549,8 +7598,8 @@ $43D5  A6 C9 0C B0                        LDA 3248,U
 $43D9  27 06                              BEQ Sub_43E1          
 $43DB  A7 C8 44                           STA 68,U              
 $43DE  17 FA 7C                           LBSR Sub_3E5D          ; call Sub_3E5D
-$43E1  EC 46               Sub_43E1:      LDD BSS.RxBufPtr,U    
-$43E3  A3 44                              SUBD BSS.ParamBase,U  
+$43E1  EC 46               Sub_43E1:      LDD 6,U               
+$43E3  A3 44                              SUBD 4,U              
 $43E5  1F 02                              TFR D,Y               
 $43E7  30 C9 16 B9                        LEAX 5817,U           
 $43EB  A6 C8 2A                           LDA 42,U              
@@ -7559,8 +7608,8 @@ $43F1  A6 C9 0C AF                        LDA 3247,U
 $43F5  27 06                              BEQ Sub_43FD          
 $43F7  A7 C8 44                           STA 68,U              
 $43FA  17 FA 60                           LBSR Sub_3E5D          ; call Sub_3E5D
-$43FD  EC 44               Sub_43FD:      LDD BSS.ParamBase,U   
-$43FF  ED 46                              STD BSS.RxBufPtr,U    
+$43FD  EC 44               Sub_43FD:      LDD 4,U               
+$43FF  ED 46                              STD 6,U               
 $4401  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
@@ -7593,19 +7642,19 @@ $4437  27 04                              BEQ Sub_443D
 $4439  C1 20                              CMPB #$20              ; compare B with ' '
 $443B  25 F3                              BCS Sub_4430           ; C=1 (BLO)
 $443D  4F                  Sub_443D:      CLRA                   ; A = 0
-$443E  ED C8 1E                           STD BSS.CurrChar,U    
-$4441  6C C8 20                           INC BSS.StateFlag,U   
+$443E  ED C8 1E                           STD 30,U              
+$4441  6C C8 20                           INC 32,U              
 $4444  17 FD EC                           LBSR Sub_4233          ; call Sub_4233
-$4447  6F C8 20            Sub_4447:      CLR BSS.StateFlag,U   
+$4447  6F C8 20            Sub_4447:      CLR 32,U              
 $444A  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
 ; --------------------------------------------------------------
 $444C  30 8D C4 C0         Sub_444C:      LEAX Dat_0910,PC       ; X → Dat_0910
-$4450  17 D6 B0                           LBSR WriteBlock        ; call WriteBlock
+$4450  17 D6 B0                           LBSR Sub_1B03          ; call Sub_1B03
 $4453  30 8D C0 34                        LEAX Dat_048B,PC       ; X → Dat_048B
-$4457  17 D6 A9                           LBSR WriteBlock        ; call WriteBlock
+$4457  17 D6 A9                           LBSR Sub_1B03          ; call Sub_1B03
 $445A  30 8D C1 01                        LEAX Dat_055F,PC       ; X → Dat_055F
-$445E  17 D6 A2                           LBSR WriteBlock        ; call WriteBlock
+$445E  17 D6 A2                           LBSR Sub_1B03          ; call Sub_1B03
 $4461  C6 1E                              LDB #$1E              
 $4463  17 D6 FB                           LBSR Sub_1B61          ; call Sub_1B61
 $4466  6D C8 21                           TST 33,U              
@@ -7673,7 +7722,7 @@ $44FD  35 B6                              PULS A,B,X,Y,PC        ; return from s
 
 ; --------------------------------------------------------------
 $44FF  34 36               Sub_44FF:      PSHS A,B,X,Y          
-$4501  A7 48                              STA BSS.TxBufPtr,U    
+$4501  A7 48                              STA 8,U               
 $4503  44                                 LSRA                  
 $4504  44                                 LSRA                  
 $4505  4C                                 INCA                  
@@ -7712,7 +7761,7 @@ $4545  10 AE 4F                           LDY 15,U
 $4548  A6 80               Sub_4548:      LDA ,X+               
 $454A  A7 A0                              STA ,Y+               
 $454C  5A                                 DECB                  
-$454D  10 AC 4B                           CMPY BSS.Var000B,U    
+$454D  10 AC 4B                           CMPY 11,U             
 $4550  25 03                              BCS Sub_4555           ; C=1 (BLO)
 $4552  10 AE 4D                           LDY 13,U              
 $4555  5D                  Sub_4555:      TSTB                  
@@ -7728,7 +7777,7 @@ $4563  81 2E                              CMPA #$2E              ; compare A wit
 $4565  27 10                              BEQ Sub_4577          
 $4567  AC 4D               Sub_4567:      CMPX 13,U             
 $4569  26 02                              BNE Sub_456D          
-$456B  AE 4B                              LDX BSS.Var000B,U     
+$456B  AE 4B                              LDX 11,U              
 $456D  AC 4F               Sub_456D:      CMPX 15,U             
 $456F  26 F0                              BNE Sub_4561          
 $4571  6F C9 00 9B                        CLR 155,U             
@@ -7759,7 +7808,7 @@ $45A1  25 15                              BCS Sub_45B8           ; C=1 (BLO)
 $45A3  A7 A0                              STA ,Y+               
 $45A5  5A                                 DECB                  
 $45A6  27 10                              BEQ Sub_45B8          
-$45A8  AC 4B                              CMPX BSS.Var000B,U    
+$45A8  AC 4B                              CMPX 11,U             
 $45AA  27 06                              BEQ Sub_45B2          
 $45AC  AC 4F                              CMPX 15,U             
 $45AE  27 08                              BEQ Sub_45B8          
@@ -7784,3 +7833,28 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+
+; ══════════════════════════════════════════════════════════════
+; ANALYST NOTES
+; ══════════════════════════════════════════════════════════════
+
+; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
+; ──────────────────────────────────────────────────────────────
+;      $0C57 is referenced as a branch target but falls
+;      inside the operand of a preceding instruction (Insn_0C54).
+;      Byte $01 at $0C57 is not a valid 6809 opcode.
+;
+;      On 6809 / 6309-emulation mode: $01 is a harmless undefined
+;      opcode — execution falls through to the next instruction.
+;      On 6309 native mode: $01 may be interpreted as a 6309
+;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
+;
+;      The EQU expression 'Sub_0C57 EQU Insn_0C54+3' resolves
+;      to $0C57 at assembly time. Branches to Sub_0C57
+;      will target the correct address and the assembled binary
+;      WILL match the original at those branch sites.
+;
+;      Probable cause: the branch target address is off by one byte
+;      (a bug in the original code, or a deliberate overlapping-code trick).
+
+; ══════════════════════════════════════════════════════════════

@@ -156,13 +156,13 @@ BSS.FlowState EQU    3703     ; BSS offset $0E77
 BSS.IoBuf     EQU    6613     ; BSS offset $19D5
 
 ; ==============================================================
-; Disassembly:  supercomm22-restored\sc22_restored.bin
+; Disassembly:  /home/claude/SuperComm/supercomm22
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $45C5  (17861 bytes)
 ; Entry:        $0A71
 ; BSS:          $2000  (8192 bytes)
-; CRC-24:       $15E38F
+; CRC-24:       $F5ADE1
 ;
 ; SuperComm v2.2 — OS-9 Level II terminal / communications program
 ; Author: Dave Philipsen  Copyright (c) 1988, 1989
@@ -1227,9 +1227,8 @@ $0B87  20 09                              BRA Sub_0B92
 
 ; --------------------------------------------------------------
 $0B89  A6 C8 72            Sub_0B89:      LDA 114,U             
-$0B8C  10 3F 8F                           OS9 I$Close            ; path=A
-$0B8D  3F                  Sub_0B8D:      SWI                   
-$0B8E  8F                                 FCB    $8F                ; undefined opcode $8F -- not a valid 6809 instruction
+$0B8C  10 3F 8F            Insn_0B8C:     OS9 I$Close            ; path=A
+$0B8D  3F                  Sub_0B8D:      EQU    $0B8D            ; mid-instruction overlap: Insn_0B8C+1 -- mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C
 $0B8F  6F C8 72                           CLR 114,U             
 $0B92  30 C9 05 0F         Sub_0B92:      LEAX 1295,U           
 $0B96  AF C8 66                           STX 102,U             
@@ -2802,8 +2801,8 @@ $19E0  20 2A                              BRA Sub_1A0C
 $19E2  A6 C8 2B            Sub_19E2:      LDA 43,U              
 $19E5  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $19E7  30 8D EF 96         Sub_19E7:      LEAX Dat_0981,PC       ; X → Dat_0981
-$19EB  10 8E 00 01                        LDY #$0001            
-$19EC  8E 00 01            Sub_19EC:      LDX #$0001            
+$19EB  10 8E 00 01         Insn_19EB:     LDY #$0001            
+$19EC  8E                  Sub_19EC:      EQU    $19EC            ; mid-instruction overlap: Insn_19EB+1 -- mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write
 $19EF  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $19F2  8E 00 0C                           LDX #$000C            
 $19F5  17 F5 5E                           LBSR Sub_0F56          ; call Sub_0F56
@@ -6014,8 +6013,8 @@ $364A  16 00 A7                           LBRA Sub_36F4
 
 ; --------------------------------------------------------------
 $364D  86 FF               Sub_364D:      LDA #$FF              
-$364E  FF A7 C8            Sub_364E:      STU $A7C8             
-$3651  42                                 FCB    $42                ; undefined opcode $42 -- not a valid 6809 instruction
+$364E  FF                  Sub_364E:      EQU    $364E            ; mid-instruction overlap: Sub_364D+1 -- mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D
+$364F  A7 C8 42                           STA 66,U              
 $3652  6F C8 69                           CLR 105,U             
 $3655  6F C8 5F                           CLR BSS.BufCount,U    
 $3658  6F C8 4C                           CLR 76,U              
@@ -6375,9 +6374,12 @@ $39DB  A7 C8 4F                           STA 79,U
 $39DE  16 01 A2                           LBRA Sub_3B83         
 
 ; --------------------------------------------------------------
-$39E1  86 02               Sub_39E1:      LDA #$02               ; A = CurXY
+$39E1  86 02               Sub_39E1:      LDA #$02               ; Error # 2 (Wrong Block #)
 $39E3  A7 C8 4F                           STA 79,U              
-$39E6  16 01 9A                           LBRA Sub_3B83         
+$39E6  16 D2 6E                           LBRA Sub_3B83          ; RESTORED: original binary has corrupted branch to Sub_0C57
+                                                                  ; (lands mid-instruction at $0C57, 3 bytes into LDY #$0001)
+                                                                  ; NitrOS9 source confirms correct target is Sub_3B83
+                                                                  ; Bug only triggered on XMODEM wrong-block-number error
 
 ; --------------------------------------------------------------
 $39E9  86 01               Sub_39E9:      LDA #$01              
@@ -6931,8 +6933,8 @@ $3E43  AC C8 50                           CMPX 80,U
 $3E46  27 0E                              BEQ Sub_3E56          
 $3E48  A6 C8 48                           LDA 72,U              
 $3E4B  AB 80               Sub_3E4B:      ADDA ,X+              
-$3E4D  AC C8 50                           CMPX 80,U             
-$3E4E  C8 50               Sub_3E4E:      EORB #$50             
+$3E4D  AC C8 50            Insn_3E4D:     CMPX 80,U             
+$3E4E  C8                  Sub_3E4E:      EQU    $3E4E            ; mid-instruction overlap: Insn_3E4D+1 -- mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0
 $3E50  27 04                              BEQ Sub_3E56          
 $3E52  AC E4                              CMPX ,S               
 $3E54  25 F5                              BCS Sub_3E4B           ; C=1 (BLO)
@@ -7784,3 +7786,9 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+
+; ══════════════════════════════════════════════════════════════
+; ANALYST NOTES
+; ══════════════════════════════════════════════════════════════
+
+; ══════════════════════════════════════════════════════════════
