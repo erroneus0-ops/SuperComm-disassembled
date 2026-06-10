@@ -67,6 +67,34 @@ Directive syntax (all directives begin with / in column 1):
 
 import json
 import re
+
+
+def _count_data_bytes(lines):
+    """Count binary bytes represented by a list of FCB/FCC/FDB/FCS lines."""
+    total = 0
+    for line in lines:
+        s = line.strip()
+        if not s or s.startswith(';'):
+            continue
+        if ';' in s:
+            s = s[:s.index(';')].strip()
+        upper = s.upper()
+        if upper.startswith('FCB'):
+            args = s[3:].strip()
+            total += len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FDB'):
+            args = s[3:].strip()
+            total += 2 * len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FCC') or upper.startswith('FCS'):
+            m = re.search(r'["\'](.+?)["\']', s)
+            if m:
+                total += len(m.group(1))
+        elif upper.startswith('RMB'):
+            try:
+                total += int(s[3:].strip())
+            except ValueError:
+                pass
+    return total
 import sys
 import os
 from collections import defaultdict
@@ -214,7 +242,7 @@ def parse_directives(lines, json_path=None):
     XREF_RE = re.compile(r';\s*[XYUS]\s*→\s*([A-Za-z_][A-Za-z0-9_]*)')
     # And LEAX/LEAY with PCR: $HHHH  30 8D xx xx   LEAX Label,PC
     LEAX_RE = re.compile(
-        r'^\$([0-9A-Fa-f]{4})\s+30 8D ([0-9A-Fa-f]{2}) ([0-9A-Fa-f]{2})\s')
+        r'^\$([0-9A-Fa-f]{4})\s+3[0123] 8D ([0-9A-Fa-f]{2}) ([0-9A-Fa-f]{2})\s')
 
     listing_labels = {}
 
@@ -315,10 +343,18 @@ def parse_directives(lines, json_path=None):
             if rep_addr is None:
                 rep_addr = current_addr  # fall back to address context before /replace/
             if rep_addr is not None:
-                changes['substitutions'][rep_addr] = {
-                    'replace_lines': replace_lines,
-                    'with_lines':    with_lines,
-                }
+                replace_count = _count_data_bytes(replace_lines)
+                with_count    = _count_data_bytes(with_lines)
+                if replace_count != with_count:
+                    changes['warnings'].append(
+                        f"/replace/ at ${rep_addr:04X} — size mismatch: "
+                        f"/replace/ = {replace_count} bytes, /with/ = {with_count} bytes. "
+                        f"Substitution NOT saved.")
+                else:
+                    changes['substitutions'][rep_addr] = {
+                        'replace_lines': replace_lines,
+                        'with_lines':    with_lines,
+                    }
             else:
                 changes['warnings'].append("/replace/ block — could not determine address")
 
@@ -326,38 +362,26 @@ def parse_directives(lines, json_path=None):
         elif line == '/end-label/':
             lbl = current_data_label(lines, i)
             if lbl:
-                # end_addr = address of next bare label after this directive
-                end_addr = None
-                for j in range(i + 1, len(lines)):
-                    nl = lines[j].rstrip()
-                    if nl.startswith('/') or nl.startswith(';') or nl == '':
-                        continue
-                    if LABEL_LINE_RE.match(nl):
-                        end_lbl = nl.strip()
-                        end_addr = label_to_addr.get(end_lbl)
-                        break
-                    if extract_addr(nl):
-                        break
                 changes['data_regions'].append({
                     'action':     'end_label',
                     'label':      lbl,
-                    'end_addr':   end_addr,
                     'label_addr': label_to_addr.get(lbl),
                 })
             else:
                 changes['warnings'].append(
-                    f"/end-label/ at ${current_addr:04X} — could not find preceding data label")
+                    f"/end-label/ — could not find preceding data label")
 
         # ── /format/ name ────────────────────────────────────────────────────
         elif line.startswith('/format/'):
-            fmt = line[len('/format/'):].strip()
+            parts = line[len('/format/'):].strip().split()
+            fmt = parts[0] if parts else 'auto'
+            epl = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else None
             lbl = current_data_label(lines, i)
             if lbl:
-                changes['data_regions'].append({
-                    'action': 'format',
-                    'label':  lbl,
-                    'format': fmt,
-                })
+                action = {'action': 'format', 'label': lbl, 'format': fmt}
+                if epl:
+                    action['entries_per_line'] = epl
+                changes['data_regions'].append(action)
             else:
                 changes['warnings'].append(f"/format/ '{fmt}' — could not find preceding data label")
 
@@ -482,13 +506,18 @@ def merge_into_json(json_path, changes, warn):
         r   = add_or_get_region(lbl)
         if action['action'] == 'end_label':
             r['end_label'] = True
-            if 'end' not in r and action.get('end_addr') is not None:
-                r['end'] = f"{action['end_addr']:04X}"
-            # Populate start from label address if known
             if 'start' not in r and action.get('label_addr') is not None:
                 r['start'] = f"{action['label_addr']:04X}"
         elif action['action'] == 'format':
             r['format'] = action['format']
+            if action.get('entries_per_line'):
+                r['entries_per_line'] = action['entries_per_line']
+            # Warn if fdb/hexdump format on a region with odd byte count
+            if action['format'] in ('fdb', 'hexdump') and 'start' in r and 'end' in r:
+                size = int(r['end'], 16) - int(r['start'], 16)
+                if size % 2 != 0:
+                    warn(f"/format/ fdb on '{r.get('label','?')}' — region size is {size} bytes (odd). "
+                         f"Last byte will be emitted as FCB.")
         elif action['action'] == 'comment':
             r['comment'] = action['comment']
 

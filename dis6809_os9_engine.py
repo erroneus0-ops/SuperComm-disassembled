@@ -345,13 +345,17 @@ class Project:
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
             if 'start' not in r: continue
+            fmt = r.get('format', 'auto')
+            epl = r.get('entries_per_line', None)
+            if epl and fmt == 'fdb':
+                fmt = f'fdb:{epl}'
             p.data_regions.append({
                 'start':   int(r['start'], 16),
                 'end':     int(r['end'], 16) if 'end' in r else None,
                 'end_label': r.get('end_label', False),
                 'label':   r.get('label', f"Dat_{r['start']}"),
                 'comment': r.get('comment', ''),
-                'format':  r.get('format', 'auto'),  # 'auto','fdb','raw'
+                'format':  fmt,
             })
 
         # line_comments: "HHHH" -> "text"
@@ -766,8 +770,9 @@ class Engine:
         for r in self.project.data_regions:
             # Force the region start as DATA, and mark interior as forced
             add(r['start'], KIND_DATA)
-            for addr in range(r['start'], r['end']):
-                forced_data[addr] = True
+            if r['end'] is not None:
+                for addr in range(r['start'], r['end']):
+                    forced_data[addr] = True
 
         # ── Resolve final labels and regions ──────────────────────────
         labels  = {}
@@ -1425,13 +1430,22 @@ class Engine:
                 # Body — fall through to auto heuristics below
                 fmt = 'auto'
 
-            if fmt == 'fdb':
+            if fmt == 'fdb' or fmt.startswith('fdb:'):
+                # Parse entries per line: 'fdb' = 1, 'fdb:8' = 8
+                try:
+                    epl = int(fmt.split(':')[1]) if ':' in fmt else 1
+                except (IndexError, ValueError):
+                    epl = 1
                 if i+1 < end:
                     v = (d[i]<<8)|d[i+1]
-                    out.append(f"         FDB    ${v:04X}")
-                    i += 2
+                    # Collect entries_per_line values then emit as one line
+                    entries = []
+                    while i+1 < end and len(entries) < epl:
+                        entries.append(f"${(d[i]<<8)|d[i+1]:04X}")
+                        i += 2
+                    out.append(f"         FDB    {','.join(entries)}")
                 else:
-                    # Odd byte at end of fdb region -- emit as FCB
+                    # Odd byte at end of fdb region -- emit as plain FCB
                     out.append(f"         FCB    ${d[i]:02X}")
                     i += 1
                 last_printable = False; continue
@@ -1553,8 +1567,9 @@ class Engine:
         # Build set of addresses inside declared data_regions (skip those)
         data_region_addrs = set()
         for r in proj.data_regions:
-            for a2 in range(r['start'], r['end']):
-                data_region_addrs.add(a2)
+            if r['end'] is not None:
+                for a2 in range(r['start'], r['end']):
+                    data_region_addrs.add(a2)
 
         for addr, lbl in list(lbs.items()):
             if addr >= exec_off and addr < crc_off:
@@ -1664,7 +1679,8 @@ class Engine:
                 pre_fmt_map = {}  # addr -> (end, fmt, comment, end_label, label)
                 for r in proj.data_regions:
                     if r['start'] < exec_off:
-                        pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
+                        # end can be None — we'll use pend (natural boundary) instead
+                        pre_fmt_map[r['start']] = (r.get('end'), r.get('format','auto'),
                                                     r.get('comment',''),
                                                     r.get('end_label', False),
                                                     r.get('label', ''))
@@ -1687,7 +1703,7 @@ class Engine:
                     while cur < pend:
                         if cur in pre_fmt_map:
                             rend, rfmt, rcmt, r_end_label, r_label = pre_fmt_map[cur]
-                            rend = min(rend, pend)
+                            rend = min(rend, pend) if rend is not None else pend
                             if cur > paddr:
                                 out.extend(self.emit_data(paddr, cur, 
                                     {k:v for k,v in sub.items() if paddr <= k < cur}))

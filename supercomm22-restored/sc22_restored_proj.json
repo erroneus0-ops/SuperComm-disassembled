@@ -104,6 +104,33 @@
       "end_label": true,
       "end": "00C6",
       "start": "006F"
+    },
+    {
+      "label": "Dat_00C6",
+      "end_label": true,
+      "start": "00C6",
+      "end": "00EB"
+    },
+    {
+      "label": "Dat_00EB",
+      "end_label": true,
+      "start": "00EB",
+      "end": "0109"
+    },
+    {
+      "label": "Dat_0109",
+      "end_label": true,
+      "start": "0109"
+    },
+    {
+      "label": "Dat_02F0",
+      "end_label": true,
+      "start": "02F0"
+    },
+    {
+      "label": "Dat_0322",
+      "end_label": true,
+      "start": "0322"
     }
   ],
   "line_comments": {},
@@ -139,6 +166,51 @@
       ],
       "with": [
         "         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content (excl. this word)"
+      ]
+    },
+    "00C6": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $23               ; '#'"
+      ],
+      "with": [
+        "         FDB    Dat_00C6end-Dat_00C6-2 ;Message byte length"
+      ]
+    },
+    "00EB": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $1C               ; $1C"
+      ],
+      "with": [
+        "         FDB    Dat_00EBend-Dat_00EB-2 ;Message byte length"
+      ]
+    },
+    "0109": {
+      "replace_lines": [
+        "         FCB    $01               ; SOH",
+        "         FCB    $C6"
+      ],
+      "with": [
+        "         FDB    Dat_0109end-Dat_0109-2 ;message byte length"
+      ]
+    },
+    "02F0": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $28               ; '('"
+      ],
+      "with": [
+        "         FDB    Dat_02F0end-Dat_02F0-2 ;Message byte length"
+      ]
+    },
+    "0322": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $25               ; '%'"
+      ],
+      "with": [
+        "         FDB    Dat_0322end-Dat_0322-2 ;Message byte length"
       ]
     }
   },

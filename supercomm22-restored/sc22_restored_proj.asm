@@ -219,29 +219,28 @@ Dat_006Fend
 
 Dat_00C6
 ; Referenced by: $0BED
-         FCB    $00               ; NUL
-         FCB    $23               ; '#'
+         FDB    Dat_00C6end-Dat_00C6-2 ;Message byte length
          FCB    $0C               ; FF clear+home
          FCB    CurXY,$22,$21     ; CurXY(row=2,col=1)
          FCC    "with updates by"
          FCB    CurXY,$22,$22     ; CurXY(row=2,col=2)
          FCC    " Randy Wilson"
+Dat_00C6end
 
 Dat_00EB
 ; Referenced by: Sub_2BC0
-         FCB    $00               ; NUL
-         FCB    $1C               ; $1C
+         FDB    Dat_00EBend-Dat_00EB-2 ;Message byte length
          FCB    CurXY,$40,$20     ; CurXY(row=32,col=0)
          FCB    ESC,W.FColor,$04         ; Foreground Color palette[4]
          FCC    "SuperComm v2.2 "
          FCB    ESC,W.FColor,$03         ; Foreground Color palette[3]
          FCB    CurXY,$58,$20     ; CurXY(row=56,col=0)
          FCB    $3D               ; '='
+Dat_00EBend
 
 Dat_0109
 ; Referenced by: $111E
-         FCB    $01               ; SOH
-         FCB    $C6
+         FDB    Dat_0109end-Dat_0109-2 ;message byte length
          FCC    "   Use <ALT> key with the following keys:"
          FDB    $0D0A             ; CRLF
          FCB    $0A               ; LF
@@ -264,6 +263,7 @@ Dat_0109
          FCB    $0D               ; CR
          FCB    $0A               ; LF
          FCC    "     Select function or <Space> to continue"
+Dat_0109end
 
 Dat_02D1
 ; Referenced by: $2DF5
@@ -298,13 +298,13 @@ Dat_02E9
 
 Dat_02F0
 ; Referenced by: $17A4
-         FCB    $00               ; NUL
-         FCB    $28               ; '('
+         FDB    Dat_02F0end-Dat_02F0-2 ;Message byte length
          FCB    CurXY,$34,$20     ; CurXY(row=20,col=0)
          FCC    "External ZModem File Receive"
          FDB    $0D0A             ; CRLF
          FCB    $0A               ; LF
          FCB    ESC,W.CWArea,$00,$03,$40,$07  ; CPX=0 CPY=3 SZX=64 SZY=7
+Dat_02F0end
 
 Dat_031A
 ; Referenced by: $0C49, Sub_1090, $10B7
@@ -320,13 +320,13 @@ Dat_031F
 
 Dat_0322
 ; Referenced by: $186A
-         FCB    $00               ; NUL
-         FCB    $25               ; '%'
+         FDB    Dat_0322end-Dat_0322-2 ;Message byte length
          FCB    CurXY,$36,$20     ; CurXY(row=22,col=0)
          FCC    "External ZModem File Send"
          FDB    $0D0A             ; CRLF
          FCB    $0A               ; LF
          FCB    ESC,W.CWArea,$00,$03,$40,$07  ; CPX=0 CPY=3 SZX=64 SZY=7
+Dat_0322end
 
 Dat_0349
 ; Referenced by: $19A6
@@ -412,8 +412,8 @@ Dat_03A1
 Dat_03A4
 ; Referenced by: $1C66
          FCB    $00               ; NUL
-         FCB    $02               ; CurXY
-         FCB    $02               ; CurXY
+         FCB    $02               ; STX
+         FCB    $02               ; STX
 
 Dat_03A7
 ; Referenced by: Sub_13BA
@@ -1575,7 +1575,7 @@ $0EB1  20 30                              BRA Sub_0EE3
 
 ; --------------------------------------------------------------
 $0EB3  E6 C8 65            Sub_0EB3:      LDB BSS.BufPtr3,U     
-$0EB6  C1 02                              CMPB #$02              ; compare B with CurXY
+$0EB6  C1 02                              CMPB #$02             
 $0EB8  27 D0                              BEQ Sub_0E8A          
 $0EBA  81 1E                              CMPA #$1E             
 $0EBC  25 CC                              BCS Sub_0E8A           ; C=1 (BLO)
@@ -1586,7 +1586,7 @@ $0EC6  20 1B                              BRA Sub_0EE3
 
 ; --------------------------------------------------------------
 $0EC8  E6 C8 65            Sub_0EC8:      LDB BSS.BufPtr3,U     
-$0ECB  C1 02                              CMPB #$02              ; compare B with CurXY
+$0ECB  C1 02                              CMPB #$02             
 $0ECD  27 BB                              BEQ Sub_0E8A          
 $0ECF  81 28                              CMPA #$28              ; compare A with '('
 $0ED1  25 B7                              BCS Sub_0E8A           ; C=1 (BLO)
@@ -1774,7 +1774,7 @@ $1040  A6 C9 0C A6         Sub_1040:      LDA 3238,U
 $1044  27 0C                              BEQ Sub_1052          
 $1046  81 01                              CMPA #$01             
 $1048  10 27 FC 35                        LBEQ Sub_0C81         
-$104C  81 02                              CMPA #$02              ; compare A with CurXY
+$104C  81 02                              CMPA #$02             
 $104E  10 27 FC 98                        LBEQ Sub_0CEA         
 $1052  30 C9 00 DF         Sub_1052:      LEAX 223,U            
 $1056  31 C9 07 0D                        LEAY 1805,U           
@@ -1850,7 +1850,7 @@ $10E1  39                                 RTS                    ; return from s
 $10E2  34 16               Sub_10E2:      PSHS A,B,X            
 $10E4  30 C9 0C 60                        LEAX 3168,U           
 $10E8  A6 84                              LDA ,X                
-$10EA  81 02                              CMPA #$02              ; compare A with CurXY
+$10EA  81 02                              CMPA #$02             
 $10EC  27 09                              BEQ Sub_10F7          
 $10EE  30 8D F3 72                        LEAX Dat_0464,PC       ; X → Dat_0464
 $10F2  8D DE                              BSR Sub_10D2           ; call Sub_10D2
@@ -2215,7 +2215,7 @@ $143F  16 F8 CD                           LBRA Sub_0D0F
 
 ; --------------------------------------------------------------
 $1442  34 06               Sub_1442:      PSHS A,B              
-$1444  86 02                              LDA #$02               ; A = CurXY
+$1444  86 02                              LDA #$02              
 $1446  A7 A0                              STA ,Y+               
 $1448  EC C9 0C 96                        LDD 3222,U            
 $144C  ED C9 0C 94                        STD 3220,U            
@@ -2232,7 +2232,7 @@ $1464  16 F8 A8                           LBRA Sub_0D0F
 ; --------------------------------------------------------------
 $1467  34 16               Sub_1467:      PSHS A,B,X            
 $1469  30 C9 0C 60                        LEAX 3168,U           
-$146D  86 02                              LDA #$02               ; A = CurXY
+$146D  86 02                              LDA #$02              
 $146F  A7 A0                              STA ,Y+               
 $1471  A6 01                              LDA 1,X               
 $1473  27 0E                              BEQ Sub_1483          
@@ -2349,7 +2349,7 @@ $1582  A7 C8 41                           STA 65,U
 $1585  A6 C9 06 0E                        LDA 1550,U            
 $1589  6F C9 06 0E                        CLR 1550,U            
 $158D  E6 C9 0C A6                        LDB 3238,U            
-$1591  C1 02                              CMPB #$02              ; compare B with CurXY
+$1591  C1 02                              CMPB #$02             
 $1593  10 27 0C 59                        LBEQ Sub_21F0         
 $1597  81 1A               Sub_1597:      CMPA #$1A              ; compare A with SUB
 $1599  26 0A                              BNE Sub_15A5          
@@ -2922,7 +2922,7 @@ $1AE4  20 F0                              BRA Sub_1AD6
 ; --------------------------------------------------------------
 $1AE6  20 CD               Sub_1AE6:      BRA Sub_1AB5          
 $1AE8  30 8D E9 7B         Sub_1AE8:      LEAX Dat_0467,PC       ; X → Dat_0467
-$1AEC  86 02                              LDA #$02               ; A = CurXY
+$1AEC  86 02                              LDA #$02              
 $1AEE  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $1AF1  A7 C8 3E                           STA 62,U              
 $1AF4  30 8D E9 7F                        LEAX Dat_0477,PC       ; X → Dat_0477
@@ -3060,7 +3060,7 @@ $1BDC  35 96                              PULS A,B,X,PC          ; return from s
 ; --------------------------------------------------------------
 $1BDE  39                  Sub_1BDE:      RTS                    ; return from subroutine
 $1BDF  A6 C8 65            Sub_1BDF:      LDA BSS.BufPtr3,U     
-$1BE2  81 02                              CMPA #$02              ; compare A with CurXY
+$1BE2  81 02                              CMPA #$02             
 $1BE4  26 06                              BNE Sub_1BEC          
 $1BE6  31 8D E7 87                        LEAY Dat_0371,PC       ; Y → Dat_0371
 $1BEA  20 2A                              BRA Sub_1C16          
@@ -3110,7 +3110,7 @@ $1C56  39                                 RTS                    ; return from s
 ; --------------------------------------------------------------
 $1C57  34 12               Sub_1C57:      PSHS A,X              
 $1C59  A6 C8 65                           LDA BSS.BufPtr3,U     
-$1C5C  81 02                              CMPA #$02              ; compare A with CurXY
+$1C5C  81 02                              CMPA #$02             
 $1C5E  27 0C                              BEQ Sub_1C6C          
 $1C60  6D C9 0C A6                        TST 3238,U            
 $1C64  26 06                              BNE Sub_1C6C          
@@ -3541,7 +3541,7 @@ $205C  20 04                              BRA Sub_2062
 ; --------------------------------------------------------------
 $205E  6F C9 0C A8         Sub_205E:      CLR 3240,U            
 $2062  17 00 A3            Sub_2062:      LBSR Sub_2108          ; call Sub_2108
-$2065  C1 02                              CMPB #$02              ; compare B with CurXY
+$2065  C1 02                              CMPB #$02             
 $2067  26 13                              BNE Sub_207C          
 $2069  A6 C9 0C A9                        LDA 3241,U            
 $206D  26 06                              BNE Sub_2075          
@@ -3833,7 +3833,7 @@ $229A  8B 20                              ADDA #$20
 $229C  A7 01                              STA 1,X               
 $229E  CB 20                              ADDB #$20             
 $22A0  E7 02                              STB 2,X               
-$22A2  86 02                              LDA #$02               ; A = CurXY
+$22A2  86 02                              LDA #$02              
 $22A4  A7 84                              STA ,X                
 $22A6  86 01                              LDA #$01              
 $22A8  10 8E 00 03                        LDY #$0003            
@@ -4033,7 +4033,7 @@ $2465  A7 84                              STA ,X
 $2467  20 04                              BRA Sub_246D          
 
 ; --------------------------------------------------------------
-$2469  86 02               Sub_2469:      LDA #$02               ; A = CurXY
+$2469  86 02               Sub_2469:      LDA #$02              
 $246B  A7 84                              STA ,X                
 $246D  35 B6               Sub_246D:      PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 $246F  6D C8 69            Sub_246F:      TST 105,U             
@@ -4270,7 +4270,7 @@ $264A  ED 09                              STD 9,X
 $264C  86 01                              LDA #$01              
 $264E  10 8E 00 0B                        LDY #$000B            
 $2652  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$2655  86 02                              LDA #$02               ; A = CurXY
+$2655  86 02                              LDA #$02              
 $2657  30 8D DE 0C                        LEAX Dat_0467,PC       ; X → Dat_0467
 $265B  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $265E  25 B2                              BCS Sub_2612           ; C=1 (BLO)
@@ -4561,7 +4561,7 @@ $291F  26 23                              BNE Sub_2944
 $2921  EC C8 5B                           LDD BSS.ConnWord,U    
 $2924  26 1E                              BNE Sub_2944          
 $2926  30 C9 00 9F         Sub_2926:      LEAX 159,U            
-$292A  86 02                              LDA #$02               ; A = CurXY
+$292A  86 02                              LDA #$02              
 $292C  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $292E  10 3F 83                           OS9 I$Create           ; mode=B  name→X  → path→A
 $2931  25 05                              BCS Sub_2938           ; C=1 (BLO)
@@ -5306,7 +5306,7 @@ $301D  20 04                              BRA Sub_3023
 $301F  86 45               Sub_301F:      LDA #$45               ; A = 'E'
 $3021  C0 0F                              SUBB #$0F             
 $3023  A7 01               Sub_3023:      STA 1,X               
-$3025  86 02                              LDA #$02               ; A = CurXY
+$3025  86 02                              LDA #$02              
 $3027  A7 84                              STA ,X                
 $3029  CB 20                              ADDB #$20             
 $302B  E7 02                              STB 2,X               
@@ -5343,7 +5343,7 @@ $306F  20 02                              BRA Sub_3073
 ; --------------------------------------------------------------
 $3071  86 42               Sub_3071:      LDA #$42               ; A = 'B'
 $3073  A7 01               Sub_3073:      STA 1,X               
-$3075  86 02                              LDA #$02               ; A = CurXY
+$3075  86 02                              LDA #$02              
 $3077  A7 84                              STA ,X                
 $3079  17 00 8B                           LBSR Sub_3107          ; call Sub_3107
 $307C  86 01                              LDA #$01              
@@ -5542,7 +5542,7 @@ $31F5  C1 3D                              CMPB #$3D              ; compare B wit
 $31F7  26 76                              BNE Sub_326F          
 $31F9  81 01                              CMPA #$01             
 $31FB  27 74                              BEQ Sub_3271          
-$31FD  81 02                              CMPA #$02              ; compare A with CurXY
+$31FD  81 02                              CMPA #$02             
 $31FF  10 27 00 87                        LBEQ Sub_328A         
 $3203  81 03                              CMPA #$03             
 $3205  10 27 00 9A                        LBEQ Sub_32A3         
@@ -5960,7 +5960,7 @@ $35C0  27 14                              BEQ Sub_35D6
 $35C2  C1 03                              CMPB #$03             
 $35C4  22 16                              BHI Sub_35DC          
 $35C6  E7 C8 4B                           STB 75,U              
-$35C9  C1 02                              CMPB #$02              ; compare B with CurXY
+$35C9  C1 02                              CMPB #$02             
 $35CB  10 22 E1 C4                        LBHI Sub_1793         
 $35CF  25 77                              BCS Sub_3648           ; C=1 (BLO)
 $35D1  6C C8 46                           INC BSS.EchoFlag,U    
@@ -5996,7 +5996,7 @@ $3622  27 1B                              BEQ Sub_363F
 $3624  C1 04                              CMPB #$04             
 $3626  22 B4                              BHI Sub_35DC          
 $3628  E7 C8 4A                           STB BSS.FlowCtrl,U    
-$362B  C1 02                              CMPB #$02              ; compare B with CurXY
+$362B  C1 02                              CMPB #$02             
 $362D  25 19                              BCS Sub_3648           ; C=1 (BLO)
 $362F  6C C8 45                           INC 69,U              
 $3632  C1 03                              CMPB #$03             
@@ -6068,7 +6068,7 @@ $36D5  C6 01                              LDB #$01               ; B = SS.Ready 
 $36D7  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
 $36DA  24 09                              BCC Sub_36E5           ; C=0 (BHS)
 $36DC  17 04 FB                           LBSR Sub_3BDA          ; call Sub_3BDA
-$36DF  81 02                              CMPA #$02              ; compare A with CurXY
+$36DF  81 02                              CMPA #$02             
 $36E1  25 EF                              BCS Sub_36D2           ; C=1 (BLO)
 $36E3  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
 
@@ -6149,7 +6149,7 @@ $37A9  10 8E 00 20                        LDY #$0020
 $37AD  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $37B0  30 8D CC DB                        LEAX Dat_048F,PC       ; X → Dat_048F
 $37B4  17 E3 4C                           LBSR WriteBlock        ; call WriteBlock
-$37B7  86 02                              LDA #$02               ; A = CurXY
+$37B7  86 02                              LDA #$02              
 $37B9  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $37BB  30 C9 00 9F                        LEAX 159,U            
 $37BF  10 3F 83                           OS9 I$Create           ; mode=B  name→X  → path→A
@@ -6375,7 +6375,7 @@ $39DB  A7 C8 4F                           STA 79,U
 $39DE  16 01 A2                           LBRA Sub_3B83         
 
 ; --------------------------------------------------------------
-$39E1  86 02               Sub_39E1:      LDA #$02               ; A = CurXY
+$39E1  86 02               Sub_39E1:      LDA #$02              
 $39E3  A7 C8 4F                           STA 79,U              
 $39E6  16 01 9A                           LBRA Sub_3B83         
 
@@ -6409,7 +6409,7 @@ $3A2B  1F 20                              TFR Y,D
 $3A2D  ED C8 4D                           STD BSS.Counter2,U    
 $3A30  3A                                 ABX                   
 $3A31  A6 C9 00 DF                        LDA 223,U             
-$3A35  81 02                              CMPA #$02              ; compare A with CurXY
+$3A35  81 02                              CMPA #$02             
 $3A37  27 1E                              BEQ Sub_3A57          
 $3A39  81 01                              CMPA #$01             
 $3A3B  27 15                              BEQ Sub_3A52          
@@ -6441,13 +6441,13 @@ $3A76  20 09                              BRA Sub_3A81
 
 ; --------------------------------------------------------------
 $3A78  17 01 5F            Sub_3A78:      LBSR Sub_3BDA          ; call Sub_3BDA
-$3A7B  81 02                              CMPA #$02              ; compare A with CurXY
+$3A7B  81 02                              CMPA #$02             
 $3A7D  10 22 FF 50                        LBHI Sub_39D1         
 $3A81  A6 C8 2B            Sub_3A81:      LDA 43,U              
 $3A84  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 $3A86  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
 $3A89  25 ED                              BCS Sub_3A78           ; C=1 (BLO)
-$3A8B  C1 02                              CMPB #$02              ; compare B with CurXY
+$3A8B  C1 02                              CMPB #$02             
 $3A8D  25 E9                              BCS Sub_3A78           ; C=1 (BLO)
 $3A8F  4F                                 CLRA                   ; A = 0
 $3A90  10 8E 00 02                        LDY #$0002            
@@ -6473,7 +6473,7 @@ $3AC0  20 EA                              BRA Sub_3AAC
 ; --------------------------------------------------------------
 $3AC2  17 00 F7            Sub_3AC2:      LBSR Sub_3BBC          ; call Sub_3BBC
 $3AC5  17 01 12            Sub_3AC5:      LBSR Sub_3BDA          ; call Sub_3BDA
-$3AC8  81 02                              CMPA #$02              ; compare A with CurXY
+$3AC8  81 02                              CMPA #$02             
 $3ACA  10 22 FF 03                        LBHI Sub_39D1         
 $3ACE  A6 C8 2B            Sub_3ACE:      LDA 43,U              
 $3AD1  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
@@ -7444,7 +7444,7 @@ $42E7  30 C9 00 BF         Sub_42E7:      LEAX 191,U
 $42EB  A6 84                              LDA ,X                
 $42ED  81 0D                              CMPA #$0D              ; compare A with CR
 $42EF  27 41                              BEQ Sub_4332          
-$42F1  86 02                              LDA #$02               ; A = CurXY
+$42F1  86 02                              LDA #$02              
 $42F3  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $42F5  10 3F 83                           OS9 I$Create           ; mode=B  name→X  → path→A
 $42F8  24 1E                              BCC Sub_4318           ; C=0 (BHS)
