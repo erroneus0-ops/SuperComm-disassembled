@@ -349,11 +349,12 @@ def parse_directives(lines, json_path=None):
                     changes['warnings'].append(
                         f"/replace/ at ${rep_addr:04X} — size mismatch: "
                         f"/replace/ = {replace_count} bytes, /with/ = {with_count} bytes. "
-                        f"This will break assembly.")
-                changes['substitutions'][rep_addr] = {
-                    'replace_lines': replace_lines,
-                    'with_lines':    with_lines,
-                }
+                        f"Substitution NOT saved.")
+                else:
+                    changes['substitutions'][rep_addr] = {
+                        'replace_lines': replace_lines,
+                        'with_lines':    with_lines,
+                    }
             else:
                 changes['warnings'].append("/replace/ block — could not determine address")
 
