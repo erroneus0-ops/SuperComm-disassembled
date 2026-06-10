@@ -512,8 +512,8 @@ def merge_into_json(json_path, changes, warn):
             r['format'] = action['format']
             if action.get('entries_per_line'):
                 r['entries_per_line'] = action['entries_per_line']
-            # Warn if fdb format on a region with odd byte count
-            if action['format'] == 'fdb' and 'start' in r and 'end' in r:
+            # Warn if fdb/hexdump format on a region with odd byte count
+            if action['format'] in ('fdb', 'hexdump') and 'start' in r and 'end' in r:
                 size = int(r['end'], 16) - int(r['start'], 16)
                 if size % 2 != 0:
                     warn(f"/format/ fdb on '{r.get('label','?')}' — region size is {size} bytes (odd). "

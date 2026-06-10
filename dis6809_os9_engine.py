@@ -347,8 +347,8 @@ class Project:
             if 'start' not in r: continue
             fmt = r.get('format', 'auto')
             epl = r.get('entries_per_line', None)
-            if epl and fmt == 'fdb':
-                fmt = f'fdb:{epl}'
+            if epl and fmt in ('fdb', 'hexdump'):
+                fmt = f'{fmt}:{epl}'
             p.data_regions.append({
                 'start':   int(r['start'], 16),
                 'end':     int(r['end'], 16) if 'end' in r else None,
@@ -1453,6 +1453,47 @@ class Engine:
             if fmt == 'raw':
                 out.append(f"         FCB    ${b:02X}")
                 i += 1; last_printable = False; continue
+
+            if fmt == 'hexdump' or fmt.startswith('hexdump:'):
+                # hexdump format: N FDBs per line (default 8 = 16 bytes)
+                # with ASCII comment column. FCB for odd trailing byte.
+                try:
+                    fdbs_per_line = int(fmt.split(':')[1]) if ':' in fmt else 8
+                except (IndexError, ValueError):
+                    fdbs_per_line = 8
+                bytes_per_line = fdbs_per_line * 2
+                # Collect one full line worth of bytes
+                line_bytes = []
+                while i < end and len(line_bytes) < bytes_per_line:
+                    line_bytes.append(d[i])
+                    i += 1
+                # Build FDB entries (pairs), FCB for odd trailing byte
+                entries = []
+                j = 0
+                while j + 1 <= len(line_bytes):
+                    if j + 1 < len(line_bytes):
+                        entries.append(f"${(line_bytes[j]<<8)|line_bytes[j+1]:04X}")
+                        j += 2
+                    else:
+                        entries.append(f"${line_bytes[j]:02X}")  # odd byte as FCB below
+                        j += 1
+                # Check if last entry is an odd byte
+                odd_byte = None
+                if len(line_bytes) % 2 != 0:
+                    odd_byte = line_bytes[-1]
+                    fdb_entries = entries[:-1]
+                else:
+                    fdb_entries = entries
+                # Build ASCII comment
+                ascii_chars = ''.join(
+                    chr(b) if 0x20 <= b < 0x7F else '.'
+                    for b in line_bytes
+                )
+                if fdb_entries:
+                    out.append(f"         FDB    {','.join(fdb_entries)}   ; {ascii_chars}")
+                if odd_byte is not None:
+                    out.append(f"         FCB    ${odd_byte:02X}   ; odd byte")
+                last_printable = False; continue
 
             # ── auto heuristics ───────────────────────────────────────
             # CRLF (only after printable)
