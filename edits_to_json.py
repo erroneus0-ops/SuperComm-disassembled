@@ -214,7 +214,7 @@ def parse_directives(lines, json_path=None):
     XREF_RE = re.compile(r';\s*[XYUS]\s*→\s*([A-Za-z_][A-Za-z0-9_]*)')
     # And LEAX/LEAY with PCR: $HHHH  30 8D xx xx   LEAX Label,PC
     LEAX_RE = re.compile(
-        r'^\$([0-9A-Fa-f]{4})\s+30 8D ([0-9A-Fa-f]{2}) ([0-9A-Fa-f]{2})\s')
+        r'^\$([0-9A-Fa-f]{4})\s+3[0123] 8D ([0-9A-Fa-f]{2}) ([0-9A-Fa-f]{2})\s')
 
     listing_labels = {}
 

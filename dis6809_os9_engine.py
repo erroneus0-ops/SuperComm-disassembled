@@ -766,8 +766,9 @@ class Engine:
         for r in self.project.data_regions:
             # Force the region start as DATA, and mark interior as forced
             add(r['start'], KIND_DATA)
-            for addr in range(r['start'], r['end']):
-                forced_data[addr] = True
+            if r['end'] is not None:
+                for addr in range(r['start'], r['end']):
+                    forced_data[addr] = True
 
         # ── Resolve final labels and regions ──────────────────────────
         labels  = {}
@@ -1553,8 +1554,9 @@ class Engine:
         # Build set of addresses inside declared data_regions (skip those)
         data_region_addrs = set()
         for r in proj.data_regions:
-            for a2 in range(r['start'], r['end']):
-                data_region_addrs.add(a2)
+            if r['end'] is not None:
+                for a2 in range(r['start'], r['end']):
+                    data_region_addrs.add(a2)
 
         for addr, lbl in list(lbs.items()):
             if addr >= exec_off and addr < crc_off:
@@ -1663,7 +1665,7 @@ class Engine:
                 # Build pre-exec format override map from data_regions
                 pre_fmt_map = {}  # addr -> (end, fmt, comment, end_label, label)
                 for r in proj.data_regions:
-                    if r['start'] < exec_off:
+                    if r['start'] < exec_off and r['end'] is not None:
                         pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
                                                     r.get('comment',''),
                                                     r.get('end_label', False),
