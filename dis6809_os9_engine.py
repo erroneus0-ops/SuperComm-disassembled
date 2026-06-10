@@ -134,7 +134,7 @@ WIN_ESC = {
 }
 
 SCF_CTRL = {
-    0x00:"NUL",0x01:"SOH",0x02:"CurXY",0x03:"ETX",0x04:"EOT",
+    0x00:"NUL",0x01:"SOH",0x02:"STX",0x03:"ETX",0x04:"EOT",
     0x07:"BEL",0x08:"BS", 0x09:"HT",  0x0A:"LF",
     0x0B:"VT cursor-up",  0x0C:"FF clear+home",
     0x0D:"CR", 0x0E:"SO cursor-right",0x0F:"SI cursor-left",
@@ -843,7 +843,7 @@ class Engine:
     def _char_ann(self, v):
         if 32<=v<127: return f"'{chr(v)}'"
         return {0x0D:'CR',0x0A:'LF',0x1B:'ESC',0x00:'NUL',
-                0x02:'CurXY',0x11:'XON',0x13:'XOFF',
+                0x11:'XON',0x13:'XOFF',
                 0x08:'BS',0x0C:'FF',0x1A:'SUB'}.get(v,'')
 
     def _cc_str(self, v):
@@ -1451,8 +1451,8 @@ class Engine:
                 lines, consumed = self._emit_win_esc(i, end)
                 out.extend(lines); i += consumed; last_printable = False; continue
 
-            # OS-9 CurXY
-            if b==0x02 and i+2<end:
+            # OS-9 CurXY — in data regions only (auto or writeblock format)
+            if b==0x02 and i+2<end and fmt in ('auto', 'writeblock'):
                 rb2=d[i+1]; cb2=d[i+2]
                 row=rb2-0x20; col=cb2-0x20
                 out.append(f"         FCB    CurXY,${rb2:02X},${cb2:02X}     ; CurXY(row={row},col={col})")
