@@ -334,9 +334,6 @@ def parse_directives(lines, json_path=None):
             else:
                 changes['warnings'].append(
                     f"/end-label/ — could not find preceding data label")
-            else:
-                changes['warnings'].append(
-                    f"/end-label/ at ${current_addr:04X} — could not find preceding data label")
 
         # ── /format/ name ────────────────────────────────────────────────────
         elif line.startswith('/format/'):
