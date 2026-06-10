@@ -373,14 +373,15 @@ def parse_directives(lines, json_path=None):
 
         # ── /format/ name ────────────────────────────────────────────────────
         elif line.startswith('/format/'):
-            fmt = line[len('/format/'):].strip()
+            parts = line[len('/format/'):].strip().split()
+            fmt = parts[0] if parts else 'auto'
+            epl = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else None
             lbl = current_data_label(lines, i)
             if lbl:
-                changes['data_regions'].append({
-                    'action': 'format',
-                    'label':  lbl,
-                    'format': fmt,
-                })
+                action = {'action': 'format', 'label': lbl, 'format': fmt}
+                if epl:
+                    action['entries_per_line'] = epl
+                changes['data_regions'].append(action)
             else:
                 changes['warnings'].append(f"/format/ '{fmt}' — could not find preceding data label")
 
@@ -509,6 +510,8 @@ def merge_into_json(json_path, changes, warn):
                 r['start'] = f"{action['label_addr']:04X}"
         elif action['action'] == 'format':
             r['format'] = action['format']
+            if action.get('entries_per_line'):
+                r['entries_per_line'] = action['entries_per_line']
         elif action['action'] == 'comment':
             r['comment'] = action['comment']
 

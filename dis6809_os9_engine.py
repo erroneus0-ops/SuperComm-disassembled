@@ -345,13 +345,17 @@ class Project:
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
             if 'start' not in r: continue
+            fmt = r.get('format', 'auto')
+            epl = r.get('entries_per_line', None)
+            if epl and fmt == 'fdb':
+                fmt = f'fdb:{epl}'
             p.data_regions.append({
                 'start':   int(r['start'], 16),
                 'end':     int(r['end'], 16) if 'end' in r else None,
                 'end_label': r.get('end_label', False),
                 'label':   r.get('label', f"Dat_{r['start']}"),
                 'comment': r.get('comment', ''),
-                'format':  r.get('format', 'auto'),  # 'auto','fdb','raw'
+                'format':  fmt,
             })
 
         # line_comments: "HHHH" -> "text"
@@ -1426,14 +1430,23 @@ class Engine:
                 # Body — fall through to auto heuristics below
                 fmt = 'auto'
 
-            if fmt == 'fdb':
+            if fmt == 'fdb' or fmt.startswith('fdb:'):
+                # Parse entries per line: 'fdb' = 1, 'fdb:8' = 8
+                try:
+                    epl = int(fmt.split(':')[1]) if ':' in fmt else 1
+                except (IndexError, ValueError):
+                    epl = 1
                 if i+1 < end:
                     v = (d[i]<<8)|d[i+1]
-                    out.append(f"         FDB    ${v:04X}")
-                    i += 2
+                    # Collect entries_per_line values then emit as one line
+                    entries = []
+                    while i+1 < end and len(entries) < epl:
+                        entries.append(f"${(d[i]<<8)|d[i+1]:04X}")
+                        i += 2
+                    out.append(f"         FDB    {','.join(entries)}")
                 else:
-                    # Odd byte at end of fdb region -- emit as FCB
-                    out.append(f"         FCB    ${d[i]:02X}")
+                    # Odd byte at end of fdb region -- emit as FCB with warning comment
+                    out.append(f"         FCB    ${d[i]:02X}               ; ODD BYTE — fdb region has uneven size")
                     i += 1
                 last_printable = False; continue
 
