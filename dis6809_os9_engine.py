@@ -1445,8 +1445,8 @@ class Engine:
                         i += 2
                     out.append(f"         FDB    {','.join(entries)}")
                 else:
-                    # Odd byte at end of fdb region -- emit as FCB with warning comment
-                    out.append(f"         FCB    ${d[i]:02X}               ; ODD BYTE — fdb region has uneven size")
+                    # Odd byte at end of fdb region -- emit as plain FCB
+                    out.append(f"         FCB    ${d[i]:02X}")
                     i += 1
                 last_printable = False; continue
 
