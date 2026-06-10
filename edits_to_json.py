@@ -326,24 +326,14 @@ def parse_directives(lines, json_path=None):
         elif line == '/end-label/':
             lbl = current_data_label(lines, i)
             if lbl:
-                # end_addr = address of next bare label after this directive
-                end_addr = None
-                for j in range(i + 1, len(lines)):
-                    nl = lines[j].rstrip()
-                    if nl.startswith('/') or nl.startswith(';') or nl == '':
-                        continue
-                    if LABEL_LINE_RE.match(nl):
-                        end_lbl = nl.strip()
-                        end_addr = label_to_addr.get(end_lbl)
-                        break
-                    if extract_addr(nl):
-                        break
                 changes['data_regions'].append({
                     'action':     'end_label',
                     'label':      lbl,
-                    'end_addr':   end_addr,
                     'label_addr': label_to_addr.get(lbl),
                 })
+            else:
+                changes['warnings'].append(
+                    f"/end-label/ — could not find preceding data label")
             else:
                 changes['warnings'].append(
                     f"/end-label/ at ${current_addr:04X} — could not find preceding data label")
@@ -482,9 +472,6 @@ def merge_into_json(json_path, changes, warn):
         r   = add_or_get_region(lbl)
         if action['action'] == 'end_label':
             r['end_label'] = True
-            if 'end' not in r and action.get('end_addr') is not None:
-                r['end'] = f"{action['end_addr']:04X}"
-            # Populate start from label address if known
             if 'start' not in r and action.get('label_addr') is not None:
                 r['start'] = f"{action['label_addr']:04X}"
         elif action['action'] == 'format':

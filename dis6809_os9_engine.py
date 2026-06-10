@@ -1665,8 +1665,9 @@ class Engine:
                 # Build pre-exec format override map from data_regions
                 pre_fmt_map = {}  # addr -> (end, fmt, comment, end_label, label)
                 for r in proj.data_regions:
-                    if r['start'] < exec_off and r['end'] is not None:
-                        pre_fmt_map[r['start']] = (r['end'], r.get('format','auto'),
+                    if r['start'] < exec_off:
+                        # end can be None — we'll use pend (natural boundary) instead
+                        pre_fmt_map[r['start']] = (r.get('end'), r.get('format','auto'),
                                                     r.get('comment',''),
                                                     r.get('end_label', False),
                                                     r.get('label', ''))
@@ -1689,7 +1690,7 @@ class Engine:
                     while cur < pend:
                         if cur in pre_fmt_map:
                             rend, rfmt, rcmt, r_end_label, r_label = pre_fmt_map[cur]
-                            rend = min(rend, pend)
+                            rend = min(rend, pend) if rend is not None else pend
                             if cur > paddr:
                                 out.extend(self.emit_data(paddr, cur, 
                                     {k:v for k,v in sub.items() if paddr <= k < cur}))
