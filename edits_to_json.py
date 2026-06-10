@@ -67,6 +67,34 @@ Directive syntax (all directives begin with / in column 1):
 
 import json
 import re
+
+
+def _count_data_bytes(lines):
+    """Count binary bytes represented by a list of FCB/FCC/FDB/FCS lines."""
+    total = 0
+    for line in lines:
+        s = line.strip()
+        if not s or s.startswith(';'):
+            continue
+        if ';' in s:
+            s = s[:s.index(';')].strip()
+        upper = s.upper()
+        if upper.startswith('FCB'):
+            args = s[3:].strip()
+            total += len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FDB'):
+            args = s[3:].strip()
+            total += 2 * len([a for a in args.split(',') if a.strip()])
+        elif upper.startswith('FCC') or upper.startswith('FCS'):
+            m = re.search(r'["\'](.+?)["\']', s)
+            if m:
+                total += len(m.group(1))
+        elif upper.startswith('RMB'):
+            try:
+                total += int(s[3:].strip())
+            except ValueError:
+                pass
+    return total
 import sys
 import os
 from collections import defaultdict
@@ -315,6 +343,13 @@ def parse_directives(lines, json_path=None):
             if rep_addr is None:
                 rep_addr = current_addr  # fall back to address context before /replace/
             if rep_addr is not None:
+                replace_count = _count_data_bytes(replace_lines)
+                with_count    = _count_data_bytes(with_lines)
+                if replace_count != with_count:
+                    changes['warnings'].append(
+                        f"/replace/ at ${rep_addr:04X} — size mismatch: "
+                        f"/replace/ = {replace_count} bytes, /with/ = {with_count} bytes. "
+                        f"This will break assembly.")
                 changes['substitutions'][rep_addr] = {
                     'replace_lines': replace_lines,
                     'with_lines':    with_lines,
