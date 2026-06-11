@@ -1535,6 +1535,38 @@ class Engine:
                     out.append(f"         FCB    ${odd_byte:02X}   ; odd byte")
                 last_printable = False; continue
 
+            if fmt == 'text':
+                # text format: emit FCC for printable runs, FCB for control bytes
+                # Collect a run of printable ASCII bytes
+                if 0x20 <= b <= 0x7E:
+                    # Gather printable run
+                    run_start = i
+                    run = []
+                    while i < end and 0x20 <= d[i] <= 0x7E:
+                        run.append(chr(d[i]))
+                        i += 1
+                    text = ''.join(run)
+                    # Escape quotes in the string
+                    if '"' in text:
+                        # Split on double quotes, emit as separate FCC/FCB
+                        parts = text.split('"')
+                        for j, part in enumerate(parts):
+                            if part:
+                                out.append(f'         FCC    "{part}"')
+                            if j < len(parts) - 1:
+                                out.append(f'         FCB    $22               ; "')
+                    else:
+                        out.append(f'         FCC    "{text}"')
+                    last_printable = True; continue
+                else:
+                    # Control/non-printable byte
+                    cm = {0x00:'NUL', 0x07:'BEL', 0x08:'BS', 0x09:'TAB',
+                          0x0A:'LF',  0x0C:'FF',  0x0D:'CR', 0x1B:'ESC',
+                          0x80:'hi-bit set'}.get(b, '')
+                    cmt = f' ; {cm}' if cm else ''
+                    out.append(f"         FCB    ${b:02X}{cmt}")
+                    i += 1; last_printable = False; continue
+
             # ── auto heuristics ───────────────────────────────────────
             # CRLF (only after printable)
             if b==0x0D and i+1<end and d[i+1]==0x0A and last_printable:
