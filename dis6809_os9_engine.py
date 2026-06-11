@@ -591,7 +591,17 @@ class Engine:
         crc_off  = self.crc_off
         refs     = {}   # addr -> set of kinds
 
+        # ── Build forced_data from declared data regions (before tracing) ──
+        forced_data = set()
+        for r in self.project.data_regions:
+            if r.get('end') is not None:
+                for addr in range(r['start'], r['end']):
+                    forced_data.add(addr)
+
         def add(addr, kind):
+            # If a code branch targets a declared data region, ignore it
+            if kind in (KIND_CODE, KIND_SUB, KIND_LOC) and addr in forced_data:
+                return
             if addr not in refs: refs[addr] = set()
             refs[addr].add(kind)
 
@@ -778,13 +788,9 @@ class Engine:
                 if stop: break
 
         # ── Apply project data_regions (override auto-classification) ──
-        forced_data = {}   # addr -> True
+        # forced_data already built before tracing — just force region starts as DATA
         for r in self.project.data_regions:
-            # Force the region start as DATA, and mark interior as forced
             add(r['start'], KIND_DATA)
-            if r['end'] is not None:
-                for addr in range(r['start'], r['end']) if r['end'] is not None else []:
-                    forced_data[addr] = True
 
         # ── Resolve final labels and regions ──────────────────────────
         labels  = {}
