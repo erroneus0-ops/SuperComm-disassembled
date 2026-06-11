@@ -404,6 +404,30 @@ def parse_directives(lines, json_path=None):
             else:
                 changes['warnings'].append(f"/format/ '{fmt}' — could not find preceding data label")
 
+        # ── /region/ $start $end [format] [label] ────────────────────────────
+        elif line.startswith('/region/'):
+            parts = line[len('/region/'):].strip().split()
+            if len(parts) < 2:
+                changes['warnings'].append(f"/region/ — expected '$start $end [format] [label]'")
+            else:
+                try:
+                    start_s = parts[0].lstrip('$')
+                    end_s   = parts[1].lstrip('$')
+                    start_v = int(start_s, 16)
+                    end_v   = int(end_s,   16)
+                    fmt     = parts[2] if len(parts) > 2 else 'auto'
+                    label   = parts[3] if len(parts) > 3 else ''
+                    changes['data_regions'].append({
+                        'action':    'region',
+                        'start':     f'{start_v:04X}',
+                        'end':       f'{end_v:04X}',
+                        'format':    fmt,
+                        'label':     label,
+                        'end_label': False,
+                    })
+                except ValueError:
+                    changes['warnings'].append(f"/region/ — invalid address in '{line.strip()}'")
+
         # ── /region-comment/ ... /end-region-comment/ ────────────────────────
         elif line == '/region-comment/':
             rc_lines = []
@@ -528,6 +552,23 @@ def merge_into_json(json_path, changes, warn):
         return r
 
     for action in changes['data_regions']:
+        if action['action'] == 'region':
+            # /region/ $start $end [format] [label] — add or replace by start address
+            start_key = action['start']
+            # Remove any existing regions that overlap this range
+            start_v = int(action['start'], 16)
+            end_v   = int(action['end'],   16)
+            regions[:] = [r for r in regions
+                          if not (int(r.get('start','0'),16) >= start_v and
+                                  (r.get('end') is None or int(r['end'],16) <= end_v))]
+            regions.append({
+                'start':     action['start'],
+                'end':       action['end'],
+                'format':    action.get('format', 'auto'),
+                'label':     action.get('label', ''),
+                'end_label': False,
+            })
+            continue
         lbl = action['label']
         r   = add_or_get_region(lbl)
         if action['action'] == 'end_label':
@@ -632,7 +673,7 @@ def main():
     n_bc      = len(changes['block_comments'])
     n_lc      = len(changes['line_comments'])
     n_subs    = len(changes['substitutions'])
-    n_regions = len(changes['data_regions'])
+    n_regions = len([r for r in changes['data_regions'] if r.get('action') in ('end_label','format','region','comment')])
     n_routines= len(changes['routines'])
 
     # Merge into JSON
