@@ -29,6 +29,8 @@ def s16(v): return v - 65536 if v >= 32768 else v
 
 KIND_CODE = 'CODE'
 KIND_DATA = 'DATA'
+KIND_SUB  = 'SUB'   # BSR/LBSR/JSR target — subroutine
+KIND_LOC  = 'LOC'   # BRA/LBRA/Bcc/LBcc target — branch location
 
 # ── OS-9 platform tables ──────────────────────────────────────────────────────
 
@@ -311,6 +313,8 @@ class Project:
         self.line_comments= {}        # int_addr -> comment_str
         self.block_comments={}        # int_addr -> [lines] before instruction
         self.custom_equates=[]        # extra EQU lines to prepend
+        self.emit_equates = True      # False = suppress built-in EQU block (use external defs)
+        self.defs_file    = None      # if set, emit 'use <defs_file>' instead of EQU block
         self.footnotes    = {}        # int -> {inline, detail:[lines]}
         self.patches      = {}        # int_addr -> [bytes_to_insert_before_addr]
         self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
@@ -330,6 +334,8 @@ class Project:
         p.output        = d.get('output', None)
         p.module_notes  = d.get('module_notes', [])
         p.custom_equates= d.get('custom_equates', [])
+        p.emit_equates  = d.get('emit_equates', True)
+        p.defs_file     = d.get('defs_file', None)
 
         # entry: hex string or None
         entry = d.get('entry', None)
@@ -347,8 +353,8 @@ class Project:
             if 'start' not in r: continue
             fmt = r.get('format', 'auto')
             epl = r.get('entries_per_line', None)
-            if epl and fmt == 'fdb':
-                fmt = f'fdb:{epl}'
+            if epl and fmt in ('fdb', 'hexdump'):
+                fmt = f'{fmt}:{epl}'
             p.data_regions.append({
                 'start':   int(r['start'], 16),
                 'end':     int(r['end'], 16) if 'end' in r else None,
@@ -413,6 +419,8 @@ class Project:
             'entry':   f'{self.entry:04X}' if self.entry else None,
             'module_notes':   self.module_notes,
             'custom_equates': self.custom_equates,
+            'emit_equates':   self.emit_equates,
+            'defs_file':      self.defs_file,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
             'data_regions':   [
@@ -591,9 +599,8 @@ class Engine:
         add(exec_off, KIND_CODE)
         for addr, name in self.project.labels.items():
             if exec_off <= addr < crc_off:
-                # Project labels in code section are assumed CODE
-                # unless they're in a declared data_region
-                add(addr, KIND_CODE)
+                # Project labels in code section are assumed subroutines
+                add(addr, KIND_SUB)
 
         visited  = set()
         worklist = [exec_off] + [a for a in self.project.labels
@@ -620,27 +627,29 @@ class Engine:
 
                 stop = False
 
-                # ── branches / calls → CODE ───────────────────────────
+                # ── branches / calls → SUB or LOC ────────────────────
                 if op in range(0x20, 0x30):          # short branches
                     off = s8(d[pos]); pos += 1
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off
+                    add(t, KIND_SUB if op == 0x8D else KIND_LOC)
+                    worklist.append(t)
                     if op == 0x20: stop = True       # BRA unconditional
                 elif op == 0x8D:                     # BSR
                     off = s8(d[pos]); pos += 1
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_SUB); worklist.append(t)
                 elif op == 0x17:                     # LBSR
                     off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_SUB); worklist.append(t)
                 elif op == 0x16:                     # LBRA
                     off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_LOC); worklist.append(t)
                     stop = True
                 elif op == 0x7E:                     # JMP ext
                     t = (d[pos]<<8)|d[pos+1]; pos += 2
-                    add(t, KIND_CODE); worklist.append(t); stop = True
+                    add(t, KIND_LOC); worklist.append(t); stop = True
                 elif op == 0xBD:                     # JSR ext
                     t = (d[pos]<<8)|d[pos+1]; pos += 2
-                    add(t, KIND_CODE); worklist.append(t)
+                    add(t, KIND_SUB); worklist.append(t)
                 elif op in (0x39, 0x3B):             # RTS, RTI
                     stop = True
                 elif op == 0x35:                     # PULS
@@ -669,17 +678,17 @@ class Engine:
                     op2 = d[pos]; pos += 1
                     if op2 in range(0x21, 0x30):
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t)
                         if op2 == 0x16: stop = True
                     elif op2 == 0x16:  # 6309 LBRA
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t); stop = True
                     elif op2 == 0x17:  # 6309 LBSR
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                        t = pos + off; add(t, KIND_SUB); worklist.append(t)
                     elif op2 == 0x20:  # 6309 LBRA variant
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t); stop = True
                     elif op2 == 0x3F:   # OS9 syscall
                         sc = d[pos]; pos += 1
                         if sc == 0x8A and ctx_leax_x is not None:  # I$Write
@@ -736,9 +745,12 @@ class Engine:
                     0xEA,0xEB,0xEC,0xED,0xEE,0xEF):
                     pos, t = self._decode_indexed_pb(pos)
                     if t is not None:
-                        kind = KIND_CODE if op == 0xAD else KIND_DATA
-                        add(t, kind)
-                        if op == 0xAD: worklist.append(t)
+                        if op == 0xAD:   # JSR indexed
+                            add(t, KIND_SUB); worklist.append(t)
+                        elif op == 0x6E: # JMP indexed
+                            add(t, KIND_LOC); worklist.append(t)
+                        else:
+                            add(t, KIND_DATA)
                     if op == 0x6E: stop = True     # JMP indexed
 
                 # ── immediate/direct/extended — advance over operands ──
@@ -785,11 +797,20 @@ class Engine:
             elif addr >= crc_off:
                 pass
             else:
-                # CODE wins unless address is inside a forced data region
+                # Forced data region overrides everything
                 if addr in forced_data:
                     regions[addr] = KIND_DATA
                     labels[addr]  = f"Dat_{addr:04X}"
+                elif KIND_SUB in kinds:
+                    # BSR/JSR target — subroutine
+                    regions[addr] = KIND_CODE
+                    labels[addr]  = f"Sub_{addr:04X}"
+                elif KIND_LOC in kinds:
+                    # Branch target — location label
+                    regions[addr] = KIND_CODE
+                    labels[addr]  = f"Loc_{addr:04X}"
                 elif KIND_CODE in kinds:
+                    # Generic code (entry point, project label, etc.)
                     regions[addr] = KIND_CODE
                     labels[addr]  = f"Sub_{addr:04X}"
                 else:
@@ -838,7 +859,7 @@ class Engine:
         self.xrefs = xrefs
 
         n_data = sum(1 for a,k in regions.items() if k==KIND_DATA and a>=exec_off)
-        n_code = sum(1 for k in regions.values() if k==KIND_CODE)
+        n_code = sum(1 for k in regions.values() if k in (KIND_CODE, KIND_SUB, KIND_LOC))
         print(f"; Pass 1: {len(labels)} labels  "
               f"({n_code} code  {n_data} data in code section)",
               file=sys.stderr)
@@ -1079,6 +1100,19 @@ class Engine:
             elif op2==0x39: v=rb(); mn='LDMD';  op_str=f'#${v:02X}'; cm='6309: load MD register'; self.found_6309=True
             else:
                 mn='FCB'; op_str=f'$11,${op2:02X}'; cm=f'unknown opcode $11{op2:02X}'
+        # ── $00-$0F direct page ──────────────────────────────────────────────
+        elif op==0x00: v=rb(); mn='NEG'; op_str=f'<${v:02X}'
+        elif op==0x03: v=rb(); mn='COM'; op_str=f'<${v:02X}'
+        elif op==0x04: v=rb(); mn='LSR'; op_str=f'<${v:02X}'
+        elif op==0x06: v=rb(); mn='ROR'; op_str=f'<${v:02X}'
+        elif op==0x07: v=rb(); mn='ASR'; op_str=f'<${v:02X}'
+        elif op==0x08: v=rb(); mn='LSL'; op_str=f'<${v:02X}'
+        elif op==0x09: v=rb(); mn='ROL'; op_str=f'<${v:02X}'
+        elif op==0x0A: v=rb(); mn='DEC'; op_str=f'<${v:02X}'
+        elif op==0x0C: v=rb(); mn='INC'; op_str=f'<${v:02X}'
+        elif op==0x0D: v=rb(); mn='TST'; op_str=f'<${v:02X}'
+        elif op==0x0E: v=rb(); mn='JMP'; op_str=f'<${v:02X}'
+        elif op==0x0F: v=rb(); mn='CLR'; op_str=f'<${v:02X}'
         elif op==0x12: mn='NOP'
         elif op==0x13: mn='SYNC'; cm='wait for interrupt'
         elif op==0x16: l,t=rel16(); mn='LBRA'; op_str=l
@@ -1454,6 +1488,47 @@ class Engine:
                 out.append(f"         FCB    ${b:02X}")
                 i += 1; last_printable = False; continue
 
+            if fmt == 'hexdump' or fmt.startswith('hexdump:'):
+                # hexdump format: N FDBs per line (default 8 = 16 bytes)
+                # with ASCII comment column. FCB for odd trailing byte.
+                try:
+                    fdbs_per_line = int(fmt.split(':')[1]) if ':' in fmt else 8
+                except (IndexError, ValueError):
+                    fdbs_per_line = 8
+                bytes_per_line = fdbs_per_line * 2
+                # Collect one full line worth of bytes
+                line_bytes = []
+                while i < end and len(line_bytes) < bytes_per_line:
+                    line_bytes.append(d[i])
+                    i += 1
+                # Build FDB entries (pairs), FCB for odd trailing byte
+                entries = []
+                j = 0
+                while j + 1 <= len(line_bytes):
+                    if j + 1 < len(line_bytes):
+                        entries.append(f"${(line_bytes[j]<<8)|line_bytes[j+1]:04X}")
+                        j += 2
+                    else:
+                        entries.append(f"${line_bytes[j]:02X}")  # odd byte as FCB below
+                        j += 1
+                # Check if last entry is an odd byte
+                odd_byte = None
+                if len(line_bytes) % 2 != 0:
+                    odd_byte = line_bytes[-1]
+                    fdb_entries = entries[:-1]
+                else:
+                    fdb_entries = entries
+                # Build ASCII comment
+                ascii_chars = ''.join(
+                    chr(b) if 0x20 <= b < 0x7F else '.'
+                    for b in line_bytes
+                )
+                if fdb_entries:
+                    out.append(f"         FDB    {','.join(fdb_entries)}   ; {ascii_chars}")
+                if odd_byte is not None:
+                    out.append(f"         FCB    ${odd_byte:02X}   ; odd byte")
+                last_printable = False; continue
+
             # ── auto heuristics ───────────────────────────────────────
             # CRLF (only after printable)
             if b==0x0D and i+1<end and d[i+1]==0x0A and last_printable:
@@ -1591,7 +1666,11 @@ class Engine:
                             break
 
         # ── File header ───────────────────────────────────────────────
-        out.append(EQUATES_BLOCK)
+        if proj.defs_file:
+            out.append(f"         use     {proj.defs_file}")
+            out.append("")
+        elif proj.emit_equates:
+            out.append(EQUATES_BLOCK)
         if proj.custom_equates:
             out.append("; ── Project-specific equates ──")
             out.extend(proj.custom_equates)
@@ -2045,10 +2124,28 @@ class Engine:
                 if is_ret and pos < span_end:
                     nxt = min((a for a in lbs if pos<=a<span_end), default=span_end)
                     if nxt > pos:
-                        pad = d[pos:nxt]
-                        if pad:
-                            args = ','.join(f'${b:02X}' for b in pad)
-                            out.append(f"         FCB    {args}  ; unreachable padding")
+                        # Attempt to disassemble gap as code rather than padding
+                        gap_pos = pos
+                        out.append("")
+                        while gap_pos < nxt:
+                            res = self.decode_one(gap_pos)
+                            if res is None:
+                                # Truly undecipherable — emit as FCB
+                                out.append(f"         FCB    ${d[gap_pos]:02X}"
+                                           f"                ; undefined opcode ${d[gap_pos]:02X}"
+                                           f" -- not a valid 6809 instruction")
+                                gap_pos += 1
+                            else:
+                                gmn, gop, gcm, graw, gnxt = res
+                                glbl = lbs.get(gap_pos, '')
+                                glbl_str = f"{glbl}:" if glbl else ''
+                                gcmt = f'   ; {gcm}' if gcm else ''
+                                hex_bytes = ' '.join(f'{b:02X}' for b in graw)
+                                out.append(
+                                    f"${gap_pos:04X}  {hex_bytes:<20}"
+                                    f"  {glbl_str:<20} {gmn} {gop}{gcmt}"
+                                )
+                                gap_pos = gnxt
                         pos = nxt; prev_ret = False
 
         out += [
@@ -2316,6 +2413,144 @@ def _import_project(old_proj, old_json_path, new_json_path, actual_crc):
     return new
 
 
+def _print_anomaly_report(eng, source):
+    """
+    Print an anomaly report covering:
+    1. Unreferenced labels — labels with no xref (no 'Referenced by')
+    2. Code overlaps — forced_equs entries (branch targets mid-instruction)
+    3. Mid-data references — labels inside declared data regions
+    """
+    exec_off = eng.exec_off
+    crc_off  = eng.crc_off
+    labels   = eng.labels
+    regions  = eng.regions
+    xrefs    = eng.xrefs
+    proj     = eng.project
+
+    print(f"\n{'='*62}")
+    print(f"ANOMALY REPORT: {source}")
+    print(f"{'='*62}\n")
+
+    # ── 1. Unreferenced labels ────────────────────────────────────────────
+    # Labels in pre-exec OR data regions in code section with no xref entry
+    # Build set of addresses covered by declared data regions
+    # to filter out sub-labels within known regions
+    declared_region_addrs = set()
+    for r in proj.data_regions:
+        if r.get('start') is not None and r.get('end') is not None:
+            for a in range(r['start'], r['end']):
+                declared_region_addrs.add(a)
+
+    unreferenced = []
+    for addr, lbl in sorted(labels.items()):
+        if addr < 0 or addr >= crc_off:
+            continue  # skip invalid addresses
+        if addr == exec_off:
+            continue  # Init is always unreferenced in xrefs
+        if addr in proj.labels:
+            continue  # analyst-named labels are intentional
+        if addr in declared_region_addrs and addr != min(declared_region_addrs):
+            continue  # sub-label inside a declared region — expected
+        if regions.get(addr) == KIND_DATA:
+            if addr not in xrefs or not xrefs[addr]:
+                unreferenced.append((addr, lbl))
+
+    if unreferenced:
+        print(f"UNREFERENCED LABELS ({len(unreferenced)}):")
+        print(f"  These labels have no 'Referenced by' entry.")
+        print(f"  May indicate mid-data references from non-LEA instructions,")
+        print(f"  computed addresses, or data values misread as pointers.\n")
+        for addr, lbl in unreferenced:
+            region = 'pre-exec' if addr < exec_off else 'code section'
+            print(f"  ${addr:04X}  {lbl:<20}  ({region})")
+        print()
+    else:
+        print("UNREFERENCED LABELS: none\n")
+
+    # Build branch caller map for forced_equs
+    # xrefs only captures LEA instructions — need to scan branches too
+    branch_callers = {}
+    d = eng.data
+    pos = exec_off
+
+    def _bs8(v):  return v - 256 if v >= 128 else v
+    def _bs16(v): return v - 65536 if v >= 32768 else v
+
+    while pos < crc_off - 3:
+        op = d[pos]
+        t = None
+        adv = 1
+        if op in range(0x20, 0x30):
+            t = pos + 2 + _bs8(d[pos+1]); adv = 2
+        elif op in (0x16, 0x17):
+            t = pos + 3 + _bs16((d[pos+1]<<8)|d[pos+2]); adv = 3
+        elif op == 0x10:
+            op2 = d[pos+1]
+            if op2 in range(0x21, 0x30) or op2 in range(0x81, 0x90):
+                t = pos + 4 + _bs16((d[pos+2]<<8)|d[pos+3]); adv = 4
+            else: adv = 1
+        if t is not None:
+            if t not in branch_callers: branch_callers[t] = []
+            branch_callers[t].append(pos)
+        pos += adv
+
+    # ── 2. Code overlaps (forced_equs) ───────────────────────────────────
+    forced = eng.project.forced_equs
+    if forced:
+        print(f"CODE OVERLAPS / FORCED EQUS ({len(forced)}):")
+        print(f"  Branch targets that land inside an existing instruction.")
+        print(f"  'No callers' may indicate a false positive from data values.\n")
+        for addr in sorted(forced.keys()):
+            lbl  = labels.get(addr, f'${addr:04X}')
+            note = forced[addr] if isinstance(forced[addr], str) else ''
+            callers = branch_callers.get(addr, [])
+            caller_str = ', '.join(labels.get(c, f'${c:04X}') for c in callers)
+            flag = '*** REAL OVERLAP ***' if callers else '(no callers — suspected false positive)'
+            print(f"  ${addr:04X}  {lbl:<20}  {flag}")
+            if callers:
+                print(f"         callers: {caller_str}")
+            if note:
+                print(f"         {note}")
+            print()
+    else:
+        print("CODE OVERLAPS: none\n")
+
+    # ── 3. Mid-data references ───────────────────────────────────────────
+    # Labels that fall inside a known data span (between two other data labels)
+    # i.e. the label address is > start of a data block but < the next label
+    pre_exec_labels = sorted(
+        [(a, l) for a, l in labels.items() if a < exec_off],
+        key=lambda x: x[0]
+    )
+    mid_data = []
+    for i, (addr, lbl) in enumerate(pre_exec_labels):
+        if addr in xrefs and xrefs[addr]:
+            continue  # has a proper reference
+        if addr in [a for a,_ in pre_exec_labels if a == addr]:
+            # Check if this address falls inside a string/data run
+            # by checking if adjacent bytes are printable ASCII
+            d = eng.data
+            prev_byte = d[addr-1] if addr > 0 else 0
+            if 0x20 <= prev_byte < 0x7F:
+                mid_data.append((addr, lbl))
+
+    if mid_data:
+        print(f"SUSPECTED MID-DATA REFERENCES ({len(mid_data)}):")
+        print(f"  Labels that appear to fall inside continuous data blocks.\n")
+        for addr, lbl in mid_data:
+            d = eng.data
+            context = ''.join(
+                chr(b) if 0x20 <= b < 0x7F else '.'
+                for b in d[max(0,addr-8):addr+8]
+            )
+            print(f"  ${addr:04X}  {lbl:<20}  context: ...{context}...")
+        print()
+    else:
+        print("SUSPECTED MID-DATA REFERENCES: none\n")
+
+    print(f"{'='*62}\n")
+
+
 def main():
     import argparse, sys, os
 
@@ -2344,6 +2579,9 @@ Examples:
     parser.add_argument('--update-labels', action='store_true',
         help='Merge auto-generated labels into the project JSON '
              '(preserves existing names, adds only new ones)')
+    parser.add_argument('--report', action='store_true',
+        help='Print anomaly report: unreferenced labels, overlaps, '
+             'mid-data references')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
         help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
@@ -2510,7 +2748,7 @@ Examples:
     # ── --stats ───────────────────────────────────────────────────────────
     if args.stats:
         exec_off = eng.exec_off
-        n_code = sum(1 for k in eng.regions.values() if k == KIND_CODE)
+        n_code = sum(1 for k in eng.regions.values() if k in (KIND_CODE, KIND_SUB, KIND_LOC))
         n_data = sum(1 for a,k in eng.regions.items()
                      if k == KIND_DATA and a >= exec_off)
         n_pre  = sum(1 for a,k in eng.regions.items()
@@ -2535,6 +2773,11 @@ Examples:
                 added += 1
         proj.to_json(json_path)
         print(f"Added {added} labels to {json_path}")
+        return
+
+    # ── --report ──────────────────────────────────────────────────────────
+    if args.report:
+        _print_anomaly_report(eng, source)
         return
 
     # ── Render and write ──────────────────────────────────────────────────

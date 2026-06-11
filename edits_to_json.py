@@ -167,6 +167,7 @@ def parse_directives(lines, json_path=None):
 
     changes = {
         'labels':          {},   # addr -> name
+        'bss':             {},   # offset -> name
         'block_comments':  {},   # addr -> [lines]
         'line_comments':   {},   # addr -> text
         'substitutions':   {},   # addr -> {replace_bytes, with_lines}
@@ -306,6 +307,24 @@ def parse_directives(lines, json_path=None):
                 changes['labels'][addr] = name
             else:
                 changes['warnings'].append(f"/label/ '{name}' — could not find address")
+
+        # ── /bss/ $offset name ────────────────────────────────────────────────
+        elif line.startswith('/bss/'):
+            parts = line[len('/bss/'):].strip().split()
+            if len(parts) >= 2:
+                offset_str, name = parts[0], parts[1]
+                try:
+                    if offset_str.startswith('$'):
+                        offset = int(offset_str[1:], 16)
+                    elif offset_str.startswith('0x') or offset_str.startswith('0X'):
+                        offset = int(offset_str, 16)
+                    else:
+                        offset = int(offset_str)
+                    changes['bss'][offset] = name
+                except ValueError:
+                    changes['warnings'].append(f"/bss/ — invalid offset '{offset_str}'")
+            else:
+                changes['warnings'].append(f"/bss/ — expected '$offset name'")
 
         # ── /comment/ ... /end-comment/ ──────────────────────────────────────
         elif line == '/comment/':
@@ -464,7 +483,14 @@ def merge_into_json(json_path, changes, warn):
         existing_labels[key] = name
     d['labels'] = dict(sorted(existing_labels.items()))
 
-    # ── block_comments ───────────────────────────────────────────────────────
+    # ── bss ──────────────────────────────────────────────────────────────────
+    existing_bss = d.get('bss', {})
+    for offset, name in changes['bss'].items():
+        key = str(offset)
+        if key in existing_bss and existing_bss[key] != name:
+            warn(f"BSS at ${offset:04X} renamed: '{existing_bss[key]}' → '{name}'")
+        existing_bss[key] = name
+    d['bss'] = dict(sorted(existing_bss.items(), key=lambda x: int(x[0])))
     bc = d.get('block_comments', {})
     for addr, lines in changes['block_comments'].items():
         bc[f'{addr:04X}'] = lines
@@ -602,6 +628,7 @@ def main():
 
     # Count meaningful changes
     n_labels  = len(changes['labels'])
+    n_bss     = len(changes['bss'])
     n_bc      = len(changes['block_comments'])
     n_lc      = len(changes['line_comments'])
     n_subs    = len(changes['substitutions'])
@@ -614,6 +641,7 @@ def main():
     print()
     print("Changes applied:")
     print(f"  Labels:          {n_labels}")
+    print(f"  BSS names:       {n_bss}")
     print(f"  Block comments:  {n_bc}")
     print(f"  Line comments:   {n_lc}")
     print(f"  Substitutions:   {n_subs}")

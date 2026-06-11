@@ -131,6 +131,21 @@
       "label": "Dat_0322",
       "end_label": true,
       "start": "0322"
+    },
+    {
+      "label": "Dat_04B1",
+      "end_label": true,
+      "start": "04B1"
+    },
+    {
+      "label": "Dat_04E5",
+      "end_label": true,
+      "start": "04E5"
+    },
+    {
+      "label": "Dat_04EA",
+      "end_label": true,
+      "start": "04EA"
     }
   ],
   "line_comments": {},
@@ -211,6 +226,33 @@
       ],
       "with": [
         "         FDB    Dat_0322end-Dat_0322-2 ;Message byte length"
+      ]
+    },
+    "04B1": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $28               ; '('"
+      ],
+      "with": [
+        "         FDB    Dat_04B1end-Dat_04B1-2  ; byte count of message"
+      ]
+    },
+    "04E5": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $03               ; ETX"
+      ],
+      "with": [
+        "         FDB    Dat_04E5end-Dat_04E5-2  ; byte count of message"
+      ]
+    },
+    "04EA": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $03               ; ETX"
+      ],
+      "with": [
+        "         FDB    Dat_04EAend-Dat_04EA-2  ; byte count of message"
       ]
     }
   },

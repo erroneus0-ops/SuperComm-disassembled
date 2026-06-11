@@ -612,8 +612,7 @@ Dat_0499
 
 Dat_04B1
 ; Referenced by: $3401
-         FCB    $00               ; NUL
-         FCB    $28               ; '('
+         FDB    Dat_04B1end-Dat_04B1-2  ; byte count of message
          FCB    CurXY,$2E,$23     ; CurXY(row=14,col=3)
          FCC    "Count  "
          FCB    CurXY,$2E,$25     ; CurXY(row=14,col=5)
@@ -622,6 +621,7 @@ Dat_04B1
          FCC    "<Space> aborts"
          FCB    $05               ; $05
          FCB    $20               ; ' '
+Dat_04B1end
 
 Dat_04DB
 ; Referenced by: $340B
@@ -631,15 +631,15 @@ Dat_04DB
 
 Dat_04E5
 ; Referenced by: $3415, $34E0
-         FCB    $00               ; NUL
-         FCB    $03               ; ETX
+         FDB    Dat_04E5end-Dat_04E5-2  ; byte count of message
          FCB    CurXY,$37,$23     ; CurXY(row=23,col=3)
+Dat_04E5end
 
 Dat_04EA
 ; Referenced by: $34C9
-         FCB    $00               ; NUL
-         FCB    $03               ; ETX
+         FDB    Dat_04EAend-Dat_04EA-2  ; byte count of message
          FCB    CurXY,$37,$25     ; CurXY(row=23,col=5)
+Dat_04EAend
 
 Dat_04EF
 ; Referenced by: $36F7, $3755
