@@ -29,6 +29,8 @@ def s16(v): return v - 65536 if v >= 32768 else v
 
 KIND_CODE = 'CODE'
 KIND_DATA = 'DATA'
+KIND_SUB  = 'SUB'   # BSR/LBSR/JSR target — subroutine
+KIND_LOC  = 'LOC'   # BRA/LBRA/Bcc/LBcc target — branch location
 
 # ── OS-9 platform tables ──────────────────────────────────────────────────────
 
@@ -591,9 +593,8 @@ class Engine:
         add(exec_off, KIND_CODE)
         for addr, name in self.project.labels.items():
             if exec_off <= addr < crc_off:
-                # Project labels in code section are assumed CODE
-                # unless they're in a declared data_region
-                add(addr, KIND_CODE)
+                # Project labels in code section are assumed subroutines
+                add(addr, KIND_SUB)
 
         visited  = set()
         worklist = [exec_off] + [a for a in self.project.labels
@@ -620,27 +621,29 @@ class Engine:
 
                 stop = False
 
-                # ── branches / calls → CODE ───────────────────────────
+                # ── branches / calls → SUB or LOC ────────────────────
                 if op in range(0x20, 0x30):          # short branches
                     off = s8(d[pos]); pos += 1
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off
+                    add(t, KIND_SUB if op == 0x8D else KIND_LOC)
+                    worklist.append(t)
                     if op == 0x20: stop = True       # BRA unconditional
                 elif op == 0x8D:                     # BSR
                     off = s8(d[pos]); pos += 1
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_SUB); worklist.append(t)
                 elif op == 0x17:                     # LBSR
                     off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_SUB); worklist.append(t)
                 elif op == 0x16:                     # LBRA
                     off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                    t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                    t = pos + off; add(t, KIND_LOC); worklist.append(t)
                     stop = True
                 elif op == 0x7E:                     # JMP ext
                     t = (d[pos]<<8)|d[pos+1]; pos += 2
-                    add(t, KIND_CODE); worklist.append(t); stop = True
+                    add(t, KIND_LOC); worklist.append(t); stop = True
                 elif op == 0xBD:                     # JSR ext
                     t = (d[pos]<<8)|d[pos+1]; pos += 2
-                    add(t, KIND_CODE); worklist.append(t)
+                    add(t, KIND_SUB); worklist.append(t)
                 elif op in (0x39, 0x3B):             # RTS, RTI
                     stop = True
                 elif op == 0x35:                     # PULS
@@ -669,17 +672,17 @@ class Engine:
                     op2 = d[pos]; pos += 1
                     if op2 in range(0x21, 0x30):
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t)
                         if op2 == 0x16: stop = True
                     elif op2 == 0x16:  # 6309 LBRA
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t); stop = True
                     elif op2 == 0x17:  # 6309 LBSR
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t)
+                        t = pos + off; add(t, KIND_SUB); worklist.append(t)
                     elif op2 == 0x20:  # 6309 LBRA variant
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
-                        t = pos + off; add(t, KIND_CODE); worklist.append(t); stop = True
+                        t = pos + off; add(t, KIND_LOC); worklist.append(t); stop = True
                     elif op2 == 0x3F:   # OS9 syscall
                         sc = d[pos]; pos += 1
                         if sc == 0x8A and ctx_leax_x is not None:  # I$Write
@@ -736,9 +739,12 @@ class Engine:
                     0xEA,0xEB,0xEC,0xED,0xEE,0xEF):
                     pos, t = self._decode_indexed_pb(pos)
                     if t is not None:
-                        kind = KIND_CODE if op == 0xAD else KIND_DATA
-                        add(t, kind)
-                        if op == 0xAD: worklist.append(t)
+                        if op == 0xAD:   # JSR indexed
+                            add(t, KIND_SUB); worklist.append(t)
+                        elif op == 0x6E: # JMP indexed
+                            add(t, KIND_LOC); worklist.append(t)
+                        else:
+                            add(t, KIND_DATA)
                     if op == 0x6E: stop = True     # JMP indexed
 
                 # ── immediate/direct/extended — advance over operands ──
@@ -785,11 +791,20 @@ class Engine:
             elif addr >= crc_off:
                 pass
             else:
-                # CODE wins unless address is inside a forced data region
+                # Forced data region overrides everything
                 if addr in forced_data:
                     regions[addr] = KIND_DATA
                     labels[addr]  = f"Dat_{addr:04X}"
+                elif KIND_SUB in kinds:
+                    # BSR/JSR target — subroutine
+                    regions[addr] = KIND_CODE
+                    labels[addr]  = f"Sub_{addr:04X}"
+                elif KIND_LOC in kinds:
+                    # Branch target — location label
+                    regions[addr] = KIND_CODE
+                    labels[addr]  = f"Loc_{addr:04X}"
                 elif KIND_CODE in kinds:
+                    # Generic code (entry point, project label, etc.)
                     regions[addr] = KIND_CODE
                     labels[addr]  = f"Sub_{addr:04X}"
                 else:
@@ -838,7 +853,7 @@ class Engine:
         self.xrefs = xrefs
 
         n_data = sum(1 for a,k in regions.items() if k==KIND_DATA and a>=exec_off)
-        n_code = sum(1 for k in regions.values() if k==KIND_CODE)
+        n_code = sum(1 for k in regions.values() if k in (KIND_CODE, KIND_SUB, KIND_LOC))
         print(f"; Pass 1: {len(labels)} labels  "
               f"({n_code} code  {n_data} data in code section)",
               file=sys.stderr)
@@ -2411,21 +2426,51 @@ def _print_anomaly_report(eng, source):
     else:
         print("UNREFERENCED LABELS: none\n")
 
+    # Build branch caller map for forced_equs
+    # xrefs only captures LEA instructions — need to scan branches too
+    branch_callers = {}
+    d = eng.data
+    pos = exec_off
+
+    def _bs8(v):  return v - 256 if v >= 128 else v
+    def _bs16(v): return v - 65536 if v >= 32768 else v
+
+    while pos < crc_off - 3:
+        op = d[pos]
+        t = None
+        adv = 1
+        if op in range(0x20, 0x30):
+            t = pos + 2 + _bs8(d[pos+1]); adv = 2
+        elif op in (0x16, 0x17):
+            t = pos + 3 + _bs16((d[pos+1]<<8)|d[pos+2]); adv = 3
+        elif op == 0x10:
+            op2 = d[pos+1]
+            if op2 in range(0x21, 0x30) or op2 in range(0x81, 0x90):
+                t = pos + 4 + _bs16((d[pos+2]<<8)|d[pos+3]); adv = 4
+            else: adv = 1
+        if t is not None:
+            if t not in branch_callers: branch_callers[t] = []
+            branch_callers[t].append(pos)
+        pos += adv
+
     # ── 2. Code overlaps (forced_equs) ───────────────────────────────────
     forced = eng.project.forced_equs
     if forced:
         print(f"CODE OVERLAPS / FORCED EQUS ({len(forced)}):")
         print(f"  Branch targets that land inside an existing instruction.")
-        print(f"  These indicate binary corruption or unusual coding.\n")
+        print(f"  'No callers' may indicate a false positive from data values.\n")
         for addr in sorted(forced.keys()):
             lbl  = labels.get(addr, f'${addr:04X}')
             note = forced[addr] if isinstance(forced[addr], str) else ''
-            callers = xrefs.get(addr, [])
+            callers = branch_callers.get(addr, [])
             caller_str = ', '.join(labels.get(c, f'${c:04X}') for c in callers)
-            print(f"  ${addr:04X}  {lbl:<20}  callers: {caller_str or 'none'}")
+            flag = '*** REAL OVERLAP ***' if callers else '(no callers — suspected false positive)'
+            print(f"  ${addr:04X}  {lbl:<20}  {flag}")
+            if callers:
+                print(f"         callers: {caller_str}")
             if note:
                 print(f"         {note}")
-        print()
+            print()
     else:
         print("CODE OVERLAPS: none\n")
 
@@ -2662,7 +2707,7 @@ Examples:
     # ── --stats ───────────────────────────────────────────────────────────
     if args.stats:
         exec_off = eng.exec_off
-        n_code = sum(1 for k in eng.regions.values() if k == KIND_CODE)
+        n_code = sum(1 for k in eng.regions.values() if k in (KIND_CODE, KIND_SUB, KIND_LOC))
         n_data = sum(1 for a,k in eng.regions.items()
                      if k == KIND_DATA and a >= exec_off)
         n_pre  = sum(1 for a,k in eng.regions.items()
