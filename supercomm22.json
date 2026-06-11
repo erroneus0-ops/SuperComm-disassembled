@@ -1,6 +1,6 @@
 {
   "binary": "supercomm22",
-  "binary_crc": "800FE3",
+  "binary_crc": "4AF84343827B17B3",
   "cpu": "6809",
   "output": "supercomm22_proj.asm",
   "entry": null,

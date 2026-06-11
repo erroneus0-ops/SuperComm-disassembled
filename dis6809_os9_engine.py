@@ -783,7 +783,7 @@ class Engine:
             # Force the region start as DATA, and mark interior as forced
             add(r['start'], KIND_DATA)
             if r['end'] is not None:
-                for addr in range(r['start'], r['end']):
+                for addr in range(r['start'], r['end']) if r['end'] is not None else []:
                     forced_data[addr] = True
 
         # ── Resolve final labels and regions ──────────────────────────
@@ -1643,7 +1643,7 @@ class Engine:
         data_region_addrs = set()
         for r in proj.data_regions:
             if r['end'] is not None:
-                for a2 in range(r['start'], r['end']):
+                for a2 in range(r['start'], r['end']) if r['end'] is not None else []:
                     data_region_addrs.add(a2)
 
         for addr, lbl in list(lbs.items()):
@@ -1862,7 +1862,7 @@ class Engine:
                 is_parent_region_start = bool(proj_r)
                 if not proj_r:
                     for r in proj.data_regions:
-                        if r['start'] <= span_start < r['end']:
+                        if r['end'] is not None and r['start'] <= span_start < r['end']:
                             proj_r = r
                             break
 
@@ -1881,7 +1881,7 @@ class Engine:
                 # render the ENTIRE region at once to avoid sub-span alignment issues.
                 # Sub-labels within the region are passed as 'sub' to emit_data.
                 if is_parent_region_start and fmt in ('fdb', 'raw'):
-                    region_end = proj_r['end']
+                    region_end = proj_r.get('end')
                     out.append(""); out.append(f"{span_lbl}")
                     callers = self.xrefs.get(span_start, [])
                     if callers:
@@ -1912,7 +1912,7 @@ class Engine:
                 if not is_parent_region_start:
                     for r in proj.data_regions:
                         if (r['format'] in ('fdb', 'raw') and
-                                r['start'] < span_start < r['end']):
+                                r['end'] is not None and r['start'] < span_start < r['end']):
                             inside_parent = True
                             break
                 if inside_parent:
@@ -1947,7 +1947,7 @@ class Engine:
             # Skip code spans that fall inside a declared fdb/raw data_region
             in_data_region = False
             for r in proj.data_regions:
-                if r.get('format') in ('fdb','raw') and r['start'] <= span_start < r['end']:
+                if r.get('format') in ('fdb','raw') and r['end'] is not None and r['start'] <= span_start < r['end']:
                     in_data_region = True
                     break
             if in_data_region:
@@ -2439,7 +2439,7 @@ def _print_anomaly_report(eng, source):
     declared_region_addrs = set()
     for r in proj.data_regions:
         if r.get('start') is not None and r.get('end') is not None:
-            for a in range(r['start'], r['end']):
+            for a in range(r['start'], r['end']) if r['end'] is not None else []:
                 declared_region_addrs.add(a)
 
     unreferenced = []
