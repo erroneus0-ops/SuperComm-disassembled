@@ -313,6 +313,8 @@ class Project:
         self.line_comments= {}        # int_addr -> comment_str
         self.block_comments={}        # int_addr -> [lines] before instruction
         self.custom_equates=[]        # extra EQU lines to prepend
+        self.emit_equates = True      # False = suppress built-in EQU block (use external defs)
+        self.defs_file    = None      # if set, emit 'use <defs_file>' instead of EQU block
         self.footnotes    = {}        # int -> {inline, detail:[lines]}
         self.patches      = {}        # int_addr -> [bytes_to_insert_before_addr]
         self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
@@ -332,6 +334,8 @@ class Project:
         p.output        = d.get('output', None)
         p.module_notes  = d.get('module_notes', [])
         p.custom_equates= d.get('custom_equates', [])
+        p.emit_equates  = d.get('emit_equates', True)
+        p.defs_file     = d.get('defs_file', None)
 
         # entry: hex string or None
         entry = d.get('entry', None)
@@ -415,6 +419,8 @@ class Project:
             'entry':   f'{self.entry:04X}' if self.entry else None,
             'module_notes':   self.module_notes,
             'custom_equates': self.custom_equates,
+            'emit_equates':   self.emit_equates,
+            'defs_file':      self.defs_file,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
             'data_regions':   [
@@ -1647,7 +1653,11 @@ class Engine:
                             break
 
         # ── File header ───────────────────────────────────────────────
-        out.append(EQUATES_BLOCK)
+        if proj.defs_file:
+            out.append(f"         use     {proj.defs_file}")
+            out.append("")
+        elif proj.emit_equates:
+            out.append(EQUATES_BLOCK)
         if proj.custom_equates:
             out.append("; ── Project-specific equates ──")
             out.extend(proj.custom_equates)
