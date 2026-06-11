@@ -156,7 +156,7 @@ BSS.FlowState EQU    3703     ; BSS offset $0E77
 BSS.IoBuf     EQU    6613     ; BSS offset $19D5
 
 ; ==============================================================
-; Disassembly:  supercomm22
+; Disassembly:  /home/claude/SuperComm/supercomm22
 ; Module:       SuperComm
 ; Type:         program  ($11)
 ; Size:         $45C5  (17861 bytes)
@@ -1295,8 +1295,7 @@ Sub_0C0B:      LBSR Sub_1CDE          ; call Sub_1CDE
 	LEAX Dat_031A,PC       ; X → Dat_031A
 	STX 108,U             
 	LEAX 1550,U           
-Insn_0C54:     LDY #$0001            
-Sub_0C57:      EQU    $0C57            ; [*1] branch target 3 byte(s) inside Insn_0C54 -- see [*1]
+	LDY #$0001            
 	OS9 I$Read             ; path=A  count=Y  buf→X
 	LBRA Sub_157B         
 
@@ -6375,9 +6374,12 @@ Sub_39D9:      LDA #$03
 	LBRA Sub_3B83         
 
 ; --------------------------------------------------------------
-Sub_39E1:      LDA #$02               ; A = CurXY
+Sub_39E1:      LDA #$02               ; Error # 2 (Wrong Block #)
 	STA 79,U              
-	LBRA Sub_0C57         
+	LBRA Sub_3B83          ; RESTORED: original binary has corrupted branch to Sub_0C57
+                                                                  ; (lands mid-instruction at $0C57, 3 bytes into LDY #$0001)
+                                                                  ; NitrOS9 source confirms correct target is Sub_3B83
+                                                                  ; Bug only triggered on XMODEM wrong-block-number error
 
 ; --------------------------------------------------------------
 Sub_39E9:      LDA #$01              
@@ -7788,24 +7790,5 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; ANALYST NOTES
 ; ══════════════════════════════════════════════════════════════
-
-; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0C57 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0C54).
-;      Byte $01 at $0C57 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $01 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $01 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Sub_0C57 EQU Insn_0C54+3' resolves
-;      to $0C57 at assembly time. Branches to Sub_0C57
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
 
 ; ══════════════════════════════════════════════════════════════
