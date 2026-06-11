@@ -2357,6 +2357,114 @@ def _import_project(old_proj, old_json_path, new_json_path, actual_crc):
     return new
 
 
+def _print_anomaly_report(eng, source):
+    """
+    Print an anomaly report covering:
+    1. Unreferenced labels — labels with no xref (no 'Referenced by')
+    2. Code overlaps — forced_equs entries (branch targets mid-instruction)
+    3. Mid-data references — labels inside declared data regions
+    """
+    exec_off = eng.exec_off
+    crc_off  = eng.crc_off
+    labels   = eng.labels
+    regions  = eng.regions
+    xrefs    = eng.xrefs
+    proj     = eng.project
+
+    print(f"\n{'='*62}")
+    print(f"ANOMALY REPORT: {source}")
+    print(f"{'='*62}\n")
+
+    # ── 1. Unreferenced labels ────────────────────────────────────────────
+    # Labels in pre-exec OR data regions in code section with no xref entry
+    # Build set of addresses covered by declared data regions
+    # to filter out sub-labels within known regions
+    declared_region_addrs = set()
+    for r in proj.data_regions:
+        if r.get('start') is not None and r.get('end') is not None:
+            for a in range(r['start'], r['end']):
+                declared_region_addrs.add(a)
+
+    unreferenced = []
+    for addr, lbl in sorted(labels.items()):
+        if addr < 0 or addr >= crc_off:
+            continue  # skip invalid addresses
+        if addr == exec_off:
+            continue  # Init is always unreferenced in xrefs
+        if addr in proj.labels:
+            continue  # analyst-named labels are intentional
+        if addr in declared_region_addrs and addr != min(declared_region_addrs):
+            continue  # sub-label inside a declared region — expected
+        if regions.get(addr) == KIND_DATA:
+            if addr not in xrefs or not xrefs[addr]:
+                unreferenced.append((addr, lbl))
+
+    if unreferenced:
+        print(f"UNREFERENCED LABELS ({len(unreferenced)}):")
+        print(f"  These labels have no 'Referenced by' entry.")
+        print(f"  May indicate mid-data references from non-LEA instructions,")
+        print(f"  computed addresses, or data values misread as pointers.\n")
+        for addr, lbl in unreferenced:
+            region = 'pre-exec' if addr < exec_off else 'code section'
+            print(f"  ${addr:04X}  {lbl:<20}  ({region})")
+        print()
+    else:
+        print("UNREFERENCED LABELS: none\n")
+
+    # ── 2. Code overlaps (forced_equs) ───────────────────────────────────
+    forced = eng.project.forced_equs
+    if forced:
+        print(f"CODE OVERLAPS / FORCED EQUS ({len(forced)}):")
+        print(f"  Branch targets that land inside an existing instruction.")
+        print(f"  These indicate binary corruption or unusual coding.\n")
+        for addr in sorted(forced.keys()):
+            lbl  = labels.get(addr, f'${addr:04X}')
+            note = forced[addr] if isinstance(forced[addr], str) else ''
+            callers = xrefs.get(addr, [])
+            caller_str = ', '.join(labels.get(c, f'${c:04X}') for c in callers)
+            print(f"  ${addr:04X}  {lbl:<20}  callers: {caller_str or 'none'}")
+            if note:
+                print(f"         {note}")
+        print()
+    else:
+        print("CODE OVERLAPS: none\n")
+
+    # ── 3. Mid-data references ───────────────────────────────────────────
+    # Labels that fall inside a known data span (between two other data labels)
+    # i.e. the label address is > start of a data block but < the next label
+    pre_exec_labels = sorted(
+        [(a, l) for a, l in labels.items() if a < exec_off],
+        key=lambda x: x[0]
+    )
+    mid_data = []
+    for i, (addr, lbl) in enumerate(pre_exec_labels):
+        if addr in xrefs and xrefs[addr]:
+            continue  # has a proper reference
+        if addr in [a for a,_ in pre_exec_labels if a == addr]:
+            # Check if this address falls inside a string/data run
+            # by checking if adjacent bytes are printable ASCII
+            d = eng.data
+            prev_byte = d[addr-1] if addr > 0 else 0
+            if 0x20 <= prev_byte < 0x7F:
+                mid_data.append((addr, lbl))
+
+    if mid_data:
+        print(f"SUSPECTED MID-DATA REFERENCES ({len(mid_data)}):")
+        print(f"  Labels that appear to fall inside continuous data blocks.\n")
+        for addr, lbl in mid_data:
+            d = eng.data
+            context = ''.join(
+                chr(b) if 0x20 <= b < 0x7F else '.'
+                for b in d[max(0,addr-8):addr+8]
+            )
+            print(f"  ${addr:04X}  {lbl:<20}  context: ...{context}...")
+        print()
+    else:
+        print("SUSPECTED MID-DATA REFERENCES: none\n")
+
+    print(f"{'='*62}\n")
+
+
 def main():
     import argparse, sys, os
 
@@ -2385,6 +2493,9 @@ Examples:
     parser.add_argument('--update-labels', action='store_true',
         help='Merge auto-generated labels into the project JSON '
              '(preserves existing names, adds only new ones)')
+    parser.add_argument('--report', action='store_true',
+        help='Print anomaly report: unreferenced labels, overlaps, '
+             'mid-data references')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
         help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
@@ -2576,6 +2687,11 @@ Examples:
                 added += 1
         proj.to_json(json_path)
         print(f"Added {added} labels to {json_path}")
+        return
+
+    # ── --report ──────────────────────────────────────────────────────────
+    if args.report:
+        _print_anomaly_report(eng, source)
         return
 
     # ── Render and write ──────────────────────────────────────────────────
