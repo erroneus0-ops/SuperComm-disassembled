@@ -1,8 +1,8 @@
 {
-  "binary": "supercomm22",
-  "binary_crc": "800FE3",
+  "binary": "supercomm22-restored\\sc22_restored.bin",
+  "binary_crc": "B3DB934D6F76D715",
   "cpu": "6809",
-  "output": "supercomm22_proj.asm",
+  "output": "supercomm22-restored\\sc22_restored_proj.asm",
   "entry": null,
   "module_notes": [
     "SuperComm v2.2 \u2014 OS-9 Level II terminal / communications program",
@@ -98,6 +98,39 @@
       "comment": "11-byte orphaned code between subroutines (unreferenced)",
       "format": "raw",
       "end_label": false
+    },
+    {
+      "label": "Dat_006F",
+      "end_label": true,
+      "end": "00C6",
+      "start": "006F"
+    },
+    {
+      "label": "Dat_00C6",
+      "end_label": true,
+      "start": "00C6",
+      "end": "00EB"
+    },
+    {
+      "label": "Dat_00EB",
+      "end_label": true,
+      "start": "00EB",
+      "end": "0109"
+    },
+    {
+      "label": "Dat_0109",
+      "end_label": true,
+      "start": "0109"
+    },
+    {
+      "label": "Dat_02F0",
+      "end_label": true,
+      "start": "02F0"
+    },
+    {
+      "label": "Dat_0322",
+      "end_label": true,
+      "start": "0322"
     }
   ],
   "line_comments": {},
@@ -125,21 +158,64 @@
       "Added in v2.2 to replace the slower OS9 F$CRC syscall."
     ]
   },
-  "substitutions": {},
+  "substitutions": {
+    "006F": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $55               ; 'U'"
+      ],
+      "with": [
+        "         FDB    Dat_006Fend-Dat_006F-2  ; byte count of display content (excl. this word)"
+      ]
+    },
+    "00C6": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $23               ; '#'"
+      ],
+      "with": [
+        "         FDB    Dat_00C6end-Dat_00C6-2 ;Message byte length"
+      ]
+    },
+    "00EB": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $1C               ; $1C"
+      ],
+      "with": [
+        "         FDB    Dat_00EBend-Dat_00EB-2 ;Message byte length"
+      ]
+    },
+    "0109": {
+      "replace_lines": [
+        "         FCB    $01               ; SOH",
+        "         FCB    $C6"
+      ],
+      "with": [
+        "         FDB    Dat_0109end-Dat_0109-2 ;message byte length"
+      ]
+    },
+    "02F0": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $28               ; '('"
+      ],
+      "with": [
+        "         FDB    Dat_02F0end-Dat_02F0-2 ;Message byte length"
+      ]
+    },
+    "0322": {
+      "replace_lines": [
+        "         FCB    $00               ; NUL",
+        "         FCB    $25               ; '%'"
+      ],
+      "with": [
+        "         FDB    Dat_0322end-Dat_0322-2 ;Message byte length"
+      ]
+    }
+  },
   "routines": [],
   "footnotes": {},
-  "forced_equs": {
-    "0B8D": "mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C",
-    "19EC": "mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write",
-    "364E": "mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D",
-    "3E4E": "mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0"
-  },
-  "patches": {
-    "03A6": {
-      "insert": [
-        "$02"
-      ],
-      "comment": "second CurXY byte in Dat_03A4 (two consecutive $02 bytes)"
-    }
-  }
+  "forced_equs": {},
+  "patches": {}
 }

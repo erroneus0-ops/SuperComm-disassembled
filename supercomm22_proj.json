@@ -1,0 +1,21 @@
+{
+  "binary": "supercomm22",
+  "binary_crc": "800FE3",
+  "cpu": "6809",
+  "output": "supercomm22_proj.asm",
+  "entry": null,
+  "module_notes": [
+    "Add notes about this module here."
+  ],
+  "custom_equates": [],
+  "labels": {},
+  "bss": {},
+  "data_regions": [],
+  "line_comments": {},
+  "block_comments": {},
+  "substitutions": {},
+  "routines": [],
+  "footnotes": {},
+  "forced_equs": {},
+  "patches": {}
+}
