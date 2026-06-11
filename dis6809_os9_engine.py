@@ -1871,6 +1871,7 @@ class Engine:
                 if fmt == 'auto' and span_start in self.data_hints:
                     hint = self.data_hints[span_start]
                     if (hint.get('syscall') == 'I$Write'
+                            and proj_r.get('end') is not None
                             and span_start + 1 < len(self.data)
                             and ((self.data[span_start]<<8)|self.data[span_start+1])
                                 == (proj_r.get('end', span_start) - span_start)):
