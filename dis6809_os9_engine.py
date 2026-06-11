@@ -1100,6 +1100,19 @@ class Engine:
             elif op2==0x39: v=rb(); mn='LDMD';  op_str=f'#${v:02X}'; cm='6309: load MD register'; self.found_6309=True
             else:
                 mn='FCB'; op_str=f'$11,${op2:02X}'; cm=f'unknown opcode $11{op2:02X}'
+        # ── $00-$0F direct page ──────────────────────────────────────────────
+        elif op==0x00: v=rb(); mn='NEG'; op_str=f'<${v:02X}'
+        elif op==0x03: v=rb(); mn='COM'; op_str=f'<${v:02X}'
+        elif op==0x04: v=rb(); mn='LSR'; op_str=f'<${v:02X}'
+        elif op==0x06: v=rb(); mn='ROR'; op_str=f'<${v:02X}'
+        elif op==0x07: v=rb(); mn='ASR'; op_str=f'<${v:02X}'
+        elif op==0x08: v=rb(); mn='LSL'; op_str=f'<${v:02X}'
+        elif op==0x09: v=rb(); mn='ROL'; op_str=f'<${v:02X}'
+        elif op==0x0A: v=rb(); mn='DEC'; op_str=f'<${v:02X}'
+        elif op==0x0C: v=rb(); mn='INC'; op_str=f'<${v:02X}'
+        elif op==0x0D: v=rb(); mn='TST'; op_str=f'<${v:02X}'
+        elif op==0x0E: v=rb(); mn='JMP'; op_str=f'<${v:02X}'
+        elif op==0x0F: v=rb(); mn='CLR'; op_str=f'<${v:02X}'
         elif op==0x12: mn='NOP'
         elif op==0x13: mn='SYNC'; cm='wait for interrupt'
         elif op==0x16: l,t=rel16(); mn='LBRA'; op_str=l
