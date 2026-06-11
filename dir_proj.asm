@@ -166,8 +166,7 @@ $0020  97 08                              STA <$08
 $0022  31 8D 04 44                        LEAY Dat_046A,PC       ; Y → Dat_046A
 $0026  10 9F 02                           STY <$02              
 $0029  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
-$002B  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$002C  79 A6 84                           ROL $A684             
+$002B  0F 79                              CLR <$79              
 $002D  A6 84               Loc_002D:      LDA ,X                
 $002F  81 0D                              CMPA #$0D              ; compare A with CR
 $0031  27 2C                              BEQ Loc_005F          
@@ -203,9 +202,9 @@ $0061  D6 0D                              LDB <$0D
 $0063  DA 0E                              ORB <$0E              
 $0065  DA 0F                              ORB <$0F              
 $0067  D7 0B                              STB <$0B              
-$0069  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$006A  10 27 33 34                        LBEQ $33A2            
-$006E  12                                 NOP                   
+$0069  0D 10                              TST <$10              
+$006B  27 33                              BEQ $00A0             
+$006D  34 12                              PSHS A,X              
 $006F  CC 01 26                           LDD #$0126            
 $0072  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
 $0075  25 1C                              BCS Loc_0093           ; C=1 (BLO)
@@ -221,8 +220,8 @@ $0087  24 11                              BCC Loc_009A           ; C=0 (BHS)
 $0089  86 20                              LDA #$20               ; A = ' '
 $008B  C1 20                              CMPB #$20              ; compare B with ' '
 $008D  24 0B                              BCC Loc_009A           ; C=0 (BHS)
-$008F  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$0090  10 20 07 C1                        LBRA $0855            
+$008F  0F 10                              CLR <$10              
+$0091  20 07                              BRA Loc_009A          
 
 ; --------------------------------------------------------------
 $0093  C1 D0               Loc_0093:      CMPB #$D0             
@@ -242,8 +241,7 @@ $00AD  97 00                              STA <$00
 $00AF  9E 02                              LDX <$02              
 $00B1  96 17                              LDA <$17              
 $00B3  10 3F 86                           OS9 I$ChgDir           ; mode=B  name→X
-$00B6  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$00B7  0B                                 FCB    $0B                ; undefined opcode $0B -- not a valid 6809 instruction
+$00B6  0D 0B                              TST <$0B              
 $00B8  27 0F                              BEQ Loc_00C9          
 $00BA  96 17                              LDA <$17              
 $00BC  30 8D 03 AC                        LEAX Dat_046C,PC       ; X → Dat_046C
@@ -266,8 +264,7 @@ $00E9  A6 80               Loc_00E9:      LDA ,X+
 $00EB  A7 A0                              STA ,Y+               
 $00ED  81 0D                              CMPA #$0D              ; compare A with CR
 $00EF  26 F8                              BNE Loc_00E9          
-$00F1  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$00F2  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$00F1  0D 0C                              TST <$0C              
 $00F3  27 13                              BEQ Loc_0108          
 $00F5  86 2F                              LDA #$2F               ; A = '/'
 $00F7  A7 3F                              STA -1,Y              
@@ -282,8 +279,7 @@ $0108  30 C8 25            Loc_0108:      LEAX 37,U
 $010B  10 8E 00 FF                        LDY #$00FF            
 $010F  86 01                              LDA #$01              
 $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$0114  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$0115  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
+$0114  0D 0D                              TST <$0D              
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102            
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D
@@ -316,17 +312,14 @@ $0159  84 7F                              ANDA #$7F
 $015B  A7 1F                              STA -1,X              
 $015D  86 0D                              LDA #$0D               ; A = CR
 $015F  A7 84                              STA ,X                
-$0161  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$0162  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$0161  0D 0C                              TST <$0C              
 $0163  27 0D                              BEQ Loc_0172          
 $0165  30 C8 58                           LEAX 88,U             
 $0168  10 9E 06                           LDY <$06              
 $016B  17 01 A9                           LBSR Sub_0317          ; call Sub_0317
-$016E  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$016F  09                                 FCB    $09                ; undefined opcode $09 -- not a valid 6809 instruction
-$0170  27 B4               Insn_0170:     BEQ Loc_0126          
-$0172  0D                  Loc_0172:      EQU    $0172            ; [*1] branch target 2 byte(s) inside Insn_0170 -- see [*1]
-$0173  0B                                 FCB    $0B                ; undefined opcode $0B -- not a valid 6809 instruction
+$016E  0D 09                              TST <$09              
+$0170  27 B4                              BEQ Loc_0126          
+$0172  0D 0B               Loc_0172:      TST <$0B              
 $0174  27 2E                              BEQ Loc_01A4          
 $0176  34 40                              PSHS U                
 $0178  30 C8 18                           LEAX 24,U             
@@ -341,25 +334,24 @@ $018A  35 40                              PULS U
 $018C  10 25 02 C1                        LBCS Loc_0451         
 $0190  96 18                              LDA <$18              
 $0192  84 80                              ANDA #$80             
-$0194  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$0195  0E                                 FCB    $0E                ; undefined opcode $0E -- not a valid 6809 instruction
+$0194  0D 0E                              TST <$0E              
 $0196  27 05                              BEQ Loc_019D          
 $0198  4D                                 TSTA                  
 $0199  27 8B                              BEQ Loc_0126          
-$019B  20 07               Insn_019B:     BRA Loc_01A4          
-$019D  0D                  Loc_019D:      EQU    $019D            ; [*2] branch target 2 byte(s) inside Insn_019B -- see [*2]
-$019E  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
+$019B  20 07                              BRA Loc_01A4          
+
+; --------------------------------------------------------------
+$019D  0D 0F               Loc_019D:      TST <$0F              
 $019F  27 03                              BEQ Loc_01A4          
 $01A1  4D                                 TSTA                  
-$01A2  26 82               Insn_01A2:     BNE Loc_0126          
-$01A4  0D                  Loc_01A4:      EQU    $01A4            ; [*3] branch target 2 byte(s) inside Insn_01A2 -- see [*3]
-$01A5  10 27 53 0F                        LBEQ $54B8            
-$01A9  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
+$01A2  26 82                              BNE Loc_0126          
+$01A4  0D 10               Loc_01A4:      TST <$10              
+$01A6  27 53                              BEQ $01FB             
+$01A8  0F 0A                              CLR <$0A              
 $01AA  D6 13                              LDB <$13              
 $01AC  D1 12                              CMPB <$12             
-$01AE  2C 2F               Insn_01AE:     BGE Loc_01DF          
-$01B0  0C                  Loc_01B0:      EQU    $01B0            ; [*4] branch target 2 byte(s) inside Insn_01AE -- see [*4]
-$01B1  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
+$01AE  2C 2F                              BGE Loc_01DF          
+$01B0  0C 0A               Loc_01B0:      INC <$0A              
 $01B2  4F                                 CLRA                   ; A = 0
 $01B3  1F 02                              TFR D,Y               
 $01B5  4C                                 INCA                  
@@ -376,7 +368,7 @@ $01CB  97 12                              STA <$12
 $01CD  4F                                 CLRA                   ; A = 0
 $01CE  1F 02                              TFR D,Y               
 $01D0  4C                                 INCA                  
-$01D1  30 8D 03 44                        LEAX Loc_0519,PC       ; X → Loc_0519
+$01D1  30 8D 03 44                        LEAX Dat_0519,PC       ; X → Dat_0519
 $01D5  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $01D8  10 25 02 75                        LBCS Loc_0451         
 $01DC  16 FF 47                           LBRA Loc_0126         
@@ -389,13 +381,11 @@ $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf�
 $01EC  10 25 02 61                        LBCS Loc_0451         
 $01F0  96 11                              LDA <$11              
 $01F2  97 12                              STA <$12              
-$01F4  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$01F5  0A                                 FCB    $0A                ; undefined opcode $0A -- not a valid 6809 instruction
+$01F4  0D 0A                              TST <$0A              
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
 
-$01FB  0D                                         ??? 
-$01FC  0D                                         ??? 
+$01FB  0D 0D                                      TST <$0D
 $01FD  10 26 01 6D                                LBNE $036E
 $0201  86 01                                      LDA #$01
 $0203  30 C8 58                                   LEAX 88,U
@@ -430,8 +420,7 @@ $0242  20 05                              BRA Loc_0249
 
 ; --------------------------------------------------------------
 $0244  39                  Loc_0244:      RTS                    ; return from subroutine
-$0245  0C                  Loc_0245:      EQU    $0245            ; [*5] branch target 1 byte(s) inside Loc_0244 -- see [*5]
-$0246  08                                 FCB    $08                ; undefined opcode $08 -- not a valid 6809 instruction
+$0245  0C 08               Loc_0245:      INC <$08              
 $0247  20 CB                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
@@ -442,25 +431,32 @@ $0253  16 01 FB                           LBRA Loc_0451
 
 ; --------------------------------------------------------------
 $0256  CB 04               Loc_0256:      ADDB #$04             
-$0258  20 BA               Insn_0258:     BRA Sub_0214          
-$025A  0F                  Loc_025A:      EQU    $025A            ; [*6] branch target 2 byte(s) inside Insn_0258 -- see [*6]
-$025B  10 20 B6 0C         Insn_025B:     LBRA $B86B            
-$025E  0C                  Loc_025E:      EQU    $025E            ; [*7] branch target 3 byte(s) inside Insn_025B -- see [*7]
-$025F  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$0260  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$0261  10 20 B0 0C         Insn_0261:     LBRA $B271            
-$0264  0C                  Loc_0264:      EQU    $0264            ; [*8] branch target 3 byte(s) inside Insn_0261 -- see [*8]
-$0265  0E                                 FCB    $0E                ; undefined opcode $0E -- not a valid 6809 instruction
-$0266  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$0267  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$0268  20 AA               Insn_0268:     BRA Sub_0214          
-$026A  0C                  Loc_026A:      EQU    $026A            ; [*9] branch target 2 byte(s) inside Insn_0268 -- see [*9]
-$026B  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$026C  0F                                 FCB    $0F                ; undefined opcode $0F -- not a valid 6809 instruction
-$026D  0E                                 FCB    $0E                ; undefined opcode $0E -- not a valid 6809 instruction
-$026E  20 A4               Insn_026E:     BRA Sub_0214          
-$0270  0F                  Loc_0270:      EQU    $0270            ; [*10] branch target 2 byte(s) inside Insn_026E -- see [*10]
-$0271  7A 20 A0                           DEC $20A0             
+$0258  20 BA                              BRA Sub_0214          
+
+; --------------------------------------------------------------
+$025A  0F 10               Loc_025A:      CLR <$10              
+$025C  20 B6                              BRA Sub_0214          
+
+; --------------------------------------------------------------
+$025E  0C 0D               Loc_025E:      INC <$0D              
+$0260  0F 10                              CLR <$10              
+$0262  20 B0                              BRA Sub_0214          
+
+; --------------------------------------------------------------
+$0264  0C 0E               Loc_0264:      INC <$0E              
+$0266  0F 0F                              CLR <$0F              
+$0268  20 AA                              BRA Sub_0214          
+
+; --------------------------------------------------------------
+$026A  0C 0F               Loc_026A:      INC <$0F              
+$026C  0F 0E                              CLR <$0E              
+$026E  20 A4                              BRA Sub_0214          
+
+; --------------------------------------------------------------
+$0270  0F 7A               Loc_0270:      CLR <$7A              
+$0272  20 A0                              BRA Sub_0214          
+
+; --------------------------------------------------------------
 $0274  9F 02               Sub_0274:      STX <$02              
 $0276  A6 80               Loc_0276:      LDA ,X+               
 $0278  81 5F                              CMPA #$5F              ; compare A with '_'
@@ -517,9 +513,8 @@ $02D6  81 2F               Loc_02D6:      CMPA #$2F              ; compare A wit
 $02D8  26 EC                              BNE Loc_02C6          
 $02DA  86 0D                              LDA #$0D               ; A = CR
 $02DC  A7 80                              STA ,X+               
-$02DE  9F 06               Insn_02DE:     STX <$06              
-$02E0  0C                  Loc_02E0:      EQU    $02E0            ; [*11] branch target 2 byte(s) inside Insn_02DE -- see [*11]
-$02E1  0C                                 FCB    $0C                ; undefined opcode $0C -- not a valid 6809 instruction
+$02DE  9F 06                              STX <$06              
+$02E0  0C 0C               Loc_02E0:      INC <$0C              
 $02E2  9E 06                              LDX <$06              
 $02E4  86 0D               Loc_02E4:      LDA #$0D               ; A = CR
 $02E6  A1 84                              CMPA ,X               
@@ -595,12 +590,14 @@ $0355  20 F0                              BRA Loc_0347
 ; --------------------------------------------------------------
 $0357  86 01               Loc_0357:      LDA #$01              
 $0359  97 09                              STA <$09              
-$035B  39                  Insn_035B:     RTS                    ; return from subroutine
-$035C  0F                  Loc_035C:      EQU    $035C            ; [*12] branch target 1 byte(s) inside Insn_035B -- see [*12]
-$035D  09                                 FCB    $09                ; undefined opcode $09 -- not a valid 6809 instruction
-$035E  39                  Insn_035E:     RTS                    ; return from subroutine
-$035F  0D                  Sub_035F:      EQU    $035F            ; [*13] branch target 1 byte(s) inside Insn_035E -- see [*13]
-$0360  08                                 FCB    $08                ; undefined opcode $08 -- not a valid 6809 instruction
+$035B  39                                 RTS                    ; return from subroutine
+
+; --------------------------------------------------------------
+$035C  0F 09               Loc_035C:      CLR <$09              
+$035E  39                                 RTS                    ; return from subroutine
+
+; --------------------------------------------------------------
+$035F  0D 08               Sub_035F:      TST <$08              
 $0361  26 0A                              BNE Loc_036D          
 $0363  81 61                              CMPA #$61              ; compare A with 'a'
 $0365  25 06                              BCS Loc_036D           ; C=1 (BLO)
@@ -719,12 +716,12 @@ $044D  E7 80                                      STB ,X+
 $044F  20 F4                                      BRA $0445
 $0451  C1 D3               Loc_0451:      CMPB #$D3             
 $0453  26 01                              BNE Loc_0456          
-$0455  5F                  Insn_0455:     CLRB                   ; B = 0
-$0456  0D                  Loc_0456:      EQU    $0456            ; [*14] branch target 1 byte(s) inside Insn_0455 -- see [*14]
-$0457  10 27 0D 30                        LBEQ $118B            
-$045B  8D 00               Insn_045B:     BSR Sub_045D           ; call Sub_045D
-$045D  0D                  Sub_045D:      EQU    $045D            ; [*15] branch target 2 byte(s) inside Insn_045B -- see [*15]
-$045E  86 01                              LDA #$01              
+$0455  5F                                 CLRB                   ; B = 0
+$0456  0D 10               Loc_0456:      TST <$10              
+$0458  27 0D                              BEQ $0467             
+$045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
+$045D  0D 86               Sub_045D:      TST <$86              
+$045F  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $0467  10 3F 06                           OS9 F$Exit             ; status=B
@@ -741,333 +738,62 @@ Dat_046B
 
 Dat_046C
 ; Referenced by: $00BC
-; ── 1 bytes  ($046C—$046C) ──
+; ── 2 bytes  ($046C—$046D) ──
          FCB    $40               ; '@'
-$046D  0D                  Insn_046D:     EQU    $046D            ; [*16] branch target 1 byte(s) inside Dat_046C -- see [*16]
+         FCB    $0D               ; CR
 
 Dat_046E
 ; Referenced by: $00D3
 ; ── 11 bytes  ($046E—$0478) ──
          FCB    $0A               ; LF
          FCC    " Directory"
-$0479  20 6F               Loc_0479:      BRA Loc_04EA          
+$0479  20 6F               Loc_0479:      BRA $04EA             
 
 $047B  66 20                                      ROR 0,Y
 
 Dat_047D
 ; Referenced by: $011B
-; ── 56 bytes  ($047D—$04B4) ──
-         FCB    $0A               ; LF
-         FCC    "User # Last Modified   Attributes Sector File Size File"
-$04B5  20 4E               Loc_04B5:      BRA Loc_0505          
+; ── 156 bytes  ($047D—$0518) ──
+         FCB    $0A ; LF
+         FCC    "User # Last Modified   Attributes Sector File Size File Name"
+         FCB    $0D ; CR
+         FCC    "------ --------------- ---------- ------ --------- ----------"
+         FCB    $0D ; CR
+         FCC    "       0000/00/00 0000  dsewrewr"
 
-$04B7  61                                         ??? 
-$04B8  6D 65                                      TST 5,S
-$04BA  0D                                         ??? 
-$04BB  2D 2D                                      BLT Loc_04EA
-$04BD  2D 2D                                      BLT $04EC
-$04BF  2D 2D                                      BLT $04EE
-$04C1  20 2D                                      BRA $04F0
-$04C3  2D 2D                                      BLT $04F2
-$04C5  2D 2D                                      BLT $04F4
-$04C7  2D 2D                                      BLT $04F6
-$04C9  2D 2D                                      BLT $04F8
-$04CB  2D 2D                                      BLT $04FA
-$04CD  2D 2D                                      BLT $04FC
-$04CF  2D 2D                                      BLT $04FE
-$04D1  20 2D                                      BRA $0500
-$04D3  2D 2D                                      BLT $0502
-$04D5  2D 2D                                      BLT $0504
-$04D7  2D 2D                                      BLT $0506
-$04D9  2D 2D                                      BLT $0508
-$04DB  2D 20                                      BLT $04FD
-$04DD  2D 2D                                      BLT $050C
-$04DF  2D 2D                                      BLT Loc_050E
-$04E1  2D 2D                                      BLT $0510
-$04E3  20 2D                                      BRA $0512
-$04E5  2D 2D                                      BLT $0514
-$04E7  2D 2D                                      BLT $0516
-$04E9  2D 2D                                      BLT $0518
-$04EA  2D 2D               Loc_04EA:      BLT Loc_0519          
-$04EC  2D 20                              BLT Loc_050E          
-$04EE  2D 2D                              BLT Loc_051D          
-$04F0  2D 2D                              BLT Loc_051F          
-$04F2  2D 2D                              BLT Loc_0521          
-$04F4  2D 2D                              BLT Loc_0523          
-$04F6  2D 2D                              BLT Loc_0525          
-$04F8  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$04F9  20 20                              BRA Loc_051B          
-
-$04FB  20 20                                      BRA Loc_051D
-$04FD  20 20                                      BRA Loc_051F
-$04FF  20 30                                      BRA Loc_0531
-$0501  30 30                                      LEAX -16,Y
-$0503  30 2F                                      LEAX 15,Y
-$0505  30 30               Loc_0505:      LEAX -16,Y            
-$0507  2F 30                              BLE Loc_0539          
-$0509  30 20                              LEAX 0,Y              
-$050B  30 30                              LEAX -16,Y            
-$050D  30 30                              LEAX -16,Y            
-$050E  30 20               Loc_050E:      LEAX 0,Y              
-$0510  20 64                              BRA Loc_0576          
-
-$0512  73 65 77                                   COM $6577
-$0515  72                                         ??? 
-$0516  65                                         ??? 
-$0517  77 72 20                                   ASR $7220
-$0519  20 20               Loc_0519:      BRA Loc_053B          
-$051B  20 20               Loc_051B:      BRA Loc_053D          
-$051D  20 20               Loc_051D:      BRA Loc_053F          
-$051F  20 20               Loc_051F:      BRA Loc_0541          
-$0521  20 20               Loc_0521:      BRA Loc_0543          
-$0523  20 20               Loc_0523:      BRA Loc_0545          
-$0525  20 20               Loc_0525:      BRA Loc_0547          
-
-$0527  20 20                                      BRA $0549
-$0529  20 20                                      BRA $054B
-$052B  20 0A                                      BRA $0537
+Dat_0519
+; Referenced by: $01D1
+; ── 19 bytes  ($0519—$052B) ──
+         FCC    "                   "
 
 Dat_052C
 ; Referenced by: $024C
-; ── 5 bytes  ($052C—$0530) ──
-         FCB    $0A               ; LF
-         FCC    "dir "
-$0531  5B                  Loc_0531:      EQU    $0531            ; [*17] undefined opcode at $0531 — see [*17]
-$0532  2D 6F                              BLT Loc_05A3          
-$0534  70 74 73                           NEG $7473             
-$0537  5D                                 TSTB                  
-$0538  20 5B               Insn_0538:     BRA Loc_0595          
-$0539  5B                  Loc_0539:      EQU    $0539            ; [*18] branch target 1 byte(s) inside Insn_0538 -- see [*18]
-$053A  70 61 74            Insn_053A:     NEG $6174             
-$053B  61                  Loc_053B:      EQU    $053B            ; [*19] branch target 1 byte(s) inside Insn_053A -- see [*19]
-$053C  74 68 2F                           LSR $682F             
-$053D  68 2F               Loc_053D:      LSL 15,Y              
-$053F  70 61 74            Loc_053F:      NEG $6174             
-$0541  74 74 5D            Loc_0541:      LSR $745D             
-$0542  74 5D 20            Insn_0542:     LSR $5D20             
-$0543  5D                  Loc_0543:      TSTB                  
-$0544  20 5B                              BRA Loc_05A1          
-
-; --------------------------------------------------------------
-$0545  5B                  Loc_0545:      EQU    $0545            ; [*20] branch target 1 byte(s) inside Insn_0544 -- see [*20]
-$0546  2D 6F                              BLT Loc_05B7          
-$0547  6F 70               Loc_0547:      CLR -16,S             
-$0549  74 73 5D                           LSR $735D             
-$054C  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$054D  6F 70                              CLR -16,S             
-$054F  74 73 3A                           LSR $733A             
-$0552  20 78                              BRA Loc_05CC          
-
-$0554  20 2D                                      BRA $0583
-$0556  20 75                                      BRA $05CD
-$0558  73 65 20                                   COM $6520
-$055B  63 75                                      COM -11,S
-$055D  72                                         ??? 
-$055E  72                                         ??? 
-$055F  65                                         ??? 
-$0560  6E 74                                      JMP -12,S
-$0562  20 65                                      BRA $05C9
-$0564  78 65 63                                   LSL $6563
-$0567  20 64                                      BRA $05CD
-$0569  69 72                                      ROL -14,S
-$056B  0D                                         ??? 
-$056C  20 20                                      BRA $058E
-$056E  20 20                                      BRA $0590
-$0570  20 20                                      BRA $0592
-$0572  73 20 2D                                   COM $202D
-$0575  20 6F                                      BRA $05E6
-$0576  6F 6E               Loc_0576:      CLR 14,S              
-$0578  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
-$0579  20 65                              BRA Loc_05E0          
-
-$057B  6E 74                                      JMP -12,S
-$057D  72                                         ??? 
-$057E  79 2F 6C                                   ROL $2F6C
-$0581  69 6E                                      ROL 14,S
-$0583  65                                         ??? 
-$0584  0D                                         ??? 
-$0585  20 20                                      BRA $05A7
-$0587  20 20                                      BRA $05A9
-$0589  65                                         ??? 
-$058A  2F 6C                                      BLE $05F8
-$058C  20 2D                                      BRA $05BB
-$058E  20 65                                      BRA $05F5
-$0590  78 74 65                                   LSL $7465
-$0593  6E 64                                      JMP 4,S
-$0595  65                  Loc_0595:      EQU    $0595            ; [*21] undefined opcode at $0595 — see [*21]
-$0596  64 20                              LSR 0,Y               
-$0598  64 69                              LSR 9,S               
-$059A  72                                 FCB    $72                ; undefined opcode $72 -- not a valid 6809 instruction
-$059B  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
-$059C  63 74                              COM -12,S             
-$059E  6F 72                              CLR -14,S             
-$05A0  79 0D 20            Insn_05A0:     ROL $0D20             
-$05A1  0D                  Loc_05A1:      EQU    $05A1            ; [*22] branch target 1 byte(s) inside Insn_05A0 -- see [*22]
-$05A2  20 20                              BRA Loc_05C4          
-
-; --------------------------------------------------------------
-$05A3  20 20               Loc_05A3:      BRA Loc_05C5          
-
-$05A5  20 20                                      BRA $05C7
-$05A7  20 61                                      BRA $060A
-$05A9  20 2D                                      BRA $05D8
-$05AB  20 73                                      BRA $0620
-$05AD  68 6F                                      LSL 15,S
-$05AF  77 20 27                                   ASR $2027
-$05B2  2E 66                                      BGT $061A
-$05B4  69 6C                                      ROL 12,S
-$05B6  65                                         ??? 
-$05B7  73 27 2C            Loc_05B7:      COM $272C             
-$05BA  20 74                              BRA Loc_0630          
-
-$05BC  6F 6F                                      CLR 15,S
-$05BE  0D                                         ??? 
-$05BF  20 20                                      BRA $05E1
-$05C1  20 20                                      BRA $05E3
-$05C3  20 20                                      BRA $05E5
-$05C4  20 64               Loc_05C4:      BRA Loc_062A          
-$05C5  64 20               Loc_05C5:      LSR 0,Y               
-$05C7  2D 20                              BLT Loc_05E9          
-$05C9  6F 6E                              CLR 14,S              
-$05CB  6C 79                              INC -7,S              
-$05CC  79 20 64            Loc_05CC:      ROL $2064             
-$05CF  69 72                              ROL -14,S             
-$05D1  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
-$05D2  63 74                              COM -12,S             
-$05D4  6F 72                              CLR -14,S             
-$05D6  79 20 66                           ROL $2066             
-$05D9  69 6C                              ROL 12,S              
-$05DB  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
-$05DC  73 0D 20                           COM $0D20             
-$05DF  20 20                              BRA Loc_0601          
-
-; --------------------------------------------------------------
-$05E0  20 20               Loc_05E0:      BRA Loc_0602          
-
-$05E2  20 20                                      BRA $0604
-$05E4  66 20                                      ROR 0,Y
-$05E6  2D 20                                      BLT $0608
-$05E8  6F 6E                                      CLR 14,S
-$05E9  6E 6C               Loc_05E9:      JMP 12,S              
-$05EB  79 20 6E                           ROL $206E             
-$05EE  6F 6E                              CLR 14,S              
-$05F0  2D 64                              BLT $0656             
-$05F2  69 72                              ROL -14,S             
-$05F4  20 66                              BRA $065C             
-
-$05F6  69 6C                                      ROL 12,S
-$05F8  65                                         ??? 
-$05F9  73 0D 20                                   COM $0D20
-$05FC  20 20                                      BRA $061E
-$05FE  20 20                                      BRA $0620
-$0600  20 63                                      BRA $0665
-$0601  63 20               Loc_0601:      COM 0,Y               
-$0602  20 2D               Loc_0602:      BRA Loc_0631          
-
-$0604  20 63                                      BRA Loc_0669
-$0606  61                                         ??? 
-$0607  73 65 20                                   COM $6520
-$060A  69 6E                                      ROL 14,S
-$060C  73 65 6E                                   COM $656E
-$060F  73 69 74                                   COM $6974
-$0612  69 76                                      ROL -10,S
-$0614  65                                         ??? 
-$0615  20 66                                      BRA Loc_067D
-$0617  69 6C                                      ROL 12,S
-$0619  65                                         ??? 
-$061A  6E 61                                      JMP 1,S
-$061C  6D 65                                      TST 5,S
-$061E  20 6D                                      BRA $068D
-$0620  61                                         ??? 
-$0621  74 63 68                                   LSR $6368
-$0624  20 28                                      BRA $064E
-$0625  28 42               Loc_0625:      BVC Loc_0669          
-$0627  55                                 FCB    $55                ; undefined opcode $55 -- not a valid 6809 instruction
-$0628  54                                 LSRB                  
-$0629  20 4E               Insn_0629:     BRA Loc_0679          
-$062A  4E                  Loc_062A:      EQU    $062A            ; [*23] branch target 1 byte(s) inside Insn_0629 -- see [*23]
-$062B  4F                                 CLRA                   ; A = 0
-$062C  54                                 LSRB                  
-$062D  20 44                              BRA Loc_0673          
-
-$062F  49                                         ROLA 
-$0630  52                  Loc_0630:      EQU    $0630            ; [*24] undefined opcode at $0630 — see [*24]
-$0631  20 4E               Loc_0631:      BRA Loc_0681          
-$0633  41                  Loc_0633:      EQU    $0633            ; [*25] branch target 2 byte(s) inside Loc_0631 -- see [*25]
-$0634  4D                                 TSTA                  
-$0635  45                                 FCB    $45                ; undefined opcode $45 -- not a valid 6809 instruction
-$0636  29 0D                              BVS Loc_0645          
-$0638  20 20                              BRA Loc_065A          
-
-$063A  20 20                                      BRA $065C
-$063C  20 20                                      BRA $065E
-$063E  3F                                         SWI 
-$063F  20 2D                                      BRA $066E
-$0641  20 68                                      BRA $06AB
-$0643  65                                         ??? 
-$0644  6C 70                                      INC -16,S
-$0645  70 20 6D            Loc_0645:      NEG $206D             
-$0648  65                                 FCB    $65                ; undefined opcode $65 -- not a valid 6809 instruction
-$0649  73 73 61                           COM $7361             
-$064C  67 65                              ASR 5,S               
-$064E  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$064F  70 61 74                           NEG $6174             
-$0652  74 65 72                           LSR $6572             
-$0655  6E 3A                              JMP -6,Y              
-$0657  20 6D                              BRA $06C6             
-
-$0659  61                                         ??? 
-$065A  79 20 69            Loc_065A:      ROL $2069             
-$065D  6E 63                              JMP 3,S               
-$065F  6C 75                              INC -11,S             
-$0661  64 65                              LSR 5,S               
-$0663  20 77                              BRA $06DC             
-
-$0665  69 6C                                      ROL 12,S
-$0667  64 20                                      LSR 0,Y
-$0669  63 61               Loc_0669:      COM 1,S               
-$066B  72                                 FCB    $72                ; undefined opcode $72 -- not a valid 6809 instruction
-$066C  64 73                              LSR -13,S             
-$066E  0D                                 FCB    $0D                ; undefined opcode $0D -- not a valid 6809 instruction
-$066F  20 20                              BRA Loc_0691          
-
-$0671  20 20                                      BRA $0693
-$0673  20 20               Loc_0673:      BRA Loc_0695          
-
-$0675  2A 20                                      BPL $0697
-$0677  2D 20                                      BLT $0699
-$0679  6D 75               Loc_0679:      TST -11,S             
-$067B  6C 74                              INC -12,S             
-$067D  69 70               Loc_067D:      ROL -16,S             
-$067F  6C 65                              INC 5,S               
-$0681  20 63               Loc_0681:      BRA $06E6             
-
-$0683  68 61                                      LSL 1,S
-$0685  72                                         ??? 
-$0686  61                                         ??? 
-$0687  63 74                                      COM -12,S
-$0689  65                                         ??? 
-$068A  72                                         ??? 
-$068B  0D                                         ??? 
-$068C  20 20                                      BRA $06AE
-$068E  20 20                                      BRA $06B0
-$0690  20 20                                      BRA $06B2
-$0691  20 3F               Loc_0691:      BRA $06D2             
-
-$0693  20 2D                                      BRA $06C2
-$0695  20 73               Loc_0695:      BRA $070A             
-
-$0697  69 6E                                      ROL 14,S
-$0699  67 6C                                      ASR 12,S
-$069B  65                                         ??? 
-$069C  20 63                                      BRA $0701
-$069E  68 61                                      LSL 1,S
-$06A0  72                                         ??? 
-$06A1  61                                         ??? 
-$06A2  63 74                                      COM -12,S
-$06A4  65                                         ??? 
-$06A5  72                                         ??? 
-$06A6  0D                                         ??? 
+; ── 379 bytes  ($052C—$06A6) ──
+         FCB    $0A ; LF
+         FCC    "dir [-opts] [path/patt] [-opts]"
+         FCB    $0D ; CR
+         FCC    "opts: x - use current exec dir"
+         FCB    $0D ; CR
+         FCC    "      s - one entry/line"
+         FCB    $0D ; CR
+         FCC    "    e/l - extended directory"
+         FCB    $0D ; CR
+         FCC    "      a - show '.files', too"
+         FCB    $0D ; CR
+         FCC    "      d - only directory files"
+         FCB    $0D ; CR
+         FCC    "      f - only non-dir files"
+         FCB    $0D ; CR
+         FCC    "      c - case insensitive filename match (BUT NOT DIR NAME)"
+         FCB    $0D ; CR
+         FCC    "      ? - help message"
+         FCB    $0D ; CR
+         FCC    "pattern: may include wild cards"
+         FCB    $0D ; CR
+         FCC    "      * - multiple character"
+         FCB    $0D ; CR
+         FCC    "      ? - single character"
+         FCB    $0D ; CR
 $06A7  5A                  Sub_06A7:      DECB                  
 $06A8  10 8E 00 50                        LDY #$0050            
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
@@ -1088,472 +814,3 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
-
-; ══════════════════════════════════════════════════════════════
-; ANALYST NOTES
-; ══════════════════════════════════════════════════════════════
-
-; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0172 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0170).
-;      Byte $0D at $0172 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0172 EQU Insn_0170+2' resolves
-;      to $0172 at assembly time. Branches to Loc_0172
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*2] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $019D is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_019B).
-;      Byte $0D at $019D is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_019D EQU Insn_019B+2' resolves
-;      to $019D at assembly time. Branches to Loc_019D
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*3] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $01A4 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_01A2).
-;      Byte $0D at $01A4 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_01A4 EQU Insn_01A2+2' resolves
-;      to $01A4 at assembly time. Branches to Loc_01A4
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*4] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $01B0 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_01AE).
-;      Byte $0C at $01B0 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_01B0 EQU Insn_01AE+2' resolves
-;      to $01B0 at assembly time. Branches to Loc_01B0
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*5] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0245 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Loc_0244).
-;      Byte $0C at $0245 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0245 EQU Loc_0244+1' resolves
-;      to $0245 at assembly time. Branches to Loc_0245
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*6] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $025A is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0258).
-;      Byte $0F at $025A is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0F may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_025A EQU Insn_0258+2' resolves
-;      to $025A at assembly time. Branches to Loc_025A
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*7] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $025E is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_025B).
-;      Byte $0C at $025E is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_025E EQU Insn_025B+3' resolves
-;      to $025E at assembly time. Branches to Loc_025E
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*8] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0264 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0261).
-;      Byte $0C at $0264 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0264 EQU Insn_0261+3' resolves
-;      to $0264 at assembly time. Branches to Loc_0264
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*9] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $026A is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0268).
-;      Byte $0C at $026A is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_026A EQU Insn_0268+2' resolves
-;      to $026A at assembly time. Branches to Loc_026A
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*10] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0270 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_026E).
-;      Byte $0F at $0270 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0F may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0270 EQU Insn_026E+2' resolves
-;      to $0270 at assembly time. Branches to Loc_0270
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*11] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $02E0 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_02DE).
-;      Byte $0C at $02E0 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0C is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0C may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_02E0 EQU Insn_02DE+2' resolves
-;      to $02E0 at assembly time. Branches to Loc_02E0
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*12] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $035C is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_035B).
-;      Byte $0F at $035C is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0F is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0F may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_035C EQU Insn_035B+1' resolves
-;      to $035C at assembly time. Branches to Loc_035C
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*13] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $035F is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_035E).
-;      Byte $0D at $035F is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Sub_035F EQU Insn_035E+1' resolves
-;      to $035F at assembly time. Branches to Sub_035F
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*14] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0456 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0455).
-;      Byte $0D at $0456 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0456 EQU Insn_0455+1' resolves
-;      to $0456 at assembly time. Branches to Loc_0456
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*15] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $045D is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_045B).
-;      Byte $0D at $045D is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Sub_045D EQU Insn_045B+2' resolves
-;      to $045D at assembly time. Branches to Sub_045D
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*16] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $046D is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Dat_046C).
-;      Byte $0D at $046D is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Insn_046D EQU Dat_046C+1' resolves
-;      to $046D at assembly time. Branches to Insn_046D
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*17] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0531 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (unknown).
-;      Byte $5B at $0531 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $5B is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $5B may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*18] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0539 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0538).
-;      Byte $5B at $0539 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $5B is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $5B may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0539 EQU Insn_0538+1' resolves
-;      to $0539 at assembly time. Branches to Loc_0539
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*19] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $053B is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_053A).
-;      Byte $61 at $053B is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $61 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $61 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_053B EQU Insn_053A+1' resolves
-;      to $053B at assembly time. Branches to Loc_053B
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*20] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0545 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0544).
-;      Byte $5B at $0545 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $5B is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $5B may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0545 EQU Insn_0544+1' resolves
-;      to $0545 at assembly time. Branches to Loc_0545
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*21] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0595 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (unknown).
-;      Byte $65 at $0595 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $65 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $65 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*22] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $05A1 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_05A0).
-;      Byte $0D at $05A1 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $0D is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $0D may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_05A1 EQU Insn_05A0+1' resolves
-;      to $05A1 at assembly time. Branches to Loc_05A1
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*23] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $062A is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0629).
-;      Byte $4E at $062A is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $4E is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $4E may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_062A EQU Insn_0629+1' resolves
-;      to $062A at assembly time. Branches to Loc_062A
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*24] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0630 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (unknown).
-;      Byte $52 at $0630 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $52 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $52 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; [*25] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0633 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Loc_0631).
-;      Byte $41 at $0633 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $41 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $41 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0633 EQU Loc_0631+2' resolves
-;      to $0633 at assembly time. Branches to Loc_0633
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; ══════════════════════════════════════════════════════════════
