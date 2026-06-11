@@ -212,6 +212,26 @@ MysteryData
          FDB    $6572,$436F,$6DED,$0150,$526F,$6772,$616D,$2062   ; erCom..Program b
          ...
 ```
+
+### Text format example:
+```
+HelpText
+/format/ text
+```
+
+### Expected outcome:
+```
+HelpText
+; Referenced by: Sub_024C
+         FCB    $0A ; LF
+         FCC    "dir [-opts] [path/patt] [-opts]"
+         FCB    $0D ; CR
+         FCC    "opts: x - use current exec dir"
+         FCB    $0D ; CR
+         FCC    "      s - one entry/line"
+         FCB    $0D ; CR
+```
+
 Known formats:
 - `auto`       — default heuristics (FCC strings, FCS keyword tables, CurXY, etc.)
 - `fdb`        — every 2 bytes as FDB (lookup tables, word arrays)
@@ -220,12 +240,16 @@ Known formats:
 - `hexdump`    — FDB pairs, 8 per line, with ASCII comment column (like hexdump output)
 - `hexdump N`  — hexdump with N FDB entries per line (e.g. `hexdump 4`)
 - `writeblock` — first word as self-describing FDB length, remainder as auto
+- `text`       — printable ASCII runs as FCC strings, control/non-printable bytes as FCB
 
 **Notes:**
 - `fdb` and `hexdump` emit a plain `FCB` for an odd trailing byte, with a console
   warning from `edits_to_json.py` if the region size is odd.
 - `hexdump` ASCII column shows printable characters as-is, dots for non-printable.
   No FCS high-bit translation.
+- `text` is the right choice for human-readable string data: help text, error messages,
+  display templates. Emits `FCC "string"` for each printable run, `FCB $0D ; CR` etc.
+  for control bytes. Double-quote characters in the string are emitted as `FCB $22`.
 
 ---
 
