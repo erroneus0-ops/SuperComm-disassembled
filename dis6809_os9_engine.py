@@ -2111,10 +2111,28 @@ class Engine:
                 if is_ret and pos < span_end:
                     nxt = min((a for a in lbs if pos<=a<span_end), default=span_end)
                     if nxt > pos:
-                        pad = d[pos:nxt]
-                        if pad:
-                            args = ','.join(f'${b:02X}' for b in pad)
-                            out.append(f"         FCB    {args}  ; unreachable padding")
+                        # Attempt to disassemble gap as code rather than padding
+                        gap_pos = pos
+                        out.append("")
+                        while gap_pos < nxt:
+                            res = self.decode_one(gap_pos)
+                            if res is None:
+                                # Truly undecipherable — emit as FCB
+                                out.append(f"         FCB    ${d[gap_pos]:02X}"
+                                           f"                ; undefined opcode ${d[gap_pos]:02X}"
+                                           f" -- not a valid 6809 instruction")
+                                gap_pos += 1
+                            else:
+                                gmn, gop, gcm, graw, gnxt = res
+                                glbl = lbs.get(gap_pos, '')
+                                glbl_str = f"{glbl}:" if glbl else ''
+                                gcmt = f'   ; {gcm}' if gcm else ''
+                                hex_bytes = ' '.join(f'{b:02X}' for b in graw)
+                                out.append(
+                                    f"${gap_pos:04X}  {hex_bytes:<20}"
+                                    f"  {glbl_str:<20} {gmn} {gop}{gcmt}"
+                                )
+                                gap_pos = gnxt
                         pos = nxt; prev_ret = False
 
         out += [
