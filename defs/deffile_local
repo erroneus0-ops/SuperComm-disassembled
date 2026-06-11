@@ -1,0 +1,45 @@
+* NitrOS9 definitions - local relative path version
+* Pre-defines all include guards to prevent double-inclusion errors
+
+Level    set     2
+H6309    set     0
+MATCHBOX set     0
+CoGrf    set     0
+GIMEX    set     0
+mc09     set     0
+dalpha   set     0
+tano     set     0
+d64      set     0
+CC3FPGA  set     0
+ROM      set     0
+NOS9DBG  set     0
+DD       set     1
+atari    set     0
+corsham  set     0
+Width    set     32
+BECKER   set     0
+BECKERONLY set   0
+BECKERTO set     0
+ARDUINO  set     0
+SY6551N  set     0
+JMCPBCK  set     0
+NOINTMASK set    0
+BAUD38400 set    0
+
+* Include guard pre-definitions (IFNE X-1 pattern)
+OS9.D    set     0
+SCF.D    set     0
+COCO.D   set     0
+RBF.D    set     0
+RBSUPER.D set    0
+COCOSDC.D set    0
+VDGDEFS  set     0
+
+         use     os9.d
+         use     rbf.d
+         use     scf.d
+         use     coco.d
+         use     cocovtio.d
+         use     rbsuper.d
+         use     cocosdc.d
+         use     vdgdefs
