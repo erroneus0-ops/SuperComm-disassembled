@@ -10,7 +10,26 @@
   "custom_equates": [],
   "labels": {},
   "bss": {},
-  "data_regions": [],
+  "data_regions": [
+    {
+      "start": "046E",
+      "end": "047D",
+      "label": "Dat_046E",
+      "format": "text"
+    },
+    {
+      "start": "047D",
+      "end": "04B5",
+      "label": "Dat_047D",
+      "format": "text"
+    },
+    {
+      "start": "04B5",
+      "end": "06A7",
+      "label": "HelpText",
+      "format": "text"
+    }
+  ],
   "line_comments": {},
   "block_comments": {},
   "substitutions": {},
