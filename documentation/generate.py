@@ -493,6 +493,7 @@ footer {
   .cc-table {
     font-size: 9pt;
     page-break-inside: avoid;
+    border: 0.5pt solid #ccc;
   }
 
   .modes-table th,
