@@ -153,7 +153,12 @@ ModName
 ; ==============================================================
 ; Code section  $0011—$06BC  (1708 bytes)
 ; ==============================================================
-
+/bss/ $00 BSS.DirPath
+/bss/ $02 BSS.NextDir
+/bss/ $04 BSS.BufPtr
+/bss/ $06 BSS.PatPtr
+/bss/ $08 BSS.DirCount
+/bss/ $7A BSS.DotChar
 $0011  CC 01 50            Init:          LDD #$0150            
 $0014  DD 10                              STD <$10              
 $0016  86 2E                              LDA #$2E               ; A = '.'
