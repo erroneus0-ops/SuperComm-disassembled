@@ -380,11 +380,13 @@ def parse_directives(lines, json_path=None):
         # ── /end-label/ ──────────────────────────────────────────────────────
         elif line == '/end-label/':
             lbl = current_data_label(lines, i)
+            end_addr = next_addr_from_lines(lines, i + 1)
             if lbl:
                 changes['data_regions'].append({
                     'action':     'end_label',
                     'label':      lbl,
                     'label_addr': label_to_addr.get(lbl),
+                    'end_addr':   end_addr,
                 })
             else:
                 changes['warnings'].append(
@@ -575,6 +577,8 @@ def merge_into_json(json_path, changes, warn):
             r['end_label'] = True
             if 'start' not in r and action.get('label_addr') is not None:
                 r['start'] = f"{action['label_addr']:04X}"
+            if action.get('end_addr') is not None:
+                r['end'] = f"{action['end_addr']:04X}"
         elif action['action'] == 'format':
             r['format'] = action['format']
             if action.get('entries_per_line'):
