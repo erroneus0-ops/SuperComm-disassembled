@@ -124,14 +124,21 @@ F$NMLink EQU    $28
 ; ================================================================
 
 ; ── BSS Variable Equates ─────────────────────────────────────
-BSS.DirPath   EQU    0        ; BSS offset $0000
-BSS.NextDir   EQU    2        ; BSS offset $0002
-BSS.BufPtr    EQU    4        ; BSS offset $0004
-BSS.PatPtr    EQU    6        ; BSS offset $0006
-BSS.DirCount  EQU    8        ; BSS offset $0008
-BSS.ColWidth  EQU    16       ; BSS offset $0010
-BSS.LastCol   EQU    17       ; BSS offset $0011
-BSS.DotChar   EQU    122      ; BSS offset $007A
+BSS.DirPath   EQU    $00      ; 2 bytes
+BSS.NextDir   EQU    $02      ; 2 bytes
+BSS.BufPtr    EQU    $04      ; 2 bytes
+BSS.PatPtr    EQU    $06      ; 2 bytes
+BSS.DirCount  EQU    $08      ; 3 bytes
+BSS.$0B       EQU    $0B      ; 1 byte
+BSS.$0C       EQU    $0C      ; 1 byte
+BSS.$0D       EQU    $0D      ; 1 byte
+BSS.$0E       EQU    $0E      ; 1 byte
+BSS.$0F       EQU    $0F      ; 1 byte
+BSS.ColWidth  EQU    $10      ; 1 byte
+BSS.LastCol   EQU    $11      ; 6 bytes
+BSS.$17       EQU    $17      ; 98 bytes
+BSS.$79       EQU    $79      ; 1 byte
+BSS.DotChar   EQU    $7A      ; ?
 
 ; ==============================================================
 ; Disassembly:  dir
@@ -165,18 +172,18 @@ ModName
 ; ==============================================================
 
 $0011  CC 01 50            Init:          LDD #$0150            
-$0014  DD 10                              STD <$10              
+$0014  DD 10                              STD <BSS.ColWidth     
 $0016  86 2E                              LDA #$2E               ; A = '.'
-$0018  97 7A                              STA <$7A              
+$0018  97 7A                              STA <BSS.DotChar      
 $001A  4F                                 CLRA                   ; A = 0
 $001B  5F                                 CLRB                   ; B = 0
-$001C  DD 0E                              STD <$0E              
-$001E  DD 0C                              STD <$0C              
-$0020  97 08                              STA <$08              
+$001C  DD 0E                              STD <BSS.$0E          
+$001E  DD 0C                              STD <BSS.$0C          
+$0020  97 08                              STA <BSS.DirCount     
 $0022  31 8D 04 44                        LEAY Dat_046A,PC       ; Y → Dat_046A
-$0026  10 9F 02                           STY <$02              
+$0026  10 9F 02                           STY <BSS.NextDir      
 $0029  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
-$002B  0F 79                              CLR <$79              
+$002B  0F 79                              CLR <BSS.$79          
 $002D  A6 84               Loc_002D:      LDA ,X                
 $002F  81 0D                              CMPA #$0D              ; compare A with CR
 $0031  27 2C                              BEQ Loc_005F          
@@ -189,7 +196,7 @@ $003D  27 06                              BEQ Loc_0045
 $003F  81 0D                              CMPA #$0D              ; compare A with CR
 $0041  26 F6                              BNE Loc_0039          
 $0043  30 1F                              LEAX -1,X             
-$0045  9F 04               Loc_0045:      STX <$04              
+$0045  9F 04               Loc_0045:      STX <BSS.BufPtr       
 $0047  35 10                              PULS X                
 $0049  A6 84                              LDA ,X                
 $004B  81 2D                              CMPA #$2D              ; compare A with '-'
@@ -199,7 +206,7 @@ $0052  20 03                              BRA Loc_0057
 
 ; --------------------------------------------------------------
 $0054  17 02 1D            Loc_0054:      LBSR Sub_0274          ; call Sub_0274
-$0057  9E 04               Loc_0057:      LDX <$04              
+$0057  9E 04               Loc_0057:      LDX <BSS.BufPtr       
 $0059  20 D2                              BRA Loc_002D          
 
 ; --------------------------------------------------------------
@@ -207,12 +214,12 @@ $005B  30 01               Loc_005B:      LEAX 1,X
 $005D  20 CE                              BRA Loc_002D          
 
 ; --------------------------------------------------------------
-$005F  D7 17               Loc_005F:      STB <$17              
-$0061  D6 0D                              LDB <$0D              
-$0063  DA 0E                              ORB <$0E              
-$0065  DA 0F                              ORB <$0F              
-$0067  D7 0B                              STB <$0B              
-$0069  0D 10                              TST <$10              
+$005F  D7 17               Loc_005F:      STB <BSS.$17          
+$0061  D6 0D                              LDB <BSS.$0D          
+$0063  DA 0E                              ORB <BSS.$0E          
+$0065  DA 0F                              ORB <BSS.$0F          
+$0067  D7 0B                              STB <BSS.$0B          
+$0069  0D 10                              TST <BSS.ColWidth     
 $006B  27 33                              BEQ $00A0             
 $006D  34 12                              PSHS A,X              
 $006F  CC 01 26                           LDD #$0126            
@@ -230,7 +237,7 @@ $0087  24 11                              BCC Loc_009A           ; C=0 (BHS)
 $0089  86 20                              LDA #$20               ; A = ' '
 $008B  C1 20                              CMPB #$20              ; compare B with ' '
 $008D  24 0B                              BCC Loc_009A           ; C=0 (BHS)
-$008F  0F 10                              CLR <$10              
+$008F  0F 10                              CLR <BSS.ColWidth     
 $0091  20 07                              BRA Loc_009A          
 
 ; --------------------------------------------------------------
@@ -239,29 +246,29 @@ $0095  27 05                              BEQ Loc_009C
 $0097  16 03 B7                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
-$009A  97 11               Loc_009A:      STA <$11              
+$009A  97 11               Loc_009A:      STA <BSS.LastCol      
 $009C  1C FE               Loc_009C:      ANDCC #$FE             ; clr CC: C
 $009E  35 12                              PULS A,X              
-$00A0  96 17                              LDA <$17              
+$00A0  96 17                              LDA <BSS.$17          
 $00A2  8A 80                              ORA #$80              
-$00A4  9E 02                              LDX <$02              
+$00A4  9E 02                              LDX <BSS.NextDir      
 $00A6  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $00A9  10 25 03 A4                        LBCS Loc_0451         
-$00AD  97 00                              STA <$00              
-$00AF  9E 02                              LDX <$02              
-$00B1  96 17                              LDA <$17              
+$00AD  97 00                              STA <BSS.DirPath      
+$00AF  9E 02                              LDX <BSS.NextDir      
+$00B1  96 17                              LDA <BSS.$17          
 $00B3  10 3F 86                           OS9 I$ChgDir           ; mode=B  name→X
-$00B6  0D 0B                              TST <$0B              
+$00B6  0D 0B                              TST <BSS.$0B          
 $00B8  27 0F                              BEQ Loc_00C9          
-$00BA  96 17                              LDA <$17              
+$00BA  96 17                              LDA <BSS.$17          
 $00BC  30 8D 03 AC                        LEAX Dat_046C,PC       ; X → Dat_046C
 $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $00C3  10 25 03 8A                        LBCS Loc_0451         
 $00C7  97 01                              STA <$01              
-$00C9  96 11               Loc_00C9:      LDA <$11              
+$00C9  96 11               Loc_00C9:      LDA <BSS.LastCol      
 $00CB  97 12                              STA <$12              
-$00CD  96 0D                              LDA <$0D              
-$00CF  9A 10                              ORA <$10              
+$00CD  96 0D                              LDA <BSS.$0D          
+$00CF  9A 10                              ORA <BSS.ColWidth     
 $00D1  27 53                              BEQ Loc_0126          
 $00D3  30 8D 03 97                        LEAX Dat_046E,PC       ; X → Dat_046E
 $00D7  10 8E 00 0F                        LDY #$000F            
@@ -269,16 +276,16 @@ $00DB  86 01                              LDA #$01
 $00DD  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $00E0  10 25 03 6D                        LBCS Loc_0451         
 $00E4  31 C8 25                           LEAY 37,U             
-$00E7  9E 02                              LDX <$02              
+$00E7  9E 02                              LDX <BSS.NextDir      
 $00E9  A6 80               Loc_00E9:      LDA ,X+               
 $00EB  A7 A0                              STA ,Y+               
 $00ED  81 0D                              CMPA #$0D              ; compare A with CR
 $00EF  26 F8                              BNE Loc_00E9          
-$00F1  0D 0C                              TST <$0C              
+$00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
 $00F5  86 2F                              LDA #$2F               ; A = '/'
 $00F7  A7 3F                              STA -1,Y              
-$00F9  9E 06                              LDX <$06              
+$00F9  9E 06                              LDX <BSS.PatPtr       
 $00FB  A6 80               Loc_00FB:      LDA ,X+               
 $00FD  17 02 5F                           LBSR Sub_035F          ; call Sub_035F
 $0100  A7 1F                              STA -1,X              
@@ -289,13 +296,13 @@ $0108  30 C8 25            Loc_0108:      LEAX 37,U
 $010B  10 8E 00 FF                        LDY #$00FF            
 $010F  86 01                              LDA #$01              
 $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$0114  0D 0D                              TST <$0D              
+$0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102            
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D
 $011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7
 $0122  10 25 03 2B                        LBCS Loc_0451         
-$0126  96 00               Loc_0126:      LDA <$00              
+$0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
 $012C  30 C8 58                           LEAX 88,U             
 $012F  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
@@ -309,7 +316,7 @@ $0140  27 E4                              BEQ Loc_0126
 $0142  81 80                              CMPA #$80             
 $0144  27 06                              BEQ Loc_014C          
 $0146  84 7F                              ANDA #$7F             
-$0148  91 7A                              CMPA <$7A             
+$0148  91 7A                              CMPA <BSS.DotChar     
 $014A  27 DA                              BEQ Loc_0126          
 $014C  5F                  Loc_014C:      CLRB                   ; B = 0
 $014D  30 C8 58                           LEAX 88,U             
@@ -322,14 +329,14 @@ $0159  84 7F                              ANDA #$7F
 $015B  A7 1F                              STA -1,X              
 $015D  86 0D                              LDA #$0D               ; A = CR
 $015F  A7 84                              STA ,X                
-$0161  0D 0C                              TST <$0C              
+$0161  0D 0C                              TST <BSS.$0C          
 $0163  27 0D                              BEQ Loc_0172          
 $0165  30 C8 58                           LEAX 88,U             
-$0168  10 9E 06                           LDY <$06              
+$0168  10 9E 06                           LDY <BSS.PatPtr       
 $016B  17 01 A9                           LBSR Sub_0317          ; call Sub_0317
 $016E  0D 09                              TST <$09              
 $0170  27 B4                              BEQ Loc_0126          
-$0172  0D 0B               Loc_0172:      TST <$0B              
+$0172  0D 0B               Loc_0172:      TST <BSS.$0B          
 $0174  27 2E                              BEQ Loc_01A4          
 $0176  34 40                              PSHS U                
 $0178  30 C8 18                           LEAX 24,U             
@@ -344,18 +351,18 @@ $018A  35 40                              PULS U
 $018C  10 25 02 C1                        LBCS Loc_0451         
 $0190  96 18                              LDA <$18              
 $0192  84 80                              ANDA #$80             
-$0194  0D 0E                              TST <$0E              
+$0194  0D 0E                              TST <BSS.$0E          
 $0196  27 05                              BEQ Loc_019D          
 $0198  4D                                 TSTA                  
 $0199  27 8B                              BEQ Loc_0126          
 $019B  20 07                              BRA Loc_01A4          
 
 ; --------------------------------------------------------------
-$019D  0D 0F               Loc_019D:      TST <$0F              
+$019D  0D 0F               Loc_019D:      TST <BSS.$0F          
 $019F  27 03                              BEQ Loc_01A4          
 $01A1  4D                                 TSTA                  
 $01A2  26 82                              BNE Loc_0126          
-$01A4  0D 10               Loc_01A4:      TST <$10              
+$01A4  0D 10               Loc_01A4:      TST <BSS.ColWidth     
 $01A6  27 53                              BEQ $01FB             
 $01A8  0F 0A                              CLR <$0A              
 $01AA  D6 13                              LDB <$13              
@@ -389,13 +396,13 @@ $01E1  10 8E 00 01                        LDY #$0001
 $01E5  30 8D 02 82                        LEAX Dat_046B,PC       ; X → Dat_046B
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $01EC  10 25 02 61                        LBCS Loc_0451         
-$01F0  96 11                              LDA <$11              
+$01F0  96 11                              LDA <BSS.LastCol      
 $01F2  97 12                              STA <$12              
 $01F4  0D 0A                              TST <$0A              
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
 
-$01FB  0D 0D                                      TST <$0D
+$01FB  0D 0D                                      TST <BSS.$0D
 $01FD  10 26 01 6D                                LBNE $036E
 $0201  86 01                                      LDA #$01
 $0203  30 C8 58                                   LEAX 88,U
@@ -430,7 +437,7 @@ $0242  20 05                              BRA Loc_0249
 
 ; --------------------------------------------------------------
 $0244  39                  Loc_0244:      RTS                    ; return from subroutine
-$0245  0C 08               Loc_0245:      INC <$08              
+$0245  0C 08               Loc_0245:      INC <BSS.DirCount     
 $0247  20 CB                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
@@ -444,30 +451,30 @@ $0256  CB 04               Loc_0256:      ADDB #$04
 $0258  20 BA                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$025A  0F 10               Loc_025A:      CLR <$10              
+$025A  0F 10               Loc_025A:      CLR <BSS.ColWidth     
 $025C  20 B6                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$025E  0C 0D               Loc_025E:      INC <$0D              
-$0260  0F 10                              CLR <$10              
+$025E  0C 0D               Loc_025E:      INC <BSS.$0D          
+$0260  0F 10                              CLR <BSS.ColWidth     
 $0262  20 B0                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$0264  0C 0E               Loc_0264:      INC <$0E              
-$0266  0F 0F                              CLR <$0F              
+$0264  0C 0E               Loc_0264:      INC <BSS.$0E          
+$0266  0F 0F                              CLR <BSS.$0F          
 $0268  20 AA                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$026A  0C 0F               Loc_026A:      INC <$0F              
-$026C  0F 0E                              CLR <$0E              
+$026A  0C 0F               Loc_026A:      INC <BSS.$0F          
+$026C  0F 0E                              CLR <BSS.$0E          
 $026E  20 A4                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$0270  0F 7A               Loc_0270:      CLR <$7A              
+$0270  0F 7A               Loc_0270:      CLR <BSS.DotChar      
 $0272  20 A0                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$0274  9F 02               Sub_0274:      STX <$02              
+$0274  9F 02               Sub_0274:      STX <BSS.NextDir      
 $0276  A6 80               Loc_0276:      LDA ,X+               
 $0278  81 5F                              CMPA #$5F              ; compare A with '_'
 $027A  27 FA                              BEQ Loc_0276          
@@ -501,7 +508,7 @@ $02AF  1A 01                              ORCC #$01              ; set CC: C
 $02B1  16 01 9D                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
-$02B4  9F 06               Loc_02B4:      STX <$06              
+$02B4  9F 06               Loc_02B4:      STX <BSS.PatPtr       
 $02B6  A6 80               Loc_02B6:      LDA ,X+               
 $02B8  81 0D                              CMPA #$0D              ; compare A with CR
 $02BA  27 08                              BEQ Loc_02C4          
@@ -509,13 +516,13 @@ $02BC  81 20                              CMPA #$20              ; compare A wit
 $02BE  26 F6                              BNE Loc_02B6          
 $02C0  86 0D                              LDA #$0D               ; A = CR
 $02C2  A7 82                              STA ,-X               
-$02C4  9E 06               Loc_02C4:      LDX <$06              
+$02C4  9E 06               Loc_02C4:      LDX <BSS.PatPtr       
 $02C6  A6 82               Loc_02C6:      LDA ,-X               
-$02C8  9C 02                              CMPX <$02             
+$02C8  9C 02                              CMPX <BSS.NextDir     
 $02CA  26 0A                              BNE Loc_02D6          
-$02CC  9F 06                              STX <$06              
+$02CC  9F 06                              STX <BSS.PatPtr       
 $02CE  30 8D 01 98                        LEAX Dat_046A,PC       ; X → Dat_046A
-$02D2  9F 02                              STX <$02              
+$02D2  9F 02                              STX <BSS.NextDir      
 $02D4  20 0A                              BRA Loc_02E0          
 
 ; --------------------------------------------------------------
@@ -523,9 +530,9 @@ $02D6  81 2F               Loc_02D6:      CMPA #$2F              ; compare A wit
 $02D8  26 EC                              BNE Loc_02C6          
 $02DA  86 0D                              LDA #$0D               ; A = CR
 $02DC  A7 80                              STA ,X+               
-$02DE  9F 06                              STX <$06              
-$02E0  0C 0C               Loc_02E0:      INC <$0C              
-$02E2  9E 06                              LDX <$06              
+$02DE  9F 06                              STX <BSS.PatPtr       
+$02E0  0C 0C               Loc_02E0:      INC <BSS.$0C          
+$02E2  9E 06                              LDX <BSS.PatPtr       
 $02E4  86 0D               Loc_02E4:      LDA #$0D               ; A = CR
 $02E6  A1 84                              CMPA ,X               
 $02E8  27 2C                              BEQ Loc_0316          
@@ -607,7 +614,7 @@ $035C  0F 09               Loc_035C:      CLR <$09
 $035E  39                                 RTS                    ; return from subroutine
 
 ; --------------------------------------------------------------
-$035F  0D 08               Sub_035F:      TST <$08              
+$035F  0D 08               Sub_035F:      TST <BSS.DirCount     
 $0361  26 0A                              BNE Loc_036D          
 $0363  81 61                              CMPA #$61              ; compare A with 'a'
 $0365  25 06                              BCS Loc_036D           ; C=1 (BLO)
@@ -727,7 +734,7 @@ $044F  20 F4                                      BRA $0445
 $0451  C1 D3               Loc_0451:      CMPB #$D3             
 $0453  26 01                              BNE Loc_0456          
 $0455  5F                                 CLRB                   ; B = 0
-$0456  0D 10               Loc_0456:      TST <$10              
+$0456  0D 10               Loc_0456:      TST <BSS.ColWidth     
 $0458  27 0D                              BEQ $0467             
 $045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
 $045D  0D 86               Sub_045D:      TST <$86              

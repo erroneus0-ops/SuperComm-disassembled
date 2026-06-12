@@ -17,8 +17,15 @@
     "4": "BSS.BufPtr",
     "6": "BSS.PatPtr",
     "8": "BSS.DirCount",
+    "11": "BSS.$0B",
+    "12": "BSS.$0C",
+    "13": "BSS.$0D",
+    "14": "BSS.$0E",
+    "15": "BSS.$0F",
     "16": "BSS.ColWidth",
     "17": "BSS.LastCol",
+    "23": "BSS.$17",
+    "121": "BSS.$79",
     "122": "BSS.DotChar"
   },
   "data_regions": [
