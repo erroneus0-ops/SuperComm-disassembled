@@ -254,3 +254,108 @@ footer {
   border-top: 1px solid var(--border);
   margin-top: 2rem;
 }
+
+/* ── Print / PDF ─────────────────────────────────────────────── */
+@media print {
+  :root {
+    --bg:          #ffffff;
+    --bg2:         #f8f8f8;
+    --bg3:         #eeeeee;
+    --border:      #cccccc;
+    --text:        #000000;
+    --text-dim:    #444444;
+    --accent:      #000000;
+    --accent2:     #000000;
+    --mnemonic:    #000000;
+    --code-bg:     #f4f4f4;
+    --cc-affected: #000000;
+    --cc-set:      #000000;
+    --cc-cleared:  #666666;
+    --cc-undef:    #000000;
+  }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 10pt;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @page {
+    size: letter;
+    margin: 1in 0.9in 1in 1.1in;  /* inner margin wider for binding */
+  }
+
+  @page :left  { margin-left: 1.1in; margin-right: 0.9in; }
+  @page :right { margin-left: 0.9in; margin-right: 1.1in; }
+
+  header {
+    border-bottom: 2pt solid black;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  header h1 { font-size: 18pt; }
+  header h2 { font-size: 12pt; font-style: italic; }
+
+  .topnav { display: none; }
+
+  h2 {
+    font-size: 14pt;
+    border-bottom: 1pt solid black;
+    page-break-after: avoid;
+  }
+
+  h3.mnemonic {
+    font-size: 12pt;
+    page-break-after: avoid;
+  }
+
+  .instruction {
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5pt solid #ccc;
+  }
+
+  .modes-table,
+  .cc-table {
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+
+  .modes-table th,
+  .modes-table td,
+  .cc-table th,
+  .cc-table td {
+    border: 0.5pt solid #ccc;
+    padding: 0.2rem 0.4rem;
+    background: none !important;
+  }
+
+  .modes-table th,
+  .cc-table th {
+    background: #eeeeee !important;
+    font-weight: bold;
+  }
+
+  code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 9pt;
+    background: none;
+  }
+
+  .notes {
+    font-size: 9pt;
+    border-left: 2pt solid #ccc;
+    padding-left: 0.5rem;
+  }
+
+  .mnemonic-list a { color: black; text-decoration: none; }
+  .index-group { page-break-inside: avoid; border: 0.5pt solid #ccc; }
+
+  a[href]::after { content: none; }  /* suppress URL printing */
+
+  footer { font-size: 8pt; border-top: 0.5pt solid #ccc; }
+}
