@@ -47,10 +47,11 @@ def render_modes_table(modes):
     for m in modes:
         cycles = m.get('cycles', '?')
         bytes_ = m.get('bytes', '?')
+        syntax = m['syntax'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
         rows.append(
             f'<tr>'
             f'<td class="mode">{m["mode"].replace("-", "&#8209;")}</td>'
-            f'<td class="syntax"><code>{m["syntax"]}</code></td>'
+            f'<td class="syntax"><code>{syntax}</code></td>'
             f'<td class="opcode"><code>${m["opcode"]}</code></td>'
             f'<td class="bytes">{bytes_}</td>'
             f'<td class="cycles">{cycles}</td>'
@@ -61,7 +62,7 @@ def render_modes_table(modes):
 def render_instruction(instr):
     mnemonic = instr['mnemonic']
     full_name = instr['full_name']
-    operation = instr.get('operation', '')
+    operation = instr.get('operation', '').replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
     description = instr.get('description', '')
     notes = instr.get('notes', '')
     cc = instr.get('condition_codes', {})

@@ -26,7 +26,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>ANDA #n</code></td><td class="opcode"><code>$84</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>ANDA <addr</code></td><td class="opcode"><code>$94</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ANDA &lt;addr</code></td><td class="opcode"><code>$94</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>ANDA addr,R</code></td><td class="opcode"><code>$A4</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>ANDA addr</code></td><td class="opcode"><code>$B4</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -56,7 +56,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>ANDB #n</code></td><td class="opcode"><code>$C4</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>ANDB <addr</code></td><td class="opcode"><code>$D4</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ANDB &lt;addr</code></td><td class="opcode"><code>$D4</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>ANDB addr,R</code></td><td class="opcode"><code>$E4</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>ANDB addr</code></td><td class="opcode"><code>$F4</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -113,7 +113,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>ORA #n</code></td><td class="opcode"><code>$8A</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>ORA <addr</code></td><td class="opcode"><code>$9A</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ORA &lt;addr</code></td><td class="opcode"><code>$9A</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>ORA addr,R</code></td><td class="opcode"><code>$AA</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>ORA addr</code></td><td class="opcode"><code>$BA</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -143,7 +143,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>ORB #n</code></td><td class="opcode"><code>$CA</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>ORB <addr</code></td><td class="opcode"><code>$DA</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ORB &lt;addr</code></td><td class="opcode"><code>$DA</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>ORB addr,R</code></td><td class="opcode"><code>$EA</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>ORB addr</code></td><td class="opcode"><code>$FA</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -200,7 +200,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>EORA #n</code></td><td class="opcode"><code>$88</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>EORA <addr</code></td><td class="opcode"><code>$98</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>EORA &lt;addr</code></td><td class="opcode"><code>$98</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>EORA addr,R</code></td><td class="opcode"><code>$A8</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>EORA addr</code></td><td class="opcode"><code>$B8</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -230,7 +230,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>EORB #n</code></td><td class="opcode"><code>$C8</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>EORB <addr</code></td><td class="opcode"><code>$D8</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>EORB &lt;addr</code></td><td class="opcode"><code>$D8</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>EORB addr,R</code></td><td class="opcode"><code>$E8</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>EORB addr</code></td><td class="opcode"><code>$F8</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -313,7 +313,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>COM <addr</code></td><td class="opcode"><code>$03</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+      <tr><td class="mode">direct</td><td class="syntax"><code>COM &lt;addr</code></td><td class="opcode"><code>$03</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>COM addr,R</code></td><td class="opcode"><code>$63</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>COM addr</code></td><td class="opcode"><code>$73</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
     </tbody>
@@ -396,7 +396,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>CLR <addr</code></td><td class="opcode"><code>$0F</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+      <tr><td class="mode">direct</td><td class="syntax"><code>CLR &lt;addr</code></td><td class="opcode"><code>$0F</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CLR addr,R</code></td><td class="opcode"><code>$6F</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CLR addr</code></td><td class="opcode"><code>$7F</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
     </tbody>

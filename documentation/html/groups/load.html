@@ -26,7 +26,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDA #n</code></td><td class="opcode"><code>$86</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDA <addr</code></td><td class="opcode"><code>$96</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDA &lt;addr</code></td><td class="opcode"><code>$96</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDA addr,R</code></td><td class="opcode"><code>$A6</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDA addr</code></td><td class="opcode"><code>$B6</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -56,7 +56,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDB #n</code></td><td class="opcode"><code>$C6</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDB <addr</code></td><td class="opcode"><code>$D6</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDB &lt;addr</code></td><td class="opcode"><code>$D6</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDB addr,R</code></td><td class="opcode"><code>$E6</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDB addr</code></td><td class="opcode"><code>$F6</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -86,7 +86,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDD #nn</code></td><td class="opcode"><code>$CC</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDD <addr</code></td><td class="opcode"><code>$DC</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDD &lt;addr</code></td><td class="opcode"><code>$DC</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDD addr,R</code></td><td class="opcode"><code>$EC</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDD addr</code></td><td class="opcode"><code>$FC</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
     </tbody>
@@ -116,7 +116,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDX #nn</code></td><td class="opcode"><code>$8E</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDX <addr</code></td><td class="opcode"><code>$9E</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDX &lt;addr</code></td><td class="opcode"><code>$9E</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDX addr,R</code></td><td class="opcode"><code>$AE</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDX addr</code></td><td class="opcode"><code>$BE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
     </tbody>
@@ -146,7 +146,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDY #nn</code></td><td class="opcode"><code>$108E</code></td><td class="bytes">4</td><td class="cycles">4</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDY <addr</code></td><td class="opcode"><code>$109E</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDY &lt;addr</code></td><td class="opcode"><code>$109E</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDY addr,R</code></td><td class="opcode"><code>$10AE</code></td><td class="bytes">3+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDY addr</code></td><td class="opcode"><code>$10BE</code></td><td class="bytes">4</td><td class="cycles">7</td></tr>
     </tbody>
@@ -176,7 +176,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDS #nn</code></td><td class="opcode"><code>$10CE</code></td><td class="bytes">4</td><td class="cycles">4</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDS <addr</code></td><td class="opcode"><code>$10DE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDS &lt;addr</code></td><td class="opcode"><code>$10DE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDS addr,R</code></td><td class="opcode"><code>$10EE</code></td><td class="bytes">3+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDS addr</code></td><td class="opcode"><code>$10FE</code></td><td class="bytes">4</td><td class="cycles">7</td></tr>
     </tbody>
@@ -206,7 +206,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>LDU #nn</code></td><td class="opcode"><code>$CE</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>LDU <addr</code></td><td class="opcode"><code>$DE</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDU &lt;addr</code></td><td class="opcode"><code>$DE</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>LDU addr,R</code></td><td class="opcode"><code>$EE</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDU addr</code></td><td class="opcode"><code>$FE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
     </tbody>

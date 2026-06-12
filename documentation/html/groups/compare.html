@@ -26,7 +26,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPA #n</code></td><td class="opcode"><code>$81</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPA <addr</code></td><td class="opcode"><code>$91</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPA &lt;addr</code></td><td class="opcode"><code>$91</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPA addr,R</code></td><td class="opcode"><code>$A1</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPA addr</code></td><td class="opcode"><code>$B1</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -56,7 +56,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPB #n</code></td><td class="opcode"><code>$C1</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPB <addr</code></td><td class="opcode"><code>$D1</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPB &lt;addr</code></td><td class="opcode"><code>$D1</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPB addr,R</code></td><td class="opcode"><code>$E1</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPB addr</code></td><td class="opcode"><code>$F1</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -86,7 +86,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPD #nn</code></td><td class="opcode"><code>$1083</code></td><td class="bytes">4</td><td class="cycles">5</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPD <addr</code></td><td class="opcode"><code>$1093</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPD &lt;addr</code></td><td class="opcode"><code>$1093</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPD addr,R</code></td><td class="opcode"><code>$10A3</code></td><td class="bytes">3+</td><td class="cycles">7+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPD addr</code></td><td class="opcode"><code>$10B3</code></td><td class="bytes">4</td><td class="cycles">8</td></tr>
     </tbody>
@@ -116,7 +116,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPX #nn</code></td><td class="opcode"><code>$8C</code></td><td class="bytes">3</td><td class="cycles">4</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPX <addr</code></td><td class="opcode"><code>$9C</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPX &lt;addr</code></td><td class="opcode"><code>$9C</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPX addr,R</code></td><td class="opcode"><code>$AC</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPX addr</code></td><td class="opcode"><code>$BC</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
     </tbody>
@@ -146,7 +146,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPY #nn</code></td><td class="opcode"><code>$108C</code></td><td class="bytes">4</td><td class="cycles">5</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPY <addr</code></td><td class="opcode"><code>$109C</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPY &lt;addr</code></td><td class="opcode"><code>$109C</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPY addr,R</code></td><td class="opcode"><code>$10AC</code></td><td class="bytes">3+</td><td class="cycles">7+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPY addr</code></td><td class="opcode"><code>$10BC</code></td><td class="bytes">4</td><td class="cycles">8</td></tr>
     </tbody>
@@ -176,7 +176,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPS #nn</code></td><td class="opcode"><code>$118C</code></td><td class="bytes">4</td><td class="cycles">5</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPS <addr</code></td><td class="opcode"><code>$119C</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPS &lt;addr</code></td><td class="opcode"><code>$119C</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPS addr,R</code></td><td class="opcode"><code>$11AC</code></td><td class="bytes">3+</td><td class="cycles">7+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPS addr</code></td><td class="opcode"><code>$11BC</code></td><td class="bytes">4</td><td class="cycles">8</td></tr>
     </tbody>
@@ -206,7 +206,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>CMPU #nn</code></td><td class="opcode"><code>$1183</code></td><td class="bytes">4</td><td class="cycles">5</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>CMPU <addr</code></td><td class="opcode"><code>$1193</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>CMPU &lt;addr</code></td><td class="opcode"><code>$1193</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>CMPU addr,R</code></td><td class="opcode"><code>$11A3</code></td><td class="bytes">3+</td><td class="cycles">7+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>CMPU addr</code></td><td class="opcode"><code>$11B3</code></td><td class="bytes">4</td><td class="cycles">8</td></tr>
     </tbody>
@@ -289,7 +289,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>TST <addr</code></td><td class="opcode"><code>$0D</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+      <tr><td class="mode">direct</td><td class="syntax"><code>TST &lt;addr</code></td><td class="opcode"><code>$0D</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>TST addr,R</code></td><td class="opcode"><code>$6D</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>TST addr</code></td><td class="opcode"><code>$7D</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
     </tbody>
@@ -319,7 +319,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>BITA #n</code></td><td class="opcode"><code>$85</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>BITA <addr</code></td><td class="opcode"><code>$95</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>BITA &lt;addr</code></td><td class="opcode"><code>$95</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>BITA addr,R</code></td><td class="opcode"><code>$A5</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>BITA addr</code></td><td class="opcode"><code>$B5</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
@@ -349,7 +349,7 @@
     </thead>
     <tbody>
       <tr><td class="mode">immediate</td><td class="syntax"><code>BITB #n</code></td><td class="opcode"><code>$C5</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
-<tr><td class="mode">direct</td><td class="syntax"><code>BITB <addr</code></td><td class="opcode"><code>$D5</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>BITB &lt;addr</code></td><td class="opcode"><code>$D5</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
 <tr><td class="mode">indexed</td><td class="syntax"><code>BITB addr,R</code></td><td class="opcode"><code>$E5</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>BITB addr</code></td><td class="opcode"><code>$F5</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
     </tbody>
