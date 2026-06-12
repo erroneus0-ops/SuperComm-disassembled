@@ -43,6 +43,8 @@
       "label": "Dat_047D",
       "format": "text",
       "end_label": false
+<<<<<<< HEAD
+=======
     },
     {
       "label": "Dat_052C",
@@ -50,6 +52,7 @@
       "start": "052C",
       "end": "06A7",
       "format": "text"
+>>>>>>> 57e87bbcb9e546cb2fa90da2c0901d0fc3ece6d0
     }
   ],
   "line_comments": {
