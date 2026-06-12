@@ -136,7 +136,8 @@ BSS.$0E       EQU    $0E      ; 1 byte
 BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
 BSS.LastCol   EQU    $11      ; 6 bytes
-BSS.$17       EQU    $17      ; 98 bytes
+BSS.$17       EQU    $17      ; 14 bytes
+BSS.$25       EQU    $25      ; 84 bytes
 BSS.$79       EQU    $79      ; 1 byte
 BSS.DotChar   EQU    $7A      ; ?
 
@@ -275,12 +276,12 @@ $00D7  10 8E 00 0F                        LDY #$000F
 $00DB  86 01                              LDA #$01              
 $00DD  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $00E0  10 25 03 6D                        LBCS Loc_0451         
-$00E4  31 C8 25                           LEAY 37,U             
+$00E4  31 C8 25                           LEAY BSS.$25,U        
 $00E7  9E 02                              LDX <BSS.NextDir      
-$00E9  A6 80               Loc_00E9:      LDA ,X+               
+$00E9  A6 80               Loc_00E9:      LDA ,X+                ; this is a loop copying the NextDir to BSS.$25
 $00EB  A7 A0                              STA ,Y+               
-$00ED  81 0D                              CMPA #$0D              ; compare A with CR
-$00EF  26 F8                              BNE Loc_00E9          
+$00ED  81 0D                              CMPA #$0D              ; compare A with CR  [Looking for a CR terminator]
+$00EF  26 F8                              BNE Loc_00E9           ; Nope?  Keep looking!
 $00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
 $00F5  86 2F                              LDA #$2F               ; A = '/'
@@ -292,7 +293,7 @@ $0100  A7 1F                              STA -1,X
 $0102  A7 A0                              STA ,Y+               
 $0104  81 0D                              CMPA #$0D              ; compare A with CR
 $0106  26 F3                              BNE Loc_00FB          
-$0108  30 C8 25            Loc_0108:      LEAX 37,U             
+$0108  30 C8 25            Loc_0108:      LEAX BSS.$25,U        
 $010B  10 8E 00 FF                        LDY #$00FF            
 $010F  86 01                              LDA #$01              
 $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
@@ -624,7 +625,7 @@ $036B  84 DF                              ANDA #$DF
 $036D  39                  Loc_036D:      RTS                    ; return from subroutine
 
 $036E  30 8D 01 87                                LEAX +391,PC
-$0372  31 C8 25                                   LEAY 37,U
+$0372  31 C8 25                                   LEAY BSS.$25,U
 $0375  A6 80                                      LDA ,X+
 $0377  81 0A                                      CMPA #$0A   ; compare A with LF
 $0379  27 04                                      BEQ $037F
@@ -695,7 +696,7 @@ $0401  5A                                         DECB
 $0402  26 F9                                      BNE $03FD
 $0404  30 C8 4F                                   LEAX 79,U
 $0407  8D 39                                      BSR $0442
-$0409  30 C8 25                                   LEAX 37,U
+$0409  30 C8 25                                   LEAX BSS.$25,U
 $040C  10 8E 00 50                                LDY #$0050
 $0410  86 01                                      LDA #$01
 $0412  10 3F 8C                                   OS9 I$WritLn   ; path=A  buf→X
@@ -786,31 +787,31 @@ Dat_0519
 Dat_052C
 ; Referenced by: $024C
 ; ── 379 bytes  ($052C—$06A6) ──
-         FCB    $0A ; LF
+         FCB    $0A               ; LF
          FCC    "dir [-opts] [path/patt] [-opts]"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "opts: x - use current exec dir"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      s - one entry/line"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "    e/l - extended directory"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      a - show '.files', too"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      d - only directory files"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      f - only non-dir files"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      c - case insensitive filename match (BUT NOT DIR NAME)"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      ? - help message"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "pattern: may include wild cards"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      * - multiple character"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      ? - single character"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
 $06A7  5A                  Sub_06A7:      DECB                  
 $06A8  10 8E 00 50                        LDY #$0050            
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
