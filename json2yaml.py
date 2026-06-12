@@ -20,7 +20,7 @@ def main():
                        default_flow_style=False, width=80)
 
     if len(sys.argv) >= 3:
-        with open(sys.argv[2], 'w') as f:
+        with open(sys.argv[2], 'w', encoding='utf-8') as f:
             f.write(output)
         print(f"Written: {sys.argv[2]}")
     else:
