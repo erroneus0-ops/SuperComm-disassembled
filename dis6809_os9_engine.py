@@ -1863,7 +1863,7 @@ class Engine:
                 # For fdb/raw regions: if this is the START of the declared region,
                 # render the ENTIRE region at once to avoid sub-span alignment issues.
                 # Sub-labels within the region are passed as 'sub' to emit_data.
-                if is_parent_region_start and fmt in ('fdb', 'raw'):
+                if is_parent_region_start and fmt in ('fdb', 'raw', 'text', 'auto', 'hexdump', 'writeblock'):
                     region_end = proj_r.get('end')
                     out.append(""); out.append(f"{span_lbl}")
                     callers = self.xrefs.get(span_start, [])

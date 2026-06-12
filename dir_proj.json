@@ -34,11 +34,12 @@
       "label": "Dat_046E",
       "format": "auto",
       "end_label": true,
-      "start": "046E"
+      "start": "046E",
+      "end": "047D"
     },
     {
       "start": "047D",
-      "end": "06A7",
+      "end": "052C",
       "label": "Dat_047D",
       "format": "text",
       "end_label": false
@@ -47,7 +48,8 @@
       "label": "Dat_052C",
       "end_label": true,
       "start": "052C",
-      "end": "06A7"
+      "end": "06A7",
+      "format": "text"
     }
   ],
   "line_comments": {
