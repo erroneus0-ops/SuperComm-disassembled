@@ -812,6 +812,7 @@ Dat_052C
          FCB    $0D               ; CR
          FCC    "      ? - single character"
          FCB    $0D               ; CR
+/region/ $052C $06A7 text Dat_052C endlabel
 $06A7  5A                  Sub_06A7:      DECB                  
 $06A8  10 8E 00 50                        LDY #$0050            
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
