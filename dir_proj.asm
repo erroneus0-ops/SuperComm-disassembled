@@ -123,6 +123,16 @@ F$SigMask EQU   $27
 F$NMLink EQU    $28
 ; ================================================================
 
+; ── BSS Variable Equates ─────────────────────────────────────
+BSS.DirPath   EQU    0        ; BSS offset $0000
+BSS.NextDir   EQU    2        ; BSS offset $0002
+BSS.BufPtr    EQU    4        ; BSS offset $0004
+BSS.PatPtr    EQU    6        ; BSS offset $0006
+BSS.DirCount  EQU    8        ; BSS offset $0008
+BSS.ColWidth  EQU    16       ; BSS offset $0010
+BSS.LastCol   EQU    17       ; BSS offset $0011
+BSS.DotChar   EQU    122      ; BSS offset $007A
+
 ; ==============================================================
 ; Disassembly:  dir
 ; Module:       dir
@@ -153,12 +163,7 @@ ModName
 ; ==============================================================
 ; Code section  $0011—$06BC  (1708 bytes)
 ; ==============================================================
-/bss/ $00 BSS.DirPath
-/bss/ $02 BSS.NextDir
-/bss/ $04 BSS.BufPtr
-/bss/ $06 BSS.PatPtr
-/bss/ $08 BSS.DirCount
-/bss/ $7A BSS.DotChar
+
 $0011  CC 01 50            Init:          LDD #$0150            
 $0014  DD 10                              STD <$10              
 $0016  86 2E                              LDA #$2E               ; A = '.'
