@@ -9,7 +9,16 @@
   ],
   "custom_equates": [],
   "labels": {},
-  "bss": {},
+  "bss": {
+    "0": "BSS.DirPath",
+    "2": "BSS.NextDir",
+    "4": "BSS.BufPtr",
+    "6": "BSS.PatPtr",
+    "8": "BSS.DirCount",
+    "16": "BSS.ColWidth",
+    "17": "BSS.LastCol",
+    "122": "BSS.DotChar"
+  },
   "data_regions": [
     {
       "start": "046E",

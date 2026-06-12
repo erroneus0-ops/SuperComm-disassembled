@@ -124,36 +124,36 @@ F$NMLink EQU    $28
 ; ================================================================
 
 ; ── BSS Variable Equates ─────────────────────────────────────
-BSS.ParamStr  EQU    2        ; BSS offset $0002
-BSS.ParamBase EQU    4        ; BSS offset $0004
-BSS.RxBufPtr  EQU    6        ; BSS offset $0006
-BSS.TxBufPtr  EQU    8        ; BSS offset $0008
-BSS.Var000B   EQU    11       ; BSS offset $000B
-BSS.CurrChar  EQU    30       ; BSS offset $001E
-BSS.PrevChar  EQU    31       ; BSS offset $001F
-BSS.StateFlag EQU    32       ; BSS offset $0020
-BSS.Counter1  EQU    45       ; BSS offset $002D
-BSS.TermMode  EQU    51       ; BSS offset $0033
-BSS.EchoFlag  EQU    70       ; BSS offset $0046
-BSS.FlowCtrl  EQU    74       ; BSS offset $004A
-BSS.Counter2  EQU    77       ; BSS offset $004D
-BSS.Counter3  EQU    78       ; BSS offset $004E
-BSS.ConnState EQU    90       ; BSS offset $005A
-BSS.ConnWord  EQU    91       ; BSS offset $005B
-BSS.BufPtr1   EQU    93       ; BSS offset $005D
-BSS.BufCount  EQU    95       ; BSS offset $005F
-BSS.BufPtr2   EQU    99       ; BSS offset $0063
-BSS.BufPtr3   EQU    101      ; BSS offset $0065
-BSS.Counter4  EQU    103      ; BSS offset $0067
-BSS.CommPtr   EQU    3660     ; BSS offset $0E4C
-BSS.CommState EQU    3665     ; BSS offset $0E51
-BSS.CommSz1   EQU    3671     ; BSS offset $0E57
-BSS.CommSz2   EQU    3673     ; BSS offset $0E59
-BSS.CommOff   EQU    3676     ; BSS offset $0E5C
-BSS.CommFlag  EQU    3693     ; BSS offset $0E6D
-BSS.BaudState EQU    3699     ; BSS offset $0E73
-BSS.FlowState EQU    3703     ; BSS offset $0E77
-BSS.IoBuf     EQU    6613     ; BSS offset $19D5
+BSS.ParamStr  EQU    $02      ; 2 bytes
+BSS.ParamBase EQU    $04      ; 2 bytes
+BSS.RxBufPtr  EQU    $06      ; 2 bytes
+BSS.TxBufPtr  EQU    $08      ; 3 bytes
+BSS.Var000B   EQU    $0B      ; 19 bytes
+BSS.CurrChar  EQU    $1E      ; 1 byte
+BSS.PrevChar  EQU    $1F      ; 1 byte
+BSS.StateFlag EQU    $20      ; 13 bytes
+BSS.Counter1  EQU    $2D      ; 6 bytes
+BSS.TermMode  EQU    $33      ; 19 bytes
+BSS.EchoFlag  EQU    $46      ; 4 bytes
+BSS.FlowCtrl  EQU    $4A      ; 3 bytes
+BSS.Counter2  EQU    $4D      ; 1 byte
+BSS.Counter3  EQU    $4E      ; 12 bytes
+BSS.ConnState EQU    $5A      ; 1 byte
+BSS.ConnWord  EQU    $5B      ; 2 bytes
+BSS.BufPtr1   EQU    $5D      ; 2 bytes
+BSS.BufCount  EQU    $5F      ; 4 bytes
+BSS.BufPtr2   EQU    $63      ; 2 bytes
+BSS.BufPtr3   EQU    $65      ; 2 bytes
+BSS.Counter4  EQU    $67      ; 3557 bytes
+BSS.CommPtr   EQU    $E4C      ; 5 bytes
+BSS.CommState EQU    $E51      ; 6 bytes
+BSS.CommSz1   EQU    $E57      ; 2 bytes
+BSS.CommSz2   EQU    $E59      ; 3 bytes
+BSS.CommOff   EQU    $E5C      ; 17 bytes
+BSS.CommFlag  EQU    $E6D      ; 6 bytes
+BSS.BaudState EQU    $E73      ; 4 bytes
+BSS.FlowState EQU    $E77      ; 2910 bytes
+BSS.IoBuf     EQU    $19D5      ; ?
 
 ; ==============================================================
 ; Disassembly:  supercomm22
@@ -1295,8 +1295,8 @@ $0C47  86 00                              LDA #$00               ; A = NUL
 $0C49  30 8D F6 CD                        LEAX Dat_031A,PC       ; X → Dat_031A
 $0C4D  AF C8 6C                           STX 108,U             
 $0C50  30 C9 06 0E                        LEAX 1550,U           
-$0C54  10 8E 00 01         Insn_0C54:     LDY #$0001            
-$0C57  01                  Loc_0C57:      EQU    $0C57            ; [*1] branch target 3 byte(s) inside Insn_0C54 -- see [*1]
+$0C54  10 8E 00 01                        LDY #$0001            
+$0C57  01                  Loc_0C57:            EQU    $0C57            ; [*1] branch target 3 byte(s) inside Insn_0C54 -- see [*1]
 $0C58  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $0C5B  16 09 1D                           LBRA Loc_157B         
 
@@ -7812,28 +7812,3 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
-
-; ══════════════════════════════════════════════════════════════
-; ANALYST NOTES
-; ══════════════════════════════════════════════════════════════
-
-; [*1] UNRESOLVABLE DISASSEMBLY CONDITION
-; ──────────────────────────────────────────────────────────────
-;      $0C57 is referenced as a branch target but falls
-;      inside the operand of a preceding instruction (Insn_0C54).
-;      Byte $01 at $0C57 is not a valid 6809 opcode.
-;
-;      On 6809 / 6309-emulation mode: $01 is a harmless undefined
-;      opcode — execution falls through to the next instruction.
-;      On 6309 native mode: $01 may be interpreted as a 6309
-;      instruction consuming subsequent bytes — UNPREDICTABLE RESULTS.
-;
-;      The EQU expression 'Loc_0C57 EQU Insn_0C54+3' resolves
-;      to $0C57 at assembly time. Branches to Loc_0C57
-;      will target the correct address and the assembled binary
-;      WILL match the original at those branch sites.
-;
-;      Probable cause: the branch target address is off by one byte
-;      (a bug in the original code, or a deliberate overlapping-code trick).
-
-; ══════════════════════════════════════════════════════════════
