@@ -1872,8 +1872,7 @@ class Engine:
                         out.append(f"; Referenced by: {', '.join(caller_strs)}")
                     if proj_r.get('comment'):
                         out.append(f"; {proj_r['comment']}")
-                    out.append(f"; ── {region_end-span_start} bytes"
-                               f"  (${span_start:04X}—${region_end-1:04X}) ──")
+                    out.append(f"; ── {region_end-span_start} (${region_end-span_start:04X}) bytes  (${span_start:04X}—${region_end-1:04X}) ──")
                     sub = {k:v for k,v in lbs.items()
                            if span_start < k < region_end}
                     out.extend(self.emit_data(span_start, region_end, sub, fmt))
@@ -1910,8 +1909,7 @@ class Engine:
                     out.append(f"; Referenced by: {', '.join(caller_strs)}")
                 if proj_r.get('comment') and span_start == proj_r.get('start'):
                     out.append(f"; {proj_r['comment']}")
-                out.append(f"; ── {span_end-span_start} bytes"
-                           f"  (${span_start:04X}—${span_end-1:04X}) ──")
+                out.append(f"; ── {span_end-span_start} (${span_end-span_start:04X}) bytes  (${span_start:04X}—${span_end-1:04X}) ──")
                 sub = {k:v for k,v in lbs.items()
                        if span_start < k < span_end}
                 # Apply syscall hint if no project format override
