@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Increment and Decrement</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Increment and Decrement</span>
+  </nav>
+  <main>
+    <h2>Increment and Decrement</h2>
+    
+<div class="instruction" id="INCA">
+  <h3 class="mnemonic">INCA <span class="full-name">— Increment Accumulator A</span></h3>
+  <div class="operation"><code>A ← A + 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>INCA</code></td><td class="opcode"><code>$4C</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">C is not affected — use ADDA #1 if carry is needed. V is set if A was $7F (overflow from +127 to -128 in signed arithmetic).</p>
+</div>
+
+
+<div class="instruction" id="INCB">
+  <h3 class="mnemonic">INCB <span class="full-name">— Increment Accumulator B</span></h3>
+  <div class="operation"><code>B ← B + 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>INCB</code></td><td class="opcode"><code>$5C</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">C is not affected. V is set if B was $7F.</p>
+</div>
+
+
+<div class="instruction" id="INC">
+  <h3 class="mnemonic">INC <span class="full-name">— Increment Memory</span></h3>
+  <div class="operation"><code>M ← M + 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">direct</td><td class="syntax"><code>INC <addr</code></td><td class="opcode"><code>$0C</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>INC addr,R</code></td><td class="opcode"><code>$6C</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>INC addr</code></td><td class="opcode"><code>$7C</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Read-modify-write on memory. C is not affected.</p>
+</div>
+
+
+<div class="instruction" id="DECA">
+  <h3 class="mnemonic">DECA <span class="full-name">— Decrement Accumulator A</span></h3>
+  <div class="operation"><code>A ← A - 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>DECA</code></td><td class="opcode"><code>$4A</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">C is not affected. V is set if A was $80 (overflow from -128 to +127). Classic loop counter idiom: load count, loop body, DECA, BNE loop.</p>
+</div>
+
+
+<div class="instruction" id="DECB">
+  <h3 class="mnemonic">DECB <span class="full-name">— Decrement Accumulator B</span></h3>
+  <div class="operation"><code>B ← B - 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>DECB</code></td><td class="opcode"><code>$5A</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">C is not affected. V is set if B was $80.</p>
+</div>
+
+
+<div class="instruction" id="DEC">
+  <h3 class="mnemonic">DEC <span class="full-name">— Decrement Memory</span></h3>
+  <div class="operation"><code>M ← M - 1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">direct</td><td class="syntax"><code>DEC <addr</code></td><td class="opcode"><code>$0A</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>DEC addr,R</code></td><td class="opcode"><code>$6A</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>DEC addr</code></td><td class="opcode"><code>$7A</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Read-modify-write on memory. C is not affected.</p>
+</div>
+
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>

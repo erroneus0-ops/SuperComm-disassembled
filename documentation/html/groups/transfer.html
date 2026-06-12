@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Transfer and Exchange</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Transfer and Exchange</span>
+  </nav>
+  <main>
+    <h2>Transfer and Exchange</h2>
+    
+<div class="instruction" id="TFR">
+  <h3 class="mnemonic">TFR <span class="full-name">— Transfer Register to Register</span></h3>
+  <div class="operation"><code>R1 ← R2</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>TFR R1,R2</code></td><td class="opcode"><code>$1F</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Postbyte encodes source (high nibble) and destination (low nibble). Transferring between different-sized registers: 8-bit to 16-bit zero-extends; 16-bit to 8-bit takes low byte. CC and DP are affected only when transferred to. When CC is the destination, all flags are set from the transferred value.</p>
+</div>
+
+
+<div class="instruction" id="EXG">
+  <h3 class="mnemonic">EXG <span class="full-name">— Exchange Registers</span></h3>
+  <div class="operation"><code>R1 ↔ R2</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">inherent</td><td class="syntax"><code>EXG R1,R2</code></td><td class="opcode"><code>$1E</code></td><td class="bytes">2</td><td class="cycles">8</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Same postbyte encoding as TFR. Both registers must be the same size. Exchanging different-sized registers produces undefined results on 6809; 6309 handles it differently.</p>
+</div>
+
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Load</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Load</span>
+  </nav>
+  <main>
+    <h2>Load</h2>
+    
+<div class="instruction" id="LDA">
+  <h3 class="mnemonic">LDA <span class="full-name">— Load Accumulator A</span></h3>
+  <div class="operation"><code>A ← M</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDA #n</code></td><td class="opcode"><code>$86</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDA <addr</code></td><td class="opcode"><code>$96</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDA addr,R</code></td><td class="opcode"><code>$A6</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDA addr</code></td><td class="opcode"><code>$B6</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">V is cleared, not affected by the loaded value.</p>
+</div>
+
+
+<div class="instruction" id="LDB">
+  <h3 class="mnemonic">LDB <span class="full-name">— Load Accumulator B</span></h3>
+  <div class="operation"><code>B ← M</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDB #n</code></td><td class="opcode"><code>$C6</code></td><td class="bytes">2</td><td class="cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDB <addr</code></td><td class="opcode"><code>$D6</code></td><td class="bytes">2</td><td class="cycles">4</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDB addr,R</code></td><td class="opcode"><code>$E6</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDB addr</code></td><td class="opcode"><code>$F6</code></td><td class="bytes">3</td><td class="cycles">5</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">V is cleared, not affected by the loaded value.</p>
+</div>
+
+
+<div class="instruction" id="LDD">
+  <h3 class="mnemonic">LDD <span class="full-name">— Load Double Accumulator D</span></h3>
+  <div class="operation"><code>D ← M:M+1  (A ← M, B ← M+1)</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDD #nn</code></td><td class="opcode"><code>$CC</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDD <addr</code></td><td class="opcode"><code>$DC</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDD addr,R</code></td><td class="opcode"><code>$EC</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDD addr</code></td><td class="opcode"><code>$FC</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Loads 16-bit value. High byte to A, low byte to B. V is cleared.</p>
+</div>
+
+
+<div class="instruction" id="LDX">
+  <h3 class="mnemonic">LDX <span class="full-name">— Load Index Register X</span></h3>
+  <div class="operation"><code>X ← M:M+1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDX #nn</code></td><td class="opcode"><code>$8E</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDX <addr</code></td><td class="opcode"><code>$9E</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDX addr,R</code></td><td class="opcode"><code>$AE</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDX addr</code></td><td class="opcode"><code>$BE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">V is cleared.</p>
+</div>
+
+
+<div class="instruction" id="LDY">
+  <h3 class="mnemonic">LDY <span class="full-name">— Load Index Register Y</span></h3>
+  <div class="operation"><code>Y ← M:M+1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDY #nn</code></td><td class="opcode"><code>$108E</code></td><td class="bytes">4</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDY <addr</code></td><td class="opcode"><code>$109E</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDY addr,R</code></td><td class="opcode"><code>$10AE</code></td><td class="bytes">3+</td><td class="cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDY addr</code></td><td class="opcode"><code>$10BE</code></td><td class="bytes">4</td><td class="cycles">7</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Page 2 instruction ($10 prefix). V is cleared.</p>
+</div>
+
+
+<div class="instruction" id="LDS">
+  <h3 class="mnemonic">LDS <span class="full-name">— Load Stack Pointer S</span></h3>
+  <div class="operation"><code>S ← M:M+1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDS #nn</code></td><td class="opcode"><code>$10CE</code></td><td class="bytes">4</td><td class="cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDS <addr</code></td><td class="opcode"><code>$10DE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDS addr,R</code></td><td class="opcode"><code>$10EE</code></td><td class="bytes">3+</td><td class="cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDS addr</code></td><td class="opcode"><code>$10FE</code></td><td class="bytes">4</td><td class="cycles">7</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">Page 2 instruction ($10 prefix). V is cleared.</p>
+</div>
+
+
+<div class="instruction" id="LDU">
+  <h3 class="mnemonic">LDU <span class="full-name">— Load User Stack Pointer U</span></h3>
+  <div class="operation"><code>U ← M:M+1</code></div>
+  
+  <table class="modes-table">
+    <thead>
+      <tr>
+        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mode">immediate</td><td class="syntax"><code>LDU #nn</code></td><td class="opcode"><code>$CE</code></td><td class="bytes">3</td><td class="cycles">3</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>LDU <addr</code></td><td class="opcode"><code>$DE</code></td><td class="bytes">2</td><td class="cycles">5</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LDU addr,R</code></td><td class="opcode"><code>$EE</code></td><td class="bytes">2+</td><td class="cycles">5+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LDU addr</code></td><td class="opcode"><code>$FE</code></td><td class="bytes">3</td><td class="cycles">6</td></tr>
+    </tbody>
+  </table>
+  <table class="cc-table">
+    <thead>
+      <tr><th colspan="5">Condition Codes</th></tr>
+      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+    </tbody>
+  </table>
+  <p class="notes">V is cleared.</p>
+</div>
+
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>
