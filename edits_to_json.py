@@ -406,26 +406,31 @@ def parse_directives(lines, json_path=None):
             else:
                 changes['warnings'].append(f"/format/ '{fmt}' — could not find preceding data label")
 
-        # ── /region/ $start $end [format] [label] ────────────────────────────
+        # ── /region/ $start $end [format] [label] [endlabel] ────────────────
         elif line.startswith('/region/'):
             parts = line[len('/region/'):].strip().split()
             if len(parts) < 2:
-                changes['warnings'].append(f"/region/ — expected '$start $end [format] [label]'")
+                changes['warnings'].append(f"/region/ — expected '$start $end [format] [label] [endlabel]'")
             else:
                 try:
-                    start_s = parts[0].lstrip('$')
-                    end_s   = parts[1].lstrip('$')
-                    start_v = int(start_s, 16)
-                    end_v   = int(end_s,   16)
-                    fmt     = parts[2] if len(parts) > 2 else 'auto'
-                    label   = parts[3] if len(parts) > 3 else ''
+                    start_v = int(parts[0].lstrip('$'), 16)
+                    end_v   = int(parts[1].lstrip('$'), 16)
+                    fmt     = parts[2] if len(parts) > 2 and parts[2] != 'endlabel' else 'auto'
+                    # label is next non-'endlabel' part after format
+                    label   = ''
+                    end_lbl = False
+                    for p in parts[3:]:
+                        if p == 'endlabel':
+                            end_lbl = True
+                        elif not label:
+                            label = p
                     changes['data_regions'].append({
                         'action':    'region',
                         'start':     f'{start_v:04X}',
                         'end':       f'{end_v:04X}',
                         'format':    fmt,
                         'label':     label,
-                        'end_label': False,
+                        'end_label': end_lbl,
                     })
                 except ValueError:
                     changes['warnings'].append(f"/region/ — invalid address in '{line.strip()}'")
@@ -568,7 +573,7 @@ def merge_into_json(json_path, changes, warn):
                 'end':       action['end'],
                 'format':    action.get('format', 'auto'),
                 'label':     action.get('label', ''),
-                'end_label': False,
+                'end_label': action.get('end_label', False),
             })
             continue
         lbl = action['label']
