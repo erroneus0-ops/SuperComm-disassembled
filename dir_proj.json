@@ -34,14 +34,25 @@
       "label": "Dat_046E",
       "format": "auto",
       "end_label": true,
-      "start": "046E"
+      "start": "046E",
+      "end": "047D"
     },
     {
       "start": "047D",
-      "end": "06A7",
+      "end": "052C",
       "label": "Dat_047D",
       "format": "text",
       "end_label": false
+<<<<<<< HEAD
+=======
+    },
+    {
+      "label": "Dat_052C",
+      "end_label": true,
+      "start": "052C",
+      "end": "06A7",
+      "format": "text"
+>>>>>>> 57e87bbcb9e546cb2fa90da2c0901d0fc3ece6d0
     }
   ],
   "line_comments": {
