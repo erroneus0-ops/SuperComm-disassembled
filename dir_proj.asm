@@ -277,9 +277,9 @@ $00DD  10 3F 8A                           OS9 I$Write            ; path=A  count
 $00E0  10 25 03 6D                        LBCS Loc_0451         
 $00E4  31 C8 25                           LEAY 37,U             
 $00E7  9E 02                              LDX <BSS.NextDir      
-$00E9  A6 80               Loc_00E9:      LDA ,X+               /comment/This is a copy a string "NextDir"
+$00E9  A6 80               Loc_00E9:      LDA ,X+               
 $00EB  A7 A0                              STA ,Y+               
-$00ED  81 0D                              CMPA #$0D             /comment/Looking for a CR to end
+$00ED  81 0D                              CMPA #$0D              ; compare A with CR
 $00EF  26 F8                              BNE Loc_00E9          
 $00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
