@@ -32,6 +32,10 @@ KIND_DATA = 'DATA'
 KIND_SUB  = 'SUB'   # BSR/LBSR/JSR target — subroutine
 KIND_LOC  = 'LOC'   # BRA/LBRA/Bcc/LBcc target — branch location
 
+class _OverlapHandled(Exception):
+    """Sentinel: mid-instruction overlap was handled, skip normal decode path."""
+    pass
+
 # ── OS-9 platform tables ──────────────────────────────────────────────────────
 
 OS9_SYSCALLS = {
@@ -696,7 +700,7 @@ class Engine:
                     elif op2 == 0x17:  # 6309 LBSR
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
                         t = pos + off; add(t, KIND_SUB); worklist.append(t)
-                    elif op2 == 0x20:  # 6309 LBRA variant
+                    elif op2 == 0x20:  # LBRA variant
                         off = s16((d[pos]<<8)|d[pos+1]); pos += 2
                         t = pos + off; add(t, KIND_LOC); worklist.append(t); stop = True
                     elif op2 == 0x3F:   # OS9 syscall
@@ -981,8 +985,6 @@ class Engine:
             nonlocal pos; v=d[pos]; pos+=1; return v
         def rw():
             nonlocal pos; v=(d[pos]<<8)|d[pos+1]; pos+=2; return v
-        def rq():
-            nonlocal pos; v=(d[pos]<<24)|(d[pos+1]<<16)|(d[pos+2]<<8)|d[pos+3]; pos+=4; return v
         def rel8():
             o=s8(rb()); t=(pos+o)&0xFFFF; return lbs.get(t,f'${t:04X}'), t
         def rel16():
@@ -994,413 +996,323 @@ class Engine:
 
         IREG16={0:'D',1:'X',2:'Y',3:'U',4:'S',5:'PC',
                 6:'W',7:'V',8:'A',9:'B',10:'CC',11:'DP',
-                14:'E',15:'F'}  # 6309 extensions: W,V,E,F
+                14:'E',15:'F'}
 
         op = rb()
 
-        if op==0x10:
-            op2=rb()
-            LB={0x21:'LBRN',0x22:'LBHI',0x23:'LBLS',0x24:'LBCC',0x25:'LBCS',
-                0x26:'LBNE',0x27:'LBEQ',0x28:'LBVC',0x29:'LBVS',0x2A:'LBPL',
-                0x2B:'LBMI',0x2C:'LBGE',0x2D:'LBLT',0x2E:'LBGT',0x2F:'LBLE',
-                0x16:'LBRA',0x17:'LBSR',0x20:'LBRA'}  # 6309 page1 variants
-            if op2 in LB: l,t=rel16(); mn=LB[op2]; op_str=l
-            elif op2==0x3F:
+        # ── Page 2 prefix ($10) ───────────────────────────────────────────
+        if op == 0x10:
+            op2 = rb()
+            # Long branches
+            LB = {0x16:'LBRA',0x17:'LBSR',0x20:'LBRA',
+                  0x21:'LBRN',0x22:'LBHI',0x23:'LBLS',0x24:'LBCC',0x25:'LBCS',
+                  0x26:'LBNE',0x27:'LBEQ',0x28:'LBVC',0x29:'LBVS',0x2A:'LBPL',
+                  0x2B:'LBMI',0x2C:'LBGE',0x2D:'LBLT',0x2E:'LBGT',0x2F:'LBLE'}
+            if op2 in LB:
+                l,t = rel16(); mn = LB[op2]; op_str = l
+            elif op2 == 0x3F:
                 sc=rb(); nm,conv=OS9_SYSCALLS.get(sc,(f'${sc:02X}',''))
                 mn='OS9'; op_str=nm; cm=conv
-            elif op2==0x83: v=rw(); mn='CMPD'; op_str=f'#${v:04X}'
-            elif op2==0x8C: v=rw(); mn='CMPY'; op_str=f'#${v:04X}'
-            elif op2==0x8E: v=rw(); mn='LDY';  op_str=f'#${v:04X}'
-            elif op2==0xCE: v=rw(); mn='LDS';  op_str=f'#${v:04X}'
-            elif op2==0x9E: v=rb(); mn='LDY';  op_str=f'<${v:02X}'
-            elif op2==0x9F: v=rb(); mn='STY';  op_str=f'<${v:02X}'
-            elif op2==0x93: v=rb(); mn='CMPD'; op_str=f'<${v:02X}'
-            elif op2==0x9C: v=rb(); mn='CMPY'; op_str=f'<${v:02X}'
-            elif op2==0xAE: op_str=idx(); mn='LDY'
-            elif op2==0xAF: op_str=idx(); mn='STY'
-            elif op2==0xA3: op_str=idx(); mn='CMPD'
-            elif op2==0xAC: op_str=idx(); mn='CMPY'
-            elif op2==0xBE: v=rw(); mn='LDY'; op_str=f'${v:04X}'
-            elif op2==0xBF: v=rw(); mn='STY'; op_str=f'${v:04X}'
-            elif op2==0xFE: v=rw(); mn='LDS'; op_str=f'${v:04X}'
-            elif op2==0xFF: v=rw(); mn='STS'; op_str=f'${v:04X}'
-            elif op2==0xB3: v=rw(); mn='CMPD'; op_str=f'${v:04X}'
-            elif op2==0xBC: v=rw(); mn='CMPY'; op_str=f'${v:04X}'
-            # ── 6309 page 1 ops ──────────────────────────────────────
-            # Register-register ops (1 post-byte)
-            elif op2 in (0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F):
-                names6309 = {0x30:'ADDR',0x31:'ADCR',0x32:'SUBR',0x33:'SBCR',
-                             0x34:'ANDR',0x35:'ORR',0x36:'EORR',0x37:'CMPR',
-                             0x38:'PSHSW',0x39:'PULSW',0x3A:'PSHUW',0x3B:'PULUW',
-                             0x3D:'MULD',0x3E:'DIVD',0x3F:'DIVQ'}
-                if op2 in (0x38,0x39,0x3A,0x3B): mn=names6309[op2]; self.found_6309=True
-                elif op2 in (0x3D,0x3E,0x3F): mn=names6309[op2]; self.found_6309=True
+            else:
+                # Page 2 table: {op2: (mnemonic, operand_type)}
+                P2 = {
+                    0x83:('CMPD','imm16'), 0x8C:('CMPY','imm16'), 0x8E:('LDY','imm16'),
+                    0xCE:('LDS', 'imm16'),
+                    0x93:('CMPD','dir'),   0x9C:('CMPY','dir'),   0x9E:('LDY','dir'),
+                    0x9F:('STY', 'dir'),   0xDE:('LDS', 'dir'),   0xDF:('STS','dir'),
+                    0xA3:('CMPD','idx'),   0xAC:('CMPY','idx'),   0xAE:('LDY','idx'),
+                    0xAF:('STY', 'idx'),   0xEE:('LDS', 'idx'),   0xEF:('STS','idx'),
+                    0xB3:('CMPD','ext'),   0xBC:('CMPY','ext'),   0xBE:('LDY','ext'),
+                    0xBF:('STY', 'ext'),   0xFE:('LDS', 'ext'),   0xFF:('STS','ext'),
+                    # 6309 page 1 register ops
+                    0x30:('ADDR','reg2'),  0x31:('ADCR','reg2'),  0x32:('SUBR','reg2'),
+                    0x33:('SBCR','reg2'),  0x34:('ANDR','reg2'),  0x35:('ORR', 'reg2'),
+                    0x36:('EORR','reg2'),  0x37:('CMPR','reg2'),
+                    0x38:('PSHSW','inh'), 0x39:('PULSW','inh'),
+                    0x3A:('PSHUW','inh'), 0x3B:('PULUW','inh'),
+                    0x3D:('MULD','reg2'), 0x3E:('DIVD','reg2'),  0x3F:('DIVQ','reg2'),
+                    # 6309 bit ops and others handled below
+                }
+                if op2 in P2:
+                    mn2, otype = P2[op2]
+                    mn = mn2
+                    if otype == 'imm16': v=rw(); op_str=f'#${v:04X}'
+                    elif otype == 'imm8': v=rb(); op_str=f'#${v:02X}'
+                    elif otype == 'dir':  v=rb(); op_str=f'<${v:02X}'
+                    elif otype == 'ext':  v=rw(); op_str=f'${v:04X}'
+                    elif otype == 'idx':  op_str=idx()
+                    elif otype == 'inh':  pass
+                    elif otype == 'reg2':
+                        pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
+                        op_str=f'{s2},{d2}'
+                    if any(r in mn for r in ('ADDR','ADCR','SUBR','SBCR','ANDR','ORR','EORR','CMPR',
+                                             'PSHSW','PULSW','PSHUW','PULUW','MULD','DIVD','DIVQ')):
+                        self.found_6309 = True
+                # 6309 bit manipulation / misc
+                elif op2 in (0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B):
+                    _6309_b = {0x00:'BAND',0x01:'BIAND',0x02:'BOR',0x03:'BIOR',
+                               0x04:'BEOR',0x05:'BIEOR',0x06:'LDBT',0x07:'STBT'}
+                    if op2 in _6309_b:
+                        pb=rb(); v=rb(); v2=rb()
+                        mn=_6309_b[op2]; op_str=f'${pb:02X},${v:02X},${v2:02X}'; self.found_6309=True
+                    else:
+                        _nm={0x08:'PSHSW',0x09:'PULSW',0x0A:'PSHUW',0x0B:'PULUW'}
+                        mn=_nm.get(op2,f'10{op2:02X}?'); self.found_6309=True
+                elif op2 == 0x3C:
+                    v=rb(); mn='BITMD'; op_str=f'#${v:02X}'; cm='6309: test MD register bits'; self.found_6309=True
+                elif op2 == 0x3D:
+                    v=rb(); mn='LDMD';  op_str=f'#${v:02X}'; cm='6309: load MD register'; self.found_6309=True
                 else:
-                    pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-                    mn=names6309.get(op2,f'10{op2:02X}?'); op_str=f'{s2},{d2}'
-                    self.found_6309=True
-            # Inherent D/W register ops
-            elif op2==0x43: mn='COMD'; self.found_6309=True
-            elif op2==0x44: mn='LSRD'; self.found_6309=True
-            elif op2==0x46: mn='RORD'; self.found_6309=True
-            elif op2==0x47: mn='ASRD'; self.found_6309=True
-            elif op2==0x48: mn='ASLD'; self.found_6309=True
-            elif op2==0x49: mn='ROLD'; self.found_6309=True
-            elif op2==0x4A: mn='DECD'; self.found_6309=True
-            elif op2==0x4C: mn='INCD'; self.found_6309=True
-            elif op2==0x4D: mn='TSTD'; self.found_6309=True
-            elif op2==0x4F: mn='CLRD'; self.found_6309=True
-            elif op2==0x53: mn='COMW'; self.found_6309=True
-            elif op2==0x54: mn='LSRW'; self.found_6309=True
-            elif op2==0x56: mn='RORW'; self.found_6309=True
-            elif op2==0x59: mn='ROLW'; self.found_6309=True
-            elif op2==0x5A: mn='DECW'; self.found_6309=True
-            elif op2==0x5C: mn='INCW'; self.found_6309=True
-            elif op2==0x5D: mn='TSTW'; self.found_6309=True
-            elif op2==0x5F: mn='CLRW'; self.found_6309=True
-            # W register memory ops
-            elif op2==0x80: v=rw(); mn='SUBW'; op_str=f'#${v:04X}'; self.found_6309=True
-            elif op2==0x81: v=rw(); mn='CMPW'; op_str=f'#${v:04X}'; self.found_6309=True
-            elif op2==0x86: v=rw(); mn='LDW';  op_str=f'#${v:04X}'; self.found_6309=True
-            elif op2==0x90: v=rb(); mn='SUBW'; op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0x91: v=rb(); mn='CMPW'; op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0x97: v=rb(); mn='STW';  op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0xA6: op_str=idx(); mn='LDW'; self.found_6309=True
-            elif op2==0xA7: op_str=idx(); mn='STW'; self.found_6309=True
-            elif op2==0xA9: op_str=idx(); mn='ADCW'; self.found_6309=True
-            elif op2==0xB6: v=rw(); mn='LDW'; op_str=f'${v:04X}'; self.found_6309=True
-            elif op2==0xB7: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
-            elif op2==0xBF: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
-            elif op2==0xC6: v=rb(); mn='LDW'; op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0xCC: v=rq(); mn='LDQ'; op_str=f'#${v:08X}'; self.found_6309=True
-            elif op2==0xD6: v=rb(); mn='LDW'; op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0xD7: v=rb(); mn='STW'; op_str=f'<${v:02X}'; self.found_6309=True
-            elif op2==0xF6: v=rw(); mn='LDW'; op_str=f'${v:04X}'; self.found_6309=True
-            elif op2==0xF7: v=rw(); mn='STW'; op_str=f'${v:04X}'; self.found_6309=True
-            elif op2==0xFD: v=rw(); mn='STQ'; op_str=f'${v:04X}'; self.found_6309=True
-            # TFM -- block transfer (4 variants, 1 post-byte)
-            elif op2 in (0x38,0x39,0x3A,0x3B):
-                tfm_modes = {0x38:'TFM r+,r+',0x39:'TFM r-,r-',0x3A:'TFM r+,r',0x3B:'TFM r,r+'}
-                pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-                mn=tfm_modes.get(op2,'TFM'); op_str=f'{s2},{d2}'; self.found_6309=True
-            # page 1 LBRA variant
-            elif op2==0x16: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
-            elif op2==0x17: l,t=rel16(); mn='LBSR'; op_str=l
-            elif op2==0x20: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
-            # long conditional branches
-            elif op2==0x21: l,t=rel16(); mn='LBRN'; op_str=l
-            elif op2==0x22: l,t=rel16(); mn='LBHI'; op_str=l
-            elif op2==0x23: l,t=rel16(); mn='LBLS'; op_str=l
-            elif op2==0x24: l,t=rel16(); mn='LBCC'; op_str=l
-            elif op2==0x25: l,t=rel16(); mn='LBCS'; op_str=l
-            elif op2==0x26: l,t=rel16(); mn='LBNE'; op_str=l
-            elif op2==0x27: l,t=rel16(); mn='LBEQ'; op_str=l
-            elif op2==0x28: l,t=rel16(); mn='LBVC'; op_str=l
-            elif op2==0x29: l,t=rel16(); mn='LBVS'; op_str=l
-            elif op2==0x2A: l,t=rel16(); mn='LBPL'; op_str=l
-            elif op2==0x2B: l,t=rel16(); mn='LBMI'; op_str=l
-            elif op2==0x2C: l,t=rel16(); mn='LBGE'; op_str=l
-            elif op2==0x2D: l,t=rel16(); mn='LBLT'; op_str=l
-            elif op2==0x2E: l,t=rel16(); mn='LBGT'; op_str=l
-            elif op2==0x2F: l,t=rel16(); mn='LBLE'; op_str=l
-            # LDS / STS direct and indexed
-            elif op2==0xDE: v=rb(); mn='LDS'; op_str=f'<${v:02X}'
-            elif op2==0xEE: op_str=idx(); mn='LDS'
-            elif op2==0xDF: v=rb(); mn='STS'; op_str=f'<${v:02X}'
-            elif op2==0xEF: op_str=idx(); mn='STS'
-            else: mn=f'FCB'; op_str=f'$10,${op2:02X}'; cm=f'unknown opcode $10{op2:02X}'
-        elif op==0x11:
-            op2=rb()
-            if op2==0x3F:
+                    mn='FCB'; op_str=f'$10,${op2:02X}'; cm=f'unknown opcode $10{op2:02X}'
+
+        # ── Page 3 prefix ($11) ───────────────────────────────────────────
+        elif op == 0x11:
+            op2 = rb()
+            if op2 == 0x3F:
                 sc=rb(); nm,conv=OS9_SYSCALLS.get(sc,(f'${sc:02X}',''))
                 mn='OS9'; op_str=nm; cm=conv
-            elif op2==0x83: v=rw(); mn='CMPU'; op_str=f'#${v:04X}'
-            elif op2==0x8C: v=rw(); mn='CMPS'; op_str=f'#${v:04X}'
-            elif op2==0x93: v=rb(); mn='CMPU'; op_str=f'<${v:02X}'
-            elif op2==0x9C: v=rb(); mn='CMPS'; op_str=f'<${v:02X}'
-            elif op2==0xA3: op_str=idx(); mn='CMPU'
-            elif op2==0xAC: op_str=idx(); mn='CMPS'
-            elif op2==0xB3: v=rw(); mn='CMPU'; op_str=f'${v:04X}'
-            elif op2==0xBC: v=rw(); mn='CMPS'; op_str=f'${v:04X}'
-            # 6309 page 2 ops
-            elif op2==0x38: v=rb(); mn='BITMD'; op_str=f'#${v:02X}'; cm='6309: test MD register bits'; self.found_6309=True
-            elif op2==0x39: v=rb(); mn='LDMD';  op_str=f'#${v:02X}'; cm='6309: load MD register'; self.found_6309=True
             else:
-                mn='FCB'; op_str=f'$11,${op2:02X}'; cm=f'unknown opcode $11{op2:02X}'
-        # ── $00-$0F direct page ──────────────────────────────────────────────
-        elif op==0x00: v=rb(); mn='NEG'; op_str=f'<${v:02X}'
-        elif op==0x03: v=rb(); mn='COM'; op_str=f'<${v:02X}'
-        elif op==0x04: v=rb(); mn='LSR'; op_str=f'<${v:02X}'
-        elif op==0x06: v=rb(); mn='ROR'; op_str=f'<${v:02X}'
-        elif op==0x07: v=rb(); mn='ASR'; op_str=f'<${v:02X}'
-        elif op==0x08: v=rb(); mn='LSL'; op_str=f'<${v:02X}'
-        elif op==0x09: v=rb(); mn='ROL'; op_str=f'<${v:02X}'
-        elif op==0x0A: v=rb(); mn='DEC'; op_str=f'<${v:02X}'
-        elif op==0x0C: v=rb(); mn='INC'; op_str=f'<${v:02X}'
-        elif op==0x0D: v=rb(); mn='TST'; op_str=f'<${v:02X}'
-        elif op==0x0E: v=rb(); mn='JMP'; op_str=f'<${v:02X}'
-        elif op==0x0F: v=rb(); mn='CLR'; op_str=f'<${v:02X}'
-        elif op==0x12: mn='NOP'
-        elif op==0x13: mn='SYNC'; cm='wait for interrupt'
-        elif op==0x16: l,t=rel16(); mn='LBRA'; op_str=l
-        elif op==0x17:
-            l,t=rel16(); mn='LBSR'; op_str=l
-            if t in lbs: cm=f"call {lbs[t]}"
-        elif op==0x19: mn='DAA'
-        elif op==0x1A: v=rb(); mn='ORCC';  op_str=f'#${v:02X}'; cm=f"set CC: {self._cc_str(v)}"
-        elif op==0x1C: v=rb(); mn='ANDCC'; op_str=f'#${v:02X}'; cm=f"clr CC: {self._cc_str(~v&0xFF)}"
-        elif op==0x1D: mn='SEX'; cm='sign-extend B into A'
-        elif op==0x1E:
-            pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-            if '?' in (s2, d2):
-                mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'EXG with unknown register code ${pb:02X}'
-            else:
-                mn='EXG'; op_str=f'{s2},{d2}'
-                if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
-        elif op==0x1F:
-            pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
-            if '?' in (s2, d2):
-                mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'TFR with unknown register code ${pb:02X}'
-            else:
-                mn='TFR'; op_str=f'{s2},{d2}'
-                if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
-        elif op==0x20: l,t=rel8(); mn='BRA'; op_str=l
-        elif op==0x21: l,t=rel8(); mn='BRN'; op_str=l
-        elif op==0x22: l,t=rel8(); mn='BHI'; op_str=l
-        elif op==0x23: l,t=rel8(); mn='BLS'; op_str=l
-        elif op==0x24: l,t=rel8(); mn='BCC'; op_str=l; cm='C=0 (BHS)'
-        elif op==0x25: l,t=rel8(); mn='BCS'; op_str=l; cm='C=1 (BLO)'
-        elif op==0x26: l,t=rel8(); mn='BNE'; op_str=l
-        elif op==0x27: l,t=rel8(); mn='BEQ'; op_str=l
-        elif op==0x28: l,t=rel8(); mn='BVC'; op_str=l
-        elif op==0x29: l,t=rel8(); mn='BVS'; op_str=l
-        elif op==0x2A: l,t=rel8(); mn='BPL'; op_str=l
-        elif op==0x2B: l,t=rel8(); mn='BMI'; op_str=l
-        elif op==0x2C: l,t=rel8(); mn='BGE'; op_str=l
-        elif op==0x2D: l,t=rel8(); mn='BLT'; op_str=l
-        elif op==0x2E: l,t=rel8(); mn='BGT'; op_str=l
-        elif op==0x2F: l,t=rel8(); mn='BLE'; op_str=l
-        elif op==0x30:
-            s2,tgt=lea(); mn='LEAX'; op_str=s2
-            if tgt and tgt in lbs: cm=f"X → {lbs[tgt]}"
-        elif op==0x31:
-            s2,tgt=lea(); mn='LEAY'; op_str=s2
-            if tgt and tgt in lbs: cm=f"Y → {lbs[tgt]}"
-        elif op==0x32:
-            s2,tgt=lea(); mn='LEAS'; op_str=s2
-        elif op==0x33:
-            s2,tgt=lea(); mn='LEAU'; op_str=s2
-            if tgt and tgt in lbs: cm=f"U → {lbs[tgt]}"
-        elif op==0x34: pb=rb(); mn='PSHS'; op_str=self._push_regs(pb,True)
-        elif op==0x35:
-            pb=rb(); mn='PULS'; op_str=self._push_regs(pb,True)
-            if pb&0x80: cm='return from subroutine  (PULS PC = RTS)'
-        elif op==0x36: pb=rb(); mn='PSHU'; op_str=self._push_regs(pb,False)
-        elif op==0x37: pb=rb(); mn='PULU'; op_str=self._push_regs(pb,False)
-        elif op==0x39: mn='RTS'; cm='return from subroutine'
-        elif op==0x3A: mn='ABX'
-        elif op==0x3B: mn='RTI'; cm='return from interrupt'
-        elif op==0x3C: v=rb(); mn='CWAI'; op_str=f'#${v:02X}'
-        elif op==0x3D: mn='MUL'; cm='D = A×B unsigned'
-        elif op==0x3F: mn='SWI'
-        elif op==0x40: mn='NEGA'
-        elif op==0x43: mn='COMA'
-        elif op==0x44: mn='LSRA'
-        elif op==0x46: mn='RORA'
-        elif op==0x47: mn='ASRA'
-        elif op==0x48: mn='LSLA'
-        elif op==0x49: mn='ROLA'
-        elif op==0x4A: mn='DECA'
-        elif op==0x4C: mn='INCA'
-        elif op==0x4D: mn='TSTA'
-        elif op==0x4F: mn='CLRA'; cm='A = 0'
-        elif op==0x50: mn='NEGB'
-        elif op==0x53: mn='COMB'
-        elif op==0x54: mn='LSRB'
-        elif op==0x56: mn='RORB'
-        elif op==0x57: mn='ASRB'
-        elif op==0x58: mn='LSLB'
-        elif op==0x59: mn='ROLB'
-        elif op==0x5A: mn='DECB'
-        elif op==0x5C: mn='INCB'
-        elif op==0x5D: mn='TSTB'
-        elif op==0x5F: mn='CLRB'; cm='B = 0'
-        elif op==0x60: op_str=idx(); mn='NEG'
-        elif op==0x63: op_str=idx(); mn='COM'
-        elif op==0x64: op_str=idx(); mn='LSR'
-        elif op==0x66: op_str=idx(); mn='ROR'
-        elif op==0x67: op_str=idx(); mn='ASR'
-        elif op==0x68: op_str=idx(); mn='LSL'
-        elif op==0x69: op_str=idx(); mn='ROL'
-        elif op==0x6A: op_str=idx(); mn='DEC'
-        elif op==0x6C: op_str=idx(); mn='INC'
-        elif op==0x6D: op_str=idx(); mn='TST'
-        elif op==0x6E: op_str=idx(); mn='JMP'
-        elif op==0x6F: op_str=idx(); mn='CLR'
-        elif op==0x70: v=rw(); mn='NEG'; op_str=f'${v:04X}'
-        elif op==0x73: v=rw(); mn='COM'; op_str=f'${v:04X}'
-        elif op==0x74: v=rw(); mn='LSR'; op_str=f'${v:04X}'
-        elif op==0x76: v=rw(); mn='ROR'; op_str=f'${v:04X}'
-        elif op==0x77: v=rw(); mn='ASR'; op_str=f'${v:04X}'
-        elif op==0x78: v=rw(); mn='LSL'; op_str=f'${v:04X}'
-        elif op==0x79: v=rw(); mn='ROL'; op_str=f'${v:04X}'
-        elif op==0x7A: v=rw(); mn='DEC'; op_str=f'${v:04X}'
-        elif op==0x7C: v=rw(); mn='INC'; op_str=f'${v:04X}'
-        elif op==0x7D: v=rw(); mn='TST'; op_str=f'${v:04X}'
-        elif op==0x7E: v=rw(); mn='JMP'; op_str=f'${v:04X}'
-        elif op==0x7F: v=rw(); mn='CLR'; op_str=f'${v:04X}'
-        elif op==0x80: v=rb(); mn='SUBA'; op_str=f'#${v:02X}'
-        elif op==0x81:
-            v=rb(); mn='CMPA'; op_str=f'#${v:02X}'
-            c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 else ''
-        elif op==0x82: v=rb(); mn='SBCA'; op_str=f'#${v:02X}'
-        elif op==0x83: v=rw(); mn='SUBD'; op_str=f'#${v:04X}'
-        elif op==0x84: v=rb(); mn='ANDA'; op_str=f'#${v:02X}'
-        elif op==0x85: v=rb(); mn='BITA'; op_str=f'#${v:02X}'
-        elif op==0x86:
-            v=rb(); mn='LDA'; op_str=f'#${v:02X}'
-            c2=self._char_ann(v); cm=f"A = {c2}" if c2 else ''
-        elif op==0x88: v=rb(); mn='EORA'; op_str=f'#${v:02X}'
-        elif op==0x89: v=rb(); mn='ADCA'; op_str=f'#${v:02X}'
-        elif op==0x8A: v=rb(); mn='ORA';  op_str=f'#${v:02X}'
-        elif op==0x8B: v=rb(); mn='ADDA'; op_str=f'#${v:02X}'
-        elif op==0x8C: v=rw(); mn='CMPX'; op_str=f'#${v:04X}'
-        elif op==0x8D:
-            l,t=rel8(); mn='BSR'; op_str=l
-            if t in lbs: cm=f"call {lbs[t]}"
-        elif op==0x8E: v=rw(); mn='LDX';  op_str=f'#${v:04X}'
-        elif op==0x90: v=rb(); mn='SUBA'; op_str=f'<${v:02X}'
-        elif op==0x91: v=rb(); mn='CMPA'; op_str=f'<${v:02X}'
-        elif op==0x92: v=rb(); mn='SBCA'; op_str=f'<${v:02X}'
-        elif op==0x93: v=rb(); mn='SUBD'; op_str=f'<${v:02X}'
-        elif op==0x94: v=rb(); mn='ANDA'; op_str=f'<${v:02X}'
-        elif op==0x95: v=rb(); mn='BITA'; op_str=f'<${v:02X}'
-        elif op==0x96: v=rb(); mn='LDA';  op_str=f'<${v:02X}'
-        elif op==0x97: v=rb(); mn='STA';  op_str=f'<${v:02X}'
-        elif op==0x98: v=rb(); mn='EORA'; op_str=f'<${v:02X}'
-        elif op==0x99: v=rb(); mn='ADCA'; op_str=f'<${v:02X}'
-        elif op==0x9A: v=rb(); mn='ORA';  op_str=f'<${v:02X}'
-        elif op==0x9B: v=rb(); mn='ADDA'; op_str=f'<${v:02X}'
-        elif op==0x9C: v=rb(); mn='CMPX'; op_str=f'<${v:02X}'
-        elif op==0x9D: v=rb(); mn='JSR';  op_str=f'<${v:02X}'; cm='call via direct page'
-        elif op==0x9E: v=rb(); mn='LDX';  op_str=f'<${v:02X}'
-        elif op==0x9F: v=rb(); mn='STX';  op_str=f'<${v:02X}'
-        elif op==0xA0: op_str=idx(); mn='SUBA'
-        elif op==0xA1: op_str=idx(); mn='CMPA'
-        elif op==0xA2: op_str=idx(); mn='SBCA'
-        elif op==0xA3: op_str=idx(); mn='SUBD'
-        elif op==0xA4: op_str=idx(); mn='ANDA'
-        elif op==0xA5: op_str=idx(); mn='BITA'
-        elif op==0xA6: op_str=idx(); mn='LDA'
-        elif op==0xA7: op_str=idx(); mn='STA'
-        elif op==0xA8: op_str=idx(); mn='EORA'
-        elif op==0xA9: op_str=idx(); mn='ADCA'
-        elif op==0xAA: op_str=idx(); mn='ORA'
-        elif op==0xAB: op_str=idx(); mn='ADDA'
-        elif op==0xAC: op_str=idx(); mn='CMPX'
-        elif op==0xAD: op_str=idx(); mn='JSR'; cm='call via indexed pointer'
-        elif op==0xAE: op_str=idx(); mn='LDX'
-        elif op==0xAF: op_str=idx(); mn='STX'
-        elif op==0xB0: v=rw(); mn='SUBA'; op_str=f'${v:04X}'
-        elif op==0xB1: v=rw(); mn='CMPA'; op_str=f'${v:04X}'
-        elif op==0xB2: v=rw(); mn='SBCA'; op_str=f'${v:04X}'
-        elif op==0xB3: v=rw(); mn='SUBD'; op_str=f'${v:04X}'
-        elif op==0xB4: v=rw(); mn='ANDA'; op_str=f'${v:04X}'
-        elif op==0xB5: v=rw(); mn='BITA'; op_str=f'${v:04X}'
-        elif op==0xB6: v=rw(); mn='LDA';  op_str=f'${v:04X}'
-        elif op==0xB7: v=rw(); mn='STA';  op_str=f'${v:04X}'
-        elif op==0xB8: v=rw(); mn='EORA'; op_str=f'${v:04X}'
-        elif op==0xB9: v=rw(); mn='ADCA'; op_str=f'${v:04X}'
-        elif op==0xBA: v=rw(); mn='ORA';  op_str=f'${v:04X}'
-        elif op==0xBB: v=rw(); mn='ADDB'; op_str=f'${v:04X}'
-        elif op==0xBC: v=rw(); mn='CMPX'; op_str=f'${v:04X}'
-        elif op==0xBD:
-            v=rw(); mn='JSR'; op_str=f'${v:04X}'
-            lb=lbs.get(v,''); cm=f"call {lb}" if lb else ''
-        elif op==0xBE: v=rw(); mn='LDX';  op_str=f'${v:04X}'
-        elif op==0xBF: v=rw(); mn='STX';  op_str=f'${v:04X}'
-        elif op==0xC0: v=rb(); mn='SUBB'; op_str=f'#${v:02X}'
-        elif op==0xC1:
-            v=rb(); mn='CMPB'; op_str=f'#${v:02X}'
-            c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 else ''
-        elif op==0xC2: v=rb(); mn='SBCB'; op_str=f'#${v:02X}'
-        elif op==0xC3: v=rw(); mn='ADDD'; op_str=f'#${v:04X}'
-        elif op==0xC4: v=rb(); mn='ANDB'; op_str=f'#${v:02X}'
-        elif op==0xC5: v=rb(); mn='BITB'; op_str=f'#${v:02X}'
-        elif op==0xC6:
-            v=rb(); mn='LDB'; op_str=f'#${v:02X}'
-            ss=SS_CODES.get(v,''); c2=self._char_ann(v)
-            if ss:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
-            elif c2: cm=f"B = {c2}"
-        elif op==0xC8: v=rb(); mn='EORB'; op_str=f'#${v:02X}'
-        elif op==0xC9: v=rb(); mn='ADCB'; op_str=f'#${v:02X}'
-        elif op==0xCA: v=rb(); mn='ORB';  op_str=f'#${v:02X}'
-        elif op==0xCB: v=rb(); mn='ADDB'; op_str=f'#${v:02X}'
-        elif op==0xCC:
-            v=rw(); mn='LDD'; op_str=f'#${v:04X}'
-            hi=v>>8; lo=v&0xFF
-            if hi==0x1B and lo in WIN_ESC:
-                nm,desc,_=WIN_ESC[lo]; ch=chr(lo) if 32<=lo<127 else f'${lo:02X}'
-                cm=f"D=ESC+'{ch}'  → {nm}: {desc}"
-            elif hi==0x1B: cm=f"D=ESC+${lo:02X}"
-        elif op==0xCE: v=rw(); mn='LDU'; op_str=f'#${v:04X}'
-        elif op==0xD0: v=rb(); mn='SUBB'; op_str=f'<${v:02X}'
-        elif op==0xD1: v=rb(); mn='CMPB'; op_str=f'<${v:02X}'
-        elif op==0xD2: v=rb(); mn='SBCB'; op_str=f'<${v:02X}'
-        elif op==0xD3: v=rb(); mn='ADDD'; op_str=f'<${v:02X}'
-        elif op==0xD4: v=rb(); mn='ANDB'; op_str=f'<${v:02X}'
-        elif op==0xD5: v=rb(); mn='BITB'; op_str=f'<${v:02X}'
-        elif op==0xD6: v=rb(); mn='LDB';  op_str=f'<${v:02X}'
-        elif op==0xD7: v=rb(); mn='STB';  op_str=f'<${v:02X}'
-        elif op==0xD8: v=rb(); mn='EORB'; op_str=f'<${v:02X}'
-        elif op==0xD9: v=rb(); mn='ADCB'; op_str=f'<${v:02X}'
-        elif op==0xDA: v=rb(); mn='ORB';  op_str=f'<${v:02X}'
-        elif op==0xDB: v=rb(); mn='ADDB'; op_str=f'<${v:02X}'
-        elif op==0xDC: v=rb(); mn='LDD';  op_str=f'<${v:02X}'
-        elif op==0xDD: v=rb(); mn='STD';  op_str=f'<${v:02X}'
-        elif op==0xDE: v=rb(); mn='LDU';  op_str=f'<${v:02X}'
-        elif op==0xDF: v=rb(); mn='STU';  op_str=f'<${v:02X}'
-        elif op==0xE0: op_str=idx(); mn='SUBB'
-        elif op==0xE1: op_str=idx(); mn='CMPB'
-        elif op==0xE2: op_str=idx(); mn='SBCB'
-        elif op==0xE3: op_str=idx(); mn='ADDD'
-        elif op==0xE4: op_str=idx(); mn='ANDB'
-        elif op==0xE5: op_str=idx(); mn='BITB'
-        elif op==0xE6: op_str=idx(); mn='LDB'
-        elif op==0xE7: op_str=idx(); mn='STB'
-        elif op==0xE8: op_str=idx(); mn='EORB'
-        elif op==0xE9: op_str=idx(); mn='ADCB'
-        elif op==0xEA: op_str=idx(); mn='ORB'
-        elif op==0xEB: op_str=idx(); mn='ADDB'
-        elif op==0xEC: op_str=idx(); mn='LDD'
-        elif op==0xED: op_str=idx(); mn='STD'
-        elif op==0xEE: op_str=idx(); mn='LDU'
-        elif op==0xEF: op_str=idx(); mn='STU'
-        elif op==0xF0: v=rw(); mn='SUBB'; op_str=f'${v:04X}'
-        elif op==0xF1: v=rw(); mn='CMPB'; op_str=f'${v:04X}'
-        elif op==0xF2: v=rw(); mn='SBCB'; op_str=f'${v:04X}'
-        elif op==0xF3: v=rw(); mn='ADDD'; op_str=f'${v:04X}'
-        elif op==0xF4: v=rw(); mn='ANDB'; op_str=f'${v:04X}'
-        elif op==0xF5: v=rw(); mn='BITB'; op_str=f'${v:04X}'
-        elif op==0xF6: v=rw(); mn='LDB';  op_str=f'${v:04X}'
-        elif op==0xF7: v=rw(); mn='STB';  op_str=f'${v:04X}'
-        elif op==0xF8: v=rw(); mn='EORB'; op_str=f'${v:04X}'
-        elif op==0xF9: v=rw(); mn='ADCB'; op_str=f'${v:04X}'
-        elif op==0xFA: v=rw(); mn='ORB';  op_str=f'${v:04X}'
-        elif op==0xFB: v=rw(); mn='ADDB'; op_str=f'${v:04X}'
-        elif op==0xFC: v=rw(); mn='LDD';  op_str=f'${v:04X}'
-        elif op==0xFD: v=rw(); mn='STD';  op_str=f'${v:04X}'
-        elif op==0xFE: v=rw(); mn='LDU';  op_str=f'${v:04X}'
-        elif op==0xFF: v=rw(); mn='STU';  op_str=f'${v:04X}'
+                P3 = {
+                    0x83:('CMPU','imm16'), 0x8C:('CMPS','imm16'),
+                    0x93:('CMPU','dir'),   0x9C:('CMPS','dir'),
+                    0xA3:('CMPU','idx'),   0xAC:('CMPS','idx'),
+                    0xB3:('CMPU','ext'),   0xBC:('CMPS','ext'),
+                    0x38:('BITMD','imm8'), 0x39:('LDMD','imm8'),
+                    # 6309 TFM block moves
+                    0x38:('TFM', 'tfm'),  0x39:('TFM', 'tfm'),
+                    0x3A:('TFM', 'tfm'),  0x3B:('TFM', 'tfm'),
+                }
+                if op2 in P3:
+                    mn2, otype = P3[op2]
+                    mn = mn2
+                    if otype == 'imm16': v=rw(); op_str=f'#${v:04X}'
+                    elif otype == 'imm8': v=rb(); op_str=f'#${v:02X}'
+                    elif otype == 'dir':  v=rb(); op_str=f'<${v:02X}'
+                    elif otype == 'ext':  v=rw(); op_str=f'${v:04X}'
+                    elif otype == 'idx':  op_str=idx()
+                    elif otype == 'tfm':
+                        pb=rb()
+                        _tfm_mode={0x38:'+,+',0x39:'-,-',0x3A:'+,0',0x3B:'0,+'}
+                        r1=IREG16.get((pb>>4)&0xF,'?'); r2=IREG16.get(pb&0xF,'?')
+                        sfx=_tfm_mode.get(op2,'')
+                        op_str=f'{r1}{sfx[0]},{r2}{sfx[2]}' if sfx else f'{r1},{r2}'
+                        self.found_6309=True
+                    if mn in ('BITMD','LDMD','TFM'): self.found_6309=True
+                else:
+                    mn='FCB'; op_str=f'$11,${op2:02X}'; cm=f'unknown opcode $11{op2:02X}'
 
-        # If still unknown and cpu is 6309, try 6309-specific decoder
+        # ── Primary opcode table ──────────────────────────────────────────
+        else:
+            # Special-cased opcodes (context-sensitive comments, etc.)
+            # Format: op -> (mnemonic, operand_type, comment)
+            # operand types: inh, imm8, imm16, dir, ext, idx, rel8, rel16,
+            #                lea, pshs, pshu, exg, tfr, bsr, lbsr, jsr_dir,
+            #                jsr_ext, jsr_idx, lda, ldb, ldd, cmpa, cmpb,
+            #                orcc, andcc, lbra, lbsr_l
+
+            # Table-driven: most instructions
+            _T = {
+                # $00-$0F direct page
+                0x00:('NEG', 'dir',  ''), 0x03:('COM', 'dir', ''),
+                0x04:('LSR', 'dir',  ''), 0x06:('ROR', 'dir', ''),
+                0x07:('ASR', 'dir',  ''), 0x08:('LSL', 'dir', ''),
+                0x09:('ROL', 'dir',  ''), 0x0A:('DEC', 'dir', ''),
+                0x0C:('INC', 'dir',  ''), 0x0D:('TST', 'dir', ''),
+                0x0E:('JMP', 'dir',  ''), 0x0F:('CLR', 'dir', ''),
+                # Misc single-byte
+                0x12:('NOP',  'inh', ''), 0x13:('SYNC','inh','wait for interrupt'),
+                0x19:('DAA',  'inh', ''), 0x1D:('SEX', 'inh','sign-extend B into A'),
+                0x39:('RTS',  'inh', 'return from subroutine'),
+                0x3A:('ABX',  'inh', ''), 0x3B:('RTI', 'inh','return from interrupt'),
+                0x3D:('MUL',  'inh', 'D = A×B unsigned'), 0x3F:('SWI','inh',''),
+                # Accumulator A
+                0x40:('NEGA','inh',''), 0x43:('COMA','inh',''), 0x44:('LSRA','inh',''),
+                0x46:('RORA','inh',''), 0x47:('ASRA','inh',''), 0x48:('LSLA','inh',''),
+                0x49:('ROLA','inh',''), 0x4A:('DECA','inh',''), 0x4C:('INCA','inh',''),
+                0x4D:('TSTA','inh',''), 0x4F:('CLRA','inh','A = 0'),
+                # Accumulator B
+                0x50:('NEGB','inh',''), 0x53:('COMB','inh',''), 0x54:('LSRB','inh',''),
+                0x56:('RORB','inh',''), 0x57:('ASRB','inh',''), 0x58:('LSLB','inh',''),
+                0x59:('ROLB','inh',''), 0x5A:('DECB','inh',''), 0x5C:('INCB','inh',''),
+                0x5D:('TSTB','inh',''), 0x5F:('CLRB','inh','B = 0'),
+                # Indexed ($60-$6F)
+                0x60:('NEG','idx',''), 0x63:('COM','idx',''), 0x64:('LSR','idx',''),
+                0x66:('ROR','idx',''), 0x67:('ASR','idx',''), 0x68:('LSL','idx',''),
+                0x69:('ROL','idx',''), 0x6A:('DEC','idx',''), 0x6C:('INC','idx',''),
+                0x6D:('TST','idx',''), 0x6E:('JMP','idx',''), 0x6F:('CLR','idx',''),
+                # Extended ($70-$7F)
+                0x70:('NEG','ext',''), 0x73:('COM','ext',''), 0x74:('LSR','ext',''),
+                0x76:('ROR','ext',''), 0x77:('ASR','ext',''), 0x78:('LSL','ext',''),
+                0x79:('ROL','ext',''), 0x7A:('DEC','ext',''), 0x7C:('INC','ext',''),
+                0x7D:('TST','ext',''), 0x7E:('JMP','ext',''), 0x7F:('CLR','ext',''),
+                # Immediate ($80-$8F)
+                0x80:('SUBA','imm8', ''),  0x82:('SBCA','imm8',''),
+                0x83:('SUBD','imm16',''),  0x84:('ANDA','imm8', ''),
+                0x85:('BITA','imm8', ''),  0x88:('EORA','imm8', ''),
+                0x89:('ADCA','imm8', ''),  0x8A:('ORA', 'imm8', ''),
+                0x8B:('ADDA','imm8', ''),  0x8C:('CMPX','imm16',''),
+                0x8E:('LDX', 'imm16',''),
+                # Direct ($90-$9F)
+                0x90:('SUBA','dir',''), 0x91:('CMPA','dir',''), 0x92:('SBCA','dir',''),
+                0x93:('SUBD','dir',''), 0x94:('ANDA','dir',''), 0x95:('BITA','dir',''),
+                0x96:('LDA', 'dir',''), 0x97:('STA', 'dir',''), 0x98:('EORA','dir',''),
+                0x99:('ADCA','dir',''), 0x9A:('ORA', 'dir',''), 0x9B:('ADDA','dir',''),
+                0x9C:('CMPX','dir',''), 0x9E:('LDX', 'dir',''), 0x9F:('STX', 'dir',''),
+                # Indexed ($A0-$AF)
+                0xA0:('SUBA','idx',''), 0xA1:('CMPA','idx',''), 0xA2:('SBCA','idx',''),
+                0xA3:('SUBD','idx',''), 0xA4:('ANDA','idx',''), 0xA5:('BITA','idx',''),
+                0xA6:('LDA', 'idx',''), 0xA7:('STA', 'idx',''), 0xA8:('EORA','idx',''),
+                0xA9:('ADCA','idx',''), 0xAA:('ORA', 'idx',''), 0xAB:('ADDA','idx',''),
+                0xAC:('CMPX','idx',''), 0xAE:('LDX', 'idx',''), 0xAF:('STX', 'idx',''),
+                # Extended ($B0-$BF)
+                0xB0:('SUBA','ext',''), 0xB1:('CMPA','ext',''), 0xB2:('SBCA','ext',''),
+                0xB3:('SUBD','ext',''), 0xB4:('ANDA','ext',''), 0xB5:('BITA','ext',''),
+                0xB6:('LDA', 'ext',''), 0xB7:('STA', 'ext',''), 0xB8:('EORA','ext',''),
+                0xB9:('ADCA','ext',''), 0xBA:('ORA', 'ext',''), 0xBB:('ADDA','ext',''),
+                0xBC:('CMPX','ext',''), 0xBE:('LDX', 'ext',''), 0xBF:('STX', 'ext',''),
+                # Immediate ($C0-$CF)
+                0xC0:('SUBB','imm8', ''), 0xC2:('SBCB','imm8',''),
+                0xC3:('ADDD','imm16',''), 0xC4:('ANDB','imm8',''),
+                0xC5:('BITB','imm8', ''), 0xC8:('EORB','imm8',''),
+                0xC9:('ADCB','imm8', ''), 0xCA:('ORB', 'imm8',''),
+                0xCB:('ADDB','imm8', ''), 0xCE:('LDU', 'imm16',''),
+                # Direct ($D0-$DF)
+                0xD0:('SUBB','dir',''), 0xD1:('CMPB','dir',''), 0xD2:('SBCB','dir',''),
+                0xD3:('ADDD','dir',''), 0xD4:('ANDB','dir',''), 0xD5:('BITB','dir',''),
+                0xD6:('LDB', 'dir',''), 0xD7:('STB', 'dir',''), 0xD8:('EORB','dir',''),
+                0xD9:('ADCB','dir',''), 0xDA:('ORB', 'dir',''), 0xDB:('ADDB','dir',''),
+                0xDC:('LDD', 'dir',''), 0xDD:('STD', 'dir',''), 0xDE:('LDU', 'dir',''),
+                0xDF:('STU', 'dir',''),
+                # Indexed ($E0-$EF)
+                0xE0:('SUBB','idx',''), 0xE1:('CMPB','idx',''), 0xE2:('SBCB','idx',''),
+                0xE3:('ADDD','idx',''), 0xE4:('ANDB','idx',''), 0xE5:('BITB','idx',''),
+                0xE6:('LDB', 'idx',''), 0xE7:('STB', 'idx',''), 0xE8:('EORB','idx',''),
+                0xE9:('ADCB','idx',''), 0xEA:('ORB', 'idx',''), 0xEB:('ADDB','idx',''),
+                0xEC:('LDD', 'idx',''), 0xED:('STD', 'idx',''), 0xEE:('LDU', 'idx',''),
+                0xEF:('STU', 'idx',''),
+                # Extended ($F0-$FF)
+                0xF0:('SUBB','ext',''), 0xF1:('CMPB','ext',''), 0xF2:('SBCB','ext',''),
+                0xF3:('ADDD','ext',''), 0xF4:('ANDB','ext',''), 0xF5:('BITB','ext',''),
+                0xF6:('LDB', 'ext',''), 0xF7:('STB', 'ext',''), 0xF8:('EORB','ext',''),
+                0xF9:('ADCB','ext',''), 0xFA:('ORB', 'ext',''), 0xFB:('ADDB','ext',''),
+                0xFC:('LDD', 'ext',''), 0xFD:('STD', 'ext',''), 0xFE:('LDU', 'ext',''),
+                0xFF:('STU', 'ext',''),
+            }
+
+            if op in _T:
+                mn, otype, cm = _T[op]
+                if   otype == 'inh':   pass
+                elif otype == 'imm8':  v=rb();  op_str=f'#${v:02X}'
+                elif otype == 'imm16': v=rw();  op_str=f'#${v:04X}'
+                elif otype == 'dir':   v=rb();  op_str=f'<${v:02X}'
+                elif otype == 'ext':   v=rw();  op_str=f'${v:04X}'
+                elif otype == 'idx':   op_str=idx()
+
+            # ── Special cases with context-sensitive comments ─────────────
+            elif op == 0x81:
+                v=rb(); mn='CMPA'; op_str=f'#${v:02X}'
+                c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 else ''
+            elif op == 0x86:
+                v=rb(); mn='LDA'; op_str=f'#${v:02X}'
+                c2=self._char_ann(v); cm=f"A = {c2}" if c2 else ''
+            elif op == 0x8D:
+                l,t=rel8(); mn='BSR'; op_str=l
+                if t in lbs: cm=f"call {lbs[t]}"
+            elif op == 0xC1:
+                v=rb(); mn='CMPB'; op_str=f'#${v:02X}'
+                c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 else ''
+            elif op == 0xC6:
+                v=rb(); mn='LDB'; op_str=f'#${v:02X}'
+                ss=SS_CODES.get(v,''); c2=self._char_ann(v)
+                if ss:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
+                elif c2: cm=f"B = {c2}"
+            elif op == 0xCC:
+                v=rw(); mn='LDD'; op_str=f'#${v:04X}'
+                hi=v>>8; lo=v&0xFF
+                if hi==0x1B and lo in WIN_ESC:
+                    nm2,desc,_=WIN_ESC[lo]; ch=chr(lo) if 32<=lo<127 else f'${lo:02X}'
+                    cm=f"D=ESC+'{ch}'  → {nm2}: {desc}"
+                elif hi==0x1B: cm=f"D=ESC+${lo:02X}"
+            elif op == 0x16:
+                l,t=rel16(); mn='LBRA'; op_str=l
+            elif op == 0x17:
+                l,t=rel16(); mn='LBSR'; op_str=l
+                if t in lbs: cm=f"call {lbs[t]}"
+            elif op == 0x1A:
+                v=rb(); mn='ORCC';  op_str=f'#${v:02X}'; cm=f"set CC: {self._cc_str(v)}"
+            elif op == 0x1C:
+                v=rb(); mn='ANDCC'; op_str=f'#${v:02X}'; cm=f"clr CC: {self._cc_str(~v&0xFF)}"
+            elif op == 0x1E:
+                pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
+                if '?' in (s2, d2):
+                    mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'EXG with unknown register code ${pb:02X}'
+                else:
+                    mn='EXG'; op_str=f'{s2},{d2}'
+                    if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
+            elif op == 0x1F:
+                pb=rb(); s2=IREG16.get((pb>>4)&0xF,'?'); d2=IREG16.get(pb&0xF,'?')
+                if '?' in (s2, d2):
+                    mn='FCB'; op_str=f'${op:02X},${pb:02X}'; cm=f'TFR with unknown register code ${pb:02X}'
+                else:
+                    mn='TFR'; op_str=f'{s2},{d2}'
+                    if any(r in (s2,d2) for r in ('W','V','E','F')): self.found_6309=True
+            elif op == 0x20: l,t=rel8(); mn='BRA'; op_str=l
+            elif op == 0x21: l,t=rel8(); mn='BRN'; op_str=l
+            elif op == 0x22: l,t=rel8(); mn='BHI'; op_str=l
+            elif op == 0x23: l,t=rel8(); mn='BLS'; op_str=l
+            elif op == 0x24: l,t=rel8(); mn='BCC'; op_str=l; cm='C=0 (BHS)'
+            elif op == 0x25: l,t=rel8(); mn='BCS'; op_str=l; cm='C=1 (BLO)'
+            elif op == 0x26: l,t=rel8(); mn='BNE'; op_str=l
+            elif op == 0x27: l,t=rel8(); mn='BEQ'; op_str=l
+            elif op == 0x28: l,t=rel8(); mn='BVC'; op_str=l
+            elif op == 0x29: l,t=rel8(); mn='BVS'; op_str=l
+            elif op == 0x2A: l,t=rel8(); mn='BPL'; op_str=l
+            elif op == 0x2B: l,t=rel8(); mn='BMI'; op_str=l
+            elif op == 0x2C: l,t=rel8(); mn='BGE'; op_str=l
+            elif op == 0x2D: l,t=rel8(); mn='BLT'; op_str=l
+            elif op == 0x2E: l,t=rel8(); mn='BGT'; op_str=l
+            elif op == 0x2F: l,t=rel8(); mn='BLE'; op_str=l
+            elif op == 0x30:
+                s2,tgt=lea(); mn='LEAX'; op_str=s2
+                if tgt and tgt in lbs: cm=f"X → {lbs[tgt]}"
+            elif op == 0x31:
+                s2,tgt=lea(); mn='LEAY'; op_str=s2
+                if tgt and tgt in lbs: cm=f"Y → {lbs[tgt]}"
+            elif op == 0x32:
+                s2,tgt=lea(); mn='LEAS'; op_str=s2
+            elif op == 0x33:
+                s2,tgt=lea(); mn='LEAU'; op_str=s2
+                if tgt and tgt in lbs: cm=f"U → {lbs[tgt]}"
+            elif op == 0x34: pb=rb(); mn='PSHS'; op_str=self._push_regs(pb,True)
+            elif op == 0x35:
+                pb=rb(); mn='PULS'; op_str=self._push_regs(pb,True)
+                if pb&0x80: cm='return from subroutine  (PULS PC = RTS)'
+            elif op == 0x36: pb=rb(); mn='PSHU'; op_str=self._push_regs(pb,False)
+            elif op == 0x37: pb=rb(); mn='PULU'; op_str=self._push_regs(pb,False)
+            elif op == 0x3C: v=rb(); mn='CWAI'; op_str=f'#${v:02X}'
+            elif op == 0x9D:
+                v=rb(); mn='JSR'; op_str=f'<${v:02X}'; cm='call via direct page'
+            elif op == 0xAD:
+                op_str=idx(); mn='JSR'; cm='call via indexed pointer'
+            elif op == 0xBD:
+                v=rw(); mn='JSR'; op_str=f'${v:04X}'
+                lb=lbs.get(v,''); cm=f"call {lb}" if lb else ''
+            elif op == 0xBB:
+                v=rw(); mn='ADDA'; op_str=f'${v:04X}'   # note: was ADDB in old code — bug fixed
+            else:
+                # Unknown — will try 6309 decoder below
+                pass
+
         if mn == '???' and getattr(self, '_cpu', '6809') == '6309':
             result = decode_6309(d, start, self.labels, self.project.bss)
             if result is not None:
                 return result
+        if mn == '???':
+            pos = start + 1  # consume just the opcode byte
+            mn='FCB'; op_str=f'${d[start]:02X}'; cm=f'undefined opcode ${d[start]:02X} -- not a valid 6809 instruction'
         return mn, op_str.strip(), cm, bytes(d[start:pos]), pos
 
-    # ── Data region emitter ───────────────────────────────────────────────
+        # ── Data region emitter ───────────────────────────────────────────────
 
     def _emit_win_esc(self, i, end):
         """Emit one windowing ESC sequence as annotated FCB."""
@@ -2073,7 +1985,44 @@ class Engine:
                     continue
 
                 try:
+                    # ── Check for mid-instruction overlap before decoding ──
+                    # Only if the byte at pos is undefined on 6809 (would decode
+                    # as '???') OR is already in proj.forced_equs.
+                    # This avoids falsely treating valid code as overlaps.
+                    if lbl_here:
+                        test_mn, _, _, test_raw, _ = self.decode_one(pos)
+                        is_undefined = (test_mn in ('???', 'FCB') and len(test_raw) == 1)
+                        in_forced = pos in proj.forced_equs
+                        if is_undefined and not in_forced:
+                            for istart, iend in sorted(self.insn_spans.items()):
+                                if istart < pos < iend:
+                                    byte_val = d[pos]
+                                    hx = f'{byte_val:02X}'
+                                    ls = f'{lbl_here}:'
+                                    used_nums = set(footnote_used.values())
+                                    next_num = 1
+                                    while next_num in used_nums: next_num += 1
+                                    footnote_used[pos] = next_num
+                                    fn_num = next_num
+                                    cont_lbl = lbs.get(istart, f'Insn_{istart:04X}')
+                                    if not lbs.get(istart):
+                                        lbs[istart] = cont_lbl
+                                    offset_into = pos - istart
+                                    equ_expr = f'${pos:04X}'
+                                    equ_cmt = (f'[*{fn_num}] branch target {offset_into} '
+                                               f'byte(s) inside {cont_lbl} -- see [*{fn_num}]')
+                                    out.append(f'${pos:04X}  {hx}                  '
+                                               f'{ls:<20} EQU    {equ_expr}            '
+                                               f'; {equ_cmt}')
+                                    if pos not in proj.forced_equs:
+                                        proj.forced_equs[pos] = (
+                                            f'mid-instruction overlap: {cont_lbl}+{offset_into}')
+                                    pos += 1
+                                    prev_ret = False
+                                    raise _OverlapHandled()
                     mn, op_str, cm, raw, pos2 = self.decode_one(pos)
+                except _OverlapHandled:
+                    continue
                 except (IndexError, Exception) as e:
                     out.append(f"${pos:04X}  {d[pos]:02X}               ; decode error: {e}")
                     pos += 1; continue
@@ -2188,6 +2137,21 @@ class Engine:
                         gap_pos = pos
                         out.append("")
                         while gap_pos < nxt:
+                            # Check for forced overlap (mid-instruction label)
+                            if gap_pos in proj.forced_equs:
+                                equ_comment = proj.forced_equs[gap_pos]
+                                containing = None
+                                for a2 in lbs:
+                                    if a2 < gap_pos:
+                                        mn_t,_,_,raw_t,_ = self.decode_one(a2)
+                                        if a2 + len(raw_t) > gap_pos:
+                                            containing = lbs[a2]; break
+                                equ_expr = f"{lbs[gap_pos]} EQU {containing}+{gap_pos - list(lbs.keys())[list(lbs.values()).index(containing)]}" if containing and lbs.get(gap_pos) else f"${gap_pos:04X}"
+                                lbl = lbs.get(gap_pos, f"Loc_{gap_pos:04X}")
+                                fn_idx = len(proj.footnotes) + 1
+                                out.append(f"${gap_pos:04X}  {d[gap_pos]:02X}                  {lbl}:      EQU    ${gap_pos:04X}")
+                                gap_pos += 1
+                                continue
                             res = self.decode_one(gap_pos)
                             if res is None:
                                 # Truly undecipherable — emit as FCB
