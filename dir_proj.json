@@ -25,6 +25,7 @@
     "16": "BSS.ColWidth",
     "17": "BSS.LastCol",
     "23": "BSS.$17",
+    "37": "BSS.$25",
     "121": "BSS.$79",
     "122": "BSS.DotChar"
   },
@@ -41,9 +42,18 @@
       "label": "Dat_047D",
       "format": "text",
       "end_label": false
+    },
+    {
+      "label": "Dat_052C",
+      "end_label": true,
+      "start": "052C"
     }
   ],
-  "line_comments": {},
+  "line_comments": {
+    "00E9": "this is a loop copying the NextDir to BSS.$25",
+    "00ED": "Looking for a CR terminator",
+    "00EF": "Nope?  Keep looking!"
+  },
   "block_comments": {},
   "substitutions": {},
   "routines": [],
