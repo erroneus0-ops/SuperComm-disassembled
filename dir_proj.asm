@@ -721,7 +721,7 @@ $0456  0D 10               Loc_0456:      TST <$10
 $0458  27 0D                              BEQ $0467             
 $045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
 $045D  0D 86               Sub_045D:      TST <$86              
-$045F  01                                 FCB    $01                ; undefined opcode $01 -- not a valid 6809 instruction
+$045F  01                                 FCB $01                ; undefined opcode $01 -- not a valid 6809 instruction
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $0467  10 3F 06                           OS9 F$Exit             ; status=B
