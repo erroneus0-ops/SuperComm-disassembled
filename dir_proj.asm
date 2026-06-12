@@ -787,32 +787,31 @@ Dat_0519
 Dat_052C
 ; Referenced by: $024C
 ; ── 379 bytes  ($052C—$06A6) ──
-         FCB    $0A               ; LF
+         FCB    $0A ; LF
          FCC    "dir [-opts] [path/patt] [-opts]"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "opts: x - use current exec dir"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      s - one entry/line"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "    e/l - extended directory"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      a - show '.files', too"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      d - only directory files"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      f - only non-dir files"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      c - case insensitive filename match (BUT NOT DIR NAME)"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      ? - help message"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "pattern: may include wild cards"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      * - multiple character"
-         FCB    $0D               ; CR
+         FCB    $0D ; CR
          FCC    "      ? - single character"
-         FCB    $0D               ; CR
-/region/ $052C $06A7 text Dat_052C endlabel
+         FCB    $0D ; CR
 $06A7  5A                  Sub_06A7:      DECB                  
 $06A8  10 8E 00 50                        LDY #$0050            
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
