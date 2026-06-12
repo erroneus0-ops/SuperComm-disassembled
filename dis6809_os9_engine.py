@@ -998,6 +998,11 @@ class Engine:
                 6:'W',7:'V',8:'A',9:'B',10:'CC',11:'DP',
                 14:'E',15:'F'}
 
+        def dp(v):
+            """Format a direct page operand, substituting BSS name if known."""
+            bn = self.project.bss.get(v, '')
+            return f'<{bn}' if bn else f'<${v:02X}'
+
         op = rb()
 
         # ── Page 2 prefix ($10) ───────────────────────────────────────────
@@ -1038,7 +1043,7 @@ class Engine:
                     mn = mn2
                     if otype == 'imm16': v=rw(); op_str=f'#${v:04X}'
                     elif otype == 'imm8': v=rb(); op_str=f'#${v:02X}'
-                    elif otype == 'dir':  v=rb(); op_str=f'<${v:02X}'
+                    elif otype == 'dir':  v=rb(); op_str=dp(v)
                     elif otype == 'ext':  v=rw(); op_str=f'${v:04X}'
                     elif otype == 'idx':  op_str=idx()
                     elif otype == 'inh':  pass
@@ -1087,7 +1092,7 @@ class Engine:
                     mn = mn2
                     if otype == 'imm16': v=rw(); op_str=f'#${v:04X}'
                     elif otype == 'imm8': v=rb(); op_str=f'#${v:02X}'
-                    elif otype == 'dir':  v=rb(); op_str=f'<${v:02X}'
+                    elif otype == 'dir':  v=rb(); op_str=dp(v)
                     elif otype == 'ext':  v=rw(); op_str=f'${v:04X}'
                     elif otype == 'idx':  op_str=idx()
                     elif otype == 'tfm':
@@ -1204,7 +1209,7 @@ class Engine:
                 if   otype == 'inh':   pass
                 elif otype == 'imm8':  v=rb();  op_str=f'#${v:02X}'
                 elif otype == 'imm16': v=rw();  op_str=f'#${v:04X}'
-                elif otype == 'dir':   v=rb();  op_str=f'<${v:02X}'
+                elif otype == 'dir':   v=rb();  op_str=dp(v)
                 elif otype == 'ext':   v=rw();  op_str=f'${v:04X}'
                 elif otype == 'idx':   op_str=idx()
 
@@ -1291,7 +1296,7 @@ class Engine:
             elif op == 0x37: pb=rb(); mn='PULU'; op_str=self._push_regs(pb,False)
             elif op == 0x3C: v=rb(); mn='CWAI'; op_str=f'#${v:02X}'
             elif op == 0x9D:
-                v=rb(); mn='JSR'; op_str=f'<${v:02X}'; cm='call via direct page'
+                v=rb(); mn='JSR'; op_str=dp(v); cm='call via direct page'
             elif op == 0xAD:
                 op_str=idx(); mn='JSR'; cm='call via indexed pointer'
             elif op == 0xBD:
@@ -1649,9 +1654,16 @@ class Engine:
 
         if proj.bss:
             out.append("; ── BSS Variable Equates ─────────────────────────────────────")
-            for off in sorted(proj.bss.keys()):
+            sorted_bss = sorted(proj.bss.keys())
+            for i, off in enumerate(sorted_bss):
                 name_str = proj.bss[off]
-                out.append(f"{name_str:<14}EQU    {off:<9}; BSS offset ${off:04X}")
+                # Determine size from gap to next named offset
+                if i + 1 < len(sorted_bss):
+                    gap = sorted_bss[i+1] - off
+                    size_cmt = f"{gap} byte{'s' if gap != 1 else ''}"
+                else:
+                    size_cmt = "?"
+                out.append(f"{name_str:<14}EQU    ${off:02X}      ; {size_cmt}")
             out.append("")
 
         out += [
@@ -2336,7 +2348,7 @@ def decode_6309(data, pos, labels=None, bss_names=None):
         elif op2 == 0x8A: v=rw(); mn='ORW';   op_str=f'#${v:04X}'  # ORD
         elif op2 == 0x8B: v=rw(); mn='ADDW';  op_str=f'#${v:04X}'
         elif op2 == 0xC6: v=rb(); mn='LDE';   op_str=f'#${v:02X}'; cm='E = imm'
-        elif op2 == 0xD6: v=rb(); mn='LDE';   op_str=f'<${v:02X}'
+        elif op2 == 0xD6: v=rb(); mn='LDE';   op_str=dp(v)
         elif op2 == 0x86: v=rw(); mn='LDW';   op_str=f'#${v:04X}'; cm='W = imm'
 
         # Stack ops for W
@@ -2354,11 +2366,11 @@ def decode_6309(data, pos, labels=None, bss_names=None):
 
         # MULD / DIVD / DIVQ
         if op2 == 0x8F: v=rw(); mn='MULD'; op_str=f'#${v:04X}'; cm='Q = D × operand (32-bit result)'
-        elif op2 == 0x9F: v=rb(); mn='MULD'; op_str=f'<${v:02X}'
+        elif op2 == 0x9F: v=rb(); mn='MULD'; op_str=dp(v)
         elif op2 == 0x88: v=rb(); mn='DIVD'; op_str=f'#${v:02X}'; cm='D = D ÷ imm8; remainder in B'
-        elif op2 == 0x98: v=rb(); mn='DIVD'; op_str=f'<${v:02X}'
+        elif op2 == 0x98: v=rb(); mn='DIVD'; op_str=dp(v)
         elif op2 == 0x8B: v=rw(); mn='DIVQ'; op_str=f'#${v:04X}'; cm='W:D = Q ÷ imm16'
-        elif op2 == 0x9B: v=rb(); mn='DIVQ'; op_str=f'<${v:02X}'
+        elif op2 == 0x9B: v=rb(); mn='DIVQ'; op_str=dp(v)
 
         # Bit transfer ops: BAND BIAND BOR BIOR BEOR BIEOR BLDX BSTX
         # Format: opcode  postbyte(dst_reg:dst_bit:src_bit)  dp_addr
