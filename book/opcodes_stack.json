@@ -1,0 +1,54 @@
+{
+  "group": "stack",
+  "description": "Push and pull registers to/from S and U stacks",
+  "instructions": [
+    {
+      "mnemonic": "PSHS",
+      "full_name": "Push Registers to S Stack",
+      "operation": "S ← S - n; M[S] ← registers",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "PSHS reglist", "opcode": "34", "bytes": 2, "cycles": "5+n" }
+      ],
+      "flow": "sequential",
+      "register_list": {
+        "CC": "bit 0", "A": "bit 1", "B": "bit 2", "DP": "bit 3",
+        "X": "bit 4", "Y": "bit 5", "U": "bit 6", "PC": "bit 7"
+      },
+      "notes": "Postbyte is a bitmask of registers to push. Registers are pushed in a fixed order regardless of bit order in postbyte: PC, U, Y, X, DP, B, A, CC (highest address to lowest). Cycles = 5 + 1 per 8-bit register + 2 per 16-bit register. Cannot push S itself."
+    },
+    {
+      "mnemonic": "PULS",
+      "full_name": "Pull Registers from S Stack",
+      "operation": "registers ← M[S]; S ← S + n",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "PULS reglist", "opcode": "35", "bytes": 2, "cycles": "5+n" }
+      ],
+      "flow": "sequential",
+      "notes": "Pulls registers in reverse push order: CC, A, B, DP, X, Y, U, PC. PULS PC is equivalent to RTS. If CC is in the list, all condition codes are restored from the stack. Cycles = 5 + 1 per 8-bit register + 2 per 16-bit register."
+    },
+    {
+      "mnemonic": "PSHU",
+      "full_name": "Push Registers to U Stack",
+      "operation": "U ← U - n; M[U] ← registers",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "PSHU reglist", "opcode": "36", "bytes": 2, "cycles": "5+n" }
+      ],
+      "flow": "sequential",
+      "notes": "Same as PSHS but uses U stack. Postbyte bit 6 refers to S (not U). Cannot push U itself."
+    },
+    {
+      "mnemonic": "PULU",
+      "full_name": "Pull Registers from U Stack",
+      "operation": "registers ← M[U]; U ← U + n",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "PULU reglist", "opcode": "37", "bytes": 2, "cycles": "5+n" }
+      ],
+      "flow": "sequential",
+      "notes": "Same as PULS but uses U stack. PULU PC jumps to the address on top of the U stack."
+    }
+  ]
+}

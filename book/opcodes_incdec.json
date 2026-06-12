@@ -1,0 +1,76 @@
+{
+  "group": "incdec",
+  "description": "Increment and decrement registers and memory",
+  "instructions": [
+    {
+      "mnemonic": "INCA",
+      "full_name": "Increment Accumulator A",
+      "operation": "A ← A + 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "INCA", "opcode": "4C", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "C is not affected — use ADDA #1 if carry is needed. V is set if A was $7F (overflow from +127 to -128 in signed arithmetic)."
+    },
+    {
+      "mnemonic": "INCB",
+      "full_name": "Increment Accumulator B",
+      "operation": "B ← B + 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "INCB", "opcode": "5C", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "C is not affected. V is set if B was $7F."
+    },
+    {
+      "mnemonic": "INC",
+      "full_name": "Increment Memory",
+      "operation": "M ← M + 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "INC <addr", "opcode": "0C", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "INC addr,R","opcode": "6C", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "INC addr",  "opcode": "7C", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory. C is not affected."
+    },
+    {
+      "mnemonic": "DECA",
+      "full_name": "Decrement Accumulator A",
+      "operation": "A ← A - 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "DECA", "opcode": "4A", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "C is not affected. V is set if A was $80 (overflow from -128 to +127). Classic loop counter idiom: load count, loop body, DECA, BNE loop."
+    },
+    {
+      "mnemonic": "DECB",
+      "full_name": "Decrement Accumulator B",
+      "operation": "B ← B - 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "DECB", "opcode": "5A", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "C is not affected. V is set if B was $80."
+    },
+    {
+      "mnemonic": "DEC",
+      "full_name": "Decrement Memory",
+      "operation": "M ← M - 1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "DEC <addr", "opcode": "0A", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "DEC addr,R","opcode": "6A", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "DEC addr",  "opcode": "7A", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory. C is not affected."
+    }
+  ]
+}

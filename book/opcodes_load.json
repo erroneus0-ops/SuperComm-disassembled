@@ -1,0 +1,104 @@
+{
+  "group": "load",
+  "description": "Load register from memory or immediate value",
+  "instructions": [
+    {
+      "mnemonic": "LDA",
+      "full_name": "Load Accumulator A",
+      "operation": "A ← M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDA #n",    "opcode": "86", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "LDA <addr", "opcode": "96", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "LDA addr,R","opcode": "A6", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "LDA addr",  "opcode": "B6", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared, not affected by the loaded value."
+    },
+    {
+      "mnemonic": "LDB",
+      "full_name": "Load Accumulator B",
+      "operation": "B ← M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDB #n",    "opcode": "C6", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "LDB <addr", "opcode": "D6", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "LDB addr,R","opcode": "E6", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "LDB addr",  "opcode": "F6", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared, not affected by the loaded value."
+    },
+    {
+      "mnemonic": "LDD",
+      "full_name": "Load Double Accumulator D",
+      "operation": "D ← M:M+1  (A ← M, B ← M+1)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDD #nn",   "opcode": "CC", "bytes": 3, "cycles": 3 },
+        { "mode": "direct",    "syntax": "LDD <addr", "opcode": "DC", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",   "syntax": "LDD addr,R","opcode": "EC", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended",  "syntax": "LDD addr",  "opcode": "FC", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "Loads 16-bit value. High byte to A, low byte to B. V is cleared."
+    },
+    {
+      "mnemonic": "LDX",
+      "full_name": "Load Index Register X",
+      "operation": "X ← M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDX #nn",   "opcode": "8E", "bytes": 3, "cycles": 3 },
+        { "mode": "direct",    "syntax": "LDX <addr", "opcode": "9E", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",   "syntax": "LDX addr,R","opcode": "AE", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended",  "syntax": "LDX addr",  "opcode": "BE", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared."
+    },
+    {
+      "mnemonic": "LDY",
+      "full_name": "Load Index Register Y",
+      "operation": "Y ← M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDY #nn",   "opcode": "108E", "bytes": 4, "cycles": 4 },
+        { "mode": "direct",    "syntax": "LDY <addr", "opcode": "109E", "bytes": 3, "cycles": 6 },
+        { "mode": "indexed",   "syntax": "LDY addr,R","opcode": "10AE", "bytes": "3+","cycles": "6+" },
+        { "mode": "extended",  "syntax": "LDY addr",  "opcode": "10BE", "bytes": 4, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). V is cleared."
+    },
+    {
+      "mnemonic": "LDS",
+      "full_name": "Load Stack Pointer S",
+      "operation": "S ← M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDS #nn",   "opcode": "10CE", "bytes": 4, "cycles": 4 },
+        { "mode": "direct",    "syntax": "LDS <addr", "opcode": "10DE", "bytes": 3, "cycles": 6 },
+        { "mode": "indexed",   "syntax": "LDS addr,R","opcode": "10EE", "bytes": "3+","cycles": "6+" },
+        { "mode": "extended",  "syntax": "LDS addr",  "opcode": "10FE", "bytes": 4, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). V is cleared."
+    },
+    {
+      "mnemonic": "LDU",
+      "full_name": "Load User Stack Pointer U",
+      "operation": "U ← M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "LDU #nn",   "opcode": "CE", "bytes": 3, "cycles": 3 },
+        { "mode": "direct",    "syntax": "LDU <addr", "opcode": "DE", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",   "syntax": "LDU addr,R","opcode": "EE", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended",  "syntax": "LDU addr",  "opcode": "FE", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared."
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "group": "arithmetic",
+  "description": "Addition, subtraction, multiplication, negation, decimal adjust",
+  "instructions": [
+    {
+      "mnemonic": "ADDA",
+      "full_name": "Add Memory to Accumulator A",
+      "operation": "A ← A + M",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ADDA #n",    "opcode": "8B", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ADDA <addr", "opcode": "9B", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ADDA addr,R","opcode": "AB", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ADDA addr",  "opcode": "BB", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "H is set if carry from bit 3 — used for BCD arithmetic. Follow with DAA for BCD correction."
+    },
+    {
+      "mnemonic": "ADDB",
+      "full_name": "Add Memory to Accumulator B",
+      "operation": "B ← B + M",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ADDB #n",    "opcode": "CB", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ADDB <addr", "opcode": "DB", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ADDB addr,R","opcode": "EB", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ADDB addr",  "opcode": "FB", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "H is set if carry from bit 3."
+    },
+    {
+      "mnemonic": "ADDD",
+      "full_name": "Add Memory to Double Accumulator D",
+      "operation": "D ← D + M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ADDD #nn",   "opcode": "C3", "bytes": 3, "cycles": 4 },
+        { "mode": "direct",    "syntax": "ADDD <addr", "opcode": "D3", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",   "syntax": "ADDD addr,R","opcode": "E3", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended",  "syntax": "ADDD addr",  "opcode": "F3", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "16-bit addition. H is not affected."
+    },
+    {
+      "mnemonic": "ADCA",
+      "full_name": "Add with Carry to Accumulator A",
+      "operation": "A ← A + M + C",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ADCA #n",    "opcode": "89", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ADCA <addr", "opcode": "99", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ADCA addr,R","opcode": "A9", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ADCA addr",  "opcode": "B9", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used for multi-byte addition — add low bytes with ADDA, then high bytes with ADCA to propagate carry."
+    },
+    {
+      "mnemonic": "ADCB",
+      "full_name": "Add with Carry to Accumulator B",
+      "operation": "B ← B + M + C",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ADCB #n",    "opcode": "C9", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ADCB <addr", "opcode": "D9", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ADCB addr,R","opcode": "E9", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ADCB addr",  "opcode": "F9", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used for multi-byte addition."
+    },
+    {
+      "mnemonic": "SUBA",
+      "full_name": "Subtract Memory from Accumulator A",
+      "operation": "A ← A - M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "SUBA #n",    "opcode": "80", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "SUBA <addr", "opcode": "90", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "SUBA addr,R","opcode": "A0", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "SUBA addr",  "opcode": "B0", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "C is set if borrow (unsigned underflow). V is set if signed overflow."
+    },
+    {
+      "mnemonic": "SUBB",
+      "full_name": "Subtract Memory from Accumulator B",
+      "operation": "B ← B - M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "SUBB #n",    "opcode": "C0", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "SUBB <addr", "opcode": "D0", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "SUBB addr,R","opcode": "E0", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "SUBB addr",  "opcode": "F0", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "C is set if borrow. V is set if signed overflow."
+    },
+    {
+      "mnemonic": "SUBD",
+      "full_name": "Subtract Memory from Double Accumulator D",
+      "operation": "D ← D - M:M+1",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "SUBD #nn",   "opcode": "83", "bytes": 3, "cycles": 4 },
+        { "mode": "direct",    "syntax": "SUBD <addr", "opcode": "93", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",   "syntax": "SUBD addr,R","opcode": "A3", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended",  "syntax": "SUBD addr",  "opcode": "B3", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "16-bit subtraction."
+    },
+    {
+      "mnemonic": "SBCA",
+      "full_name": "Subtract with Carry from Accumulator A",
+      "operation": "A ← A - M - C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "SBCA #n",    "opcode": "82", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "SBCA <addr", "opcode": "92", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "SBCA addr,R","opcode": "A2", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "SBCA addr",  "opcode": "B2", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used for multi-byte subtraction — subtract low bytes with SUBA, then high bytes with SBCA to propagate borrow."
+    },
+    {
+      "mnemonic": "SBCB",
+      "full_name": "Subtract with Carry from Accumulator B",
+      "operation": "B ← B - M - C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "SBCB #n",    "opcode": "C2", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "SBCB <addr", "opcode": "D2", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "SBCB addr,R","opcode": "E2", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "SBCB addr",  "opcode": "F2", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used for multi-byte subtraction."
+    },
+    {
+      "mnemonic": "MUL",
+      "full_name": "Unsigned Multiply",
+      "operation": "D ← A × B  (unsigned)",
+      "condition_codes": { "H": "-", "N": "-", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "MUL", "opcode": "3D", "bytes": 1, "cycles": 11 }
+      ],
+      "flow": "sequential",
+      "notes": "Multiplies unsigned 8-bit A by unsigned 8-bit B. 16-bit result in D. C is set to bit 7 of B (the MSB of the result's low byte) — useful for rounding. Z reflects whether result is zero."
+    },
+    {
+      "mnemonic": "NEG",
+      "full_name": "Negate Memory",
+      "operation": "M ← 0 - M  (two's complement)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "NEG <addr", "opcode": "00", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "NEG addr,R","opcode": "60", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "NEG addr",  "opcode": "70", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "V is set if operand was $80 (overflow — two's complement of $80 is $80). C is set if operand was non-zero."
+    },
+    {
+      "mnemonic": "NEGA",
+      "full_name": "Negate Accumulator A",
+      "operation": "A ← 0 - A",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "NEGA", "opcode": "40", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "V is set if A was $80. C is set if A was non-zero."
+    },
+    {
+      "mnemonic": "NEGB",
+      "full_name": "Negate Accumulator B",
+      "operation": "B ← 0 - B",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "NEGB", "opcode": "50", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "V is set if B was $80. C is set if B was non-zero."
+    },
+    {
+      "mnemonic": "DAA",
+      "full_name": "Decimal Adjust Accumulator A",
+      "operation": "A ← BCD adjust of A",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "?", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "DAA", "opcode": "19", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Adjusts A after BCD addition (ADDA or ADCA) to produce a valid BCD result. Uses H and C flags set by the preceding addition. V is undefined after DAA. Must only be used after addition — not subtraction."
+    }
+  ]
+}

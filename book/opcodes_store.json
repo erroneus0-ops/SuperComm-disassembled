@@ -1,0 +1,97 @@
+{
+  "group": "store",
+  "description": "Store register to memory",
+  "instructions": [
+    {
+      "mnemonic": "STA",
+      "full_name": "Store Accumulator A",
+      "operation": "M ← A",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STA <addr", "opcode": "97", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",  "syntax": "STA addr,R","opcode": "A7", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended", "syntax": "STA addr",  "opcode": "B7", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "No immediate mode — storing to an immediate value is meaningless. V is cleared."
+    },
+    {
+      "mnemonic": "STB",
+      "full_name": "Store Accumulator B",
+      "operation": "M ← B",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STB <addr", "opcode": "D7", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",  "syntax": "STB addr,R","opcode": "E7", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended", "syntax": "STB addr",  "opcode": "F7", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "No immediate mode. V is cleared."
+    },
+    {
+      "mnemonic": "STD",
+      "full_name": "Store Double Accumulator D",
+      "operation": "M ← A, M+1 ← B",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STD <addr", "opcode": "DD", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",  "syntax": "STD addr,R","opcode": "ED", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended", "syntax": "STD addr",  "opcode": "FD", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "Stores 16-bit value. A to high byte, B to low byte. V is cleared."
+    },
+    {
+      "mnemonic": "STX",
+      "full_name": "Store Index Register X",
+      "operation": "M:M+1 ← X",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STX <addr", "opcode": "9F", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",  "syntax": "STX addr,R","opcode": "AF", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended", "syntax": "STX addr",  "opcode": "BF", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared."
+    },
+    {
+      "mnemonic": "STY",
+      "full_name": "Store Index Register Y",
+      "operation": "M:M+1 ← Y",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STY <addr", "opcode": "109F", "bytes": 3, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "STY addr,R","opcode": "10AF", "bytes": "3+","cycles": "6+" },
+        { "mode": "extended", "syntax": "STY addr",  "opcode": "10BF", "bytes": 4, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). V is cleared."
+    },
+    {
+      "mnemonic": "STS",
+      "full_name": "Store Stack Pointer S",
+      "operation": "M:M+1 ← S",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STS <addr", "opcode": "10DF", "bytes": 3, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "STS addr,R","opcode": "10EF", "bytes": "3+","cycles": "6+" },
+        { "mode": "extended", "syntax": "STS addr",  "opcode": "10FF", "bytes": 4, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). V is cleared."
+    },
+    {
+      "mnemonic": "STU",
+      "full_name": "Store User Stack Pointer U",
+      "operation": "M:M+1 ← U",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "STU <addr", "opcode": "DF", "bytes": 2, "cycles": 5 },
+        { "mode": "indexed",  "syntax": "STU addr,R","opcode": "EF", "bytes": "2+","cycles": "5+" },
+        { "mode": "extended", "syntax": "STU addr",  "opcode": "FF", "bytes": 3, "cycles": 6 }
+      ],
+      "flow": "sequential",
+      "notes": "V is cleared."
+    }
+  ]
+}

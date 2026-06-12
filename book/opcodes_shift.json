@@ -1,0 +1,181 @@
+{
+  "group": "shift",
+  "description": "Arithmetic and logical shifts, rotations",
+  "instructions": [
+    {
+      "mnemonic": "LSLA",
+      "full_name": "Logical Shift Left Accumulator A",
+      "operation": "C ← b7 ← b6...b0 ← 0",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "LSLA", "opcode": "48", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Also called ASLA. Shifts all bits left one position; bit 7 goes to C, bit 0 filled with 0. Equivalent to multiplying by 2. V is set if the sign changes (bit 7 XOR bit 6 before shift)."
+    },
+    {
+      "mnemonic": "LSLB",
+      "full_name": "Logical Shift Left Accumulator B",
+      "operation": "C ← b7 ← b6...b0 ← 0",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "LSLB", "opcode": "58", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Also called ASLB. Same operation as LSLA on B."
+    },
+    {
+      "mnemonic": "LSL",
+      "full_name": "Logical Shift Left Memory",
+      "operation": "C ← b7 ← b6...b0 ← 0",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "LSL <addr", "opcode": "08", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "LSL addr,R","opcode": "68", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "LSL addr",  "opcode": "78", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Also called ASL. Read-modify-write on memory."
+    },
+    {
+      "mnemonic": "LSRA",
+      "full_name": "Logical Shift Right Accumulator A",
+      "operation": "0 → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "0", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "LSRA", "opcode": "44", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Shifts all bits right one position; bit 0 goes to C, bit 7 filled with 0. Equivalent to dividing unsigned value by 2. N is always cleared (bit 7 is always 0 after). Unlike ASRA, does not propagate sign."
+    },
+    {
+      "mnemonic": "LSRB",
+      "full_name": "Logical Shift Right Accumulator B",
+      "operation": "0 → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "0", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "LSRB", "opcode": "54", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Same operation as LSRA on B."
+    },
+    {
+      "mnemonic": "LSR",
+      "full_name": "Logical Shift Right Memory",
+      "operation": "0 → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "0", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "LSR <addr", "opcode": "04", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "LSR addr,R","opcode": "64", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "LSR addr",  "opcode": "74", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory."
+    },
+    {
+      "mnemonic": "ASRA",
+      "full_name": "Arithmetic Shift Right Accumulator A",
+      "operation": "b7 → b7...b0 → C  (sign bit propagates)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "ASRA", "opcode": "47", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Bit 7 is reproduced (sign extension). Bit 0 goes to C. Equivalent to dividing signed value by 2, rounding toward negative infinity. V is not affected."
+    },
+    {
+      "mnemonic": "ASRB",
+      "full_name": "Arithmetic Shift Right Accumulator B",
+      "operation": "b7 → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "ASRB", "opcode": "57", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Same operation as ASRA on B."
+    },
+    {
+      "mnemonic": "ASR",
+      "full_name": "Arithmetic Shift Right Memory",
+      "operation": "b7 → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "ASR <addr", "opcode": "07", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "ASR addr,R","opcode": "67", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "ASR addr",  "opcode": "77", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory."
+    },
+    {
+      "mnemonic": "ROLA",
+      "full_name": "Rotate Left Accumulator A through Carry",
+      "operation": "C ← b7 ← b6...b0 ← C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "ROLA", "opcode": "49", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "9-bit rotation through carry. Old C goes to bit 0; bit 7 goes to new C. Used for multi-byte shifts — ROL/ROR pairs can shift values wider than 8 bits."
+    },
+    {
+      "mnemonic": "ROLB",
+      "full_name": "Rotate Left Accumulator B through Carry",
+      "operation": "C ← b7 ← b6...b0 ← C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "ROLB", "opcode": "59", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Same operation as ROLA on B."
+    },
+    {
+      "mnemonic": "ROL",
+      "full_name": "Rotate Left Memory through Carry",
+      "operation": "C ← b7 ← b6...b0 ← C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "ROL <addr", "opcode": "09", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "ROL addr,R","opcode": "69", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "ROL addr",  "opcode": "79", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory."
+    },
+    {
+      "mnemonic": "RORA",
+      "full_name": "Rotate Right Accumulator A through Carry",
+      "operation": "C → b7...b0 → C  (old C to bit 7)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "RORA", "opcode": "46", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "9-bit rotation through carry. Old C goes to bit 7; bit 0 goes to new C. V is not affected."
+    },
+    {
+      "mnemonic": "RORB",
+      "full_name": "Rotate Right Accumulator B through Carry",
+      "operation": "C → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "RORB", "opcode": "56", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Same operation as RORA on B."
+    },
+    {
+      "mnemonic": "ROR",
+      "full_name": "Rotate Right Memory through Carry",
+      "operation": "C → b7...b0 → C",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "↕" },
+      "modes": [
+        { "mode": "direct",   "syntax": "ROR <addr", "opcode": "06", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "ROR addr,R","opcode": "66", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "ROR addr",  "opcode": "76", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Read-modify-write on memory. V is not affected."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "group": "misc",
+  "description": "Miscellaneous: NOP, SYNC, CWAI, SWI, ABX",
+  "instructions": [
+    {
+      "mnemonic": "NOP",
+      "full_name": "No Operation",
+      "operation": "none",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "NOP", "opcode": "12", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Does nothing for 2 cycles. Used for timing loops, code patching placeholders, and alignment."
+    },
+    {
+      "mnemonic": "ABX",
+      "full_name": "Add Accumulator B to X",
+      "operation": "X ← X + B  (unsigned)",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "ABX", "opcode": "3A", "bytes": 1, "cycles": 3 }
+      ],
+      "flow": "sequential",
+      "notes": "B is treated as unsigned (0-255). No flags affected. Equivalent to LEAX B,X but faster (3 vs 4+ cycles) and does not affect Z. Useful for indexing into a table using B as an unsigned offset."
+    },
+    {
+      "mnemonic": "SEX",
+      "full_name": "Sign Extend B into A",
+      "operation": "A ← sign extend of B  (A ← $FF if B7=1, else A ← $00)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "SEX", "opcode": "1D", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Sign extends the 8-bit value in B into the 16-bit D register. If B is negative (bit 7 set), A is set to $FF; otherwise A is cleared. Allows treating B as a signed 16-bit value in D."
+    },
+    {
+      "mnemonic": "CWAI",
+      "full_name": "AND Condition Codes and Wait for Interrupt",
+      "operation": "CC ← CC AND M; push all registers; wait for interrupt",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CWAI #n", "opcode": "3C", "bytes": 2, "cycles": "20+" }
+      ],
+      "flow": "sequential",
+      "notes": "Clears selected CC bits via AND mask, then pushes all registers (sets E flag in CC), then halts execution until an unmasked interrupt arrives. Faster interrupt response than SYNC because all registers are pre-saved. Minimum 20 cycles before interrupt vector is fetched."
+    },
+    {
+      "mnemonic": "SYNC",
+      "full_name": "Synchronize with Interrupt",
+      "operation": "halt until interrupt",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "SYNC", "opcode": "13", "bytes": 1, "cycles": "2+" }
+      ],
+      "flow": "sequential",
+      "notes": "Halts execution and waits for any interrupt. If the interrupt is masked, execution resumes at the next instruction after 2 cycles (without servicing the interrupt). If unmasked, the interrupt is serviced normally. Used for precise timing synchronization."
+    },
+    {
+      "mnemonic": "SWI",
+      "full_name": "Software Interrupt 1",
+      "operation": "push all registers; PC ← M[$FFFA:$FFFB]",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "SWI", "opcode": "3F", "bytes": 1, "cycles": 19 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "Pushes all registers with E set, then vectors through $FFFA/$FFFB. Under OS-9 this is the syscall mechanism — the byte following SWI is the syscall number."
+    },
+    {
+      "mnemonic": "SWI2",
+      "full_name": "Software Interrupt 2",
+      "operation": "push all registers; PC ← M[$FFF4:$FFF5]",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "SWI2", "opcode": "103F", "bytes": 2, "cycles": 20 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "Page 2 instruction. Vectors through $FFF4/$FFF5. Under OS-9 Level II this is the user-mode syscall."
+    },
+    {
+      "mnemonic": "SWI3",
+      "full_name": "Software Interrupt 3",
+      "operation": "push all registers; PC ← M[$FFF2:$FFF3]",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "SWI3", "opcode": "113F", "bytes": 2, "cycles": 20 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "Page 3 instruction. Vectors through $FFF2/$FFF3."
+    }
+  ]
+}

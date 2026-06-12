@@ -1,0 +1,182 @@
+{
+  "group": "logical",
+  "description": "Boolean AND, OR, XOR, complement operations",
+  "instructions": [
+    {
+      "mnemonic": "ANDA",
+      "full_name": "AND Accumulator A with Memory",
+      "operation": "A ← A AND M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ANDA #n",    "opcode": "84", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ANDA <addr", "opcode": "94", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ANDA addr,R","opcode": "A4", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ANDA addr",  "opcode": "B4", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used to clear specific bits. Mask immediate value with 0s in bit positions to clear. V is always cleared."
+    },
+    {
+      "mnemonic": "ANDB",
+      "full_name": "AND Accumulator B with Memory",
+      "operation": "B ← B AND M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ANDB #n",    "opcode": "C4", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ANDB <addr", "opcode": "D4", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ANDB addr,R","opcode": "E4", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ANDB addr",  "opcode": "F4", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "V is always cleared."
+    },
+    {
+      "mnemonic": "ANDCC",
+      "full_name": "AND Condition Code Register",
+      "operation": "CC ← CC AND M",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ANDCC #n", "opcode": "1C", "bytes": 2, "cycles": 3 }
+      ],
+      "flow": "sequential",
+      "notes": "Used to clear specific condition code bits. Bits set to 0 in the immediate mask are cleared in CC. Commonly used to clear the interrupt mask bits (enable interrupts) or clear the carry flag."
+    },
+    {
+      "mnemonic": "ORA",
+      "full_name": "OR Accumulator A with Memory",
+      "operation": "A ← A OR M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ORA #n",    "opcode": "8A", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ORA <addr", "opcode": "9A", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ORA addr,R","opcode": "AA", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ORA addr",  "opcode": "BA", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used to set specific bits. Mask immediate value with 1s in bit positions to set. V is always cleared."
+    },
+    {
+      "mnemonic": "ORB",
+      "full_name": "OR Accumulator B with Memory",
+      "operation": "B ← B OR M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ORB #n",    "opcode": "CA", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "ORB <addr", "opcode": "DA", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "ORB addr,R","opcode": "EA", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "ORB addr",  "opcode": "FA", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "V is always cleared."
+    },
+    {
+      "mnemonic": "ORCC",
+      "full_name": "OR Condition Code Register",
+      "operation": "CC ← CC OR M",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "ORCC #n", "opcode": "1A", "bytes": 2, "cycles": 3 }
+      ],
+      "flow": "sequential",
+      "notes": "Used to set specific condition code bits. Bits set to 1 in the immediate mask are set in CC. Commonly used to set the interrupt mask bits (disable interrupts) or set the carry flag."
+    },
+    {
+      "mnemonic": "EORA",
+      "full_name": "Exclusive OR Accumulator A with Memory",
+      "operation": "A ← A XOR M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "EORA #n",    "opcode": "88", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "EORA <addr", "opcode": "98", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "EORA addr,R","opcode": "A8", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "EORA addr",  "opcode": "B8", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Used to toggle specific bits, or to test equality (result is zero if A equals M). V is always cleared."
+    },
+    {
+      "mnemonic": "EORB",
+      "full_name": "Exclusive OR Accumulator B with Memory",
+      "operation": "B ← B XOR M",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "EORB #n",    "opcode": "C8", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "EORB <addr", "opcode": "D8", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "EORB addr,R","opcode": "E8", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "EORB addr",  "opcode": "F8", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "V is always cleared."
+    },
+    {
+      "mnemonic": "COMA",
+      "full_name": "Complement Accumulator A",
+      "operation": "A ← ~A  (one's complement)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "1" },
+      "modes": [
+        { "mode": "inherent", "syntax": "COMA", "opcode": "43", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Inverts all bits of A. C is always set to 1 after COM. V is always cleared. For two's complement negation use NEGA."
+    },
+    {
+      "mnemonic": "COMB",
+      "full_name": "Complement Accumulator B",
+      "operation": "B ← ~B  (one's complement)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "1" },
+      "modes": [
+        { "mode": "inherent", "syntax": "COMB", "opcode": "53", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Inverts all bits of B. C is always set to 1. V is always cleared."
+    },
+    {
+      "mnemonic": "COM",
+      "full_name": "Complement Memory",
+      "operation": "M ← ~M  (one's complement)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "1" },
+      "modes": [
+        { "mode": "direct",   "syntax": "COM <addr", "opcode": "03", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "COM addr,R","opcode": "63", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "COM addr",  "opcode": "73", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Inverts all bits of memory byte. C is always set to 1. V is always cleared."
+    },
+    {
+      "mnemonic": "CLRA",
+      "full_name": "Clear Accumulator A",
+      "operation": "A ← 0",
+      "condition_codes": { "H": "-", "N": "0", "Z": "1", "V": "0", "C": "0" },
+      "modes": [
+        { "mode": "inherent", "syntax": "CLRA", "opcode": "4F", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "All affected flags are set to fixed values — N=0, Z=1, V=0, C=0. Faster than LDA #0."
+    },
+    {
+      "mnemonic": "CLRB",
+      "full_name": "Clear Accumulator B",
+      "operation": "B ← 0",
+      "condition_codes": { "H": "-", "N": "0", "Z": "1", "V": "0", "C": "0" },
+      "modes": [
+        { "mode": "inherent", "syntax": "CLRB", "opcode": "5F", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Faster than LDB #0."
+    },
+    {
+      "mnemonic": "CLR",
+      "full_name": "Clear Memory",
+      "operation": "M ← 0",
+      "condition_codes": { "H": "-", "N": "0", "Z": "1", "V": "0", "C": "0" },
+      "modes": [
+        { "mode": "direct",   "syntax": "CLR <addr", "opcode": "0F", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "CLR addr,R","opcode": "6F", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "CLR addr",  "opcode": "7F", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "All affected flags set to fixed values. Faster than loading 0 into a register and storing."
+    }
+  ]
+}

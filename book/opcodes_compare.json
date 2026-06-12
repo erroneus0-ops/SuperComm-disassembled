@@ -1,0 +1,167 @@
+{
+  "group": "compare",
+  "description": "Compare and test — set condition codes without storing result",
+  "instructions": [
+    {
+      "mnemonic": "CMPA",
+      "full_name": "Compare Accumulator A with Memory",
+      "operation": "A - M  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPA #n",    "opcode": "81", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "CMPA <addr", "opcode": "91", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "CMPA addr,R","opcode": "A1", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "CMPA addr",  "opcode": "B1", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Subtracts M from A and sets flags; result is not stored. Use signed branches (BGT, BLT, BGE, BLE) for signed comparisons; unsigned branches (BHI, BLO, BHS, BLS) for unsigned."
+    },
+    {
+      "mnemonic": "CMPB",
+      "full_name": "Compare Accumulator B with Memory",
+      "operation": "B - M  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPB #n",    "opcode": "C1", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "CMPB <addr", "opcode": "D1", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "CMPB addr,R","opcode": "E1", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "CMPB addr",  "opcode": "F1", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "Same semantics as CMPA."
+    },
+    {
+      "mnemonic": "CMPD",
+      "full_name": "Compare Double Accumulator D with Memory",
+      "operation": "D - M:M+1  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPD #nn",   "opcode": "1083", "bytes": 4, "cycles": 5 },
+        { "mode": "direct",    "syntax": "CMPD <addr", "opcode": "1093", "bytes": 3, "cycles": 7 },
+        { "mode": "indexed",   "syntax": "CMPD addr,R","opcode": "10A3", "bytes": "3+","cycles": "7+" },
+        { "mode": "extended",  "syntax": "CMPD addr",  "opcode": "10B3", "bytes": 4, "cycles": 8 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). 16-bit compare."
+    },
+    {
+      "mnemonic": "CMPX",
+      "full_name": "Compare Index Register X with Memory",
+      "operation": "X - M:M+1  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPX #nn",   "opcode": "8C", "bytes": 3, "cycles": 4 },
+        { "mode": "direct",    "syntax": "CMPX <addr", "opcode": "9C", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",   "syntax": "CMPX addr,R","opcode": "AC", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended",  "syntax": "CMPX addr",  "opcode": "BC", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "16-bit compare."
+    },
+    {
+      "mnemonic": "CMPY",
+      "full_name": "Compare Index Register Y with Memory",
+      "operation": "Y - M:M+1  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPY #nn",   "opcode": "108C", "bytes": 4, "cycles": 5 },
+        { "mode": "direct",    "syntax": "CMPY <addr", "opcode": "109C", "bytes": 3, "cycles": 7 },
+        { "mode": "indexed",   "syntax": "CMPY addr,R","opcode": "10AC", "bytes": "3+","cycles": "7+" },
+        { "mode": "extended",  "syntax": "CMPY addr",  "opcode": "10BC", "bytes": 4, "cycles": 8 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 2 instruction ($10 prefix). 16-bit compare."
+    },
+    {
+      "mnemonic": "CMPS",
+      "full_name": "Compare Stack Pointer S with Memory",
+      "operation": "S - M:M+1  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPS #nn",   "opcode": "118C", "bytes": 4, "cycles": 5 },
+        { "mode": "direct",    "syntax": "CMPS <addr", "opcode": "119C", "bytes": 3, "cycles": 7 },
+        { "mode": "indexed",   "syntax": "CMPS addr,R","opcode": "11AC", "bytes": "3+","cycles": "7+" },
+        { "mode": "extended",  "syntax": "CMPS addr",  "opcode": "11BC", "bytes": 4, "cycles": 8 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 3 instruction ($11 prefix). 16-bit compare."
+    },
+    {
+      "mnemonic": "CMPU",
+      "full_name": "Compare User Stack Pointer U with Memory",
+      "operation": "U - M:M+1  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "immediate", "syntax": "CMPU #nn",   "opcode": "1183", "bytes": 4, "cycles": 5 },
+        { "mode": "direct",    "syntax": "CMPU <addr", "opcode": "1193", "bytes": 3, "cycles": 7 },
+        { "mode": "indexed",   "syntax": "CMPU addr,R","opcode": "11A3", "bytes": "3+","cycles": "7+" },
+        { "mode": "extended",  "syntax": "CMPU addr",  "opcode": "11B3", "bytes": 4, "cycles": 8 }
+      ],
+      "flow": "sequential",
+      "notes": "Page 3 instruction ($11 prefix). 16-bit compare."
+    },
+    {
+      "mnemonic": "TSTA",
+      "full_name": "Test Accumulator A",
+      "operation": "A - 0  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "TSTA", "opcode": "4D", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Sets N and Z based on A. V is always cleared. Equivalent to CMPA #0 but shorter and faster. C is not affected."
+    },
+    {
+      "mnemonic": "TSTB",
+      "full_name": "Test Accumulator B",
+      "operation": "B - 0  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "TSTB", "opcode": "5D", "bytes": 1, "cycles": 2 }
+      ],
+      "flow": "sequential",
+      "notes": "Sets N and Z based on B. V is always cleared. C is not affected."
+    },
+    {
+      "mnemonic": "TST",
+      "full_name": "Test Memory",
+      "operation": "M - 0  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "TST <addr", "opcode": "0D", "bytes": 2, "cycles": 6 },
+        { "mode": "indexed",  "syntax": "TST addr,R","opcode": "6D", "bytes": "2+","cycles": "6+" },
+        { "mode": "extended", "syntax": "TST addr",  "opcode": "7D", "bytes": 3, "cycles": 7 }
+      ],
+      "flow": "sequential",
+      "notes": "Sets N and Z based on memory byte. V is always cleared. C is not affected."
+    },
+    {
+      "mnemonic": "BITA",
+      "full_name": "Bit Test Accumulator A",
+      "operation": "A AND M  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "BITA #n",    "opcode": "85", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "BITA <addr", "opcode": "95", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "BITA addr,R","opcode": "A5", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "BITA addr",  "opcode": "B5", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "ANDs A with M and sets flags; neither A nor M is changed. Used to test individual bits. V is cleared."
+    },
+    {
+      "mnemonic": "BITB",
+      "full_name": "Bit Test Accumulator B",
+      "operation": "B AND M  (result discarded)",
+      "condition_codes": { "H": "-", "N": "↕", "Z": "↕", "V": "0", "C": "-" },
+      "modes": [
+        { "mode": "immediate", "syntax": "BITB #n",    "opcode": "C5", "bytes": 2, "cycles": 2 },
+        { "mode": "direct",    "syntax": "BITB <addr", "opcode": "D5", "bytes": 2, "cycles": 4 },
+        { "mode": "indexed",   "syntax": "BITB addr,R","opcode": "E5", "bytes": "2+","cycles": "4+" },
+        { "mode": "extended",  "syntax": "BITB addr",  "opcode": "F5", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "sequential",
+      "notes": "ANDs B with M and sets flags; neither B nor M is changed. V is cleared."
+    }
+  ]
+}

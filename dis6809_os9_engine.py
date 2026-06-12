@@ -1087,6 +1087,27 @@ class Engine:
             elif op2==0x16: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
             elif op2==0x17: l,t=rel16(); mn='LBSR'; op_str=l
             elif op2==0x20: l,t=rel16(); mn='LBRA'; op_str=l; stop=True
+            # long conditional branches
+            elif op2==0x21: l,t=rel16(); mn='LBRN'; op_str=l
+            elif op2==0x22: l,t=rel16(); mn='LBHI'; op_str=l
+            elif op2==0x23: l,t=rel16(); mn='LBLS'; op_str=l
+            elif op2==0x24: l,t=rel16(); mn='LBCC'; op_str=l
+            elif op2==0x25: l,t=rel16(); mn='LBCS'; op_str=l
+            elif op2==0x26: l,t=rel16(); mn='LBNE'; op_str=l
+            elif op2==0x27: l,t=rel16(); mn='LBEQ'; op_str=l
+            elif op2==0x28: l,t=rel16(); mn='LBVC'; op_str=l
+            elif op2==0x29: l,t=rel16(); mn='LBVS'; op_str=l
+            elif op2==0x2A: l,t=rel16(); mn='LBPL'; op_str=l
+            elif op2==0x2B: l,t=rel16(); mn='LBMI'; op_str=l
+            elif op2==0x2C: l,t=rel16(); mn='LBGE'; op_str=l
+            elif op2==0x2D: l,t=rel16(); mn='LBLT'; op_str=l
+            elif op2==0x2E: l,t=rel16(); mn='LBGT'; op_str=l
+            elif op2==0x2F: l,t=rel16(); mn='LBLE'; op_str=l
+            # LDS / STS direct and indexed
+            elif op2==0xDE: v=rb(); mn='LDS'; op_str=f'<${v:02X}'
+            elif op2==0xEE: op_str=idx(); mn='LDS'
+            elif op2==0xDF: v=rb(); mn='STS'; op_str=f'<${v:02X}'
+            elif op2==0xEF: op_str=idx(); mn='STS'
             else: mn=f'FCB'; op_str=f'$10,${op2:02X}'; cm=f'unknown opcode $10{op2:02X}'
         elif op==0x11:
             op2=rb()

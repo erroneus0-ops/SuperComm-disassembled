@@ -1,0 +1,417 @@
+{
+  "group": "branch",
+  "description": "Conditional and unconditional branches, jumps, subroutine calls and returns",
+  "instructions": [
+    {
+      "mnemonic": "BRA",
+      "full_name": "Branch Always",
+      "operation": "PC ← PC + offset",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BRA label", "opcode": "20", "bytes": 2, "cycles": 3 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "8-bit signed offset — range is -128 to +127 bytes from the instruction following BRA. For longer range use LBRA."
+    },
+    {
+      "mnemonic": "LBRA",
+      "full_name": "Long Branch Always",
+      "operation": "PC ← PC + offset",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBRA label", "opcode": "16", "bytes": 3, "cycles": 5 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "16-bit signed offset — full 64K range. Note: $16 is a single-byte opcode (not prefixed), unlike most long branches."
+    },
+    {
+      "mnemonic": "BRN",
+      "full_name": "Branch Never",
+      "operation": "no branch",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BRN label", "opcode": "21", "bytes": 2, "cycles": 3 }
+      ],
+      "flow": "sequential",
+      "notes": "Never branches. Equivalent to a 2-byte NOP. Useful for patching — replace BEQ/BNE with BRN to disable a branch without changing code size."
+    },
+    {
+      "mnemonic": "BEQ",
+      "full_name": "Branch if Equal  (Z=1)",
+      "operation": "PC ← PC + offset  if Z=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BEQ label", "opcode": "27", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if the Z flag is set. Typically follows CMP or TST. Cycles are 3 whether branch is taken or not (6809 always takes 3 for short branches)."
+    },
+    {
+      "mnemonic": "LBEQ",
+      "full_name": "Long Branch if Equal  (Z=1)",
+      "operation": "PC ← PC + offset  if Z=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBEQ label", "opcode": "1027", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction. 5 cycles if not taken, 6 if taken."
+    },
+    {
+      "mnemonic": "BNE",
+      "full_name": "Branch if Not Equal  (Z=0)",
+      "operation": "PC ← PC + offset  if Z=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BNE label", "opcode": "26", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if Z is clear. Common loop termination: DECB / BNE loop."
+    },
+    {
+      "mnemonic": "LBNE",
+      "full_name": "Long Branch if Not Equal  (Z=0)",
+      "operation": "PC ← PC + offset  if Z=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBNE label", "opcode": "1026", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BCS",
+      "full_name": "Branch if Carry Set  (C=1)  [Branch if Lower/Unsigned]",
+      "operation": "PC ← PC + offset  if C=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BCS label", "opcode": "25", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Also called BLO (Branch if Lower, Unsigned). Branches if C=1. Used after unsigned comparison: CMPA / BCS means 'branch if A < M (unsigned)'."
+    },
+    {
+      "mnemonic": "LBCS",
+      "full_name": "Long Branch if Carry Set",
+      "operation": "PC ← PC + offset  if C=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBCS label", "opcode": "1025", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Also called LBLO."
+    },
+    {
+      "mnemonic": "BCC",
+      "full_name": "Branch if Carry Clear  (C=0)  [Branch if Higher or Same/Unsigned]",
+      "operation": "PC ← PC + offset  if C=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BCC label", "opcode": "24", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Also called BHS (Branch if Higher or Same, Unsigned). Branches if C=0."
+    },
+    {
+      "mnemonic": "LBCC",
+      "full_name": "Long Branch if Carry Clear",
+      "operation": "PC ← PC + offset  if C=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBCC label", "opcode": "1024", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Also called LBHS."
+    },
+    {
+      "mnemonic": "BMI",
+      "full_name": "Branch if Minus  (N=1)",
+      "operation": "PC ← PC + offset  if N=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BMI label", "opcode": "2B", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if N=1 (result was negative, bit 7 was set)."
+    },
+    {
+      "mnemonic": "LBMI",
+      "full_name": "Long Branch if Minus",
+      "operation": "PC ← PC + offset  if N=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBMI label", "opcode": "102B", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BPL",
+      "full_name": "Branch if Plus  (N=0)",
+      "operation": "PC ← PC + offset  if N=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BPL label", "opcode": "2A", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if N=0 (result was positive or zero)."
+    },
+    {
+      "mnemonic": "LBPL",
+      "full_name": "Long Branch if Plus",
+      "operation": "PC ← PC + offset  if N=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBPL label", "opcode": "102A", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BVS",
+      "full_name": "Branch if Overflow Set  (V=1)",
+      "operation": "PC ← PC + offset  if V=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BVS label", "opcode": "29", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if signed overflow occurred."
+    },
+    {
+      "mnemonic": "LBVS",
+      "full_name": "Long Branch if Overflow Set",
+      "operation": "PC ← PC + offset  if V=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBVS label", "opcode": "1029", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BVC",
+      "full_name": "Branch if Overflow Clear  (V=0)",
+      "operation": "PC ← PC + offset  if V=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BVC label", "opcode": "28", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Branches if no signed overflow."
+    },
+    {
+      "mnemonic": "LBVC",
+      "full_name": "Long Branch if Overflow Clear",
+      "operation": "PC ← PC + offset  if V=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBVC label", "opcode": "1028", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BGT",
+      "full_name": "Branch if Greater Than  (signed)",
+      "operation": "PC ← PC + offset  if Z=0 AND (N XOR V)=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BGT label", "opcode": "2E", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Signed comparison. Branches if result was greater than zero (neither zero nor negative with overflow correction)."
+    },
+    {
+      "mnemonic": "LBGT",
+      "full_name": "Long Branch if Greater Than  (signed)",
+      "operation": "PC ← PC + offset  if Z=0 AND (N XOR V)=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBGT label", "opcode": "102E", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BGE",
+      "full_name": "Branch if Greater Than or Equal  (signed)",
+      "operation": "PC ← PC + offset  if (N XOR V)=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BGE label", "opcode": "2C", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Signed comparison. Branches if result was >= 0."
+    },
+    {
+      "mnemonic": "LBGE",
+      "full_name": "Long Branch if Greater Than or Equal  (signed)",
+      "operation": "PC ← PC + offset  if (N XOR V)=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBGE label", "opcode": "102C", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BLT",
+      "full_name": "Branch if Less Than  (signed)",
+      "operation": "PC ← PC + offset  if (N XOR V)=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BLT label", "opcode": "2D", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Signed comparison. Branches if result was < 0."
+    },
+    {
+      "mnemonic": "LBLT",
+      "full_name": "Long Branch if Less Than  (signed)",
+      "operation": "PC ← PC + offset  if (N XOR V)=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBLT label", "opcode": "102D", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BLE",
+      "full_name": "Branch if Less Than or Equal  (signed)",
+      "operation": "PC ← PC + offset  if Z=1 OR (N XOR V)=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BLE label", "opcode": "2F", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Signed comparison. Branches if result was <= 0."
+    },
+    {
+      "mnemonic": "LBLE",
+      "full_name": "Long Branch if Less Than or Equal  (signed)",
+      "operation": "PC ← PC + offset  if Z=1 OR (N XOR V)=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBLE label", "opcode": "102F", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BHI",
+      "full_name": "Branch if Higher  (unsigned)",
+      "operation": "PC ← PC + offset  if C=0 AND Z=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BHI label", "opcode": "22", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Unsigned comparison. Branches if result was strictly greater than (not equal, not lower)."
+    },
+    {
+      "mnemonic": "LBHI",
+      "full_name": "Long Branch if Higher  (unsigned)",
+      "operation": "PC ← PC + offset  if C=0 AND Z=0",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBHI label", "opcode": "1022", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BLS",
+      "full_name": "Branch if Lower or Same  (unsigned)",
+      "operation": "PC ← PC + offset  if C=1 OR Z=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BLS label", "opcode": "23", "bytes": 2, "cycles": "3/3" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Unsigned comparison. Branches if result was <= (lower or equal)."
+    },
+    {
+      "mnemonic": "LBLS",
+      "full_name": "Long Branch if Lower or Same  (unsigned)",
+      "operation": "PC ← PC + offset  if C=1 OR Z=1",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBLS label", "opcode": "1023", "bytes": 4, "cycles": "5/6" }
+      ],
+      "flow": "branch_conditional",
+      "notes": "Page 2 instruction."
+    },
+    {
+      "mnemonic": "BSR",
+      "full_name": "Branch to Subroutine",
+      "operation": "SP ← SP-2; M[SP] ← PC; PC ← PC + offset",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "BSR label", "opcode": "8D", "bytes": 2, "cycles": 7 }
+      ],
+      "flow": "call",
+      "notes": "Pushes return address (next instruction) onto S stack, then branches. 8-bit signed offset. For longer range use LBSR."
+    },
+    {
+      "mnemonic": "LBSR",
+      "full_name": "Long Branch to Subroutine",
+      "operation": "SP ← SP-2; M[SP] ← PC; PC ← PC + offset",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "relative", "syntax": "LBSR label", "opcode": "17", "bytes": 3, "cycles": 9 }
+      ],
+      "flow": "call",
+      "notes": "16-bit signed offset. Note: $17 is a single-byte opcode, not prefixed."
+    },
+    {
+      "mnemonic": "JSR",
+      "full_name": "Jump to Subroutine",
+      "operation": "SP ← SP-2; M[SP] ← PC; PC ← EA",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "JSR <addr", "opcode": "9D", "bytes": 2, "cycles": 7 },
+        { "mode": "indexed",  "syntax": "JSR addr,R","opcode": "AD", "bytes": "2+","cycles": "7+" },
+        { "mode": "extended", "syntax": "JSR addr",  "opcode": "BD", "bytes": 3, "cycles": 8 }
+      ],
+      "flow": "call",
+      "notes": "Jumps to an absolute or computed address rather than a relative offset. Useful for computed dispatch tables or calling through pointers."
+    },
+    {
+      "mnemonic": "RTS",
+      "full_name": "Return from Subroutine",
+      "operation": "PC ← M[SP]; SP ← SP+2",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "inherent", "syntax": "RTS", "opcode": "39", "bytes": 1, "cycles": 5 }
+      ],
+      "flow": "return",
+      "notes": "Pulls return address from S stack. Pairs with BSR, LBSR, or JSR."
+    },
+    {
+      "mnemonic": "JMP",
+      "full_name": "Jump",
+      "operation": "PC ← EA",
+      "condition_codes": { "H": "-", "N": "-", "Z": "-", "V": "-", "C": "-" },
+      "modes": [
+        { "mode": "direct",   "syntax": "JMP <addr", "opcode": "0E", "bytes": 2, "cycles": 3 },
+        { "mode": "indexed",  "syntax": "JMP addr,R","opcode": "6E", "bytes": "2+","cycles": "3+" },
+        { "mode": "extended", "syntax": "JMP addr",  "opcode": "7E", "bytes": 3, "cycles": 4 }
+      ],
+      "flow": "branch_unconditional",
+      "notes": "Absolute jump to effective address. Indexed mode allows computed jumps — dispatch tables, state machines. No immediate mode (jumping to a literal address makes no sense as a concept)."
+    },
+    {
+      "mnemonic": "RTI",
+      "full_name": "Return from Interrupt",
+      "operation": "Pull CC,A,B,DP,X,Y,U,PC from stack",
+      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "modes": [
+        { "mode": "inherent", "syntax": "RTI", "opcode": "3B", "bytes": 1, "cycles": "6/15" }
+      ],
+      "flow": "return",
+      "notes": "Restores CPU state from S stack. If the E (Entire) flag in the stacked CC is set, all 9 registers are restored (15 cycles). If E is clear, only CC and PC are restored (6 cycles — fast interrupt return). See CWAI and SYNC for interrupt handling."
+    }
+  ]
+}
