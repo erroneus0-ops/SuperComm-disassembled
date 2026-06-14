@@ -2585,6 +2585,94 @@ def _print_anomaly_report(eng, source):
     print(f"{'='*62}\n")
 
 
+
+# ── Markup quick reference ────────────────────────────────────────────────────
+
+MARKUP_QUICK_REF = """
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /comment/
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the next address.
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
+"""
+
 def main():
     import argparse, sys, os
 
@@ -2616,6 +2704,8 @@ Examples:
     parser.add_argument('--report', action='store_true',
         help='Print anomaly report: unreferenced labels, overlaps, '
              'mid-data references')
+    parser.add_argument('--markup', action='store_true',
+        help='Append markup quick reference to the end of the output listing')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
         help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
@@ -2816,6 +2906,8 @@ Examples:
 
     # ── Render and write ──────────────────────────────────────────────────
     asm = eng.render()
+    if args.markup:
+        asm = asm + MARKUP_QUICK_REF
     out_path = proj.output or (stem + '_proj.asm')
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(asm)
