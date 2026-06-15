@@ -301,7 +301,7 @@ $0114  0D 0D                              TST <BSS.$0D
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7  [call write out lines]
+$011F  17 05 85                           LBSR WritBLines        ; call WritBLines  [call write out lines]
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -444,7 +444,7 @@ $0247  20 CB                              BRA Sub_0214
 ; --------------------------------------------------------------
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
 $024C  30 8D 02 DC                        LEAX Dat_052C,PC       ; X → Dat_052C
-$0250  17 04 54                           LBSR Sub_06A7          ; call Sub_06A7
+$0250  17 04 54                           LBSR WritBLines        ; call WritBLines
 $0253  16 01 FB                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
@@ -776,6 +776,7 @@ Dat_047D
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
          FCC    "       0000/00/00 0000  dsewrewr                   "
+; The last line is a format template — fields updated in place.
 
 Dat_0519
 ; Referenced by: $01D1
@@ -811,9 +812,7 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-; The last line doesn't look like it is actually printed.  This looks like a format string where
-; details are updated in place maybe?
-$06A7  5A                  Sub_06A7:      DECB                   ; B=# of lines, X=location of stuff to print.
+$06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
 $06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
@@ -822,8 +821,9 @@ $06B3  1F 20                              TFR Y,D                ; Y now contain
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
-$06BA  26 EB                              BNE Sub_06A7           ; If not loop back where it decrements B for the next line
+$06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
 $06BC  39                  Loc_06BC:      RTS                    ; return from subroutine  [loop copying path to buffer]
+/remove-line-comment/ $06BC
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -833,3 +833,101 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
