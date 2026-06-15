@@ -2936,16 +2936,7 @@ $1B02  39                                 RTS                    ; return from s
 ; 106 callers use this entry.
 
 ; --------------------------------------------------------------
-; WriteBlock — write count-prefixed block to STDOUT (path=1)
-;   LEAX  DataLabel,PC    ; X → FDB count / data payload
-;   LBSR  WriteBlock      ; LDY [X]++  OS9 I$Write  path=STDOUT
-; 106 callers use this entry.
 $1B03  86 01               WriteBlock:    LDA #$01              
-; WriteBlockPath — write count-prefixed block to path already in A
-;   LDA   #path           ; A = path number
-;   LEAX  DataLabel,PC
-;   LBSR  WriteBlockPath
-; 3 callers use this entry (non-STDOUT paths).
 ; WriteBlockPath — write count-prefixed block to path already in A
 ;   LDA   #path           ; A = path number
 ;   LEAX  DataLabel,PC

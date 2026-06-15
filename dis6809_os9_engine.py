@@ -2661,6 +2661,11 @@ MARKUP_QUICK_REF = """
 ;         ; This comment is no longer needed.
 ;         /end-remove-comment/
 ;
+; /remove-line-comment/ $addr
+;     Remove an inline line comment from the JSON at the given address.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
 ; ── Substitutions ─────────────────────────────────────────────
 ;
 ; /replace/

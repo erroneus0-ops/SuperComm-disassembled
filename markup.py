@@ -170,6 +170,7 @@ def parse_directives(lines, json_path=None):
         'bss':             {},   # offset -> name
         'block_comments':  {},   # addr -> [lines]
         'remove_comments': [],   # list of addrs to remove from block_comments
+        'remove_line_comments': [],  # list of addrs to remove from line_comments
         'line_comments':   {},   # addr -> text
         'substitutions':   {},   # addr -> {replace_bytes, with_lines}
         'data_regions':    [],   # list of {start, end?, label?, end_label?, format?, comment?}
@@ -361,6 +362,15 @@ def parse_directives(lines, json_path=None):
                 remove_lines.append(rl)
                 i += 1
             changes['remove_comments'].append(('content', remove_lines))
+
+        # ── /remove-line-comment/ $addr ───────────────────────────────────────
+        elif line.startswith('/remove-line-comment/'):
+            parts = line[len('/remove-line-comment/'):].strip()
+            try:
+                addr = int(parts.lstrip('$'), 16)
+                changes['remove_line_comments'].append(addr)
+            except ValueError:
+                changes['warnings'].append(f"/remove-line-comment/ — invalid address '{parts}'")
 
         # ── /replace/ ... /with/ ... /end-replace/ ───────────────────────────
         elif line == '/replace/':
@@ -599,6 +609,8 @@ def merge_into_json(json_path, changes, warn):
     lc = d.get('line_comments', {})
     for addr, text in changes['line_comments'].items():
         lc[f'{addr:04X}'] = text
+    for addr in changes.get('remove_line_comments', []):
+        lc.pop(f'{addr:04X}', None)
     d['line_comments'] = dict(sorted(lc.items()))
 
     # ── substitutions ────────────────────────────────────────────────────────
@@ -752,21 +764,27 @@ def main():
     n_subs    = len(changes['substitutions'])
     n_regions = len([r for r in changes['data_regions'] if r.get('action') in ('end_label','format','region','comment')])
     n_routines= len(changes['routines'])
+    n_rm_bc   = len(changes.get('remove_comments', []))
+    n_rm_lc   = len(changes.get('remove_line_comments', []))
 
     # Merge into JSON
     merge_into_json(json_path, changes, warn)
 
     print()
     print("Changes applied:")
-    print(f"  Labels:          {n_labels}")
-    print(f"  BSS names:       {n_bss}")
-    print(f"  Block comments:  {n_bc}")
-    print(f"  Line comments:   {n_lc}")
-    print(f"  Substitutions:   {n_subs}")
-    print(f"  Data regions:    {n_regions}")
-    print(f"  Routines:        {n_routines}")
+    print(f"  Labels:                  {n_labels}")
+    print(f"  BSS names:               {n_bss}")
+    print(f"  Block comments added:    {n_bc}")
+    if n_rm_bc:
+        print(f"  Block comments removed:  {n_rm_bc}")
+    print(f"  Line comments:           {n_lc}")
+    if n_rm_lc:
+        print(f"  Line comments removed:   {n_rm_lc}")
+    print(f"  Substitutions:           {n_subs}")
+    print(f"  Data regions:            {n_regions}")
+    print(f"  Routines:                {n_routines}")
     if warnings:
-        print(f"  Warnings:        {len(warnings)}")
+        print(f"  Warnings:                {len(warnings)}")
     print()
     print("Done. Run the disassembler to regenerate the proj.asm with changes applied.")
 

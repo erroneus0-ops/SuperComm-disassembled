@@ -70,8 +70,7 @@
     "06B5": "Move X pointet to next line",
     "06B7": "Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)",
     "06B9": "Is B zero?",
-    "06BA": "If not loop back where it decrements B for the next line",
-    "06BC": "loop copying path to buffer"
+    "06BA": "If not loop back where it decrements B for the next line"
   },
   "block_comments": {
     "0519": [
