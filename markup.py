@@ -752,21 +752,24 @@ def main():
     n_subs    = len(changes['substitutions'])
     n_regions = len([r for r in changes['data_regions'] if r.get('action') in ('end_label','format','region','comment')])
     n_routines= len(changes['routines'])
+    n_rm_bc   = len(changes.get('remove_comments', []))
 
     # Merge into JSON
     merge_into_json(json_path, changes, warn)
 
     print()
     print("Changes applied:")
-    print(f"  Labels:          {n_labels}")
-    print(f"  BSS names:       {n_bss}")
-    print(f"  Block comments:  {n_bc}")
-    print(f"  Line comments:   {n_lc}")
-    print(f"  Substitutions:   {n_subs}")
-    print(f"  Data regions:    {n_regions}")
-    print(f"  Routines:        {n_routines}")
+    print(f"  Labels:                  {n_labels}")
+    print(f"  BSS names:               {n_bss}")
+    print(f"  Block comments added:    {n_bc}")
+    if n_rm_bc:
+        print(f"  Block comments removed:  {n_rm_bc}")
+    print(f"  Line comments:           {n_lc}")
+    print(f"  Substitutions:           {n_subs}")
+    print(f"  Data regions:            {n_regions}")
+    print(f"  Routines:                {n_routines}")
     if warnings:
-        print(f"  Warnings:        {len(warnings)}")
+        print(f"  Warnings:                {len(warnings)}")
     print()
     print("Done. Run the disassembler to regenerate the proj.asm with changes applied.")
 
