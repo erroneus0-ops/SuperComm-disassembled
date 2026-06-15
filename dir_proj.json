@@ -10,7 +10,9 @@
   "emit_equates": true,
   "defs_file": null,
   "custom_equates": [],
-  "labels": {},
+  "labels": {
+    "06A7": "WritBLines"
+  },
   "bss": {
     "0": "BSS.DirPath",
     "2": "BSS.NextDir",
@@ -72,9 +74,8 @@
     "06BC": "loop copying path to buffer"
   },
   "block_comments": {
-    "06A7": [
-      "The last line doesn't look like it is actually printed.  This looks like a format string where",
-      "details are updated in place maybe?"
+    "0519": [
+      "The last line is a format template \u2014 fields updated in place."
     ]
   },
   "substitutions": {},
