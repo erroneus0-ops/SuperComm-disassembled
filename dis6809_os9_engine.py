@@ -1949,9 +1949,10 @@ class Engine:
 
                 first = False
 
-                # block comment
-                for bcline in proj.block_comments.get(pos, []):
-                    out.append(f"; {bcline}")
+                # block comment — only emit if not already emitted at span level
+                if pos != span_start:
+                    for bcline in proj.block_comments.get(pos, []):
+                        out.append(f"; {bcline}")
 
                 # Check if this address is a forced EQU (mid-instruction overlap)
                 if pos in proj.forced_equs:
