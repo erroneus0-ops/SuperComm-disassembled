@@ -2651,10 +2651,15 @@ MARKUP_QUICK_REF = """
 ;         This FCC line is a format template updated in place.
 ;         /end-comment/
 ;
-; /remove-comment/ $addr
-;     Remove a block comment from the JSON at the given address.
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
 ;     Example:
-;         /remove-comment/ $06A7
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
 ;
 ; ── Substitutions ─────────────────────────────────────────────
 ;

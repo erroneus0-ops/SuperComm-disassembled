@@ -347,14 +347,20 @@ def parse_directives(lines, json_path=None):
             else:
                 changes['warnings'].append("/comment/ block — could not find target address")
 
-        # ── /remove-comment/ $addr ────────────────────────────────────────────
-        elif line.startswith('/remove-comment/'):
-            parts = line[len('/remove-comment/'):].strip()
-            try:
-                addr = int(parts.lstrip('$'), 16)
-                changes['remove_comments'].append(addr)
-            except ValueError:
-                changes['warnings'].append(f"/remove-comment/ — invalid address '{parts}'")
+        # ── /remove-comment/ ... /end-remove-comment/ ────────────────────────
+        elif line == '/remove-comment/':
+            remove_lines = []
+            i += 1
+            while i < len(lines) and lines[i].rstrip() != '/end-remove-comment/':
+                # Strip leading '; ' if present — match against stored content
+                rl = lines[i].rstrip()
+                if rl.startswith('; '):
+                    rl = rl[2:]
+                elif rl.startswith(';'):
+                    rl = rl[1:]
+                remove_lines.append(rl)
+                i += 1
+            changes['remove_comments'].append(('content', remove_lines))
 
         # ── /replace/ ... /with/ ... /end-replace/ ───────────────────────────
         elif line == '/replace/':
@@ -580,8 +586,13 @@ def merge_into_json(json_path, changes, warn):
     bc = d.get('block_comments', {})
     for addr, lines in changes['block_comments'].items():
         bc[f'{addr:04X}'] = lines
-    for addr in changes.get('remove_comments', []):
-        bc.pop(f'{addr:04X}', None)
+    for item in changes.get('remove_comments', []):
+        if item[0] == 'content':
+            remove_lines = item[1]
+            for key, val in list(bc.items()):
+                if val == remove_lines:
+                    del bc[key]
+                    break
     d['block_comments'] = dict(sorted(bc.items()))
 
     # ── line_comments ────────────────────────────────────────────────────────
