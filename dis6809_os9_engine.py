@@ -773,6 +773,9 @@ class Engine:
                             0xC8,0xC9,0xCA,0xCB,0x1A,0x1C,0x3C): pos += 1
                 elif op in (0x83,0xCC,0xCE): pos += 2
                 elif op in (0x1E,0x1F,0x34,0x36): pos += 1
+                # $00-$0F direct page: all take 1 operand byte
+                elif op in (0x00,0x03,0x04,0x06,0x07,0x08,0x09,0x0A,
+                            0x0C,0x0D,0x0E,0x0F): pos += 1
                 elif op in (
                     0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,
                     0x9A,0x9B,0x9C,0x9D,0x9E,0x9F,0xD0,0xD1,0xD2,0xD3,
@@ -1601,6 +1604,9 @@ class Engine:
         # another rendered instruction (cascading overlap).
         for addr in proj.forced_equs:
             if addr >= exec_off and addr < crc_off:
+                # Ensure the forced_equs address itself is in lbs (so it appears in code_pts)
+                if not lbs.get(addr):
+                    lbs[addr] = f"Loc_{addr:04X}"
                 for istart, iend in sorted(self.insn_spans.items()):
                     if istart < addr <= iend:
                         # Only label if istart is not strictly inside another span
@@ -1997,9 +2003,6 @@ class Engine:
 
                 try:
                     # ── Check for mid-instruction overlap before decoding ──
-                    # Only if the byte at pos is undefined on 6809 (would decode
-                    # as '???') OR is already in proj.forced_equs.
-                    # This avoids falsely treating valid code as overlaps.
                     if lbl_here:
                         test_mn, _, _, test_raw, _ = self.decode_one(pos)
                         is_undefined = (test_mn in ('???', 'FCB') and len(test_raw) == 1)

@@ -131,8 +131,9 @@
   "forced_equs": {
     "0B8D": "mid-instruction entry point -- byte 2 of OS9 I$Close ($10 3F 8F) at $0B8C",
     "19EC": "mid-instruction entry point -- byte 2 of LDY #$0001 ($10 8E 00 01) at $19EB; BSR from $1A02 executes LDX #$0001 then falls to OS9 I$Write",
-    "364E": "mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D",
-    "3E4E": "mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0"
+    "3E4E": "mid-instruction entry point -- byte 2 of CMPX 80,U ($AC C8 50) at $3E4D; BNE from $3DE0",
+    "3BC5": "mid-instruction entry point -- byte 1 of LDB 115,U (E6 C8 73) at $3BC4; BEQ from $15382",
+    "3F3A": "mid-instruction entry point -- byte 1 of LBSR WriteBlock (17 DB C7) at $3F39; BSR from $3F32"
   },
   "patches": {
     "03A6": {
