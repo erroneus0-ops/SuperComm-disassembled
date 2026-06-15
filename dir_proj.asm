@@ -815,14 +815,18 @@ Dat_052Cend
 $06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
-$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
+$06AF  25 0B                              BCS endWritBlines      ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
 $06B1  34 06                              PSHS A,B               ; Save the path and line count
 $06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
+<<<<<<< HEAD
+$06BC  39                  endWritBlines: RTS                   
+=======
 $06BC  39                  Loc_06BC:      RTS                   
+>>>>>>> 2a996dd91e7ba902ccc91b2ff83fabe24dfba120
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
