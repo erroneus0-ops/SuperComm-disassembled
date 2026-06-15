@@ -834,10 +834,7 @@ Dat_0734
          FCC    "o SuperComm File Receive"
          FDB    $0D0A             ; CRLF
          FCB    $0A               ; LF
-         FCC    "     ASCII R"
-
-Dat_075C
-         FCC    "eceive"
+         FCC    "     ASCII Receive"
          FDB    $0D0A             ; CRLF
          FCC    "     XModem (and X-1k)"
          FDB    $0D0A             ; CRLF
@@ -1235,7 +1232,7 @@ $0B96  AF C8 66                           STX 102,U
 $0B99  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 $0B9B  E7 C9 0D 19                        STB 3353,U            
 $0B9F  4F                                 CLRA                   ; A = 0
-$0BA0  C6 14                              LDB #$14              
+$0BA0  C6 14               Sub_0BA0:      LDB #$14              
 $0BA2  A7 C9 0D 1A                        STA 3354,U            
 $0BA6  CC 1B 32                           LDD #$1B32             ; D=ESC+'2'  → W.FColor: Foreground Color
 $0BA9  ED C9 00 9C                        STD 156,U             
@@ -3170,7 +3167,7 @@ $1CF5  35 B6                              PULS A,B,X,Y,PC        ; return from s
 $1CF7  34 36               Sub_1CF7:      PSHS A,B,X,Y          
 $1CF9  8E 10 03                           LDX #$1003            
 $1CFC  10 8E 0E A0                        LDY #$0EA0            
-$1D00  86 01               Loc_1D00:      LDA #$01              
+$1D00  86 01                              LDA #$01              
 $1D02  C6 98                              LDB #$98              
 $1D04  10 3F 8E                           OS9 I$SetStt           ; path=A  subcode=B  buf→X
 $1D07  35 B6                              PULS A,B,X,Y,PC        ; return from subroutine  (PULS PC = RTS)
@@ -3179,7 +3176,7 @@ $1D07  35 B6                              PULS A,B,X,Y,PC        ; return from s
 $1D09  34 36               Sub_1D09:      PSHS A,B,X,Y          
 $1D0B  8E 3F 03                           LDX #$3F03            
 $1D0E  10 8E 0F D1                        LDY #$0FD1            
-$1D12  20 EC                              BRA Loc_1D00          
+$1D12  20 EC                              BRA $1D00             
 
 ; --------------------------------------------------------------
 $1D14  34 16               Sub_1D14:      PSHS A,B,X            
@@ -6047,7 +6044,6 @@ $364A  16 00 A7                           LBRA Loc_36F4
 
 ; --------------------------------------------------------------
 $364D  86 FF               Sub_364D:      LDA #$FF              
-$364E  FF                  Loc_364E:      EQU    $364E            ; mid-instruction overlap: Sub_364D+1 -- mid-instruction entry point -- byte 2 of LDA #$FF (86 FF) at $364D
 $364F  A7 C8 42                           STA 66,U              
 $3652  6F C8 69                           CLR 105,U             
 $3655  6F C8 5F                           CLR BSS.BufCount,U    
@@ -6617,7 +6613,8 @@ $3BBC  34 16               Sub_3BBC:      PSHS A,B,X
 $3BBE  6D C8 72                           TST 114,U             
 $3BC1  27 09                              BEQ Loc_3BCC          
 $3BC3  4F                                 CLRA                   ; A = 0
-$3BC4  E6 C8 73                           LDB 115,U             
+$3BC4  E6 C8 73            Insn_3BC4:     LDB 115,U             
+$3BC5  C8                  Loc_3BC5:      EQU    $3BC5            ; mid-instruction overlap: Insn_3BC4+1 -- mid-instruction entry point -- byte 1 of LDB 115,U (E6 C8 73) at $3BC4; BEQ from $15382
 $3BC7  ED C8 60                           STD 96,U              
 $3BCA  35 96                              PULS A,B,X,PC          ; return from subroutine  (PULS PC = RTS)
 
@@ -7082,7 +7079,8 @@ $3F2B  10 3F 8C                           OS9 I$WritLn           ; path=A  buf�
 $3F2E  30 8D C5 5D                        LEAX Dat_048F,PC       ; X → Dat_048F
 $3F32  17 DB CE                           LBSR WriteBlock        ; call WriteBlock
 $3F35  30 8D C7 8E                        LEAX Dat_06C7,PC       ; X → Dat_06C7
-$3F39  17 DB C7                           LBSR WriteBlock        ; call WriteBlock
+$3F39  17 DB C7            Insn_3F39:     LBSR WriteBlock        ; call WriteBlock
+$3F3A  DB                  Sub_3F3A:      EQU    $3F3A            ; mid-instruction overlap: Insn_3F39+1 -- mid-instruction entry point -- byte 1 of LBSR WriteBlock (17 DB C7) at $3F39; BSR from $3F32
 $3F3C  86 01                              LDA #$01              
 $3F3E  30 C9 00 9F                        LEAX 159,U            
 $3F42  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
