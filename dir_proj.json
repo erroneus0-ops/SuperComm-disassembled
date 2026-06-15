@@ -55,9 +55,28 @@
   "line_comments": {
     "00E9": "this is a loop copying the NextDir to BSS.$25",
     "00ED": "Looking for a CR terminator",
-    "00EF": "Nope?  Keep looking!"
+    "00EF": "Nope?  Keep looking!",
+    "0118": "LDA=$01 (output path), LDB=$02 (Number of lines)",
+    "011B": "X \u2192 Address of output lines",
+    "011F": "call write out lines",
+    "06A7": "B=# of lines, X=location of stuff to print.",
+    "06A8": "Max length = 80 columns",
+    "06AC": "path=A=$01  buf\u2192X",
+    "06AF": "C=1 (BLO) Is this an error? It breaks out of the routine loop anyway",
+    "06B1": "Save the path and line count",
+    "06B3": "Y now contains # chars printed and so does D",
+    "06B5": "Move X pointet to next line",
+    "06B7": "Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)",
+    "06B9": "Is B zero?",
+    "06BA": "If not loop back where it decrements B for the next line",
+    "06BC": "loop copying path to buffer"
   },
-  "block_comments": {},
+  "block_comments": {
+    "06A7": [
+      "The last line doesn't look like it is actually printed.  This looks like a format string where",
+      "details are updated in place maybe?"
+    ]
+  },
   "substitutions": {},
   "routines": [],
   "footnotes": {},

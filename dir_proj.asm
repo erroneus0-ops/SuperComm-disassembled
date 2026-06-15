@@ -299,9 +299,9 @@ $010F  86 01                              LDA #$01
 $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
-$0118  CC 01 02                           LDD #$0102            
-$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D
-$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7
+$0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
+$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
+$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7  [call write out lines]
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -746,30 +746,30 @@ $0467  10 3F 06                           OS9 F$Exit             ; status=B
 
 Dat_046A
 ; Referenced by: $0022, $02CE
-; ── 1 bytes  ($046A—$046A) ──
+; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
 
 Dat_046B
 ; Referenced by: $01E5, $045A
-; ── 1 bytes  ($046B—$046B) ──
+; ── 1 ($0001) bytes  ($046B—$046B) ──
          FCB    $0D               ; CR
 
 Dat_046C
 ; Referenced by: $00BC
-; ── 2 bytes  ($046C—$046D) ──
+; ── 2 ($0002) bytes  ($046C—$046D) ──
          FCB    $40               ; '@'
          FCB    $0D               ; CR
 
 Dat_046E
 ; Referenced by: $00D3
-; ── 15 bytes  ($046E—$047C) ──
+; ── 15 ($000F) bytes  ($046E—$047C) ──
          FCB    $0A               ; LF
          FCC    " Directory of "
 Dat_046Eend
 
 Dat_047D
 ; Referenced by: $011B
-; ── 175 bytes  ($047D—$052B) ──
+; ── 175 ($00AF) bytes  ($047D—$052B) ──
          FCB    $0A ; LF
          FCC    "User # Last Modified   Attributes Sector File Size File Name"
          FCB    $0D ; CR
@@ -779,12 +779,12 @@ Dat_047D
 
 Dat_0519
 ; Referenced by: $01D1
-; ── 19 bytes  ($0519—$052B) ──
+; ── 19 ($0013) bytes  ($0519—$052B) ──
          FCC    "                   "
 
 Dat_052C
 ; Referenced by: $024C
-; ── 379 bytes  ($052C—$06A6) ──
+; ── 379 ($017B) bytes  ($052C—$06A6) ──
          FCB    $0A ; LF
          FCC    "dir [-opts] [path/patt] [-opts]"
          FCB    $0D ; CR
@@ -811,17 +811,21 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-$06A7  5A                  Sub_06A7:      DECB                  
-$06A8  10 8E 00 50                        LDY #$0050            
-$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)
-$06B1  34 06                              PSHS A,B              
-$06B3  1F 20                              TFR Y,D               
-$06B5  30 8B                              LEAX D,X              
-$06B7  35 06                              PULS A,B              
-$06B9  5D                                 TSTB                  
-$06BA  26 EB                              BNE Sub_06A7          
-$06BC  39                  Loc_06BC:      RTS                    ; return from subroutine
+; The last line doesn't look like it is actually printed.  This looks like a format string where
+; details are updated in place maybe?
+; The last line doesn't look like it is actually printed.  This looks like a format string where
+; details are updated in place maybe?
+$06A7  5A                  Sub_06A7:      DECB                   ; B=# of lines, X=location of stuff to print.
+$06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
+$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
+$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
+$06B1  34 06                              PSHS A,B               ; Save the path and line count
+$06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
+$06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
+$06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
+$06B9  5D                                 TSTB                   ; Is B zero?
+$06BA  26 EB                              BNE Sub_06A7           ; If not loop back where it decrements B for the next line
+$06BC  39                  Loc_06BC:      RTS                    ; return from subroutine  [loop copying path to buffer]
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -831,3 +835,85 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /comment/
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the next address.
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
