@@ -782,15 +782,12 @@ Dat_046Eend
 
 Dat_047D
 ; Referenced by: $011B
-; ── 175 ($00AF) bytes  ($047D—$052B) ──
+; ── 124 ($007C) bytes  ($047D—$04F8) ──
          FCB    $0A ; LF
          FCC    "User # Last Modified   Attributes Sector File Size File Name"
          FCB    $0D ; CR
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
-
-Dat_04F9
-         FCC    "       0000/00/00 0000  dsewrewr                   "
 
 Dat_04F9
 ; Referenced by: Loc_036E
@@ -835,22 +832,14 @@ Dat_052Cend
 $06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A=$01  buf→X
-<<<<<<< HEAD
 $06AF  25 0B                              BCS endWritBlines      ; Error detected. Break out of loop.
-=======
-$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO) Is this an error? It breaks out of the routine loop anyway
->>>>>>> 57b2192a6a72aff00dcc8948b6cebde17b384ea2
 $06B1  34 06                              PSHS A,B               ; Save the path and line count
 $06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.
 $06B9  5D                                 TSTB                   ; Is B zero? (last line)
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
-<<<<<<< HEAD
 $06BC  39                  endWritBlines: RTS                   
-=======
-$06BC  39                  Loc_06BC:      RTS                    ; loop copying path to buffer
->>>>>>> 57b2192a6a72aff00dcc8948b6cebde17b384ea2
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -860,113 +849,3 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
-; ══════════════════════════════════════════════════════════════
-; MARKUP QUICK REFERENCE  (markup.py directives)
-; ══════════════════════════════════════════════════════════════
-;
-; Run:  python markup.py proj.asm [proj.json]
-; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
-;
-; ── Labeling ──────────────────────────────────────────────────
-;
-; /label/ Name
-;     Name the next address in the listing.
-;     Example:
-;         /label/ Sub_ReadDir
-;         $0126  96 00    LDA <$00
-;
-; /bss/ $XX Name
-;     Declare a BSS variable at direct page offset $XX.
-;     Example:
-;         /bss/ $00 BSS.DirPath
-;         /bss/ $7A BSS.DotChar
-;
-; ── Data regions ──────────────────────────────────────────────
-;
-; /region/ $start $end [format] [label] [endlabel]
-;     Declare a data region. Format: auto text fdb hexdump raw writeblock
-;     endlabel — emit a NameEnd label at the region boundary.
-;     Example:
-;         /region/ $052C $06A7 text endlabel
-;         /region/ $047D $052C text Dat_047D
-;
-; /format/ fmt
-;     Set format for the preceding data label's region.
-;     Example:
-;         Dat_046E
-;         /format/ text
-;
-; /end-label/
-;     Mark end of a data region at the next address.
-;     Example:
-;         /end-label/
-;         $06A7  5A    Sub_06A7: DECB
-;
-; ── Comments ──────────────────────────────────────────────────
-;
-; /; comment text/
-;     Inline comment appended to the instruction on this line.
-;     Example:
-;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
-;
-; /; /
-;     Empty inline comment — inhibits any auto-generated comment for
-;     this address permanently (stores "" in JSON as a suppressor).
-;     The inhibitor persists across disassembler runs.
-;     Use /remove-line-comment/ $addr to lift the inhibition.
-;
-; /comment/ [$addr]
-; comment line 1
-; comment line 2
-; /end-comment/
-;     Block comment inserted before the target address.
-;     Optional $addr targets a specific address directly.
-;     Without $addr, targets the next $XXXX line.
-;     Example:
-;         /comment/ $0519
-;         This FCC line is a format template updated in place.
-;         /end-comment/
-;
-; /remove-comment/
-; comment line to remove
-; /end-remove-comment/
-;     Remove a block comment matching the given content from the JSON.
-;     Prefix '; ' on each line is stripped before matching.
-;     Example:
-;         /remove-comment/
-;         ; This comment is no longer needed.
-;         /end-remove-comment/
-;
-; /remove-line-comment/ $addr
-;     Remove a line comment or inhibitor from the JSON at the given address.
-;     Auto-generated comments will return on the next disassembler run.
-;     Example:
-;         /remove-line-comment/ $06BC
-;
-; ── Substitutions ─────────────────────────────────────────────
-;
-; /replace/
-; <original disassembler lines>
-; /with/
-; <replacement source lines>
-; /end-replace/
-;     Replace disassembler output with analyst-supplied source.
-;     WARNING: byte counts must match. Instruction substitutions
-;     trigger a confirmation prompt — mismatch breaks byte-perfect.
-;     Example:
-;         /replace/
-;                  FCB    $0A               ; LF
-;                  FCC    "Dir"
-;         /with/
-;                  FCB    C$LF
-;                  FCS    /Dir/
-;         /end-replace/
-;
-; ── Routines ──────────────────────────────────────────────────
-;
-; /routine/ Name
-; ...code...
-; /end-routine/ Name
-;     Mark a routine boundary for structural annotation.
-;
-; ══════════════════════════════════════════════════════════════

@@ -42,8 +42,22 @@
     },
     {
       "start": "047D",
-      "end": "052C",
+      "end": "04F9",
       "label": "Dat_047D",
+      "format": "text",
+      "end_label": false
+    },
+    {
+      "start": "04F9",
+      "end": "0519",
+      "label": "Dat_04F9",
+      "format": "text",
+      "end_label": false
+    },
+    {
+      "start": "0519",
+      "end": "052C",
+      "label": "Dat_0519",
       "format": "text",
       "end_label": false
     },
