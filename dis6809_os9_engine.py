@@ -1127,7 +1127,7 @@ class Engine:
                 # Misc single-byte
                 0x12:('NOP',  'inh', ''), 0x13:('SYNC','inh','wait for interrupt'),
                 0x19:('DAA',  'inh', ''), 0x1D:('SEX', 'inh','sign-extend B into A'),
-                0x39:('RTS',  'inh', 'return from subroutine'),
+                0x39:('RTS',  'inh', ''),
                 0x3A:('ABX',  'inh', ''), 0x3B:('RTI', 'inh','return from interrupt'),
                 0x3D:('MUL',  'inh', 'D = A×B unsigned'), 0x3F:('SWI','inh',''),
                 # Accumulator A
@@ -2039,8 +2039,12 @@ class Engine:
                     pos += 1; continue
 
                 # project line comment overrides / augments engine comment
-                proj_cm = proj.line_comments.get(pos, '')
-                if proj_cm:
+                proj_cm = proj.line_comments.get(pos, None)
+                if proj_cm is None:
+                    pass  # no override — keep auto-comment
+                elif proj_cm == '':
+                    cm = ''  # empty string suppresses auto-comment
+                else:
                     cm = proj_cm if not cm else f"{cm}  [{proj_cm}]"
 
                 hx  = ' '.join(f'{b:02X}' for b in raw)
