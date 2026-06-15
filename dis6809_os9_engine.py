@@ -2643,6 +2643,12 @@ MARKUP_QUICK_REF = """
 ;     Example:
 ;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
 ;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
 ; /comment/ [$addr]
 ; comment line 1
 ; comment line 2
@@ -2666,7 +2672,8 @@ MARKUP_QUICK_REF = """
 ;         /end-remove-comment/
 ;
 ; /remove-line-comment/ $addr
-;     Remove an inline line comment from the JSON at the given address.
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
 ;     Example:
 ;         /remove-line-comment/ $06BC
 ;
