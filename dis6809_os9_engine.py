@@ -2045,7 +2045,7 @@ class Engine:
                 elif proj_cm == '':
                     cm = ''  # empty string suppresses auto-comment
                 else:
-                    cm = proj_cm if not cm else f"{cm}  [{proj_cm}]"
+                    cm = proj_cm  # analyst comment replaces auto-comment
 
                 hx  = ' '.join(f'{b:02X}' for b in raw)
                 ls  = f"{lbl_here}:" if lbl_here else ''
