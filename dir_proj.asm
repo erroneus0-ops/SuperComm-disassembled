@@ -280,7 +280,7 @@ $00E4  31 C8 25                           LEAY BSS.$25,U
 $00E7  9E 02                              LDX <BSS.NextDir      
 $00E9  A6 80               Loc_00E9:      LDA ,X+                ; this is a loop copying the NextDir to BSS.$25
 $00EB  A7 A0                              STA ,Y+               
-$00ED  81 0D                              CMPA #$0D              ; compare A with CR  [Looking for a CR terminator]
+$00ED  81 0D                              CMPA #$0D              ; Looking for a CR terminator
 $00EF  26 F8                              BNE Loc_00E9           ; Nope?  Keep looking!
 $00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
@@ -300,8 +300,8 @@ $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf�
 $0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
-$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR WritBLines        ; call WritBLines  [call write out lines]
+$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Address of output lines
+$011F  17 05 85                           LBSR WritBLines        ; call write out lines
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -814,19 +814,15 @@ Dat_052C
 Dat_052Cend
 $06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
-$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
-$06AF  25 0B                              BCS endWritBlines      ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
+$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A=$01  buf→X
+$06AF  25 0B                              BCS endWritBlines      ; Error detected. Break out of loop.
 $06B1  34 06                              PSHS A,B               ; Save the path and line count
 $06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
-$06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
-$06B9  5D                                 TSTB                   ; Is B zero?
+$06B7  35 06                              PULS A,B               ; Bring A and B back.
+$06B9  5D                                 TSTB                   ; Is B zero? (last line)
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
-<<<<<<< HEAD
 $06BC  39                  endWritBlines: RTS                   
-=======
-$06BC  39                  Loc_06BC:      RTS                   
->>>>>>> 2a996dd91e7ba902ccc91b2ff83fabe24dfba120
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -836,3 +832,113 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════

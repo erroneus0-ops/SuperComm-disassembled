@@ -65,12 +65,12 @@
     "06A7": "B=# of lines, X=location of stuff to print.",
     "06A8": "Max length = 80 columns",
     "06AC": "path=A=$01  buf\u2192X",
-    "06AF": "C=1 (BLO) Is this an error? It breaks out of the routine loop anyway",
+    "06AF": "Error detected. Break out of loop.",
     "06B1": "Save the path and line count",
     "06B3": "Y now contains # chars printed and so does D",
     "06B5": "Move X pointet to next line",
-    "06B7": "Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)",
-    "06B9": "Is B zero?",
+    "06B7": "Bring A and B back.",
+    "06B9": "Is B zero? (last line)",
     "06BA": "If not loop back where it decrements B for the next line"
   },
   "block_comments": {
