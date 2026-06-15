@@ -279,6 +279,10 @@ def parse_directives(lines, json_path=None):
     while i < len(lines):
         line = lines[i].rstrip()
 
+        # Stop at the markup quick reference section — don't parse examples as directives
+        if line.startswith('; ══') and 'MARKUP QUICK REFERENCE' in ''.join(lines[i:i+3]):
+            break
+
         # Track current address from listing lines ($XXXX prefix)
         addr = extract_addr(line)
         if addr is not None:
