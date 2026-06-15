@@ -301,7 +301,7 @@ $0114  0D 0D                              TST <BSS.$0D
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7  [call write out lines]
+$011F  17 05 85                           LBSR WritBLines        ; call WritBLines  [call write out lines]
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -444,7 +444,7 @@ $0247  20 CB                              BRA Sub_0214
 ; --------------------------------------------------------------
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
 $024C  30 8D 02 DC                        LEAX Dat_052C,PC       ; X → Dat_052C
-$0250  17 04 54                           LBSR Sub_06A7          ; call Sub_06A7
+$0250  17 04 54                           LBSR WritBLines        ; call WritBLines
 $0253  16 01 FB                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
@@ -776,6 +776,7 @@ Dat_047D
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
          FCC    "       0000/00/00 0000  dsewrewr                   "
+; The last line is a format template — fields updated in place.
 
 Dat_0519
 ; Referenced by: $01D1
@@ -811,9 +812,7 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-; The last line doesn't look like it is actually printed.  This looks like a format string where
-; details are updated in place maybe?
-$06A7  5A                  Sub_06A7:      DECB                   ; B=# of lines, X=location of stuff to print.
+$06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
 $06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
@@ -822,13 +821,8 @@ $06B3  1F 20                              TFR Y,D                ; Y now contain
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
-<<<<<<< HEAD
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
-$06BC  39                  Loc_06BC:      RTS                    /; /
-=======
-$06BA  26 EB                              BNE Sub_06A7           ; If not loop back where it decrements B for the next line
-$06BC  39                  Loc_06BC:      RTS                   
->>>>>>> b3cacd2c187084a71d3ed65d2f8b4a3ed637786f
+$06BC  39                  Loc_06BC:      RTS                    ; loop copying path to buffer
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -837,7 +831,6 @@ ModEnd
 ; CRC-24 (3 bytes) appended here by fixmod
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
-<<<<<<< HEAD
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; MARKUP QUICK REFERENCE  (markup.py directives)
@@ -888,6 +881,12 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Example:
 ;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
 ;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
 ; /comment/ [$addr]
 ; comment line 1
 ; comment line 2
@@ -911,7 +910,8 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;         /end-remove-comment/
 ;
 ; /remove-line-comment/ $addr
-;     Remove an inline line comment from the JSON at the given address.
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
 ;     Example:
 ;         /remove-line-comment/ $06BC
 ;
@@ -942,6 +942,3 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Mark a routine boundary for structural annotation.
 ;
 ; ══════════════════════════════════════════════════════════════
-=======
-ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
->>>>>>> b3cacd2c187084a71d3ed65d2f8b4a3ed637786f
