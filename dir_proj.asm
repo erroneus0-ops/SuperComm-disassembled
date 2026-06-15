@@ -762,22 +762,20 @@ Dat_046C
 
 Dat_046E
 ; Referenced by: $00D3
-; ── 11 bytes  ($046E—$0478) ──
+; ── 15 bytes  ($046E—$047C) ──
          FCB    $0A               ; LF
-         FCC    " Directory"
-$0479  20 6F               Loc_0479:      BRA $04EA             
-
-$047B  66 20                                      ROR 0,Y
+         FCC    " Directory of "
+Dat_046Eend
 
 Dat_047D
 ; Referenced by: $011B
-; ── 156 bytes  ($047D—$0518) ──
+; ── 175 bytes  ($047D—$052B) ──
          FCB    $0A ; LF
          FCC    "User # Last Modified   Attributes Sector File Size File Name"
          FCB    $0D ; CR
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
-         FCC    "       0000/00/00 0000  dsewrewr"
+         FCC    "       0000/00/00 0000  dsewrewr                   "
 
 Dat_0519
 ; Referenced by: $01D1
@@ -812,6 +810,7 @@ Dat_052C
          FCB    $0D ; CR
          FCC    "      ? - single character"
          FCB    $0D ; CR
+Dat_052Cend
 $06A7  5A                  Sub_06A7:      DECB                  
 $06A8  10 8E 00 50                        LDY #$0050            
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
