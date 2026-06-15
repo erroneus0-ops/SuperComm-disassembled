@@ -221,7 +221,7 @@ $0063  DA 0E                              ORB <BSS.$0E
 $0065  DA 0F                              ORB <BSS.$0F          
 $0067  D7 0B                              STB <BSS.$0B          
 $0069  0D 10                              TST <BSS.ColWidth     
-$006B  27 33                              BEQ $00A0             
+$006B  27 33                              BEQ Loc_00A0          
 $006D  34 12                              PSHS A,X              
 $006F  CC 01 26                           LDD #$0126            
 $0072  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
@@ -250,7 +250,7 @@ $0097  16 03 B7                           LBRA Loc_0451
 $009A  97 11               Loc_009A:      STA <BSS.LastCol      
 $009C  1C FE               Loc_009C:      ANDCC #$FE             ; clr CC: C
 $009E  35 12                              PULS A,X              
-$00A0  96 17                              LDA <BSS.$17          
+$00A0  96 17               Loc_00A0:      LDA <BSS.$17          
 $00A2  8A 80                              ORA #$80              
 $00A4  9E 02                              LDX <BSS.NextDir      
 $00A6  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
@@ -280,7 +280,7 @@ $00E4  31 C8 25                           LEAY BSS.$25,U
 $00E7  9E 02                              LDX <BSS.NextDir      
 $00E9  A6 80               Loc_00E9:      LDA ,X+                ; this is a loop copying the NextDir to BSS.$25
 $00EB  A7 A0                              STA ,Y+               
-$00ED  81 0D                              CMPA #$0D              ; compare A with CR  [Looking for a CR terminator]
+$00ED  81 0D                              CMPA #$0D              ; Looking for a CR terminator
 $00EF  26 F8                              BNE Loc_00E9           ; Nope?  Keep looking!
 $00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
@@ -300,8 +300,8 @@ $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf�
 $0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
-$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR WritBLines        ; call WritBLines  [call write out lines]
+$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Address of output lines
+$011F  17 05 85                           LBSR WritBLines        ; call write out lines
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -364,7 +364,7 @@ $019F  27 03                              BEQ Loc_01A4
 $01A1  4D                                 TSTA                  
 $01A2  26 82                              BNE Loc_0126          
 $01A4  0D 10               Loc_01A4:      TST <BSS.ColWidth     
-$01A6  27 53                              BEQ $01FB             
+$01A6  27 53                              BEQ Loc_01FB          
 $01A8  0F 0A                              CLR <$0A              
 $01AA  D6 13                              LDB <$13              
 $01AC  D1 12                              CMPB <$12             
@@ -403,14 +403,17 @@ $01F4  0D 0A                              TST <$0A
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
 
-$01FB  0D 0D                                      TST <BSS.$0D
-$01FD  10 26 01 6D                                LBNE $036E
-$0201  86 01                                      LDA #$01
-$0203  30 C8 58                                   LEAX 88,U
-$0206  10 8E 00 1E                                LDY #$001E
-$020A  10 3F 8C                                   OS9 I$WritLn   ; path=A  buf→X
-$020D  10 25 02 40                                LBCS Loc_0451
-$0211  16 FF 12                                   LBRA Loc_0126
+; --------------------------------------------------------------
+$01FB  0D 0D               Loc_01FB:      TST <BSS.$0D          
+$01FD  10 26 01 6D                        LBNE Loc_036E         
+$0201  86 01                              LDA #$01              
+$0203  30 C8 58                           LEAX 88,U             
+$0206  10 8E 00 1E                        LDY #$001E            
+$020A  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
+$020D  10 25 02 40                        LBCS Loc_0451         
+$0211  16 FF 12                           LBRA Loc_0126         
+
+; --------------------------------------------------------------
 $0214  30 01               Sub_0214:      LEAX 1,X              
 $0216  A6 84                              LDA ,X                
 $0218  81 20                              CMPA #$20              ; compare A with ' '
@@ -623,126 +626,136 @@ $0367  81 7A                              CMPA #$7A              ; compare A wit
 $0369  22 02                              BHI Loc_036D          
 $036B  84 DF                              ANDA #$DF             
 $036D  39                  Loc_036D:      RTS                   
+$036E  30 8D 01 87         Loc_036E:      LEAX Dat_04F9,PC       ; X → Dat_04F9
+$0372  31 C8 25                           LEAY BSS.$25,U        
+$0375  A6 80               Loc_0375:      LDA ,X+               
+$0377  81 0A                              CMPA #$0A              ; compare A with LF
+$0379  27 04                              BEQ Loc_037F          
+$037B  A7 A0                              STA ,Y+               
+$037D  20 F6                              BRA Loc_0375          
 
-$036E  30 8D 01 87                                LEAX +391,PC
-$0372  31 C8 25                                   LEAY BSS.$25,U
-$0375  A6 80                                      LDA ,X+
-$0377  81 0A                                      CMPA #$0A   ; compare A with LF
-$0379  27 04                                      BEQ $037F
-$037B  A7 A0                                      STA ,Y+
-$037D  20 F6                                      BRA $0375
-$037F  31 C8 26                                   LEAY 38,U
-$0382  30 C8 19                                   LEAX 25,U
-$0385  C6 02                                      LDB #$02   ; B = SS.Size  (GetStt/SetStt subcode)
-$0387  A6 80                                      LDA ,X+
-$0389  17 00 9F                                   LBSR $042B
-$038C  5A                                         DECB 
-$038D  26 F8                                      BNE $0387
-$038F  30 C8 26                                   LEAX 38,U
-$0392  17 00 AD                                   LBSR $0442
-$0395  31 C8 2C                                   LEAY 44,U
-$0398  30 C8 1B                                   LEAX 27,U
-$039B  E6 84                                      LDB ,X
-$039D  4F                                         CLRA    ; A = 0
-$039E  C1 64                                      CMPB #$64   ; compare B with 'd'
-$03A0  25 05                                      BCS $03A7   ; C=1 (BLO)
-$03A2  4C                                         INCA 
-$03A3  C0 64                                      SUBB #$64
-$03A5  20 F7                                      BRA $039E
-$03A7  1F 89                                      TFR A,B
-$03A9  8B 13                                      ADDA #$13
-$03AB  8D 6D                                      BSR $041A
-$03AD  86 64                                      LDA #$64   ; A = 'd'
-$03AF  3D                                         MUL    ; D = A×B unsigned
-$03B0  34 04                                      PSHS B
-$03B2  A6 80                                      LDA ,X+
-$03B4  A0 E0                                      SUBA ,S+
-$03B6  8D 62                                      BSR $041A
-$03B8  31 21                                      LEAY 1,Y
-$03BA  C6 02                                      LDB #$02   ; B = SS.Size  (GetStt/SetStt subcode)
-$03BC  A6 80                                      LDA ,X+
-$03BE  8D 5A                                      BSR $041A
-$03C0  31 21                                      LEAY 1,Y
-$03C2  5A                                         DECB 
-$03C3  26 F7                                      BNE $03BC
-$03C5  A6 80                                      LDA ,X+
-$03C7  8D 51                                      BSR $041A
-$03C9  A6 84                                      LDA ,X
-$03CB  8D 4D                                      BSR $041A
-$03CD  31 C8 3D                                   LEAY 61,U
-$03D0  30 C8 18                                   LEAX 24,U
-$03D3  CC 2D 08                                   LDD #$2D08
-$03D6  68 84                                      LSL ,X
-$03D8  25 02                                      BCS $03DC   ; C=1 (BLO)
-$03DA  A7 A4                                      STA ,Y
-$03DC  31 21                                      LEAY 1,Y
-$03DE  5A                                         DECB 
-$03DF  26 F5                                      BNE $03D6
-$03E1  31 C8 47                                   LEAY 71,U
-$03E4  30 C8 76                                   LEAX 118,U
-$03E7  C6 03                                      LDB #$03   ; B = SS.Reset  (GetStt/SetStt subcode)
-$03E9  A6 80                                      LDA ,X+
-$03EB  8D 3E                                      BSR $042B
-$03ED  5A                                         DECB 
-$03EE  26 F9                                      BNE $03E9
-$03F0  30 C8 47                                   LEAX 71,U
-$03F3  8D 4D                                      BSR $0442
-$03F5  31 C8 4F                                   LEAY 79,U
-$03F8  30 C8 21                                   LEAX 33,U
-$03FB  C6 04                                      LDB #$04
-$03FD  A6 80                                      LDA ,X+
-$03FF  8D 2A                                      BSR $042B
-$0401  5A                                         DECB 
-$0402  26 F9                                      BNE $03FD
-$0404  30 C8 4F                                   LEAX 79,U
-$0407  8D 39                                      BSR $0442
-$0409  30 C8 25                                   LEAX BSS.$25,U
-$040C  10 8E 00 50                                LDY #$0050
-$0410  86 01                                      LDA #$01
-$0412  10 3F 8C                                   OS9 I$WritLn   ; path=A  buf→X
-$0415  25 3A                                      BCS Loc_0451   ; C=1 (BLO)
-$0417  16 FD 0C                                   LBRA Loc_0126
-$041A  81 0A                                      CMPA #$0A   ; compare A with LF
-$041C  25 06                                      BCS $0424   ; C=1 (BLO)
-$041E  6C A4                                      INC ,Y
-$0420  80 0A                                      SUBA #$0A
-$0422  20 F6                                      BRA $041A
-$0424  31 21                                      LEAY 1,Y
-$0426  8B 30                                      ADDA #$30
-$0428  A7 A0                                      STA ,Y+
-$042A  39                                         RTS 
-$042B  34 02                                      PSHS A
-$042D  44                                         LSRA 
-$042E  44                                         LSRA 
-$042F  44                                         LSRA 
-$0430  44                                         LSRA 
-$0431  8D 04                                      BSR $0437
-$0433  35 02                                      PULS A
-$0435  84 0F                                      ANDA #$0F
-$0437  8B 30                                      ADDA #$30
-$0439  81 39                                      CMPA #$39   ; compare A with '9'
-$043B  23 02                                      BLS $043F
-$043D  8B 07                                      ADDA #$07
-$043F  A7 A0                                      STA ,Y+
-$0441  39                                         RTS 
-$0442  CC 30 20                                   LDD #$3020
-$0445  A1 84                                      CMPA ,X
-$0447  26 F8                                      BNE $0441
-$0449  E1 01                                      CMPB 1,X
-$044B  27 F4                                      BEQ $0441
-$044D  E7 80                                      STB ,X+
-$044F  20 F4                                      BRA $0445
+; --------------------------------------------------------------
+$037F  31 C8 26            Loc_037F:      LEAY 38,U             
+$0382  30 C8 19                           LEAX 25,U             
+$0385  C6 02                              LDB #$02               ; B = SS.Size  (GetStt/SetStt subcode)
+$0387  A6 80               Loc_0387:      LDA ,X+               
+$0389  17 00 9F                           LBSR Sub_042B          ; call Sub_042B
+$038C  5A                                 DECB                  
+$038D  26 F8                              BNE Loc_0387          
+$038F  30 C8 26                           LEAX 38,U             
+$0392  17 00 AD                           LBSR Sub_0442          ; call Sub_0442
+$0395  31 C8 2C                           LEAY 44,U             
+$0398  30 C8 1B                           LEAX 27,U             
+$039B  E6 84                              LDB ,X                
+$039D  4F                                 CLRA                   ; A = 0
+$039E  C1 64               Loc_039E:      CMPB #$64              ; compare B with 'd'
+$03A0  25 05                              BCS Loc_03A7           ; C=1 (BLO)
+$03A2  4C                                 INCA                  
+$03A3  C0 64                              SUBB #$64             
+$03A5  20 F7                              BRA Loc_039E          
+
+; --------------------------------------------------------------
+$03A7  1F 89               Loc_03A7:      TFR A,B               
+$03A9  8B 13                              ADDA #$13             
+$03AB  8D 6D                              BSR Sub_041A           ; call Sub_041A
+$03AD  86 64                              LDA #$64               ; A = 'd'
+$03AF  3D                                 MUL                    ; D = A×B unsigned
+$03B0  34 04                              PSHS B                
+$03B2  A6 80                              LDA ,X+               
+$03B4  A0 E0                              SUBA ,S+              
+$03B6  8D 62                              BSR Sub_041A           ; call Sub_041A
+$03B8  31 21                              LEAY 1,Y              
+$03BA  C6 02                              LDB #$02               ; B = SS.Size  (GetStt/SetStt subcode)
+$03BC  A6 80               Loc_03BC:      LDA ,X+               
+$03BE  8D 5A                              BSR Sub_041A           ; call Sub_041A
+$03C0  31 21                              LEAY 1,Y              
+$03C2  5A                                 DECB                  
+$03C3  26 F7                              BNE Loc_03BC          
+$03C5  A6 80                              LDA ,X+               
+$03C7  8D 51                              BSR Sub_041A           ; call Sub_041A
+$03C9  A6 84                              LDA ,X                
+$03CB  8D 4D                              BSR Sub_041A           ; call Sub_041A
+$03CD  31 C8 3D                           LEAY 61,U             
+$03D0  30 C8 18                           LEAX 24,U             
+$03D3  CC 2D 08                           LDD #$2D08            
+$03D6  68 84               Loc_03D6:      LSL ,X                
+$03D8  25 02                              BCS Loc_03DC           ; C=1 (BLO)
+$03DA  A7 A4                              STA ,Y                
+$03DC  31 21               Loc_03DC:      LEAY 1,Y              
+$03DE  5A                                 DECB                  
+$03DF  26 F5                              BNE Loc_03D6          
+$03E1  31 C8 47                           LEAY 71,U             
+$03E4  30 C8 76                           LEAX 118,U            
+$03E7  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
+$03E9  A6 80               Loc_03E9:      LDA ,X+               
+$03EB  8D 3E                              BSR Sub_042B           ; call Sub_042B
+$03ED  5A                                 DECB                  
+$03EE  26 F9                              BNE Loc_03E9          
+$03F0  30 C8 47                           LEAX 71,U             
+$03F3  8D 4D                              BSR Sub_0442           ; call Sub_0442
+$03F5  31 C8 4F                           LEAY 79,U             
+$03F8  30 C8 21                           LEAX 33,U             
+$03FB  C6 04                              LDB #$04              
+$03FD  A6 80               Loc_03FD:      LDA ,X+               
+$03FF  8D 2A                              BSR Sub_042B           ; call Sub_042B
+$0401  5A                                 DECB                  
+$0402  26 F9                              BNE Loc_03FD          
+$0404  30 C8 4F                           LEAX 79,U             
+$0407  8D 39                              BSR Sub_0442           ; call Sub_0442
+$0409  30 C8 25                           LEAX BSS.$25,U        
+$040C  10 8E 00 50                        LDY #$0050            
+$0410  86 01                              LDA #$01              
+$0412  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
+$0415  25 3A                              BCS Loc_0451           ; C=1 (BLO)
+$0417  16 FD 0C                           LBRA Loc_0126         
+
+; --------------------------------------------------------------
+$041A  81 0A               Sub_041A:      CMPA #$0A              ; compare A with LF
+$041C  25 06                              BCS Loc_0424           ; C=1 (BLO)
+$041E  6C A4                              INC ,Y                
+$0420  80 0A                              SUBA #$0A             
+$0422  20 F6                              BRA Sub_041A          
+
+; --------------------------------------------------------------
+$0424  31 21               Loc_0424:      LEAY 1,Y              
+$0426  8B 30                              ADDA #$30             
+$0428  A7 A0                              STA ,Y+               
+$042A  39                                 RTS                   
+
+; --------------------------------------------------------------
+$042B  34 02               Sub_042B:      PSHS A                
+$042D  44                                 LSRA                  
+$042E  44                                 LSRA                  
+$042F  44                                 LSRA                  
+$0430  44                                 LSRA                  
+$0431  8D 04                              BSR Sub_0437           ; call Sub_0437
+$0433  35 02                              PULS A                
+$0435  84 0F                              ANDA #$0F             
+$0437  8B 30               Sub_0437:      ADDA #$30             
+$0439  81 39                              CMPA #$39              ; compare A with '9'
+$043B  23 02                              BLS Loc_043F          
+$043D  8B 07                              ADDA #$07             
+$043F  A7 A0               Loc_043F:      STA ,Y+               
+$0441  39                  Loc_0441:      RTS                   
+$0442  CC 30 20            Sub_0442:      LDD #$3020            
+$0445  A1 84               Loc_0445:      CMPA ,X               
+$0447  26 F8                              BNE Loc_0441          
+$0449  E1 01                              CMPB 1,X              
+$044B  27 F4                              BEQ Loc_0441          
+$044D  E7 80                              STB ,X+               
+$044F  20 F4                              BRA Loc_0445          
+
+; --------------------------------------------------------------
 $0451  C1 D3               Loc_0451:      CMPB #$D3             
 $0453  26 01                              BNE Loc_0456          
 $0455  5F                                 CLRB                   ; B = 0
 $0456  0D 10               Loc_0456:      TST <BSS.ColWidth     
-$0458  27 0D                              BEQ $0467             
+$0458  27 0D                              BEQ Loc_0467          
 $045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
-$045D  0D 86               Sub_045D:      TST <$86              
-$045F  01                                 FCB $01                ; undefined opcode $01 -- not a valid 6809 instruction
+$045E  86 01                              LDA #$01              
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$0467  10 3F 06                           OS9 F$Exit             ; status=B
+$0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
 
 Dat_046A
 ; Referenced by: $0022, $02CE
@@ -775,7 +788,14 @@ Dat_047D
          FCB    $0D ; CR
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
+
+Dat_04F9
          FCC    "       0000/00/00 0000  dsewrewr                   "
+
+Dat_04F9
+; Referenced by: Loc_036E
+; ── 32 ($0020) bytes  ($04F9—$0518) ──
+         FCC    "       0000/00/00 0000  dsewrewr"
 ; The last line is a format template — fields updated in place.
 
 Dat_0519
@@ -814,19 +834,15 @@ Dat_052C
 Dat_052Cend
 $06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
-$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
-$06AF  25 0B                              BCS endWritBlines      ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
+$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A=$01  buf→X
+$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO) Is this an error? It breaks out of the routine loop anyway
 $06B1  34 06                              PSHS A,B               ; Save the path and line count
 $06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
-<<<<<<< HEAD
-$06BC  39                  endWritBlines: RTS                   
-=======
-$06BC  39                  Loc_06BC:      RTS                   
->>>>>>> 2a996dd91e7ba902ccc91b2ff83fabe24dfba120
+$06BC  39                  Loc_06BC:      RTS                    ; loop copying path to buffer
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
