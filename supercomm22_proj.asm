@@ -1625,7 +1625,7 @@ $0F15  10 3F 06            Loc_0F15:      OS9 F$Exit             ; status=B
 Dat_0F18
 ; Referenced by: $0B26
 ; 7-byte data block referenced by LEAX at $0B26 — appears after OS9 F$Exit
-; ── 7 bytes  ($0F18—$0F1E) ──
+; ── 7 ($0007) bytes  ($0F18—$0F1E) ──
          FCB    $C1
          FCB    $80
          FCB    $26
@@ -2535,7 +2535,7 @@ $174D  16 F5 0E                           LBRA Loc_0C5E
 
 Dat_1750
 ; 12-byte orphaned string copy loop (unreferenced from branch analysis)
-; ── 12 bytes  ($1750—$175B) ──
+; ── 12 ($000C) bytes  ($1750—$175B) ──
          FCB    $A6
          FCB    $80
          FCB    $A7
@@ -6671,7 +6671,7 @@ CrcTable
 Used by file transfer protocol routines for fast CRC calculation.
 Dave Philipsen added this in v2.2; v2.1 used OS9 F$CRC syscall instead.
 Table polynomial: $1021 (CRC-CCITT / CRC-16-IBM-SDLC)
-; ── 512 bytes  ($3C0F—$3E0E) ──
+; ── 512 ($0200) bytes  ($3C0F—$3E0E) ──
          FDB    $0000
          FDB    $1021
          FDB    $2042
@@ -7036,7 +7036,7 @@ $3ED0  35 B2                              PULS A,X,Y,PC          ; return from s
 
 Dat_3ED2
 ; 11-byte orphaned code between subroutines (unreferenced)
-; ── 11 bytes  ($3ED2—$3EDC) ──
+; ── 11 ($000B) bytes  ($3ED2—$3EDC) ──
          FCB    $34
          FCB    $32
          FCB    $30

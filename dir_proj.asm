@@ -299,9 +299,9 @@ $010F  86 01                              LDA #$01
 $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
-$0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
-$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7  [call write out lines]
+$0118  CC 01 02                           LDD #$0102            
+$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D
+$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -811,21 +811,17 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-; The last line doesn't look like it is actually printed.  This looks like a format string where
-; details are updated in place maybe?
-; The last line doesn't look like it is actually printed.  This looks like a format string where
-; details are updated in place maybe?
-$06A7  5A                  Sub_06A7:      DECB                   ; B=# of lines, X=location of stuff to print.
-$06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
-$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
-$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
-$06B1  34 06                              PSHS A,B               ; Save the path and line count
-$06B3  1F 20                              TFR Y,D                ; Y now contains # chars printed and so does D
-$06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
-$06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
-$06B9  5D                                 TSTB                   ; Is B zero?
-$06BA  26 EB                              BNE Sub_06A7           ; If not loop back where it decrements B for the next line
-$06BC  39                  Loc_06BC:      RTS                    ; return from subroutine  [loop copying path to buffer]
+$06A7  5A                  Sub_06A7:      DECB                  
+$06A8  10 8E 00 50                        LDY #$0050            
+$06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
+$06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)
+$06B1  34 06                              PSHS A,B              
+$06B3  1F 20                              TFR Y,D               
+$06B5  30 8B                              LEAX D,X              
+$06B7  35 06                              PULS A,B              
+$06B9  5D                                 TSTB                  
+$06BA  26 EB                              BNE Sub_06A7          
+$06BC  39                  Loc_06BC:      RTS                    ; return from subroutine
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
