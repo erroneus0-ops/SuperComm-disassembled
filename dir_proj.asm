@@ -822,8 +822,7 @@ $06B5  30 8B                              LEAX D,X               ; Move X pointe
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
-$06BC  39                  Loc_06BC:      RTS                    ; return from subroutine  [loop copying path to buffer]
-/remove-line-comment/ $06BC
+$06BC  39                  Loc_06BC:      RTS                    /; /
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -903,6 +902,11 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;         /remove-comment/
 ;         ; This comment is no longer needed.
 ;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove an inline line comment from the JSON at the given address.
+;     Example:
+;         /remove-line-comment/ $06BC
 ;
 ; ── Substitutions ─────────────────────────────────────────────
 ;
