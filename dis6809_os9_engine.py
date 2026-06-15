@@ -2639,11 +2639,22 @@ MARKUP_QUICK_REF = """
 ;     Example:
 ;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
 ;
-; /comment/
+; /comment/ [$addr]
 ; comment line 1
 ; comment line 2
 ; /end-comment/
-;     Block comment inserted before the next address.
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/ $addr
+;     Remove a block comment from the JSON at the given address.
+;     Example:
+;         /remove-comment/ $06A7
 ;
 ; ── Substitutions ─────────────────────────────────────────────
 ;

@@ -169,6 +169,7 @@ def parse_directives(lines, json_path=None):
         'labels':          {},   # addr -> name
         'bss':             {},   # offset -> name
         'block_comments':  {},   # addr -> [lines]
+        'remove_comments': [],   # list of addrs to remove from block_comments
         'line_comments':   {},   # addr -> text
         'substitutions':   {},   # addr -> {replace_bytes, with_lines}
         'data_regions':    [],   # list of {start, end?, label?, end_label?, format?, comment?}
@@ -326,18 +327,34 @@ def parse_directives(lines, json_path=None):
             else:
                 changes['warnings'].append(f"/bss/ — expected '$offset name'")
 
-        # ── /comment/ ... /end-comment/ ──────────────────────────────────────
-        elif line == '/comment/':
+        # ── /comment/ [$addr] ... /end-comment/ ──────────────────────────────
+        elif line == '/comment/' or line.startswith('/comment/ '):
+            # Optional explicit address: /comment/ $0519
+            explicit_addr = None
+            if line.startswith('/comment/ '):
+                try:
+                    explicit_addr = int(line[len('/comment/ '):].strip().lstrip('$'), 16)
+                except ValueError:
+                    changes['warnings'].append(f"/comment/ — invalid address '{line}'")
             comment_lines = []
             i += 1
             while i < len(lines) and lines[i].rstrip() != '/end-comment/':
                 comment_lines.append(lines[i].rstrip())
                 i += 1
-            addr = next_addr_from_lines(lines, i + 1)
+            addr = explicit_addr if explicit_addr is not None else next_addr_from_lines(lines, i + 1)
             if addr is not None:
                 changes['block_comments'][addr] = comment_lines
             else:
                 changes['warnings'].append("/comment/ block — could not find target address")
+
+        # ── /remove-comment/ $addr ────────────────────────────────────────────
+        elif line.startswith('/remove-comment/'):
+            parts = line[len('/remove-comment/'):].strip()
+            try:
+                addr = int(parts.lstrip('$'), 16)
+                changes['remove_comments'].append(addr)
+            except ValueError:
+                changes['warnings'].append(f"/remove-comment/ — invalid address '{parts}'")
 
         # ── /replace/ ... /with/ ... /end-replace/ ───────────────────────────
         elif line == '/replace/':
@@ -563,6 +580,8 @@ def merge_into_json(json_path, changes, warn):
     bc = d.get('block_comments', {})
     for addr, lines in changes['block_comments'].items():
         bc[f'{addr:04X}'] = lines
+    for addr in changes.get('remove_comments', []):
+        bc.pop(f'{addr:04X}', None)
     d['block_comments'] = dict(sorted(bc.items()))
 
     # ── line_comments ────────────────────────────────────────────────────────
