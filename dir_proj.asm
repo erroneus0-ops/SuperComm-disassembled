@@ -301,7 +301,7 @@ $0114  0D 0D                              TST <BSS.$0D
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Dat_047D  [X → Address of output lines]
-$011F  17 05 85                           LBSR WritBLines        ; call WritBLines  [call write out lines]
+$011F  17 05 85                           LBSR Sub_06A7          ; call Sub_06A7  [call write out lines]
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -437,14 +437,14 @@ $0240  27 2E                              BEQ Loc_0270
 $0242  20 05                              BRA Loc_0249          
 
 ; --------------------------------------------------------------
-$0244  39                  Loc_0244:      RTS                    ; return from subroutine
+$0244  39                  Loc_0244:      RTS                   
 $0245  0C 08               Loc_0245:      INC <BSS.DirCount     
 $0247  20 CB                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
 $024C  30 8D 02 DC                        LEAX Dat_052C,PC       ; X → Dat_052C
-$0250  17 04 54                           LBSR WritBLines        ; call WritBLines
+$0250  17 04 54                           LBSR Sub_06A7          ; call Sub_06A7
 $0253  16 01 FB                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
@@ -499,7 +499,7 @@ $029C  81 20                              CMPA #$20              ; compare A wit
 $029E  26 05                              BNE Loc_02A5          
 $02A0  86 0D                              LDA #$0D               ; A = CR
 $02A2  A7 82                              STA ,-X               
-$02A4  39                  Loc_02A4:      RTS                    ; return from subroutine
+$02A4  39                  Loc_02A4:      RTS                   
 $02A5  81 2A               Loc_02A5:      CMPA #$2A              ; compare A with '*'
 $02A7  27 0B                              BEQ Loc_02B4          
 $02A9  81 3F                              CMPA #$3F              ; compare A with '?'
@@ -567,7 +567,7 @@ $0312  A7 84                              STA ,X
 $0314  20 CE                              BRA Loc_02E4          
 
 ; --------------------------------------------------------------
-$0316  39                  Loc_0316:      RTS                    ; return from subroutine
+$0316  39                  Loc_0316:      RTS                   
 $0317  A6 84               Sub_0317:      LDA ,X                
 $0319  8D 44                              BSR Sub_035F           ; call Sub_035F
 $031B  E6 A4                              LDB ,Y                
@@ -608,11 +608,11 @@ $0355  20 F0                              BRA Loc_0347
 ; --------------------------------------------------------------
 $0357  86 01               Loc_0357:      LDA #$01              
 $0359  97 09                              STA <$09              
-$035B  39                                 RTS                    ; return from subroutine
+$035B  39                                 RTS                   
 
 ; --------------------------------------------------------------
 $035C  0F 09               Loc_035C:      CLR <$09              
-$035E  39                                 RTS                    ; return from subroutine
+$035E  39                                 RTS                   
 
 ; --------------------------------------------------------------
 $035F  0D 08               Sub_035F:      TST <BSS.DirCount     
@@ -622,7 +622,7 @@ $0365  25 06                              BCS Loc_036D           ; C=1 (BLO)
 $0367  81 7A                              CMPA #$7A              ; compare A with 'z'
 $0369  22 02                              BHI Loc_036D          
 $036B  84 DF                              ANDA #$DF             
-$036D  39                  Loc_036D:      RTS                    ; return from subroutine
+$036D  39                  Loc_036D:      RTS                   
 
 $036E  30 8D 01 87                                LEAX +391,PC
 $0372  31 C8 25                                   LEAY BSS.$25,U
@@ -710,7 +710,7 @@ $0422  20 F6                                      BRA $041A
 $0424  31 21                                      LEAY 1,Y
 $0426  8B 30                                      ADDA #$30
 $0428  A7 A0                                      STA ,Y+
-$042A  39                                         RTS    ; return from subroutine
+$042A  39                                         RTS 
 $042B  34 02                                      PSHS A
 $042D  44                                         LSRA 
 $042E  44                                         LSRA 
@@ -724,7 +724,7 @@ $0439  81 39                                      CMPA #$39   ; compare A with '
 $043B  23 02                                      BLS $043F
 $043D  8B 07                                      ADDA #$07
 $043F  A7 A0                                      STA ,Y+
-$0441  39                                         RTS    ; return from subroutine
+$0441  39                                         RTS 
 $0442  CC 30 20                                   LDD #$3020
 $0445  A1 84                                      CMPA ,X
 $0447  26 F8                                      BNE $0441
@@ -776,7 +776,6 @@ Dat_047D
          FCC    "------ --------------- ---------- ------ --------- ----------"
          FCB    $0D ; CR
          FCC    "       0000/00/00 0000  dsewrewr                   "
-; The last line is a format template — fields updated in place.
 
 Dat_0519
 ; Referenced by: $01D1
@@ -812,7 +811,9 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-$06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
+; The last line doesn't look like it is actually printed.  This looks like a format string where
+; details are updated in place maybe?
+$06A7  5A                  Sub_06A7:      DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X  [path=A=$01  buf→X]
 $06AF  25 0B                              BCS Loc_06BC           ; C=1 (BLO)  [C=1 (BLO) Is this an error? It breaks out of the routine loop anyway]
@@ -821,8 +822,13 @@ $06B3  1F 20                              TFR Y,D                ; Y now contain
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.(is there a PSHS D code? same bits either way I'm sure)
 $06B9  5D                                 TSTB                   ; Is B zero?
+<<<<<<< HEAD
 $06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
 $06BC  39                  Loc_06BC:      RTS                    /; /
+=======
+$06BA  26 EB                              BNE Sub_06A7           ; If not loop back where it decrements B for the next line
+$06BC  39                  Loc_06BC:      RTS                   
+>>>>>>> b3cacd2c187084a71d3ed65d2f8b4a3ed637786f
 
 ; ==============================================================
 ; ModEnd — CRC-24 appended by fixmod (not in source)
@@ -831,6 +837,7 @@ ModEnd
 ; CRC-24 (3 bytes) appended here by fixmod
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
+<<<<<<< HEAD
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; MARKUP QUICK REFERENCE  (markup.py directives)
@@ -935,3 +942,6 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Mark a routine boundary for structural annotation.
 ;
 ; ══════════════════════════════════════════════════════════════
+=======
+ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+>>>>>>> b3cacd2c187084a71d3ed65d2f8b4a3ed637786f
