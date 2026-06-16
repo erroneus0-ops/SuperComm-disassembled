@@ -135,8 +135,7 @@ BSS.$0D       EQU    $0D      ; 1 byte
 BSS.$0E       EQU    $0E      ; 1 byte
 BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
-BSS.LastCol   EQU    $11      ; 1 byte
-BSS.$12       EQU    $12      ; 5 bytes
+BSS.LastCol   EQU    $11      ; 6 bytes
 BSS.$17       EQU    $17      ; 14 bytes
 BSS.$25       EQU    $25      ; 81 bytes
 BSS.$76       EQU    $76      ; 3 bytes
@@ -269,7 +268,7 @@ $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name�
 $00C3  10 25 03 8A                        LBCS Loc_0451         
 $00C7  97 01                              STA <$01              
 $00C9  96 11               Loc_00C9:      LDA <BSS.LastCol      
-$00CB  97 12                              STA <BSS.$12          
+$00CB  97 12                              STA <$12              
 $00CD  96 0D                              LDA <BSS.$0D          
 $00CF  9A 10                              ORA <BSS.ColWidth     
 $00D1  27 53                              BEQ Loc_0126          
@@ -307,7 +306,7 @@ $011F  17 05 85                           LBSR WritBlines        ; call write ou
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
-$012C  30 C8 58                           LEAX 88,U             
+$012C  30 C8 58                           LEAX 88,U	; $58       
 $012F  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $0132  10 25 03 1B                        LBCS Loc_0451         
 $0136  DC 76                              LDD <BSS.$76          
@@ -322,7 +321,7 @@ $0146  84 7F                              ANDA #$7F              ; A & %01111111
 $0148  91 7A                              CMPA <BSS.DotChar     
 $014A  27 DA                              BEQ Loc_0126          
 $014C  5F                  Loc_014C:      CLRB                   ; B = 0
-$014D  30 C8 58                           LEAX 88,U             
+$014D  30 C8 58                           LEAX 88,U	; $58       
 $0150  A6 80               Loc_0150:      LDA ,X+               
 $0152  5C                                 INCB                  
 $0153  81 80                              CMPA #$80             
@@ -334,7 +333,7 @@ $015D  86 0D                              LDA #$0D               ; A = CR
 $015F  A7 84                              STA ,X                
 $0161  0D 0C                              TST <BSS.$0C          
 $0163  27 0D                              BEQ Loc_0172          
-$0165  30 C8 58                           LEAX 88,U             
+$0165  30 C8 58                           LEAX 88,U	; $58       
 $0168  10 9E 06                           LDY <BSS.PatPtr       
 $016B  17 01 A9                           LBSR Sub_0317          ; call Sub_0317
 $016E  0D 09                              TST <$09              
@@ -342,7 +341,7 @@ $0170  27 B4                              BEQ Loc_0126
 $0172  0D 0B               Loc_0172:      TST <BSS.$0B          
 $0174  27 2E                              BEQ Loc_01A4          
 $0176  34 40                              PSHS U                
-$0178  30 C8 18                           LEAX 24,U             
+$0178  30 C8 18                           LEAX 24,U	; $18       
 $017B  C6 0D                              LDB #$0D               ; B = CR
 $017D  96 76                              LDA <BSS.$76          
 $017F  1F 02                              TFR D,Y               
@@ -369,22 +368,22 @@ $01A4  0D 10               Loc_01A4:      TST <BSS.ColWidth
 $01A6  27 53                              BEQ Loc_01FB          
 $01A8  0F 0A                              CLR <$0A              
 $01AA  D6 13                              LDB <$13              
-$01AC  D1 12                              CMPB <BSS.$12         
+$01AC  D1 12                              CMPB <$12             
 $01AE  2C 2F                              BGE Loc_01DF          
 $01B0  0C 0A               Loc_01B0:      INC <$0A              
 $01B2  4F                                 CLRA                   ; A = 0
 $01B3  1F 02                              TFR D,Y               
 $01B5  4C                                 INCA                  
-$01B6  30 C8 58                           LEAX 88,U             
+$01B6  30 C8 58                           LEAX 88,U	; $58       
 $01B9  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $01BC  10 25 02 91                        LBCS Loc_0451         
-$01C0  96 12                              LDA <BSS.$12          
+$01C0  96 12                              LDA <$12              
 $01C2  80 10               Loc_01C2:      SUBA #$10             
 $01C4  2F 19                              BLE Loc_01DF          
 $01C6  C0 10                              SUBB #$10             
 $01C8  2C F8                              BGE Loc_01C2          
 $01CA  50                                 NEGB                  
-$01CB  97 12                              STA <BSS.$12          
+$01CB  97 12                              STA <$12              
 $01CD  4F                                 CLRA                   ; A = 0
 $01CE  1F 02                              TFR D,Y               
 $01D0  4C                                 INCA                  
@@ -400,7 +399,7 @@ $01E5  30 8D 02 82                        LEAX cwdAndCR,PC       ; X → cwdAndC
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $01EC  10 25 02 61                        LBCS Loc_0451         
 $01F0  96 11                              LDA <BSS.LastCol      
-$01F2  97 12                              STA <BSS.$12          
+$01F2  97 12                              STA <$12              
 $01F4  0D 0A                              TST <$0A              
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
@@ -409,19 +408,19 @@ $01F8  16 FF 2B                           LBRA Loc_0126
 $01FB  0D 0D               Loc_01FB:      TST <BSS.$0D          
 $01FD  10 26 01 6D                        LBNE Loc_036E         
 $0201  86 01                              LDA #$01              
-$0203  30 C8 58                           LEAX 88,U             
+$0203  30 C8 58                           LEAX 88,U	; $58       
 $0206  10 8E 00 1E                        LDY #$001E            
 $020A  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $020D  10 25 02 40                        LBCS Loc_0451         
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
-$0214  30 01               Sub_0214:      LEAX 1,X               ; X=X+1
-$0216  A6 84                              LDA ,X                 ; get the next byte
+$0214  30 01               Sub_0214:      LEAX 1,X               ; Advance X by one...
+$0216  A6 84                              LDA ,X                 ; why not lda 1,x+?
 $0218  81 20                              CMPA #$20              ; is it a space?
 $021A  27 28                              BEQ Loc_0244           ; ...go RTS
 $021C  81 0D                              CMPA #$0D              ; At the end of the cmdlin?
-$021E  27 24                              BEQ Loc_0244           ; yeah, prolly ...go RTS
+$021E  27 24                              BEQ Loc_0244           ; yeah, prolly... go RTS
 $0220  84 DF                              ANDA #$DF              ; A & %11011111 == toUpper()
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
@@ -637,17 +636,17 @@ $037B  A7 A0                              STA ,Y+                ; Otherwise cop
 $037D  20 F6                              BRA Loc_0375           ; Keep looping
 
 ; --------------------------------------------------------------
-$037F  31 C8 26            Loc_037F:      LEAY 38,U             
-$0382  30 C8 19                           LEAX 25,U             
+$037F  31 C8 26            Loc_037F:      LEAY 38,U	; $26       
+$0382  30 C8 19                           LEAX 25,U	; $19       
 $0385  C6 02                              LDB #$02               ; B = SS.Size  (GetStt/SetStt subcode)
 $0387  A6 80               Loc_0387:      LDA ,X+               
 $0389  17 00 9F                           LBSR Sub_042B          ; call Sub_042B
 $038C  5A                                 DECB                  
 $038D  26 F8                              BNE Loc_0387          
-$038F  30 C8 26                           LEAX 38,U             
+$038F  30 C8 26                           LEAX 38,U	; $26       
 $0392  17 00 AD                           LBSR Sub_0442          ; call Sub_0442
-$0395  31 C8 2C                           LEAY 44,U             
-$0398  30 C8 1B                           LEAX 27,U             
+$0395  31 C8 2C                           LEAY 44,U	; $2C       
+$0398  30 C8 1B                           LEAX 27,U	; $1B       
 $039B  E6 84                              LDB ,X                
 $039D  4F                                 CLRA                   ; A = 0
 $039E  C1 64               Loc_039E:      CMPB #$64              ; compare B with 'd'
@@ -677,8 +676,8 @@ $03C5  A6 80                              LDA ,X+
 $03C7  8D 51                              BSR Sub_041A           ; call Sub_041A
 $03C9  A6 84                              LDA ,X                
 $03CB  8D 4D                              BSR Sub_041A           ; call Sub_041A
-$03CD  31 C8 3D                           LEAY 61,U             
-$03D0  30 C8 18                           LEAX 24,U             
+$03CD  31 C8 3D                           LEAY 61,U	; $3D       
+$03D0  30 C8 18                           LEAX 24,U	; $18       
 $03D3  CC 2D 08                           LDD #$2D08            
 $03D6  68 84               Loc_03D6:      LSL ,X                
 $03D8  25 02                              BCS Loc_03DC           ; C=1 (BLO)
@@ -686,23 +685,28 @@ $03DA  A7 A4                              STA ,Y
 $03DC  31 21               Loc_03DC:      LEAY 1,Y              
 $03DE  5A                                 DECB                  
 $03DF  26 F5                              BNE Loc_03D6          
+<<<<<<< HEAD
 $03E1  31 C8 47                           LEAY 71,U             
 $03E4  30 C8 76                           LEAX BSS.$76,U        
+=======
+$03E1  31 C8 47                           LEAY 71,U	; $47       
+$03E4  30 C8 76                           LEAX 118,U	; $76      
+>>>>>>> 7f226182fba79990dae3840c1ba17c956391475e
 $03E7  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $03E9  A6 80               Loc_03E9:      LDA ,X+               
 $03EB  8D 3E                              BSR Sub_042B           ; call Sub_042B
 $03ED  5A                                 DECB                  
 $03EE  26 F9                              BNE Loc_03E9          
-$03F0  30 C8 47                           LEAX 71,U             
+$03F0  30 C8 47                           LEAX 71,U	; $47       
 $03F3  8D 4D                              BSR Sub_0442           ; call Sub_0442
-$03F5  31 C8 4F                           LEAY 79,U             
-$03F8  30 C8 21                           LEAX 33,U             
+$03F5  31 C8 4F                           LEAY 79,U	; $4F       
+$03F8  30 C8 21                           LEAX 33,U	; $21       
 $03FB  C6 04                              LDB #$04              
 $03FD  A6 80               Loc_03FD:      LDA ,X+               
 $03FF  8D 2A                              BSR Sub_042B           ; call Sub_042B
 $0401  5A                                 DECB                  
 $0402  26 F9                              BNE Loc_03FD          
-$0404  30 C8 4F                           LEAX 79,U             
+$0404  30 C8 4F                           LEAX 79,U	; $4F       
 $0407  8D 39                              BSR Sub_0442           ; call Sub_0442
 $0409  30 C8 25                           LEAX BSS.$25,U        
 $040C  10 8E 00 50                        LDY #$0050            
@@ -763,13 +767,11 @@ cwdChar
 ; Referenced by: $0022, $02CE
 ; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
-cwdCharend
 
 cwdAndCR
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
          FCB    $0D               ; CR
-cwdAndCRend
 
 Dat_046C
 ; Referenced by: $00BC
@@ -855,130 +857,3 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
-; ══════════════════════════════════════════════════════════════
-; MARKUP QUICK REFERENCE  (markup.py directives)
-; ══════════════════════════════════════════════════════════════
-;
-; Run:  python markup.py proj.asm [proj.json]
-; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
-;
-; ── Labeling ──────────────────────────────────────────────────
-;
-; /label/ Name
-;     Name the next $XXXX address in the listing.
-;     Example:
-;         /label/ Sub_ReadDir
-;         $0126  96 00    LDA <$00
-;
-; /label/ $addr Name
-;     Name a specific address directly — works for data labels too.
-;     Example:
-;         /label/ $046A cwdChar
-;         /label/ $046B cwdAndCR
-;
-; /rename-label/ OldName NewName
-;     Rename an existing label by its current name.
-;     Works for both code and data labels — no address scanning needed.
-;     Example:
-;         /rename-label/ Dat_046A cwdChar
-;         /rename-label/ Dat_046B cwdAndCR
-;
-; /bss/ $XX Name
-;     Declare a BSS variable at direct page offset $XX.
-;     Example:
-;         /bss/ $00 BSS.DirPath
-;         /bss/ $7A BSS.DotChar
-;
-; ── Data regions ──────────────────────────────────────────────
-;
-; /region/ $start $end [format] [label] [endlabel]
-; /dlabel/ $start $end [format] [label] [endlabel]
-;     Declare a data region. /dlabel/ is an alias for /region/ with a name
-;     that signals "this is a named data label".
-;     Format: auto text fdb hexdump raw writeblock
-;     +endlabel — emit a NameEnd label at the region boundary.
-;     Example:
-;         /dlabel/ $046A $046B auto cwdChar
-;         /dlabel/ $046B $046C auto cwdAndCR
-;         /region/ $052C $06A7 text +endlabel
-;
-; /format/ fmt
-;     Set format for the preceding data label's region.
-;     Example:
-;         Dat_046E
-;         /format/ text
-;
-; /end-label/
-;     Mark end of a data region at the next address.
-;     Example:
-;         /end-label/
-;         $06A7  5A    Sub_06A7: DECB
-;
-; ── Comments ──────────────────────────────────────────────────
-;
-; /; comment text/
-;     Inline comment appended to the instruction on this line.
-;     Example:
-;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
-;
-; /; /
-;     Empty inline comment — inhibits any auto-generated comment for
-;     this address permanently (stores "" in JSON as a suppressor).
-;     The inhibitor persists across disassembler runs.
-;     Use /remove-line-comment/ $addr to lift the inhibition.
-;
-; /comment/ [$addr]
-; comment line 1
-; comment line 2
-; /end-comment/
-;     Block comment inserted before the target address.
-;     Optional $addr targets a specific address directly.
-;     Without $addr, targets the next $XXXX line.
-;     Example:
-;         /comment/ $0519
-;         This FCC line is a format template updated in place.
-;         /end-comment/
-;
-; /remove-comment/
-; comment line to remove
-; /end-remove-comment/
-;     Remove a block comment matching the given content from the JSON.
-;     Prefix '; ' on each line is stripped before matching.
-;     Example:
-;         /remove-comment/
-;         ; This comment is no longer needed.
-;         /end-remove-comment/
-;
-; /remove-line-comment/ $addr
-;     Remove a line comment or inhibitor from the JSON at the given address.
-;     Auto-generated comments will return on the next disassembler run.
-;     Example:
-;         /remove-line-comment/ $06BC
-;
-; ── Substitutions ─────────────────────────────────────────────
-;
-; /replace/
-; <original disassembler lines>
-; /with/
-; <replacement source lines>
-; /end-replace/
-;     Replace disassembler output with analyst-supplied source.
-;     WARNING: byte counts must match. Instruction substitutions
-;     trigger a confirmation prompt — mismatch breaks byte-perfect.
-;     Example:
-;         /replace/
-;                  FCB    $0A               ; LF
-;                  FCC    "Dir"
-;         /with/
-;                  FCB    C$LF
-;                  FCS    /Dir/
-;         /end-replace/
-;
-; ── Routines ──────────────────────────────────────────────────
-;
-; /routine/ Name
-; ...code...
-; /end-routine/ Name
-;     Mark a routine boundary for structural annotation.
-;
-; ══════════════════════════════════════════════════════════════
