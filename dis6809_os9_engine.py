@@ -313,6 +313,7 @@ class Project:
         self.module_notes = []        # free-form notes about the module
         self.labels       = {}        # int_addr -> label_str
         self.bss          = {}        # int_offset -> name_str
+        self.bss_comments = {}        # int_offset -> comment string
         self.data_regions = []        # [{start, end, label, comment}]
         self.line_comments= {}        # int_addr -> comment_str
         self.block_comments={}        # int_addr -> [lines] before instruction
@@ -353,6 +354,8 @@ class Project:
         # bss: decimal int or "D" -> "Name"  (support both "51" and 51)
         for k,v in d.get('bss', {}).items():
             p.bss[int(k)] = v
+        for k,v in d.get('bss_comments', {}).items():
+            p.bss_comments[int(k)] = v
 
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
@@ -430,6 +433,7 @@ class Project:
             'hex_offsets':    self.hex_offsets,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
+            'bss_comments':   {str(k): v for k,v in sorted(self.bss_comments.items())},
             'data_regions':   [
                 {'start': f'{r["start"]:04X}', 'end': f'{r["end"]:04X}',
                  'label': r['label'], 'comment': r['comment'],
@@ -1688,7 +1692,9 @@ class Engine:
                     size_cmt = f"{gap} byte{'s' if gap != 1 else ''}"
                 else:
                     size_cmt = "?"
-                out.append(f"{name_str:<14}EQU    ${off:02X}      ; {size_cmt}")
+                extra = proj.bss_comments.get(off, '')
+                cmt = f"{size_cmt} — {extra}" if extra else size_cmt
+                out.append(f"{name_str:<14}EQU    ${off:02X}      ; {cmt}")
             out.append("")
 
         out += [
@@ -2645,10 +2651,11 @@ MARKUP_QUICK_REF = """
 ;         /rename-label/ Dat_046B cwdAndCR
 ;
 ; /bss/ $XX Name
-;     Declare a BSS variable at direct page offset $XX.
+;     Declare a BSS variable at direct page or U-relative offset $XX.
+;     Optional quoted comment appended to the EQU line.
 ;     Example:
 ;         /bss/ $00 BSS.DirPath
-;         /bss/ $7A BSS.DotChar
+;         /bss/ $58 BSS.DEntName "29-byte filename field of RBF directory entry"
 ;
 ; ── Data regions ──────────────────────────────────────────────
 ;
