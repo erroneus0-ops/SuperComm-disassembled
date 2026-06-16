@@ -168,6 +168,7 @@ def parse_directives(lines, json_path=None):
     changes = {
         'labels':          {},   # addr -> name
         'bss':             {},   # offset -> name
+        'bss_comments':    {},   # offset -> comment string
         'block_comments':  {},   # addr -> [lines]
         'remove_comments': [],   # list of addrs to remove from block_comments
         'remove_line_comments': [],  # list of addrs to remove from line_comments
@@ -339,7 +340,16 @@ def parse_directives(lines, json_path=None):
 
         # ── /bss/ $offset name ────────────────────────────────────────────────
         elif line.startswith('/bss/'):
-            parts = line[len('/bss/'):].strip().split()
+            rest = line[len('/bss/'):].strip()
+            # Extract optional quoted comment
+            bss_comment = ''
+            if '"' in rest:
+                q1 = rest.index('"')
+                q2 = rest.rindex('"')
+                if q2 > q1:
+                    bss_comment = rest[q1+1:q2]
+                    rest = rest[:q1].strip()
+            parts = rest.split()
             if len(parts) >= 2:
                 offset_str, name = parts[0], parts[1]
                 try:
@@ -350,6 +360,8 @@ def parse_directives(lines, json_path=None):
                     else:
                         offset = int(offset_str)
                     changes['bss'][offset] = name
+                    if bss_comment:
+                        changes['bss_comments'][offset] = bss_comment
                 except ValueError:
                     changes['warnings'].append(f"/bss/ — invalid offset '{offset_str}'")
             else:
@@ -631,6 +643,12 @@ def merge_into_json(json_path, changes, warn):
             warn(f"BSS at ${offset:04X} renamed: '{existing_bss[key]}' → '{name}'")
         existing_bss[key] = name
     d['bss'] = dict(sorted(existing_bss.items(), key=lambda x: int(x[0])))
+    # Merge bss_comments
+    existing_bss_comments = d.get('bss_comments', {})
+    for offset, cmt in changes.get('bss_comments', {}).items():
+        existing_bss_comments[str(offset)] = cmt
+    if existing_bss_comments:
+        d['bss_comments'] = dict(sorted(existing_bss_comments.items(), key=lambda x: int(x[0])))
     bc = d.get('block_comments', {})
     for addr, lines in changes['block_comments'].items():
         bc[f'{addr:04X}'] = lines
