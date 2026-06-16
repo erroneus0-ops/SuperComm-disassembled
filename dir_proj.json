@@ -34,6 +34,20 @@
   },
   "data_regions": [
     {
+      "start": "046A",
+      "end": "046B",
+      "label": "cwdChar",
+      "format": "auto",
+      "end_label": false
+    },
+    {
+      "start": "046B",
+      "end": "046C",
+      "label": "cwdAndCR",
+      "format": "auto",
+      "end_label": false
+    },
+    {
       "label": "Dat_046E",
       "format": "auto",
       "end_label": true,
