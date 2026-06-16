@@ -756,6 +756,10 @@ $045E  86 01                              LDA #$01
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; Why WritLn not Write?
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
+<<<<<<< HEAD
+$046A  2E 0D               cwdChar:       BGT $0479             
+$046B  0D 40               cwdAndCR:      TST <$40              
+=======
 
 cwdChar
 ; Referenced by: $0022, $02CE
@@ -766,6 +770,7 @@ cwdAndCR
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
          FCB    $0D               ; CR
+>>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
 
 Dat_046C
 ; Referenced by: $00BC
@@ -848,4 +853,131 @@ ModEnd
 ; CRC-24 (3 bytes) appended here by fixmod
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
+<<<<<<< HEAD
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next $XXXX address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /label/ $addr Name
+;     Name a specific address directly — works for data labels too.
+;     Example:
+;         /label/ $046A cwdChar
+;         /label/ $046B cwdAndCR
+;
+; /rename-label/ OldName NewName
+;     Rename an existing label by its current name.
+;     Works for both code and data labels — no address scanning needed.
+;     Example:
+;         /rename-label/ Dat_046A cwdChar
+;         /rename-label/ Dat_046B cwdAndCR
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
+=======
+ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+>>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
