@@ -1,0 +1,413 @@
+; ================================================================
+; dir_proj.clanalyst — Claude's analyst notes for dir
+; ================================================================
+; This file is in markup.py format. Run:
+;   python markup.py dir_proj.clanalyst dir_proj.json
+; to apply changes. Then regenerate the listing.
+;
+; These are observations, hypotheses, and suggested annotations.
+; Daniel's analysis takes precedence — treat this as a cheat sheet,
+; not gospel. Some of this may be wrong.
+; ================================================================
+
+
+; ── BSS MAPPING ─────────────────────────────────────────────────
+;
+; Confirmed or strongly suspected:
+
+/bss/ $00 BSS.DirPath "path number for the directory opened for reading"
+/bss/ $01 BSS.CWDPath "path number for CWD (opened when -e flag set)"
+/bss/ $02 BSS.NextDir "pointer to current directory path string (CR terminated)"
+/bss/ $04 BSS.BufPtr "pointer to end of current token in command line"
+/bss/ $06 BSS.PatPtr "pointer to wildcard pattern string (CR terminated)"
+/bss/ $08 BSS.DirCount "flag: set by -c option (case-insensitive match)"
+/bss/ $0B BSS.AnyFlag "OR of $0D|$0E|$0F — extended|dirs-only|files-only active"
+/bss/ $0C BSS.PatFlag "set when wildcard pattern specified"
+/bss/ $0D BSS.ExtFlag "set by -e or -l: extended listing mode"
+/bss/ $0E BSS.DirOnly "set by -d: show only directory entries"
+/bss/ $0F BSS.FileOnly "set by -f: show only non-directory entries"
+/bss/ $10 BSS.ColWidth "0=single column (-s), 1=multi-column (default)"
+/bss/ $11 BSS.LastCol "terminal column width (from SS.ScSiz, default 80=$50)"
+/bss/ $12 BSS.ColmPos "remaining columns on current line — resets to LastCol each new line"
+/bss/ $13 BSS.DENameLen "length of current filename after FCS→CR reformat"
+/bss/ $17 BSS.OpenMode "I$Open/I$ChgDir mode byte — built from flags"
+/bss/ $25 BSS.PathBuf "output buffer: copy of NextDir path, reformatted for display"
+/bss/ $58 BSS.DEName "RBF directory entry buffer (32 bytes from I$Read)"
+/bss/ $75 BSS.DENend "byte 28 of dir entry — last char of FCS name OR CR terminator"
+/bss/ $76 BSS.wLSN0 "working LSN high byte (shifted from $75 before name reformat)"
+/bss/ $77 BSS.wLSN1 "working LSN middle byte"
+/bss/ $78 BSS.wLSN2 "working LSN low byte"
+/bss/ $79 BSS.$79 "purpose unknown — cleared at init, not seen used after"
+/bss/ $7A BSS.DotChar "dot-file filter char (init='.', cleared by -a to show all)"
+
+
+; ── UNKNOWN BSS ──────────────────────────────────────────────────
+;
+; $09 — match result flag: set=1 by Sub_0317 on match, cleared=0 on no match
+; $0A — column wrap flag: set when filename written to current line
+; $14-$16 — gap between DENameLen and OpenMode — purpose unknown
+;            possibly scratch registers for Sub_0317 pattern matching
+; $15 — used explicitly in Sub_0317 as a temp char storage during wildcard match
+; $26-$57 — gap between PathBuf and DEName — may be part of PathBuf
+;            PathBuf is written up to 255 chars (LDY #$00FF at $010B)
+;            so $25 through $124 could all be PathBuf... but BSS is only $017B
+;            in practice the path is short — $25-$57 covers 51 bytes
+
+/bss/ $09 BSS.MatchFlag "Sub_0317 result: 1=match 0=no match"
+/bss/ $0A BSS.ColFlag "set when at least one entry written to current output line"
+/bss/ $15 BSS.PatTmp "temp char storage during wildcard pattern matching in Sub_0317"
+
+
+; ── SUBROUTINE NOTES ─────────────────────────────────────────────
+
+; Sub_0214 — Option parser
+;   Called when '-' found in command line.
+;   Advances X past '-', reads option letter, uppercases it, dispatches.
+;   Loops back to itself after each option (handles "-els" etc).
+;   Returns (RTS) on space or CR — silent accept of "- " garbage.
+;   Unknown option → prints help and exits.
+;
+;   Dispatch table:
+;     E, L → INC BSS.ExtFlag, CLR BSS.ColWidth  (extended listing)
+;     S    → CLR BSS.ColWidth                   (single column)
+;     D    → INC BSS.DirOnly, CLR BSS.FileOnly  (dirs only)
+;     F    → INC BSS.FileOnly, CLR BSS.DirOnly  (files only)
+;     X    → ADDB #4 (adds to mode byte — exec dir mode)
+;     C    → INC BSS.DirCount (case-insensitive match flag)
+;     A    → CLR BSS.DotChar (show dot files)
+;     ?    → falls through to unknown handler
+
+/label/ $0214 Sub_0214
+/; Option parser — advances past '-', reads letter, uppercases, dispatches/
+$0214  30 01               Sub_0214:      LEAX 1,X              
+
+/label/ $0244 OptRTS
+/label/ $0245 OptC
+/label/ $0249 OptUnknown
+/label/ $0256 OptX
+/label/ $025A OptS
+/label/ $025E OptEL
+/label/ $0264 OptD
+/label/ $026A OptF
+/label/ $0270 OptA
+
+
+; Sub_0274 — Path/pattern argument parser
+;   Called when non-'-' token found on command line.
+;   Saves start of token as BSS.NextDir.
+;   Scans forward consuming valid path chars (alphanum, '.', '-', '_').
+;   On CR or space — terminates and returns (path only, no pattern).
+;   On '*' or '?' — wildcard found: saves as BSS.PatPtr, processes pattern.
+;   On other — error: sets carry, exits via Loc_0451.
+;
+;   Pattern simplification in $02E4-$0314:
+;     Collapses "**" → "*", replaces "?*" → "*?*"
+;     This normalizes the pattern before matching.
+
+/label/ $0274 Sub_0274
+
+
+; Sub_0317 — Wildcard pattern matcher
+;   Called with X→filename, Y→pattern (both CR terminated).
+;   Recursive-style matching with '*' and '?' support.
+;   Result stored in BSS.MatchFlag ($09): 1=match, 0=no match.
+;   Uses BSS.PatTmp ($15) for character comparison temp.
+;   Calls Sub_035F for optional case folding before comparing.
+
+/label/ $0317 Sub_0317
+
+
+; Sub_035F — Conditional uppercase
+;   If BSS.DirCount ($08, the -c flag) is CLEAR, converts lowercase to upper.
+;   If -c set, leaves character unchanged (case-insensitive match).
+;   Wait — that's backwards from what you'd expect.
+;   Re-reading: TST BSS.DirCount, BNE skip_uppercase.
+;   So if DirCount NON-ZERO (flag set by -c), it SKIPS the uppercase.
+;   Meaning -c PRESERVES case for comparison — case-sensitive when -c set?
+;   That contradicts the help text "case insensitive filename match".
+;   HYPOTHESIS: BSS.DirCount may be inverted — set=0 means case-insensitive,
+;   and -c clears it rather than sets it. Need to verify against Init code.
+;   OR: the help text description is from the user's perspective
+;   and the internal logic is inverted. Flag for Daniel to verify.
+
+/label/ $035F Sub_035F
+
+
+; Loc_036E — Extended listing formatter (narrow mode path)
+;   Reached from Loc_01FB when BSS.ExtFlag set AND ColWidth=0 (narrow/single).
+;   Copies filename portion of dirMsg03 (format template) to BSS.PathBuf.
+;   Then fills in: user#, date/time, attributes, sector#, file size.
+;   Uses Sub_042B (byte-to-hex) and Sub_0442 (leading-space trimmer).
+;   Builds complete extended listing line in BSS.PathBuf, then I$WritLn.
+;
+;   The format template dirMsg03:
+;     "       0000/00/00 0000  dsewrewr                   "
+;     Fields (by position in output buffer, U-relative):
+;       $19 (25,U) — user number (2 bytes hex? divmod 100)
+;       $1B (27,U) — year
+;       $1D (29,U) — month  
+;       $1F (31,U) — day
+;       $21 (33,U) — hour:min (4 bytes)
+;       $26 (38,U) — attributes (8 bits → "dsewrewr" format)
+;       $2C (44,U) — sector number (3 bytes hex)
+;       $3D (61,U) — file size fields
+;       $47 (71,U) — file size (3 bytes)
+;       $4F (79,U) — unknown (4 bytes)
+;
+;   Sub_041A — decimal digit formatter
+;     Converts byte value to BCD-style decimal digit pair in output buffer.
+;     Divides by 10 repeatedly, stores ASCII digits.
+;
+;   Sub_042B — byte to two hex digits
+;     Splits byte into high/low nibbles, converts each to ASCII hex.
+;     Calls Sub_0437 for each nibble.
+;
+;   Sub_0437 — nibble to hex ASCII
+;     Adds $30 to nibble. If > '9', adds $07 to get A-F.
+;
+;   Sub_0442 — leading space trimmer
+;     Scans a field for leading "space+zero" pairs and replaces with spaces.
+;     Gives right-justified numeric fields a cleaner look.
+
+/label/ $036E Loc_036E
+/label/ $041A Sub_041A
+/label/ $042B Sub_042B
+/label/ $0437 Sub_0437
+/label/ $0442 Sub_0442
+
+
+; ── MAIN LOOP OVERVIEW ───────────────────────────────────────────
+;
+; Init ($0011):
+;   1. Initialize BSS — ColWidth=1, LastCol=80, DotChar='.', clear flags
+;   2. Set NextDir → cwdChar (the '.' data byte = current dir)
+;   3. Parse command line loop ($002D):
+;      - CR → done parsing, fall through to main body
+;      - space → skip
+;      - '-' → call Sub_0214 (option parser), advance X
+;      - other → call Sub_0274 (path/pattern parser), advance X
+;   4. After parsing:
+;      a. Build open mode from flags → BSS.OpenMode
+;      b. Detect terminal width via SS.ScSiz if ColWidth non-zero
+;      c. I$Open directory → BSS.DirPath
+;      d. I$ChgDir to directory
+;      e. If extended/pattern: I$Open CWD → BSS.CWDPath ($01)
+;      f. Initialize BSS.ColmPos = BSS.LastCol
+;      g. If extended or multi-col: write "Directory of " header
+;      h. Copy path to BSS.PathBuf, I$WritLn path
+;      i. If extended: write column header lines (dirMsg02 via WritBlines)
+;
+; Main read loop ($0126 = Loc_0126):
+;   1. I$Read 32 bytes → BSS.DEName buffer
+;   2. Shift LSN from $75/$76/$77 → $76/$77/$78 (make room for CR terminator)
+;   3. Skip deleted entries ($00 first byte)
+;   4. Skip degenerate entries ($80 first byte → null name)
+;   5. Strip high bit, compare against BSS.DotChar — skip dot entries
+;   6. Count filename length, convert FCS→CR format
+;   7. If pattern set: call Sub_0317 to match — skip on no match
+;   8. If extended flag: call Sub_0317 for attribute filtering
+;   9. If multi-column mode (ColWidth=1):
+;      - If filename fits on current line: write it, pad with spaces
+;      - If not: emit CR, start new line, write filename
+;   10. If single-column (ColWidth=0):
+;       - If extended flag: format full extended line via Loc_036E
+;       - Else: simple I$WritLn of filename
+;   11. Loop to $0126
+;
+; Error/exit ($0451 = Loc_0451):
+;   - Special-cases error $D3 (end-of-file on directory) → clears B = normal exit
+;   - If multi-column and something was written: emit final CR
+;   - F$Exit with B as status
+
+/comment/ $0011
+Init — program entry point.
+Initializes BSS, parses command line, opens directory, runs main listing loop.
+/end-comment/
+
+/comment/ $002D
+Command line parse loop.
+X points at OS-9 parameter string (does not include program name).
+Dispatches on: CR (done), space (skip), '-' (option), other (path/pattern).
+/end-comment/
+
+/comment/ $005F
+End of command line parsing.
+Build BSS.AnyFlag = BSS.ExtFlag | BSS.DirOnly | BSS.FileOnly.
+Then detect terminal width if multi-column mode active.
+/end-comment/
+
+/comment/ $0069
+Terminal width detection via I$GetStt subcode $20 (PD.OPT offset in path descriptor).
+B returned in X after TFR X,D.
+Thresholds: ≥$50(80)=full, ≥$40(64)=64-col, ≥$30(48)=48-col, ≥$20(32)=32-col, <$20=disable columns.
+$D0 error = non-CCIO device, also disables columns.
+/end-comment/
+
+/comment/ $00A0
+Open the directory for reading.
+Mode = BSS.OpenMode | $80 (read + directory bit).
+/end-comment/
+
+/comment/ $00B6
+If AnyFlag set (extended or filter mode), also open CWD separately.
+CWD path is the '@'+CR pair at Dat_046C — OS-9 shorthand for current execution dir.
+Wait — that's execution dir (@), not current data dir (.).
+For -e extended mode, the program needs file descriptor info requiring a second open.
+/end-comment/
+
+/comment/ $00C9
+Initialize column position to terminal width.
+If neither extended nor multi-column: skip header, go straight to read loop.
+/end-comment/
+
+/comment/ $00D3
+Write "Directory of " header (15 bytes, no CR — path follows on same line).
+/end-comment/
+
+/comment/ $00E4
+Copy BSS.NextDir path string to BSS.PathBuf.
+If pattern flag set (-p), append '/' and pattern after path.
+Then I$WritLn the full path — this is the "Directory of /dd/CMDS" header line.
+/end-comment/
+
+/comment/ $0114
+If extended mode: write column headers (dirMsg02) via WritBlines.
+dirMsg02 = "User # Last Modified..." header + separator line.
+/end-comment/
+
+/comment/ $0126
+Main directory read loop.
+Reads one 32-byte RBF directory entry per iteration.
+End-of-directory detected at Loc_0451 via error $D3 from I$Read.
+/end-comment/
+
+/comment/ $0136
+Shift LSN bytes one position down in BSS before reformatting filename.
+Reason: FCS→CR reformat may write CR at $75 (BSS.DENend), overwriting LSN0.
+After shift, LSN lives at wLSN0/1/2 ($76/$77/$78) — safe from CR overwrite.
+The 32-byte I$Read call deposits a 33-byte working structure by design.
+/end-comment/
+
+/comment/ $013E
+Filter pipeline for directory entries:
+  $00 → deleted/empty slot — skip
+  $80 → null FCS name (degenerate) — skip length count, go to Loc_014C
+  strip bit 7, compare to BSS.DotChar:
+    if match → dot/dotdot entry — skip (unless -a cleared DotChar)
+/end-comment/
+
+/comment/ $014C
+Count filename length and convert FCS format to CR-terminated string.
+FCS = last character has bit 7 set as end-of-name marker.
+BCS loop continues while char < $80 (bit 7 clear).
+After loop: strip bit 7 from last char, append CR at ,X.
+Store length in BSS.DENameLen.
+/end-comment/
+
+/comment/ $0161
+If pattern flag set: call Sub_0317 to wildcard-match filename against pattern.
+Sub_035F (called inside Sub_0317) optionally uppercases for case-insensitive compare.
+If no match: loop back to $0126 for next entry.
+/end-comment/
+
+/comment/ $0172
+If AnyFlag set (extended or filter mode):
+  Call I$GetStt on CWD path to get file attributes.
+  BSS.$18 bit 7 = directory attribute bit.
+  If DirOnly set:  skip non-directory entries.
+  If FileOnly set: skip directory entries.
+/end-comment/
+
+/comment/ $01A4
+Column layout decision:
+  ColWidth=0 → single column mode → branch to $01FB
+  ColWidth=1 → multi-column mode → continue here
+  Compare filename length against remaining column space.
+  If fits: write filename, pad spaces, update ColmPos.
+  If doesn't fit: emit CR, reset ColmPos, write filename on new line.
+/end-comment/
+
+/comment/ $01B0
+Filename fits on current line.
+I$Write the filename (not WritLn — no CR yet, more entries may follow).
+Compute padding: subtract filename len from ColmPos in steps of 16.
+Write padding spaces from Dat_0519 (19-space pad string).
+Loop back to $0126.
+/end-comment/
+
+/comment/ $01DF
+Filename didn't fit — start new line.
+I$WritLn cwdAndCR (just a CR byte) to terminate current line.
+Reset ColmPos to LastCol (full width again).
+If BSS.ColFlag set (something was on this line before): loop to pad logic.
+Otherwise loop to $0126.
+/end-comment/
+
+/comment/ $01FB
+Single-column narrow mode entry point.
+Reached when ColWidth=0 (set by -s, or forced by narrow terminal).
+If ExtFlag set → format full extended line via Loc_036E.
+If ExtFlag clear → simple I$WritLn of filename (30 bytes).
+/end-comment/
+
+/comment/ $036E
+Extended listing formatter.
+Reached when -e/-l AND single-column mode.
+Copies filename portion from dirMsg03 format template to BSS.PathBuf.
+Then fills in metadata fields by reading from file descriptor sector.
+Uses wLSN0/1/2 to locate the file descriptor sector.
+Field order in output: user#, date, time, attributes, sector, size, filename.
+Sub_041A: converts byte to 2 decimal ASCII digits in output buffer.
+Sub_042B: converts byte to 2 hex ASCII digits.
+Sub_0442: strips leading "space+zero" for cleaner numeric fields.
+/end-comment/
+
+/comment/ $0451
+Error/exit handler.
+Error $D3 = end-of-directory (I$Read past last entry) = normal termination.
+If multi-column and ColWidth still set: emit final CR to terminate last line.
+F$Exit with B = 0 (normal) or error code.
+/end-comment/
+
+
+; ── DATA LABEL SUGGESTIONS ───────────────────────────────────────
+;
+; Dat_046C — the '@'+CR pair used to I$Open the execution directory.
+;   @ is OS-9's shorthand for the current execution directory.
+;   Only opened when extended or filter mode active (BSS.$0B set).
+;   Suggest renaming: execDir
+
+/rename-label/ Dat_046C execDir
+
+
+; ── OPEN QUESTIONS FOR DANIEL ────────────────────────────────────
+;
+; 1. Sub_035F case logic — does -c flag mean case-sensitive or insensitive?
+;    Help text says "case insensitive" but the code skips uppercasing when
+;    the flag is SET. Either the help text is misleading or the flag is inverted.
+;
+; 2. BSS.$14-$16 — three bytes between DENameLen and OpenMode.
+;    $15 is used in Sub_0317 as PatTmp. What are $14 and $16?
+;
+; 3. BSS.$79 — cleared at init ($002B: CLR <BSS.$79), never seen written again.
+;    May be set by a syscall return value that we're not tracking.
+;
+; 4. BSS.$18 — loaded at $0190 (LDA <$18) to check bit 7 for directory attribute.
+;    This is at ,U+$18 relative. Is $18 a named field we should add to BSS?
+;    It's inside the gap $14-$24 which is mostly unmapped.
+;
+; 5. Loc_0451 — the $D3 special case.
+;    $D3 = 211 decimal. Is this a standard OS-9 error code for EOF on RBF?
+;    Or is it an I$Read return code meaning "end of directory"?
+;    Worth confirming against the OS-9 error code table.
+;
+; 6. WritBlines — PSHS/PULS D instead of STD/LDD.
+;    The code uses PSHS A,B and PULS A,B around TFR Y,D / LEAX D,X.
+;    This is because after I$WritLn, Y contains bytes written, and we need
+;    that in D to add to X. There is no PSHS D instruction but PSHS A,B
+;    and PSHS D produce identical postbytes ($06) — same machine code.
+;
+; 7. The -x option (OptX: ADDB #4) adds 4 to B.
+;    B is the open mode byte. Mode $05 = O.Dir (read directory).
+;    $05 + $04 = $09. What does mode $09 mean in OS-9?
+;    Likely: O.Dir | O.Exec = open in exec directory instead of data directory.
