@@ -505,10 +505,11 @@ def parse_directives(lines, json_path=None):
                 changes['warnings'].append(f"/format/ '{fmt}' — could not find preceding data label")
 
         # ── /region/ $start $end [format] [label] [endlabel] ────────────────
-        elif line.startswith('/region/'):
-            parts = line[len('/region/'):].strip().split()
+        elif line.startswith('/region/') or line.startswith('/dlabel/'):
+            prefix = '/region/' if line.startswith('/region/') else '/dlabel/'
+            parts = line[len(prefix):].strip().split()
             if len(parts) < 2:
-                changes['warnings'].append(f"/region/ — expected '$start $end [format] [label] [endlabel]'")
+                changes['warnings'].append(f"{prefix} — expected '$start $end [format] [label] [endlabel]'")
             else:
                 try:
                     start_v = int(parts[0].lstrip('$'), 16)
