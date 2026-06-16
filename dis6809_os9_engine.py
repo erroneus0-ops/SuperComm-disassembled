@@ -2638,11 +2638,11 @@ MARKUP_QUICK_REF = """
 ;     Declare a data region. /dlabel/ is an alias for /region/ with a name
 ;     that signals "this is a named data label".
 ;     Format: auto text fdb hexdump raw writeblock
-;     endlabel — emit a NameEnd label at the region boundary.
+;     +endlabel — emit a NameEnd label at the region boundary.
 ;     Example:
 ;         /dlabel/ $046A $046B auto cwdChar
 ;         /dlabel/ $046B $046C auto cwdAndCR
-;         /region/ $052C $06A7 text endlabel
+;         /region/ $052C $06A7 text +endlabel
 ;
 ; /format/ fmt
 ;     Set format for the preceding data label's region.

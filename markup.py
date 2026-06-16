@@ -509,17 +509,17 @@ def parse_directives(lines, json_path=None):
             prefix = '/region/' if line.startswith('/region/') else '/dlabel/'
             parts = line[len(prefix):].strip().split()
             if len(parts) < 2:
-                changes['warnings'].append(f"{prefix} — expected '$start $end [format] [label] [endlabel]'")
+                changes['warnings'].append(f"{prefix} — expected '$start $end [format] [label] [+endlabel]'")
             else:
                 try:
                     start_v = int(parts[0].lstrip('$'), 16)
                     end_v   = int(parts[1].lstrip('$'), 16)
-                    fmt     = parts[2] if len(parts) > 2 and parts[2] != 'endlabel' else 'auto'
+                    fmt     = parts[2] if len(parts) > 2 and parts[2] not in ('endlabel','+endlabel') else 'auto'
                     # label is next non-'endlabel' part after format
                     label   = ''
                     end_lbl = False
                     for p in parts[3:]:
-                        if p == 'endlabel':
+                        if p in ('endlabel', '+endlabel'):
                             end_lbl = True
                         elif not label:
                             label = p
