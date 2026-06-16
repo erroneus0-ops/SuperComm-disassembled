@@ -414,13 +414,13 @@ $020D  10 25 02 40                        LBCS Loc_0451
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
-$0214  30 01               Sub_0214:      LEAX 1,X              
-$0216  A6 84                              LDA ,X                
+$0214  30 01               Sub_0214:      LEAX 1,X              /; Advance X by one... /
+$0216  A6 84                              LDA ,X                /; why not lda 1,x+? /
 $0218  81 20                              CMPA #$20             /; is it a space? /
 $021A  27 28                              BEQ Loc_0244          /; ...go RTS /
 $021C  81 0D                              CMPA #$0D             /; At the end of the cmdlin? /
 $021E  27 24                              BEQ Loc_0244          /; yeah, prolly... go RTS /
-$0220  84 DF                              ANDA #$DF             
+$0220  84 DF                              ANDA #$DF             /; A & %11011111 == toUpper() /
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
 $0226  81 53                              CMPA #$53              ; compare A with 'S'
@@ -746,22 +746,24 @@ $044D  E7 80                              STB ,X+
 $044F  20 F4                              BRA Loc_0445          
 
 ; --------------------------------------------------------------
-$0451  C1 D3               Loc_0451:      CMPB #$D3             
+$0451  C1 D3               Loc_0451:      CMPB #$D3             /; %11010011 ?/
 $0453  26 01                              BNE Loc_0456          
 $0455  5F                                 CLRB                   ; B = 0
-$0456  0D 10               Loc_0456:      TST <BSS.ColWidth     
-$0458  27 0D                              BEQ Loc_0467          
+$0456  0D 10               Loc_0456:      TST <BSS.ColWidth     /; That variable /
+$0458  27 0D                              BEQ Loc_0467          /; Don't like TST=0? Fine! Quit! /
 $045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
 $045E  86 01                              LDA #$01              
 $0460  10 8E 00 01                        LDY #$0001            
-$0464  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
+$0464  10 3F 8C                           OS9 I$WritLn          /; Why WritLn not Write? /
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
 
+/label/ cwdChar
 Dat_046A
 ; Referenced by: $0022, $02CE
 ; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
 
+/label/ cwdAndCR
 Dat_046B
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
