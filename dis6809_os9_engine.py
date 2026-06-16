@@ -901,12 +901,20 @@ class Engine:
         ind = (pb & 0x10) != 0
         w = lambda s: f"[{s}]" if ind else s
 
+        def u_hex_cmt(off):
+            """Return hex comment for unnamed U-relative offset."""
+            if off < 0:
+                return f"-${(-off):02X} (${off & 0xFF:02X})"
+            return f"${off:02X}"
+
         if not (pb & 0x80):
             off = pb & 0x1F
             if off >= 16: off -= 32
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
+                cmt = u_hex_cmt(off)
+                return f"{off},U\t; {cmt}", pos
             return f"{off},{rn}", pos
 
         md = pb & 0x1F
@@ -922,12 +930,16 @@ class Engine:
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
+                cmt = u_hex_cmt(off)
+                return w(f"{off},U\t; {cmt}"), pos
             return w(f"{off},{rn}"), pos
         elif md == 0x09:
             off = s16((d[pos]<<8)|d[pos+1]); pos += 2
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
+                cmt = u_hex_cmt(off)
+                return w(f"{off},U\t; ${off:04X}"), pos
             return w(f"{off},{rn}"), pos
         elif md == 0x0B: return w(f"D,{rn}"), pos
         elif md == 0x0C or md == 0x1C:  # 8-bit PCR (direct or indirect)
