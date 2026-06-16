@@ -124,5 +124,8 @@
   "routines": [],
   "footnotes": {},
   "forced_equs": {},
-  "patches": {}
+  "patches": {},
+  "hex_offsets": [
+    "U"
+  ]
 }

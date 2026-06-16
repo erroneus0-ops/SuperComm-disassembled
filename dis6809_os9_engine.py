@@ -324,6 +324,7 @@ class Project:
         self.forced_equs  = {}        # int_addr -> comment (emit as EQU, not instruction)
         self.substitutions= {}        # int_addr -> {replace_lines, with_lines}
         self.routines     = []        # [{name, start, end}] routine boundaries
+        self.hex_offsets  = []        # list of registers to show hex offset comments: X Y U S PC
 
     @classmethod
     def from_json(cls, path):
@@ -340,6 +341,7 @@ class Project:
         p.custom_equates= d.get('custom_equates', [])
         p.emit_equates  = d.get('emit_equates', True)
         p.defs_file     = d.get('defs_file', None)
+        p.hex_offsets   = d.get('hex_offsets', [])
 
         # entry: hex string or None
         entry = d.get('entry', None)
@@ -425,6 +427,7 @@ class Project:
             'custom_equates': self.custom_equates,
             'emit_equates':   self.emit_equates,
             'defs_file':      self.defs_file,
+            'hex_offsets':    self.hex_offsets,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
             'data_regions':   [
@@ -901,11 +904,18 @@ class Engine:
         ind = (pb & 0x10) != 0
         w = lambda s: f"[{s}]" if ind else s
 
-        def u_hex_cmt(off):
-            """Return hex comment for unnamed U-relative offset."""
+        def u_hex_cmt(off, nbytes=1):
+            """Return hex comment for unnamed offset — used when rn in hex_offsets."""
             if off < 0:
-                return f"-${(-off):02X} (${off & 0xFF:02X})"
-            return f"${off:02X}"
+                mask = 0xFF if nbytes == 1 else 0xFFFF
+                return f"-${(-off):02X} (${off & mask:0{nbytes*2}X})"
+            return f"${off:0{nbytes*2}X}"
+
+        def maybe_hex(off, rn, nbytes=1):
+            """Return hex comment string if rn is in hex_offsets, else empty string."""
+            if rn in self.project.hex_offsets:
+                return f"\t; {u_hex_cmt(off, nbytes)}"
+            return ""
 
         if not (pb & 0x80):
             off = pb & 0x1F
@@ -913,9 +923,8 @@ class Engine:
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
-                cmt = u_hex_cmt(off)
-                return f"{off},U\t; {cmt}", pos
-            return f"{off},{rn}", pos
+            cmt = maybe_hex(off, rn, 1)
+            return f"{off},{rn}{cmt}", pos
 
         md = pb & 0x1F
         if md == 0x00: return w(f",{rn}+"),  pos
@@ -930,17 +939,15 @@ class Engine:
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
-                cmt = u_hex_cmt(off)
-                return w(f"{off},U\t; {cmt}"), pos
-            return w(f"{off},{rn}"), pos
+            cmt = maybe_hex(off, rn, 1)
+            return w(f"{off},{rn}{cmt}"), pos
         elif md == 0x09:
             off = s16((d[pos]<<8)|d[pos+1]); pos += 2
             if rn == 'U' and not ind:
                 bn = self.project.bss.get(off,'')
                 if bn: return f"{bn},U", pos
-                cmt = u_hex_cmt(off)
-                return w(f"{off},U\t; ${off:04X}"), pos
-            return w(f"{off},{rn}"), pos
+            cmt = maybe_hex(off, rn, 2)
+            return w(f"{off},{rn}{cmt}"), pos
         elif md == 0x0B: return w(f"D,{rn}"), pos
         elif md == 0x0C or md == 0x1C:  # 8-bit PCR (direct or indirect)
             off = s8(d[pos]); pos += 1; tgt = pos+off
