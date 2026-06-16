@@ -137,7 +137,7 @@ BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
 BSS.LastCol   EQU    $11      ; 1 byte
 BSS.ColmPos   EQU    $12      ; 1 byte
-BSS.DENameLen EQU    $13      ; 4 bytes — byte count of file name
+BSS.DENameLen EQU    $13      ; byte count of file name
 BSS.$17       EQU    $17      ; 14 bytes
 BSS.$25       EQU    $25      ; 51 bytes
 BSS.DEName    EQU    $58      ; 29 bytes
