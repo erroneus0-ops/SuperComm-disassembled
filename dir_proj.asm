@@ -416,10 +416,10 @@ $0211  16 FF 12                           LBRA Loc_0126
 ; --------------------------------------------------------------
 $0214  30 01               Sub_0214:      LEAX 1,X              
 $0216  A6 84                              LDA ,X                
-$0218  81 20                              CMPA #$20              ; compare A with ' '
-$021A  27 28                              BEQ Loc_0244          
-$021C  81 0D                              CMPA #$0D              ; compare A with CR
-$021E  27 24                              BEQ Loc_0244          
+$0218  81 20                              CMPA #$20             /; is it a space? /
+$021A  27 28                              BEQ Loc_0244          /; ...go RTS /
+$021C  81 0D                              CMPA #$0D             /; At the end of the cmdlin? /
+$021E  27 24                              BEQ Loc_0244          /; yeah, prolly... go RTS /
 $0220  84 DF                              ANDA #$DF             
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
