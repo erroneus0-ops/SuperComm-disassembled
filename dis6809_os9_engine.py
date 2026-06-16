@@ -1693,7 +1693,7 @@ class Engine:
                 else:
                     size_cmt = "?"
                 extra = proj.bss_comments.get(off, '')
-                cmt = f"{size_cmt} — {extra}" if extra else size_cmt
+                cmt = extra if extra else size_cmt
                 out.append(f"{name_str:<14}EQU    ${off:02X}      ; {cmt}")
             out.append("")
 
