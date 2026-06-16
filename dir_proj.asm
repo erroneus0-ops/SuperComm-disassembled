@@ -414,12 +414,12 @@ $020D  10 25 02 40                        LBCS Loc_0451
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
-$0214  30 01               Sub_0214:      LEAX 1,X               ; Advance X by one...
-$0216  A6 84                              LDA ,X                 ; why not lda 1,x+?
+$0214  30 01               Sub_0214:      LEAX 1,X               ; X=X+1
+$0216  A6 84                              LDA ,X                 ; get the next byte
 $0218  81 20                              CMPA #$20              ; is it a space?
 $021A  27 28                              BEQ Loc_0244           ; ...go RTS
 $021C  81 0D                              CMPA #$0D              ; At the end of the cmdlin?
-$021E  27 24                              BEQ Loc_0244           ; yeah, prolly... go RTS
+$021E  27 24                              BEQ Loc_0244           ; yeah, prolly ...go RTS
 $0220  84 DF                              ANDA #$DF              ; A & %11011111 == toUpper()
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
@@ -761,11 +761,13 @@ cwdChar
 ; Referenced by: $0022, $02CE
 ; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
+cwdCharend
 
 cwdAndCR
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
          FCB    $0D               ; CR
+cwdAndCRend
 
 Dat_046C
 ; Referenced by: $00BC
@@ -890,11 +892,11 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Declare a data region. /dlabel/ is an alias for /region/ with a name
 ;     that signals "this is a named data label".
 ;     Format: auto text fdb hexdump raw writeblock
-;     endlabel — emit a NameEnd label at the region boundary.
+;     +endlabel — emit a NameEnd label at the region boundary.
 ;     Example:
 ;         /dlabel/ $046A $046B auto cwdChar
 ;         /dlabel/ $046B $046C auto cwdAndCR
-;         /region/ $052C $06A7 text endlabel
+;         /region/ $052C $06A7 text +endlabel
 ;
 ; /format/ fmt
 ;     Set format for the preceding data label's region.
