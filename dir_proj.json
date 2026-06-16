@@ -29,26 +29,13 @@
     "15": "BSS.$0F",
     "16": "BSS.ColWidth",
     "17": "BSS.LastCol",
+    "18": "BSS.$12",
     "23": "BSS.$17",
     "37": "BSS.$25",
     "121": "BSS.$79",
     "122": "BSS.DotChar"
   },
   "data_regions": [
-    {
-      "start": "046A",
-      "end": "046B",
-      "label": "cwdChar",
-      "format": "auto",
-      "end_label": false
-    },
-    {
-      "start": "046B",
-      "end": "046C",
-      "label": "cwdAndCR",
-      "format": "auto",
-      "end_label": false
-    },
     {
       "label": "Dat_046E",
       "format": "auto",
@@ -83,6 +70,20 @@
       "start": "052C",
       "end": "06A7",
       "format": "text"
+    },
+    {
+      "start": "046A",
+      "end": "046B",
+      "format": "auto",
+      "label": "cwdChar",
+      "end_label": true
+    },
+    {
+      "start": "046B",
+      "end": "046C",
+      "format": "auto",
+      "label": "cwdAndCR",
+      "end_label": true
     }
   ],
   "line_comments": {
@@ -92,12 +93,12 @@
     "0118": "LDA=$01 (output path), LDB=$02 (Number of lines)",
     "011B": "X \u2192 Address of output lines",
     "011F": "call write out lines",
-    "0214": "Advance X by one...",
-    "0216": "why not lda 1,x+?",
+    "0214": "X=X+1",
+    "0216": "get the next byte",
     "0218": "is it a space?",
     "021A": "...go RTS",
     "021C": "At the end of the cmdlin?",
-    "021E": "yeah, prolly... go RTS",
+    "021E": "yeah, prolly ...go RTS",
     "0220": "A & %11011111 == toUpper()",
     "0451": "%11010011 ?",
     "0456": "That variable",

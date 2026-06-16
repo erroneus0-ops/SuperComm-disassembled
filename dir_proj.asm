@@ -135,7 +135,8 @@ BSS.$0D       EQU    $0D      ; 1 byte
 BSS.$0E       EQU    $0E      ; 1 byte
 BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
-BSS.LastCol   EQU    $11      ; 6 bytes
+BSS.LastCol   EQU    $11      ; 1 byte
+BSS.$12       EQU    $12      ; 5 bytes
 BSS.$17       EQU    $17      ; 14 bytes
 BSS.$25       EQU    $25      ; 84 bytes
 BSS.$79       EQU    $79      ; 1 byte
@@ -267,7 +268,7 @@ $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name�
 $00C3  10 25 03 8A                        LBCS Loc_0451         
 $00C7  97 01                              STA <$01              
 $00C9  96 11               Loc_00C9:      LDA <BSS.LastCol      
-$00CB  97 12                              STA <$12              
+$00CB  97 12                              STA <BSS.$12          
 $00CD  96 0D                              LDA <BSS.$0D          
 $00CF  9A 10                              ORA <BSS.ColWidth     
 $00D1  27 53                              BEQ Loc_0126          
@@ -367,7 +368,7 @@ $01A4  0D 10               Loc_01A4:      TST <BSS.ColWidth
 $01A6  27 53                              BEQ Loc_01FB          
 $01A8  0F 0A                              CLR <$0A              
 $01AA  D6 13                              LDB <$13              
-$01AC  D1 12                              CMPB <$12             
+$01AC  D1 12                              CMPB <BSS.$12         
 $01AE  2C 2F                              BGE Loc_01DF          
 $01B0  0C 0A               Loc_01B0:      INC <$0A              
 $01B2  4F                                 CLRA                   ; A = 0
@@ -376,13 +377,13 @@ $01B5  4C                                 INCA
 $01B6  30 C8 58                           LEAX 88,U             
 $01B9  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $01BC  10 25 02 91                        LBCS Loc_0451         
-$01C0  96 12                              LDA <$12              
+$01C0  96 12                              LDA <BSS.$12          
 $01C2  80 10               Loc_01C2:      SUBA #$10             
 $01C4  2F 19                              BLE Loc_01DF          
 $01C6  C0 10                              SUBB #$10             
 $01C8  2C F8                              BGE Loc_01C2          
 $01CA  50                                 NEGB                  
-$01CB  97 12                              STA <$12              
+$01CB  97 12                              STA <BSS.$12          
 $01CD  4F                                 CLRA                   ; A = 0
 $01CE  1F 02                              TFR D,Y               
 $01D0  4C                                 INCA                  
@@ -398,7 +399,7 @@ $01E5  30 8D 02 82                        LEAX cwdAndCR,PC       ; X → cwdAndC
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $01EC  10 25 02 61                        LBCS Loc_0451         
 $01F0  96 11                              LDA <BSS.LastCol      
-$01F2  97 12                              STA <$12              
+$01F2  97 12                              STA <BSS.$12          
 $01F4  0D 0A                              TST <$0A              
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
@@ -414,12 +415,12 @@ $020D  10 25 02 40                        LBCS Loc_0451
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
-$0214  30 01               Sub_0214:      LEAX 1,X               ; Advance X by one...
-$0216  A6 84                              LDA ,X                 ; why not lda 1,x+?
+$0214  30 01               Sub_0214:      LEAX 1,X               ; X=X+1
+$0216  A6 84                              LDA ,X                 ; get the next byte
 $0218  81 20                              CMPA #$20              ; is it a space?
 $021A  27 28                              BEQ Loc_0244           ; ...go RTS
 $021C  81 0D                              CMPA #$0D              ; At the end of the cmdlin?
-$021E  27 24                              BEQ Loc_0244           ; yeah, prolly... go RTS
+$021E  27 24                              BEQ Loc_0244           ; yeah, prolly ...go RTS
 $0220  84 DF                              ANDA #$DF              ; A & %11011111 == toUpper()
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
@@ -756,21 +757,18 @@ $045E  86 01                              LDA #$01
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; Why WritLn not Write?
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
-<<<<<<< HEAD
-$046A  2E 0D               cwdChar:       BGT $0479             
-$046B  0D 40               cwdAndCR:      TST <$40              
-=======
 
 cwdChar
 ; Referenced by: $0022, $02CE
 ; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
+cwdCharend
 
 cwdAndCR
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
          FCB    $0D               ; CR
->>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
+cwdAndCRend
 
 Dat_046C
 ; Referenced by: $00BC
@@ -853,7 +851,6 @@ ModEnd
 ; CRC-24 (3 bytes) appended here by fixmod
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
-<<<<<<< HEAD
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; MARKUP QUICK REFERENCE  (markup.py directives)
@@ -892,11 +889,15 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ── Data regions ──────────────────────────────────────────────
 ;
 ; /region/ $start $end [format] [label] [endlabel]
-;     Declare a data region. Format: auto text fdb hexdump raw writeblock
-;     endlabel — emit a NameEnd label at the region boundary.
+; /dlabel/ $start $end [format] [label] [endlabel]
+;     Declare a data region. /dlabel/ is an alias for /region/ with a name
+;     that signals "this is a named data label".
+;     Format: auto text fdb hexdump raw writeblock
+;     +endlabel — emit a NameEnd label at the region boundary.
 ;     Example:
-;         /region/ $052C $06A7 text endlabel
-;         /region/ $047D $052C text Dat_047D
+;         /dlabel/ $046A $046B auto cwdChar
+;         /dlabel/ $046B $046C auto cwdAndCR
+;         /region/ $052C $06A7 text +endlabel
 ;
 ; /format/ fmt
 ;     Set format for the preceding data label's region.
@@ -978,6 +979,3 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Mark a routine boundary for structural annotation.
 ;
 ; ══════════════════════════════════════════════════════════════
-=======
-ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
->>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
