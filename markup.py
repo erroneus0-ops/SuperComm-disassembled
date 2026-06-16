@@ -306,14 +306,27 @@ def parse_directives(lines, json_path=None):
             i += 1
             continue
 
-        # ── /label/ Name ─────────────────────────────────────────────────────
+        # ── /label/ Name  OR  /label/ $addr Name ────────────────────────────
         if line.startswith('/label/'):
-            name = line[len('/label/'):].strip()
-            addr = next_addr_from_lines(lines, i + 1)
-            if addr is not None:
-                changes['labels'][addr] = name
+            parts = line[len('/label/'):].strip().split()
+            if len(parts) >= 2 and parts[0].startswith('$'):
+                # Explicit address form: /label/ $046A cwdChar
+                try:
+                    addr = int(parts[0].lstrip('$'), 16)
+                    name = parts[1]
+                    changes['labels'][addr] = name
+                except ValueError:
+                    changes['warnings'].append(f"/label/ — invalid address '{parts[0]}'")
+            elif len(parts) >= 1:
+                # Scan-forward form: /label/ Name
+                name = parts[0]
+                addr = next_addr_from_lines(lines, i + 1)
+                if addr is not None:
+                    changes['labels'][addr] = name
+                else:
+                    changes['warnings'].append(f"/label/ '{name}' — could not find address")
             else:
-                changes['warnings'].append(f"/label/ '{name}' — could not find address")
+                changes['warnings'].append("/label/ — missing name")
 
         # ── /rename-label/ OldName NewName ────────────────────────────────────
         elif line.startswith('/rename-label/'):

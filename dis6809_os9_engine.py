@@ -2607,10 +2607,16 @@ MARKUP_QUICK_REF = """
 ; ── Labeling ──────────────────────────────────────────────────
 ;
 ; /label/ Name
-;     Name the next address in the listing.
+;     Name the next $XXXX address in the listing.
 ;     Example:
 ;         /label/ Sub_ReadDir
 ;         $0126  96 00    LDA <$00
+;
+; /label/ $addr Name
+;     Name a specific address directly — works for data labels too.
+;     Example:
+;         /label/ $046A cwdChar
+;         /label/ $046B cwdAndCR
 ;
 ; /rename-label/ OldName NewName
 ;     Rename an existing label by its current name.
