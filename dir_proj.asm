@@ -137,7 +137,8 @@ BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
 BSS.LastCol   EQU    $11      ; 6 bytes
 BSS.$17       EQU    $17      ; 14 bytes
-BSS.$25       EQU    $25      ; 84 bytes
+BSS.$25       EQU    $25      ; 81 bytes
+BSS.$76       EQU    $76      ; 3 bytes
 BSS.$79       EQU    $79      ; 1 byte
 BSS.DotChar   EQU    $7A      ; ?
 
@@ -173,8 +174,8 @@ ModName
 ; ==============================================================
 
 $0011  CC 01 50            Init:          LDD #$0150            
-$0014  DD 10                              STD <BSS.ColWidth     
-$0016  86 2E                              LDA #$2E               ; A = '.'
+$0014  DD 10                              STD <BSS.ColWidth      ; ColWidth=1, LastCol=80
+$0016  86 2E                              LDA #$2E               ; A = '.' current directory
 $0018  97 7A                              STA <BSS.DotChar      
 $001A  4F                                 CLRA                   ; A = 0
 $001B  5F                                 CLRB                   ; B = 0
@@ -271,7 +272,7 @@ $00CB  97 12                              STA <$12
 $00CD  96 0D                              LDA <BSS.$0D          
 $00CF  9A 10                              ORA <BSS.ColWidth     
 $00D1  27 53                              BEQ Loc_0126          
-$00D3  30 8D 03 97                        LEAX Dat_046E,PC       ; X → Dat_046E
+$00D3  30 8D 03 97                        LEAX dirMsg01,PC       ; X → dirMsg01
 $00D7  10 8E 00 0F                        LDY #$000F            
 $00DB  86 01                              LDA #$01              
 $00DD  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
@@ -285,7 +286,7 @@ $00EF  26 F8                              BNE Loc_00E9           ; Nope?  Keep l
 $00F1  0D 0C                              TST <BSS.$0C          
 $00F3  27 13                              BEQ Loc_0108          
 $00F5  86 2F                              LDA #$2F               ; A = '/'
-$00F7  A7 3F                              STA -1,Y              
+$00F7  A7 3F                              STA -1,Y               ; Replace the $0D(CR) with "/"
 $00F9  9E 06                              LDX <BSS.PatPtr       
 $00FB  A6 80               Loc_00FB:      LDA ,X+               
 $00FD  17 02 5F                           LBSR Sub_035F          ; call Sub_035F
@@ -300,7 +301,7 @@ $0111  10 3F 8C                           OS9 I$WritLn           ; path=A  buf�
 $0114  0D 0D                              TST <BSS.$0D          
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
-$011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Address of output lines
+$011B  30 8D 03 5E                        LEAX dirMsg02,PC       ; X → Address of output lines
 $011F  17 05 85                           LBSR WritBlines        ; call write out lines
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
@@ -308,15 +309,15 @@ $0128  10 8E 00 20                        LDY #$0020
 $012C  30 C8 58                           LEAX 88,U	; $58       
 $012F  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
 $0132  10 25 03 1B                        LBCS Loc_0451         
-$0136  DC 76                              LDD <$76              
+$0136  DC 76                              LDD <BSS.$76          
 $0138  DD 77                              STD <$77              
 $013A  96 75                              LDA <$75              
-$013C  97 76                              STA <$76              
+$013C  97 76                              STA <BSS.$76          
 $013E  96 58                              LDA <$58              
 $0140  27 E4                              BEQ Loc_0126          
 $0142  81 80                              CMPA #$80             
 $0144  27 06                              BEQ Loc_014C          
-$0146  84 7F                              ANDA #$7F             
+$0146  84 7F                              ANDA #$7F              ; A & %01111111=stripSignBit()
 $0148  91 7A                              CMPA <BSS.DotChar     
 $014A  27 DA                              BEQ Loc_0126          
 $014C  5F                  Loc_014C:      CLRB                   ; B = 0
@@ -342,7 +343,7 @@ $0174  27 2E                              BEQ Loc_01A4
 $0176  34 40                              PSHS U                
 $0178  30 C8 18                           LEAX 24,U	; $18       
 $017B  C6 0D                              LDB #$0D               ; B = CR
-$017D  96 76                              LDA <$76              
+$017D  96 76                              LDA <BSS.$76          
 $017F  1F 02                              TFR D,Y               
 $0181  DE 77                              LDU <$77              
 $0183  96 01                              LDA <$01              
@@ -446,7 +447,7 @@ $0247  20 CB                              BRA Sub_0214
 
 ; --------------------------------------------------------------
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
-$024C  30 8D 02 DC                        LEAX Dat_052C,PC       ; X → Dat_052C
+$024C  30 8D 02 DC                        LEAX helpMsg,PC        ; X → helpMsg
 $0250  17 04 54                           LBSR WritBlines        ; call WritBlines
 $0253  16 01 FB                           LBRA Loc_0451         
 
@@ -626,13 +627,13 @@ $0367  81 7A                              CMPA #$7A              ; compare A wit
 $0369  22 02                              BHI Loc_036D          
 $036B  84 DF                              ANDA #$DF             
 $036D  39                  Loc_036D:      RTS                   
-$036E  30 8D 01 87         Loc_036E:      LEAX Dat_04F9,PC       ; X → Dat_04F9
+$036E  30 8D 01 87         Loc_036E:      LEAX dirMsg03,PC       ; X → dirMsg03
 $0372  31 C8 25                           LEAY BSS.$25,U        
 $0375  A6 80               Loc_0375:      LDA ,X+               
-$0377  81 0A                              CMPA #$0A              ; compare A with LF
-$0379  27 04                              BEQ Loc_037F          
-$037B  A7 A0                              STA ,Y+               
-$037D  20 F6                              BRA Loc_0375          
+$0377  81 0A                              CMPA #$0A              ; Did we reach the next msgBlock?
+$0379  27 04                              BEQ Loc_037F           ; If yes, break from loop
+$037B  A7 A0                              STA ,Y+                ; Otherwise copy that char to Y+
+$037D  20 F6                              BRA Loc_0375           ; Keep looping
 
 ; --------------------------------------------------------------
 $037F  31 C8 26            Loc_037F:      LEAY 38,U	; $26       
@@ -684,8 +685,13 @@ $03DA  A7 A4                              STA ,Y
 $03DC  31 21               Loc_03DC:      LEAY 1,Y              
 $03DE  5A                                 DECB                  
 $03DF  26 F5                              BNE Loc_03D6          
+<<<<<<< HEAD
+$03E1  31 C8 47                           LEAY 71,U             
+$03E4  30 C8 76                           LEAX BSS.$76,U        
+=======
 $03E1  31 C8 47                           LEAY 71,U	; $47       
 $03E4  30 C8 76                           LEAX 118,U	; $76      
+>>>>>>> 7f226182fba79990dae3840c1ba17c956391475e
 $03E7  C6 03                              LDB #$03               ; B = SS.Reset  (GetStt/SetStt subcode)
 $03E9  A6 80               Loc_03E9:      LDA ,X+               
 $03EB  8D 3E                              BSR Sub_042B           ; call Sub_042B
@@ -773,26 +779,28 @@ Dat_046C
          FCB    $40               ; '@'
          FCB    $0D               ; CR
 
-Dat_046E
+dirMsg01
 ; Referenced by: $00D3
 ; ── 15 ($000F) bytes  ($046E—$047C) ──
          FCB    $0A               ; LF
          FCC    " Directory of "
-Dat_046Eend
+dirMsg01end
 
-Dat_047D
+dirMsg02
 ; Referenced by: $011B
 ; ── 124 ($007C) bytes  ($047D—$04F8) ──
-         FCB    $0A ; LF
+         FCB    $0A               ; LF
          FCC    "User # Last Modified   Attributes Sector File Size File Name"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "------ --------------- ---------- ------ --------- ----------"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
+dirMsg02end
 
-Dat_04F9
+dirMsg03
 ; Referenced by: Loc_036E
 ; ── 32 ($0020) bytes  ($04F9—$0518) ──
          FCC    "       0000/00/00 0000  dsewrewr"
+dirMsg03end
 ; The last line is a format template — fields updated in place.
 
 Dat_0519
@@ -800,35 +808,35 @@ Dat_0519
 ; ── 19 ($0013) bytes  ($0519—$052B) ──
          FCC    "                   "
 
-Dat_052C
+helpMsg
 ; Referenced by: $024C
 ; ── 379 ($017B) bytes  ($052C—$06A6) ──
-         FCB    $0A ; LF
+         FCB    $0A               ; LF
          FCC    "dir [-opts] [path/patt] [-opts]"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "opts: x - use current exec dir"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      s - one entry/line"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "    e/l - extended directory"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      a - show '.files', too"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      d - only directory files"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      f - only non-dir files"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      c - case insensitive filename match (BUT NOT DIR NAME)"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      ? - help message"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "pattern: may include wild cards"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      * - multiple character"
-         FCB    $0D ; CR
+         FCB    $0D               ; CR
          FCC    "      ? - single character"
-         FCB    $0D ; CR
-Dat_052Cend
+         FCB    $0D               ; CR
+helpMsgend
 $06A7  5A                  WritBlines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A=$01  buf→X

@@ -32,44 +32,17 @@
     "18": "BSS.$12",
     "23": "BSS.$17",
     "37": "BSS.$25",
+    "118": "BSS.$76",
     "121": "BSS.$79",
     "122": "BSS.DotChar"
   },
   "data_regions": [
-    {
-      "label": "Dat_046E",
-      "format": "auto",
-      "end_label": true,
-      "start": "046E",
-      "end": "047D"
-    },
-    {
-      "start": "047D",
-      "end": "04F9",
-      "label": "Dat_047D",
-      "format": "text",
-      "end_label": false
-    },
-    {
-      "start": "04F9",
-      "end": "0519",
-      "label": "Dat_04F9",
-      "format": "text",
-      "end_label": false
-    },
     {
       "start": "0519",
       "end": "052C",
       "label": "Dat_0519",
       "format": "text",
       "end_label": false
-    },
-    {
-      "label": "Dat_052C",
-      "end_label": true,
-      "start": "052C",
-      "end": "06A7",
-      "format": "text"
     },
     {
       "start": "046A",
@@ -84,15 +57,47 @@
       "format": "auto",
       "label": "cwdAndCR",
       "end_label": true
+    },
+    {
+      "start": "046E",
+      "end": "047D",
+      "format": "auto",
+      "label": "dirMsg01",
+      "end_label": true
+    },
+    {
+      "start": "047D",
+      "end": "04F9",
+      "format": "auto",
+      "label": "dirMsg02",
+      "end_label": true
+    },
+    {
+      "start": "04F9",
+      "end": "0519",
+      "format": "auto",
+      "label": "dirMsg03",
+      "end_label": true
+    },
+    {
+      "start": "052C",
+      "end": "06A7",
+      "format": "auto",
+      "label": "helpMsg",
+      "end_label": true
     }
   ],
   "line_comments": {
+    "0014": "ColWidth=1, LastCol=80",
+    "0016": "A = '.' current directory",
     "00E9": "this is a loop copying the NextDir to BSS.$25",
     "00ED": "Looking for a CR terminator",
     "00EF": "Nope?  Keep looking!",
+    "00F7": "Replace the $0D(CR) with \"/\"",
     "0118": "LDA=$01 (output path), LDB=$02 (Number of lines)",
     "011B": "X \u2192 Address of output lines",
     "011F": "call write out lines",
+    "0146": "A & %01111111=stripSignBit()",
     "0214": "X=X+1",
     "0216": "get the next byte",
     "0218": "is it a space?",
@@ -100,6 +105,10 @@
     "021C": "At the end of the cmdlin?",
     "021E": "yeah, prolly ...go RTS",
     "0220": "A & %11011111 == toUpper()",
+    "0377": "Did we reach the next msgBlock?",
+    "0379": "If yes, break from loop",
+    "037B": "Otherwise copy that char to Y+",
+    "037D": "Keep looping",
     "0451": "%11010011 ?",
     "0456": "That variable",
     "0458": "Don't like TST=0? Fine! Quit!",
