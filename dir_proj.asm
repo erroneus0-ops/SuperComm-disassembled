@@ -136,12 +136,8 @@ BSS.$0E       EQU    $0E      ; 1 byte
 BSS.$0F       EQU    $0F      ; 1 byte
 BSS.ColWidth  EQU    $10      ; 1 byte
 BSS.LastCol   EQU    $11      ; 1 byte
-<<<<<<< HEAD
 BSS.ColmPos   EQU    $12      ; 1 byte
-BSS.DENameLen EQU    $13      ; 4 bytes
-=======
-BSS.$12       EQU    $12      ; 5 bytes
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
+BSS.DENameLen EQU    $13      ; 4 bytes — byte count of file name
 BSS.$17       EQU    $17      ; 14 bytes
 BSS.$25       EQU    $25      ; 51 bytes
 BSS.DEName    EQU    $58      ; 29 bytes
@@ -278,11 +274,7 @@ $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name�
 $00C3  10 25 03 8A                        LBCS Loc_0451         
 $00C7  97 01                              STA <$01              
 $00C9  96 11               Loc_00C9:      LDA <BSS.LastCol      
-<<<<<<< HEAD
 $00CB  97 12                              STA <BSS.ColmPos      
-=======
-$00CB  97 12                              STA <BSS.$12          
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
 $00CD  96 0D                              LDA <BSS.$0D          
 $00CF  9A 10                              ORA <BSS.ColWidth     
 $00D1  27 53                              BEQ Loc_0126          
@@ -381,13 +373,8 @@ $01A2  26 82                              BNE Loc_0126
 $01A4  0D 10               Loc_01A4:      TST <BSS.ColWidth     
 $01A6  27 53                              BEQ Loc_01FB          
 $01A8  0F 0A                              CLR <$0A              
-<<<<<<< HEAD
 $01AA  D6 13                              LDB <BSS.DENameLen    
 $01AC  D1 12                              CMPB <BSS.ColmPos     
-=======
-$01AA  D6 13                              LDB <$13              
-$01AC  D1 12                              CMPB <BSS.$12         
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
 $01AE  2C 2F                              BGE Loc_01DF          
 $01B0  0C 0A               Loc_01B0:      INC <$0A              
 $01B2  4F                                 CLRA                   ; A = 0
@@ -396,21 +383,13 @@ $01B5  4C                                 INCA
 $01B6  30 C8 58                           LEAX BSS.DEName,U     
 $01B9  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
 $01BC  10 25 02 91                        LBCS Loc_0451         
-<<<<<<< HEAD
 $01C0  96 12                              LDA <BSS.ColmPos      
-=======
-$01C0  96 12                              LDA <BSS.$12          
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
 $01C2  80 10               Loc_01C2:      SUBA #$10             
 $01C4  2F 19                              BLE Loc_01DF          
 $01C6  C0 10                              SUBB #$10             
 $01C8  2C F8                              BGE Loc_01C2          
 $01CA  50                                 NEGB                  
-<<<<<<< HEAD
 $01CB  97 12                              STA <BSS.ColmPos      
-=======
-$01CB  97 12                              STA <BSS.$12          
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
 $01CD  4F                                 CLRA                   ; A = 0
 $01CE  1F 02                              TFR D,Y               
 $01D0  4C                                 INCA                  
@@ -426,11 +405,7 @@ $01E5  30 8D 02 82                        LEAX cwdAndCR,PC       ; X → cwdAndC
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $01EC  10 25 02 61                        LBCS Loc_0451         
 $01F0  96 11                              LDA <BSS.LastCol      
-<<<<<<< HEAD
 $01F2  97 12                              STA <BSS.ColmPos      
-=======
-$01F2  97 12                              STA <BSS.$12          
->>>>>>> 3666cd2a529d001a07aa76799d416f52808c6a57
 $01F4  0D 0A                              TST <$0A              
 $01F6  27 B8                              BEQ Loc_01B0          
 $01F8  16 FF 2B                           LBRA Loc_0126         
@@ -914,10 +889,11 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;         /rename-label/ Dat_046B cwdAndCR
 ;
 ; /bss/ $XX Name
-;     Declare a BSS variable at direct page offset $XX.
+;     Declare a BSS variable at direct page or U-relative offset $XX.
+;     Optional quoted comment appended to the EQU line.
 ;     Example:
 ;         /bss/ $00 BSS.DirPath
-;         /bss/ $7A BSS.DotChar
+;         /bss/ $58 BSS.DEntName "29-byte filename field of RBF directory entry"
 ;
 ; ── Data regions ──────────────────────────────────────────────
 ;

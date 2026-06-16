@@ -152,5 +152,8 @@
   "patches": {},
   "hex_offsets": [
     "U"
-  ]
+  ],
+  "bss_comments": {
+    "19": "byte count of file name"
+  }
 }
