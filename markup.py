@@ -171,6 +171,7 @@ def parse_directives(lines, json_path=None):
         'block_comments':  {},   # addr -> [lines]
         'remove_comments': [],   # list of addrs to remove from block_comments
         'remove_line_comments': [],  # list of addrs to remove from line_comments
+        'rename_labels':        [],  # list of (old_name, new_name) pairs
         'line_comments':   {},   # addr -> text
         'substitutions':   {},   # addr -> {replace_bytes, with_lines}
         'data_regions':    [],   # list of {start, end?, label?, end_label?, format?, comment?}
@@ -313,6 +314,15 @@ def parse_directives(lines, json_path=None):
                 changes['labels'][addr] = name
             else:
                 changes['warnings'].append(f"/label/ '{name}' — could not find address")
+
+        # ── /rename-label/ OldName NewName ────────────────────────────────────
+        elif line.startswith('/rename-label/'):
+            parts = line[len('/rename-label/'):].strip().split()
+            if len(parts) >= 2:
+                old_name, new_name = parts[0], parts[1]
+                changes['rename_labels'].append((old_name, new_name))
+            else:
+                changes['warnings'].append(f"/rename-label/ — expected 'OldName NewName'")
 
         # ── /bss/ $offset name ────────────────────────────────────────────────
         elif line.startswith('/bss/'):
@@ -587,6 +597,16 @@ def merge_into_json(json_path, changes, warn):
         if key in existing_labels and existing_labels[key] != name:
             warn(f"Label at ${key} renamed: '{existing_labels[key]}' → '{name}'")
         existing_labels[key] = name
+    # Apply /rename-label/ directives — find by name, rename in place
+    addr_by_name = {v: k for k,v in existing_labels.items()}
+    for old_name, new_name in changes.get('rename_labels', []):
+        if old_name in addr_by_name:
+            addr_key = addr_by_name[old_name]
+            existing_labels[addr_key] = new_name
+            addr_by_name[new_name] = addr_key
+            del addr_by_name[old_name]
+        else:
+            warn(f"/rename-label/ '{old_name}' — label not found in JSON")
     d['labels'] = dict(sorted(existing_labels.items()))
 
     # ── bss ──────────────────────────────────────────────────────────────────
@@ -762,6 +782,7 @@ def main():
 
     # Count meaningful changes
     n_labels  = len(changes['labels'])
+    n_renames = len(changes.get('rename_labels', []))
     n_bss     = len(changes['bss'])
     n_bc      = len(changes['block_comments'])
     n_lc      = len(changes['line_comments'])
@@ -777,6 +798,8 @@ def main():
     print()
     print("Changes applied:")
     print(f"  Labels:                  {n_labels}")
+    if n_renames:
+        print(f"  Labels renamed:          {n_renames}")
     print(f"  BSS names:               {n_bss}")
     print(f"  Block comments added:    {n_bc}")
     if n_rm_bc:

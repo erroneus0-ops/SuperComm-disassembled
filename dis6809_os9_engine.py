@@ -2612,6 +2612,13 @@ MARKUP_QUICK_REF = """
 ;         /label/ Sub_ReadDir
 ;         $0126  96 00    LDA <$00
 ;
+; /rename-label/ OldName NewName
+;     Rename an existing label by its current name.
+;     Works for both code and data labels — no address scanning needed.
+;     Example:
+;         /rename-label/ Dat_046A cwdChar
+;         /rename-label/ Dat_046B cwdAndCR
+;
 ; /bss/ $XX Name
 ;     Declare a BSS variable at direct page offset $XX.
 ;     Example:
