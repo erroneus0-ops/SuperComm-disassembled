@@ -757,13 +757,13 @@ $0460  10 8E 00 01                        LDY #$0001
 $0464  10 3F 8C                           OS9 I$WritLn          /; Why WritLn not Write? /
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
 
-/rename-label/ Dat_046A cwdChar
+/label/ $046A cwdChar
 Dat_046A
 ; Referenced by: $0022, $02CE
 ; ── 1 ($0001) bytes  ($046A—$046A) ──
          FCB    $2E               ; '.'
 
-/rename-label/ Dat_046B cwdAndCR
+/label/ $046B cwdAndCR
 Dat_046B
 ; Referenced by: $01E5, $045A
 ; ── 1 ($0001) bytes  ($046B—$046B) ──
