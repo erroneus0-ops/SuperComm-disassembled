@@ -756,8 +756,21 @@ $045E  86 01                              LDA #$01
 $0460  10 8E 00 01                        LDY #$0001            
 $0464  10 3F 8C                           OS9 I$WritLn           ; Why WritLn not Write?
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
+<<<<<<< HEAD
 $046A  2E 0D               cwdChar:       BGT $0479             
 $046B  0D 40               cwdAndCR:      TST <$40              
+=======
+
+cwdChar
+; Referenced by: $0022, $02CE
+; ── 1 ($0001) bytes  ($046A—$046A) ──
+         FCB    $2E               ; '.'
+
+cwdAndCR
+; Referenced by: $01E5, $045A
+; ── 1 ($0001) bytes  ($046B—$046B) ──
+         FCB    $0D               ; CR
+>>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
 
 Dat_046C
 ; Referenced by: $00BC
@@ -840,6 +853,7 @@ ModEnd
 ; CRC-24 (3 bytes) appended here by fixmod
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
+<<<<<<< HEAD
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; MARKUP QUICK REFERENCE  (markup.py directives)
@@ -964,3 +978,6 @@ ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ;     Mark a routine boundary for structural annotation.
 ;
 ; ══════════════════════════════════════════════════════════════
+=======
+ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+>>>>>>> 5e47640b7daa4fca82945ec1e00b2cfeeed25fdf
