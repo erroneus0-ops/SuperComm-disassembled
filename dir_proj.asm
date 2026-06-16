@@ -181,7 +181,7 @@ $001B  5F                                 CLRB                   ; B = 0
 $001C  DD 0E                              STD <BSS.$0E          
 $001E  DD 0C                              STD <BSS.$0C          
 $0020  97 08                              STA <BSS.DirCount     
-$0022  31 8D 04 44                        LEAY Dat_046A,PC       ; Y → Dat_046A
+$0022  31 8D 04 44                        LEAY cwdChar,PC        ; Y → cwdChar
 $0026  10 9F 02                           STY <BSS.NextDir      
 $0029  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 $002B  0F 79                              CLR <BSS.$79          
@@ -301,7 +301,7 @@ $0114  0D 0D                              TST <BSS.$0D
 $0116  27 0E                              BEQ Loc_0126          
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
 $011B  30 8D 03 5E                        LEAX Dat_047D,PC       ; X → Address of output lines
-$011F  17 05 85                           LBSR WritBLines        ; call write out lines
+$011F  17 05 85                           LBSR WritBlines        ; call write out lines
 $0122  10 25 03 2B                        LBCS Loc_0451         
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
@@ -394,7 +394,7 @@ $01DC  16 FF 47                           LBRA Loc_0126
 ; --------------------------------------------------------------
 $01DF  86 01               Loc_01DF:      LDA #$01              
 $01E1  10 8E 00 01                        LDY #$0001            
-$01E5  30 8D 02 82                        LEAX Dat_046B,PC       ; X → Dat_046B
+$01E5  30 8D 02 82                        LEAX cwdAndCR,PC       ; X → cwdAndCR
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $01EC  10 25 02 61                        LBCS Loc_0451         
 $01F0  96 11                              LDA <BSS.LastCol      
@@ -414,13 +414,13 @@ $020D  10 25 02 40                        LBCS Loc_0451
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
-$0214  30 01               Sub_0214:      LEAX 1,X              /; Advance X by one... /
-$0216  A6 84                              LDA ,X                /; why not lda 1,x+? /
-$0218  81 20                              CMPA #$20             /; is it a space? /
-$021A  27 28                              BEQ Loc_0244          /; ...go RTS /
-$021C  81 0D                              CMPA #$0D             /; At the end of the cmdlin? /
-$021E  27 24                              BEQ Loc_0244          /; yeah, prolly... go RTS /
-$0220  84 DF                              ANDA #$DF             /; A & %11011111 == toUpper() /
+$0214  30 01               Sub_0214:      LEAX 1,X               ; Advance X by one...
+$0216  A6 84                              LDA ,X                 ; why not lda 1,x+?
+$0218  81 20                              CMPA #$20              ; is it a space?
+$021A  27 28                              BEQ Loc_0244           ; ...go RTS
+$021C  81 0D                              CMPA #$0D              ; At the end of the cmdlin?
+$021E  27 24                              BEQ Loc_0244           ; yeah, prolly... go RTS
+$0220  84 DF                              ANDA #$DF              ; A & %11011111 == toUpper()
 $0222  81 45                              CMPA #$45              ; compare A with 'E'
 $0224  27 38                              BEQ Loc_025E          
 $0226  81 53                              CMPA #$53              ; compare A with 'S'
@@ -447,7 +447,7 @@ $0247  20 CB                              BRA Sub_0214
 ; --------------------------------------------------------------
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
 $024C  30 8D 02 DC                        LEAX Dat_052C,PC       ; X → Dat_052C
-$0250  17 04 54                           LBSR WritBLines        ; call WritBLines
+$0250  17 04 54                           LBSR WritBlines        ; call WritBlines
 $0253  16 01 FB                           LBRA Loc_0451         
 
 ; --------------------------------------------------------------
@@ -525,7 +525,7 @@ $02C6  A6 82               Loc_02C6:      LDA ,-X
 $02C8  9C 02                              CMPX <BSS.NextDir     
 $02CA  26 0A                              BNE Loc_02D6          
 $02CC  9F 06                              STX <BSS.PatPtr       
-$02CE  30 8D 01 98                        LEAX Dat_046A,PC       ; X → Dat_046A
+$02CE  30 8D 01 98                        LEAX cwdChar,PC        ; X → cwdChar
 $02D2  9F 02                              STX <BSS.NextDir      
 $02D4  20 0A                              BRA Loc_02E0          
 
@@ -746,28 +746,18 @@ $044D  E7 80                              STB ,X+
 $044F  20 F4                              BRA Loc_0445          
 
 ; --------------------------------------------------------------
-$0451  C1 D3               Loc_0451:      CMPB #$D3             /; %11010011 ?/
+$0451  C1 D3               Loc_0451:      CMPB #$D3              ; %11010011 ?
 $0453  26 01                              BNE Loc_0456          
 $0455  5F                                 CLRB                   ; B = 0
-$0456  0D 10               Loc_0456:      TST <BSS.ColWidth     /; That variable /
-$0458  27 0D                              BEQ Loc_0467          /; Don't like TST=0? Fine! Quit! /
-$045A  30 8D 00 0D                        LEAX Dat_046B,PC       ; X → Dat_046B
+$0456  0D 10               Loc_0456:      TST <BSS.ColWidth      ; That variable
+$0458  27 0D                              BEQ Loc_0467           ; Don't like TST=0? Fine! Quit!
+$045A  30 8D 00 0D                        LEAX cwdAndCR,PC       ; X → cwdAndCR
 $045E  86 01                              LDA #$01              
 $0460  10 8E 00 01                        LDY #$0001            
-$0464  10 3F 8C                           OS9 I$WritLn          /; Why WritLn not Write? /
+$0464  10 3F 8C                           OS9 I$WritLn           ; Why WritLn not Write?
 $0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
-
-/label/ $046A cwdChar
-Dat_046A
-; Referenced by: $0022, $02CE
-; ── 1 ($0001) bytes  ($046A—$046A) ──
-         FCB    $2E               ; '.'
-
-/label/ $046B cwdAndCR
-Dat_046B
-; Referenced by: $01E5, $045A
-; ── 1 ($0001) bytes  ($046B—$046B) ──
-         FCB    $0D               ; CR
+$046A  2E 0D               cwdChar:       BGT $0479             
+$046B  0D 40               cwdAndCR:      TST <$40              
 
 Dat_046C
 ; Referenced by: $00BC
@@ -831,7 +821,7 @@ Dat_052C
          FCC    "      ? - single character"
          FCB    $0D ; CR
 Dat_052Cend
-$06A7  5A                  WritBLines:    DECB                   ; B=# of lines, X=location of stuff to print.
+$06A7  5A                  WritBlines:    DECB                   ; B=# of lines, X=location of stuff to print.
 $06A8  10 8E 00 50                        LDY #$0050             ; Max length = 80 columns
 $06AC  10 3F 8C                           OS9 I$WritLn           ; path=A=$01  buf→X
 $06AF  25 0B                              BCS endWritBlines      ; Error detected. Break out of loop.
@@ -840,7 +830,7 @@ $06B3  1F 20                              TFR Y,D                ; Y now contain
 $06B5  30 8B                              LEAX D,X               ; Move X pointet to next line
 $06B7  35 06                              PULS A,B               ; Bring A and B back.
 $06B9  5D                                 TSTB                   ; Is B zero? (last line)
-$06BA  26 EB                              BNE WritBLines         ; If not loop back where it decrements B for the next line
+$06BA  26 EB                              BNE WritBlines         ; If not loop back where it decrements B for the next line
 $06BC  39                  endWritBlines: RTS                   
 
 ; ==============================================================
@@ -851,3 +841,126 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.asm [proj.json]
+; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next $XXXX address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /label/ $addr Name
+;     Name a specific address directly — works for data labels too.
+;     Example:
+;         /label/ $046A cwdChar
+;         /label/ $046B cwdAndCR
+;
+; /rename-label/ OldName NewName
+;     Rename an existing label by its current name.
+;     Works for both code and data labels — no address scanning needed.
+;     Example:
+;         /rename-label/ Dat_046A cwdChar
+;         /rename-label/ Dat_046B cwdAndCR
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page offset $XX.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $7A BSS.DotChar
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+;     Declare a data region. Format: auto text fdb hexdump raw writeblock
+;     endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /region/ $052C $06A7 text endlabel
+;         /region/ $047D $052C text Dat_047D
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════

@@ -11,6 +11,8 @@
   "defs_file": null,
   "custom_equates": [],
   "labels": {
+    "046A": "cwdChar",
+    "046B": "cwdAndCR",
     "06A7": "WritBlines",
     "06BC": "endWritBlines"
   },
