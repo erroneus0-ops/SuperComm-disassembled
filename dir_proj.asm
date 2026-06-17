@@ -756,9 +756,9 @@ $044F  20 F4                              BRA Loc_0445
 
 ; --------------------------------------------------------------
 $0451  C1 D3               ErrExit:       CMPB #$D3              ; Is this End of File error code
-$0453  26 01                              BNE Loc_0456           ; OK, then don't clear B
+$0453  26 01                              BNE ErrCode            ; B=ErrCode, don't clear B
 $0455  5F                                 CLRB                   ; If it's end of directory, that's fine
-$0456  0D 10               Loc_0456:      TST <BSS.ColWidth      ; What's in the ColWidth?
+$0456  0D 10               ErrCode:       TST <BSS.ColWidth      ; What's in the ColWidth?
 $0458  27 0D                              BEQ Loc_0467           ; If it's zero just exit
 $045A  30 8D 00 0D                        LEAX cwdAndCR,PC       ; X → cwdAndCR
 $045E  86 01                              LDA #$01               ; stdout
