@@ -487,14 +487,14 @@ $0270  0F 7A               Loc_0270:      CLR <BSS.DotChar
 $0272  20 A0                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$0274  9F 02               Sub_0274:      STX <BSS.NextDir      
-$0276  A6 80               Loc_0276:      LDA ,X+               
+$0274  9F 02               Sub_0274:      STX <BSS.NextDir       ; This is where filenames are expected
+$0276  A6 80               Loc_0276:      LDA ,X+                ; Sample char, X+1
 $0278  81 5F                              CMPA #$5F              ; compare A with '_'
-$027A  27 FA                              BEQ Loc_0276          
+$027A  27 FA                              BEQ Loc_0276           ; invalid char, get another
 $027C  81 2D                              CMPA #$2D              ; compare A with '-'
-$027E  27 F6                              BEQ Loc_0276          
+$027E  27 F6                              BEQ Loc_0276           ; invalid char, get another
 $0280  81 2E                              CMPA #$2E              ; compare A with '.'
-$0282  25 14                              BCS Loc_0298           ; C=1 (BLO)
+$0282  25 14                              BCS Loc_0298           ; unsigned BLO, this character is invalid for filemame
 $0284  81 39                              CMPA #$39              ; compare A with '9'
 $0286  23 EE                              BLS Loc_0276          
 $0288  81 41                              CMPA #$41              ; compare A with 'A'
@@ -505,20 +505,20 @@ $0290  81 61                              CMPA #$61              ; compare A wit
 $0292  25 04                              BCS Loc_0298           ; C=1 (BLO)
 $0294  81 7A                              CMPA #$7A              ; compare A with 'z'
 $0296  23 DE                              BLS Loc_0276          
-$0298  81 0D               Loc_0298:      CMPA #$0D              ; compare A with CR
-$029A  27 08                              BEQ Loc_02A4          
+$0298  81 0D               Loc_0298:      CMPA #$0D              ; Is this EOL?
+$029A  27 08                              BEQ Loc_02A4           ; if so, get out, we're done!
 $029C  81 20                              CMPA #$20              ; compare A with ' '
-$029E  26 05                              BNE Loc_02A5          
-$02A0  86 0D                              LDA #$0D               ; A = CR
-$02A2  A7 82                              STA ,-X               
+$029E  26 05                              BNE Loc_02A5           ; Ah, not a space, process the chars (wildcard)
+$02A0  86 0D                              LDA #$0D               ; load up a CR for EOL
+$02A2  A7 82                              STA ,-X                ; put it at the end of this filename, X-1
 $02A4  39                  Loc_02A4:      RTS                   
-$02A5  81 2A               Loc_02A5:      CMPA #$2A              ; compare A with '*'
-$02A7  27 0B                              BEQ Loc_02B4          
-$02A9  81 3F                              CMPA #$3F              ; compare A with '?'
-$02AB  27 07                              BEQ Loc_02B4          
-$02AD  C6 EB                              LDB #$EB              
-$02AF  1A 01                              ORCC #$01              ; set CC: C
-$02B1  16 01 9D                           LBRA Loc_0451         
+$02A5  81 2A               Loc_02A5:      CMPA #$2A              ; is it wildcard '*' ?
+$02A7  27 0B                              BEQ Loc_02B4           ; yes? Go to wild handler
+$02A9  81 3F                              CMPA #$3F              ; is it wildchar '?' ?
+$02AB  27 07                              BEQ Loc_02B4           ; yes? Go to wild handler
+$02AD  C6 EB                              LDB #$EB               ; Set error code $EB BAD NAME: illegal name syntax
+$02AF  1A 01                              ORCC #$01              ; set CC: C -- gotta be convincing with error report
+$02B1  16 01 9D                           LBRA Loc_0451          ; this is invalid input bail out!
 
 ; --------------------------------------------------------------
 $02B4  9F 06               Loc_02B4:      STX <BSS.PatPtr       
@@ -755,16 +755,16 @@ $044D  E7 80                              STB ,X+
 $044F  20 F4                              BRA Loc_0445          
 
 ; --------------------------------------------------------------
-$0451  C1 D3               Loc_0451:      CMPB #$D3              ; %11010011 ?
-$0453  26 01                              BNE Loc_0456          
-$0455  5F                                 CLRB                   ; B = 0
-$0456  0D 10               Loc_0456:      TST <BSS.ColWidth      ; That variable
-$0458  27 0D                              BEQ Loc_0467           ; Don't like TST=0? Fine! Quit!
+$0451  C1 D3               Loc_0451:      CMPB #$D3              ; Is this End of File error code?
+$0453  26 01                              BNE Loc_0456           ; OK, then don't clear B
+$0455  5F                                 CLRB                   ; What the heck? One routine sets $EEB bad name error now ignore?
+$0456  0D 10               Loc_0456:      TST <BSS.ColWidth      ; What's in the ColWidth?
+$0458  27 0D                              BEQ Loc_0467           ; If it's zero just exit
 $045A  30 8D 00 0D                        LEAX cwdAndCR,PC       ; X → cwdAndCR
-$045E  86 01                              LDA #$01              
-$0460  10 8E 00 01                        LDY #$0001            
-$0464  10 3F 8C                           OS9 I$WritLn           ; Why WritLn not Write?
-$0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B
+$045E  86 01                              LDA #$01               ; stdout
+$0460  10 8E 00 01                        LDY #$0001             ; length = 1
+$0464  10 3F 8C                           OS9 I$WritLn           ; WritLn out
+$0467  10 3F 06            Loc_0467:      OS9 F$Exit             ; status=B if it's not $D3 EOF error, then it's zero if entry point Loc_0451
 
 cwdChar
 ; Referenced by: $0022, $02CE
