@@ -192,34 +192,36 @@ $0022  31 8D 04 44                        LEAY cwdChar,PC        ; Y → cwdChar
 $0026  10 9F 02                           STY <BSS.NextDir      
 $0029  C6 01                              LDB #$01               ; B = SS.Ready  (GetStt/SetStt subcode)
 $002B  0F 79                              CLR <BSS.$79          
-$002D  A6 84               Loc_002D:      LDA ,X                
+; 
+; Command Line parsing
+$002D  A6 84               CLinPars:      LDA ,X                 ; X is cmdlin parameters address
 $002F  81 0D                              CMPA #$0D              ; compare A with CR
-$0031  27 2C                              BEQ Loc_005F          
+$0031  27 2C                              BEQ Loc_005F           ; is it done?  CR terminates the loop
 $0033  81 20                              CMPA #$20              ; compare A with ' '
-$0035  27 24                              BEQ Loc_005B          
-$0037  34 10                              PSHS X                
-$0039  A6 80               Loc_0039:      LDA ,X+               
-$003B  81 20                              CMPA #$20              ; compare A with ' '
-$003D  27 06                              BEQ Loc_0045          
-$003F  81 0D                              CMPA #$0D              ; compare A with CR
-$0041  26 F6                              BNE Loc_0039          
-$0043  30 1F                              LEAX -1,X             
-$0045  9F 04               Loc_0045:      STX <BSS.BufPtr       
-$0047  35 10                              PULS X                
-$0049  A6 84                              LDA ,X                
-$004B  81 2D                              CMPA #$2D              ; compare A with '-'
-$004D  26 05                              BNE Loc_0054          
+$0035  27 24                              BEQ CLinLoopB          ; Skip to the end, move X+1 back to top
+$0037  34 10                              PSHS X                 ; Save Start of parm, we have a char to parse
+$0039  A6 80               CLinParmG:     LDA ,X+                ; read through the parm, X+1
+$003B  81 20                              CMPA #$20              ; is this End of Parm?
+$003D  27 06                              BEQ CLinPEnd           ; non-char, We have the end of parm
+$003F  81 0D                              CMPA #$0D              ; Did we get to the end of CLine?
+$0041  26 F6                              BNE CLinParmG          ; Nope? Loop back to find end of parm
+$0043  30 1F                              LEAX -1,X              ; else it is CLinEnd, X=X-1
+$0045  9F 04               CLinPEnd:      STX <BSS.BufPtr        ; Save the "end of parm" pointer
+$0047  35 10                              PULS X                 ; restore X to beginning of parm
+$0049  A6 84                              LDA ,X                /; Now we read the parm /
+$004B  81 2D                              CMPA #$2D             /; is it a '-' flag? /
+$004D  26 05                              BNE Loc_0054          /; No?  Must be something else /
 $004F  17 01 C2                           LBSR Sub_0214          ; call Sub_0214
 $0052  20 03                              BRA Loc_0057          
 
 ; --------------------------------------------------------------
 $0054  17 02 1D            Loc_0054:      LBSR Sub_0274          ; call Sub_0274
 $0057  9E 04               Loc_0057:      LDX <BSS.BufPtr       
-$0059  20 D2                              BRA Loc_002D          
+$0059  20 D2                              BRA CLinPars          
 
 ; --------------------------------------------------------------
-$005B  30 01               Loc_005B:      LEAX 1,X              
-$005D  20 CE                              BRA Loc_002D          
+$005B  30 01               CLinLoopB:     LEAX 1,X               ; X=X+1, next char
+$005D  20 CE                              BRA CLinPars          
 
 ; --------------------------------------------------------------
 $005F  D7 17               Loc_005F:      STB <BSS.$17          
