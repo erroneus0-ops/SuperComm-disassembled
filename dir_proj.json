@@ -17,6 +17,7 @@
     "005B": "CLinLoopB",
     "0451": "ErrExit",
     "0456": "ErrCode",
+    "0467": "ErrExitNow",
     "046A": "cwdChar",
     "046B": "cwdAndCR",
     "06A7": "WritBlines",
