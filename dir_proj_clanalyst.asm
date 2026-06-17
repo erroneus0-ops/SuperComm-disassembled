@@ -291,7 +291,7 @@ $00B3  10 3F 86                           OS9 I$ChgDir           ; mode=B  name�
 $00B6  0D 0B                              TST <BSS.AnyFlag      
 $00B8  27 0F                              BEQ Loc_00C9          
 $00BA  96 17                              LDA <BSS.OpenMode     
-$00BC  30 8D 03 AC                        LEAX Dat_046C,PC       ; X → Dat_046C
+$00BC  30 8D 03 AC                        LEAX execDir,PC        ; X → execDir
 $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
 $00C3  10 25 03 8A                        LBCS Loc_0451         
 $00C7  97 01                              STA <BSS.CWDPath      
@@ -494,6 +494,7 @@ $0206  10 8E 00 1E                        LDY #$001E
 $020A  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
 $020D  10 25 02 40                        LBCS Loc_0451         
 $0211  16 FF 12                           LBRA Loc_0126         
+; Option parser — advances past '-', reads letter, uppercases, dispatches.
 
 ; --------------------------------------------------------------
 $0214  30 01               Sub_0214:      LEAX 1,X               ; X=X+1
@@ -864,7 +865,7 @@ cwdAndCR
          FCB    $0D               ; CR
 cwdAndCRend
 
-Dat_046C
+execDir
 ; Referenced by: $00BC
 ; ── 2 ($0002) bytes  ($046C—$046D) ──
          FCB    $40               ; '@'

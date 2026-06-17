@@ -31,6 +31,7 @@
     "0442": "Sub_0442",
     "046A": "cwdChar",
     "046B": "cwdAndCR",
+    "046C": "execDir",
     "06A7": "WritBlines",
     "06BC": "endWritBlines"
   },
@@ -112,6 +113,13 @@
       "format": "auto",
       "label": "helpMsg",
       "end_label": true
+    },
+    {
+      "start": "046C",
+      "end": "046E",
+      "format": "auto",
+      "label": "execDir",
+      "end_label": false
     }
   ],
   "line_comments": {
@@ -273,6 +281,9 @@
       "Reached when ColWidth=0 (set by -s, or forced by narrow terminal).",
       "If ExtFlag set \u2192 format full extended line via Loc_036E.",
       "If ExtFlag clear \u2192 simple I$WritLn of filename (30 bytes)."
+    ],
+    "0214": [
+      "Option parser \u2014 advances past '-', reads letter, uppercases, dispatches."
     ],
     "036E": [
       "Extended listing formatter.",
