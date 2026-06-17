@@ -208,9 +208,9 @@ $0041  26 F6                              BNE CLinParmG          ; Nope? Loop ba
 $0043  30 1F                              LEAX -1,X              ; else it is CLinEnd, X=X-1
 $0045  9F 04               CLinPEnd:      STX <BSS.BufPtr        ; Save the "end of parm" pointer
 $0047  35 10                              PULS X                 ; restore X to beginning of parm
-$0049  A6 84                              LDA ,X                /; Now we read the parm /
-$004B  81 2D                              CMPA #$2D             /; is it a '-' flag? /
-$004D  26 05                              BNE Loc_0054          /; No?  Must be something else /
+$0049  A6 84                              LDA ,X                 ; Now we read the parm
+$004B  81 2D                              CMPA #$2D              ; is it a '-' flag?
+$004D  26 05                              BNE Loc_0054           ; No?  Must be something else
 $004F  17 01 C2                           LBSR Sub_0214          ; call Sub_0214
 $0052  20 03                              BRA Loc_0057          
 
