@@ -78,7 +78,9 @@
 ;     ?    → falls through to unknown handler
 
 /label/ $0214 Sub_0214
-/; Option parser — advances past '-', reads letter, uppercases, dispatches/
+/comment/ $0214
+Option parser — advances past '-', reads letter, uppercases, dispatches.
+/end-comment/
 $0214  30 01               Sub_0214:      LEAX 1,X              
 
 /label/ $0244 OptRTS
@@ -377,7 +379,8 @@ F$Exit with B = 0 (normal) or error code.
 ;   Only opened when extended or filter mode active (BSS.$0B set).
 ;   Suggest renaming: execDir
 
-/rename-label/ Dat_046C execDir
+/label/ $046C execDir
+/dlabel/ $046C $046E auto execDir
 
 
 ; ── OPEN QUESTIONS FOR DANIEL ────────────────────────────────────
