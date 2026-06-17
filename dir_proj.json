@@ -15,6 +15,7 @@
     "0039": "CLinParmG",
     "0045": "CLinPEnd",
     "005B": "CLinLoopB",
+    "0451": "ErrExit",
     "046A": "cwdChar",
     "046B": "cwdAndCR",
     "06A7": "WritBlines",

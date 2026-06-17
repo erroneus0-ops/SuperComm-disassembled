@@ -253,7 +253,7 @@ $0091  20 07                              BRA Loc_009A
 ; --------------------------------------------------------------
 $0093  C1 D0               Loc_0093:      CMPB #$D0             
 $0095  27 05                              BEQ Loc_009C          
-$0097  16 03 B7                           LBRA Loc_0451         
+$0097  16 03 B7                           LBRA ErrExit          
 
 ; --------------------------------------------------------------
 $009A  97 11               Loc_009A:      STA <BSS.LastCol      
@@ -263,7 +263,7 @@ $00A0  96 17               Loc_00A0:      LDA <BSS.$17
 $00A2  8A 80                              ORA #$80              
 $00A4  9E 02                              LDX <BSS.NextDir      
 $00A6  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
-$00A9  10 25 03 A4                        LBCS Loc_0451         
+$00A9  10 25 03 A4                        LBCS ErrExit          
 $00AD  97 00                              STA <BSS.DirPath      
 $00AF  9E 02                              LDX <BSS.NextDir      
 $00B1  96 17                              LDA <BSS.$17          
@@ -273,7 +273,7 @@ $00B8  27 0F                              BEQ Loc_00C9
 $00BA  96 17                              LDA <BSS.$17          
 $00BC  30 8D 03 AC                        LEAX Dat_046C,PC       ; X → Dat_046C
 $00C0  10 3F 84                           OS9 I$Open             ; mode=B  name→X  → path→A
-$00C3  10 25 03 8A                        LBCS Loc_0451         
+$00C3  10 25 03 8A                        LBCS ErrExit          
 $00C7  97 01                              STA <$01              
 $00C9  96 11               Loc_00C9:      LDA <BSS.LastCol      
 $00CB  97 12                              STA <BSS.ColmPos      
@@ -284,7 +284,7 @@ $00D3  30 8D 03 97                        LEAX dirMsg01,PC       ; X → dirMsg0
 $00D7  10 8E 00 0F                        LDY #$000F            
 $00DB  86 01                              LDA #$01              
 $00DD  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$00E0  10 25 03 6D                        LBCS Loc_0451         
+$00E0  10 25 03 6D                        LBCS ErrExit          
 $00E4  31 C8 25                           LEAY BSS.$25,U        
 $00E7  9E 02                              LDX <BSS.NextDir      
 $00E9  A6 80               Loc_00E9:      LDA ,X+                ; this is a loop copying the NextDir to BSS.$25
@@ -311,12 +311,12 @@ $0116  27 0E                              BEQ Loc_0126
 $0118  CC 01 02                           LDD #$0102             ; LDA=$01 (output path), LDB=$02 (Number of lines)
 $011B  30 8D 03 5E                        LEAX dirMsg02,PC       ; X → Address of output lines
 $011F  17 05 85                           LBSR WritBlines        ; call write out lines
-$0122  10 25 03 2B                        LBCS Loc_0451         
+$0122  10 25 03 2B                        LBCS ErrExit          
 $0126  96 00               Loc_0126:      LDA <BSS.DirPath      
 $0128  10 8E 00 20                        LDY #$0020            
 $012C  30 C8 58                           LEAX BSS.DEName,U     
 $012F  10 3F 89                           OS9 I$Read             ; path=A  count=Y  buf→X
-$0132  10 25 03 1B                        LBCS Loc_0451          ; Run away on error
+$0132  10 25 03 1B                        LBCS ErrExit           ; Run away on error
 $0136  DC 76                              LDD <BSS.wLSN0        
 $0138  DD 77                              STD <BSS.wLSN1        
 $013A  96 75                              LDA <BSS.DENend       
@@ -358,7 +358,7 @@ $0183  96 01                              LDA <$01
 $0185  C6 20                              LDB #$20               ; B = SS.ScSiz  (GetStt/SetStt subcode)
 $0187  10 3F 8D                           OS9 I$GetStt           ; path=A  subcode=B  buf→X
 $018A  35 40                              PULS U                
-$018C  10 25 02 C1                        LBCS Loc_0451         
+$018C  10 25 02 C1                        LBCS ErrExit          
 $0190  96 18                              LDA <$18              
 $0192  84 80                              ANDA #$80             
 $0194  0D 0E                              TST <BSS.$0E          
@@ -384,7 +384,7 @@ $01B3  1F 02                              TFR D,Y
 $01B5  4C                                 INCA                  
 $01B6  30 C8 58                           LEAX BSS.DEName,U     
 $01B9  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$01BC  10 25 02 91                        LBCS Loc_0451         
+$01BC  10 25 02 91                        LBCS ErrExit          
 $01C0  96 12                              LDA <BSS.ColmPos      
 $01C2  80 10               Loc_01C2:      SUBA #$10             
 $01C4  2F 19                              BLE Loc_01DF          
@@ -397,7 +397,7 @@ $01CE  1F 02                              TFR D,Y
 $01D0  4C                                 INCA                  
 $01D1  30 8D 03 44                        LEAX Dat_0519,PC       ; X → Dat_0519
 $01D5  10 3F 8A                           OS9 I$Write            ; path=A  count=Y  buf→X
-$01D8  10 25 02 75                        LBCS Loc_0451         
+$01D8  10 25 02 75                        LBCS ErrExit          
 $01DC  16 FF 47                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
@@ -405,7 +405,7 @@ $01DF  86 01               Loc_01DF:      LDA #$01
 $01E1  10 8E 00 01                        LDY #$0001            
 $01E5  30 8D 02 82                        LEAX cwdAndCR,PC       ; X → cwdAndCR
 $01E9  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$01EC  10 25 02 61                        LBCS Loc_0451         
+$01EC  10 25 02 61                        LBCS ErrExit          
 $01F0  96 11                              LDA <BSS.LastCol      
 $01F2  97 12                              STA <BSS.ColmPos      
 $01F4  0D 0A                              TST <$0A              
@@ -419,7 +419,7 @@ $0201  86 01                              LDA #$01
 $0203  30 C8 58                           LEAX BSS.DEName,U     
 $0206  10 8E 00 1E                        LDY #$001E            
 $020A  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$020D  10 25 02 40                        LBCS Loc_0451         
+$020D  10 25 02 40                        LBCS ErrExit          
 $0211  16 FF 12                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
@@ -457,7 +457,7 @@ $0247  20 CB                              BRA Sub_0214
 $0249  CC 01 0C            Loc_0249:      LDD #$010C            
 $024C  30 8D 02 DC                        LEAX helpMsg,PC        ; X → helpMsg
 $0250  17 04 54                           LBSR WritBlines        ; call WritBlines
-$0253  16 01 FB                           LBRA Loc_0451         
+$0253  16 01 FB                           LBRA ErrExit          
 
 ; --------------------------------------------------------------
 $0256  CB 04               Loc_0256:      ADDB #$04             
@@ -518,7 +518,7 @@ $02A9  81 3F                              CMPA #$3F              ; is it wildcha
 $02AB  27 07                              BEQ Loc_02B4           ; yes? Go to wild handler
 $02AD  C6 EB                              LDB #$EB               ; Set error code $EB BAD NAME: illegal name syntax
 $02AF  1A 01                              ORCC #$01              ; set CC: C -- gotta be convincing with error report
-$02B1  16 01 9D                           LBRA Loc_0451          ; this is invalid input bail out!
+$02B1  16 01 9D                           LBRA ErrExit           ; this is invalid input bail out!
 
 ; --------------------------------------------------------------
 $02B4  9F 06               Loc_02B4:      STX <BSS.PatPtr       
@@ -715,7 +715,7 @@ $0409  30 C8 25                           LEAX BSS.$25,U
 $040C  10 8E 00 50                        LDY #$0050            
 $0410  86 01                              LDA #$01              
 $0412  10 3F 8C                           OS9 I$WritLn           ; path=A  buf→X
-$0415  25 3A                              BCS Loc_0451           ; C=1 (BLO)
+$0415  25 3A                              BCS ErrExit            ; C=1 (BLO)
 $0417  16 FD 0C                           LBRA Loc_0126         
 
 ; --------------------------------------------------------------
@@ -755,7 +755,7 @@ $044D  E7 80                              STB ,X+
 $044F  20 F4                              BRA Loc_0445          
 
 ; --------------------------------------------------------------
-$0451  C1 D3               Loc_0451:      CMPB #$D3              ; Is this End of File error code
+$0451  C1 D3               ErrExit:       CMPB #$D3              ; Is this End of File error code
 $0453  26 01                              BNE Loc_0456           ; OK, then don't clear B
 $0455  5F                                 CLRB                   ; If it's end of directory, that's fine
 $0456  0D 10               Loc_0456:      TST <BSS.ColWidth      ; What's in the ColWidth?
