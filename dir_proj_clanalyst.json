@@ -1,0 +1,335 @@
+{
+  "binary": "dir",
+  "binary_crc": "EAF8307096C720C1",
+  "cpu": "6809",
+  "output": "dir_proj_clanalyst.asm",
+  "entry": null,
+  "module_notes": [
+    "Add notes about this module here."
+  ],
+  "emit_equates": true,
+  "defs_file": null,
+  "custom_equates": [],
+  "labels": {
+    "0214": "Sub_0214",
+    "0244": "OptRTS",
+    "0245": "OptC",
+    "0249": "OptUnknown",
+    "0256": "OptX",
+    "025A": "OptS",
+    "025E": "OptEL",
+    "0264": "OptD",
+    "026A": "OptF",
+    "0270": "OptA",
+    "0274": "Sub_0274",
+    "0317": "Sub_0317",
+    "035F": "Sub_035F",
+    "036E": "Loc_036E",
+    "041A": "Sub_041A",
+    "042B": "Sub_042B",
+    "0437": "Sub_0437",
+    "0442": "Sub_0442",
+    "046A": "cwdChar",
+    "046B": "cwdAndCR",
+    "06A7": "WritBlines",
+    "06BC": "endWritBlines"
+  },
+  "bss": {
+    "0": "BSS.DirPath",
+    "1": "BSS.CWDPath",
+    "2": "BSS.NextDir",
+    "4": "BSS.BufPtr",
+    "6": "BSS.PatPtr",
+    "8": "BSS.DirCount",
+    "9": "BSS.MatchFlag",
+    "10": "BSS.ColFlag",
+    "11": "BSS.AnyFlag",
+    "12": "BSS.PatFlag",
+    "13": "BSS.ExtFlag",
+    "14": "BSS.DirOnly",
+    "15": "BSS.FileOnly",
+    "16": "BSS.ColWidth",
+    "17": "BSS.LastCol",
+    "18": "BSS.ColmPos",
+    "19": "BSS.DENameLen",
+    "21": "BSS.PatTmp",
+    "23": "BSS.OpenMode",
+    "37": "BSS.PathBuf",
+    "88": "BSS.DEName",
+    "117": "BSS.DENend",
+    "118": "BSS.wLSN0",
+    "119": "BSS.wLSN1",
+    "120": "BSS.wLSN2",
+    "121": "BSS.$79",
+    "122": "BSS.DotChar"
+  },
+  "data_regions": [
+    {
+      "start": "0519",
+      "end": "052C",
+      "label": "Dat_0519",
+      "format": "text",
+      "end_label": false
+    },
+    {
+      "start": "046A",
+      "end": "046B",
+      "format": "auto",
+      "label": "cwdChar",
+      "end_label": true
+    },
+    {
+      "start": "046B",
+      "end": "046C",
+      "format": "auto",
+      "label": "cwdAndCR",
+      "end_label": true
+    },
+    {
+      "start": "046E",
+      "end": "047D",
+      "format": "auto",
+      "label": "dirMsg01",
+      "end_label": true
+    },
+    {
+      "start": "047D",
+      "end": "04F9",
+      "format": "auto",
+      "label": "dirMsg02",
+      "end_label": true
+    },
+    {
+      "start": "04F9",
+      "end": "0519",
+      "format": "auto",
+      "label": "dirMsg03",
+      "end_label": true
+    },
+    {
+      "start": "052C",
+      "end": "06A7",
+      "format": "auto",
+      "label": "helpMsg",
+      "end_label": true
+    }
+  ],
+  "line_comments": {
+    "0014": "ColWidth=1, LastCol=80",
+    "0016": "A = '.' current directory",
+    "00E9": "this is a loop copying the NextDir to BSS.$25",
+    "00ED": "Looking for a CR terminator",
+    "00EF": "Nope?  Keep looking!",
+    "00F7": "Replace the $0D(CR) with \"/\"",
+    "0118": "LDA=$01 (output path), LDB=$02 (Number of lines)",
+    "011B": "X \u2192 Address of output lines",
+    "011F": "call write out lines",
+    "0132": "Run away on error",
+    "0140": "Loop back DEName=$00 DELETED! entry",
+    "0146": "A & %01111111=stripSignBit()",
+    "014D": "point to filename start",
+    "0150": "get the byte, X=X+1",
+    "0152": "advance length counter",
+    "0153": "this compare...?",
+    "0155": "If carry set read another character ; C=1 (BLO)",
+    "0157": "else, store filename length in BSS.$13",
+    "0159": "clear the 7th bit",
+    "015B": "fix the last character of the filename",
+    "015F": "terminate the string",
+    "0214": "X=X+1",
+    "0216": "get the next byte",
+    "0218": "is it a space?",
+    "021A": "...go RTS",
+    "021C": "At the end of the cmdlin?",
+    "021E": "yeah, prolly ...go RTS",
+    "0220": "A & %11011111 == toUpper()",
+    "0377": "Did we reach the next msgBlock?",
+    "0379": "If yes, break from loop",
+    "037B": "Otherwise copy that char to Y+",
+    "037D": "Keep looping",
+    "0451": "%11010011 ?",
+    "0456": "That variable",
+    "0458": "Don't like TST=0? Fine! Quit!",
+    "0464": "Why WritLn not Write?",
+    "06A7": "B=# of lines, X=location of stuff to print.",
+    "06A8": "Max length = 80 columns",
+    "06AC": "path=A=$01  buf\u2192X",
+    "06AF": "Error detected. Break out of loop.",
+    "06B1": "Save the path and line count",
+    "06B3": "Y now contains # chars printed and so does D",
+    "06B5": "Move X pointet to next line",
+    "06B7": "Bring A and B back.",
+    "06B9": "Is B zero? (last line)",
+    "06BA": "If not loop back where it decrements B for the next line"
+  },
+  "block_comments": {
+    "0011": [
+      "Init \u2014 program entry point.",
+      "Initializes BSS, parses command line, opens directory, runs main listing loop."
+    ],
+    "002D": [
+      "Command line parse loop.",
+      "X points at OS-9 parameter string (does not include program name).",
+      "Dispatches on: CR (done), space (skip), '-' (option), other (path/pattern)."
+    ],
+    "005F": [
+      "End of command line parsing.",
+      "Build BSS.AnyFlag = BSS.ExtFlag | BSS.DirOnly | BSS.FileOnly.",
+      "Then detect terminal width if multi-column mode active."
+    ],
+    "0069": [
+      "Terminal width detection via I$GetStt subcode $20 (PD.OPT offset in path descriptor).",
+      "B returned in X after TFR X,D.",
+      "Thresholds: \u2265$50(80)=full, \u2265$40(64)=64-col, \u2265$30(48)=48-col, \u2265$20(32)=32-col, <$20=disable columns.",
+      "$D0 error = non-CCIO device, also disables columns."
+    ],
+    "00A0": [
+      "Open the directory for reading.",
+      "Mode = BSS.OpenMode | $80 (read + directory bit)."
+    ],
+    "00B6": [
+      "If AnyFlag set (extended or filter mode), also open CWD separately.",
+      "CWD path is the '@'+CR pair at Dat_046C \u2014 OS-9 shorthand for current execution dir.",
+      "Wait \u2014 that's execution dir (@), not current data dir (.).",
+      "For -e extended mode, the program needs file descriptor info requiring a second open."
+    ],
+    "00C9": [
+      "Initialize column position to terminal width.",
+      "If neither extended nor multi-column: skip header, go straight to read loop."
+    ],
+    "00D3": [
+      "Write \"Directory of \" header (15 bytes, no CR \u2014 path follows on same line)."
+    ],
+    "00E4": [
+      "Copy BSS.NextDir path string to BSS.PathBuf.",
+      "If pattern flag set (-p), append '/' and pattern after path.",
+      "Then I$WritLn the full path \u2014 this is the \"Directory of /dd/CMDS\" header line."
+    ],
+    "0114": [
+      "If extended mode: write column headers (dirMsg02) via WritBlines.",
+      "dirMsg02 = \"User # Last Modified...\" header + separator line."
+    ],
+    "0126": [
+      "Main directory read loop.",
+      "Reads one 32-byte RBF directory entry per iteration.",
+      "End-of-directory detected at Loc_0451 via error $D3 from I$Read."
+    ],
+    "0136": [
+      "Shift LSN bytes one position down in BSS before reformatting filename.",
+      "Reason: FCS\u2192CR reformat may write CR at $75 (BSS.DENend), overwriting LSN0.",
+      "After shift, LSN lives at wLSN0/1/2 ($76/$77/$78) \u2014 safe from CR overwrite.",
+      "The 32-byte I$Read call deposits a 33-byte working structure by design."
+    ],
+    "013E": [
+      "Filter pipeline for directory entries:",
+      "  $00 \u2192 deleted/empty slot \u2014 skip",
+      "  $80 \u2192 null FCS name (degenerate) \u2014 skip length count, go to Loc_014C",
+      "  strip bit 7, compare to BSS.DotChar:",
+      "    if match \u2192 dot/dotdot entry \u2014 skip (unless -a cleared DotChar)"
+    ],
+    "014C": [
+      "Count filename length and convert FCS format to CR-terminated string.",
+      "FCS = last character has bit 7 set as end-of-name marker.",
+      "BCS loop continues while char < $80 (bit 7 clear).",
+      "After loop: strip bit 7 from last char, append CR at ,X.",
+      "Store length in BSS.DENameLen."
+    ],
+    "0161": [
+      "If pattern flag set: call Sub_0317 to wildcard-match filename against pattern.",
+      "Sub_035F (called inside Sub_0317) optionally uppercases for case-insensitive compare.",
+      "If no match: loop back to $0126 for next entry."
+    ],
+    "0172": [
+      "If AnyFlag set (extended or filter mode):",
+      "  Call I$GetStt on CWD path to get file attributes.",
+      "  BSS.$18 bit 7 = directory attribute bit.",
+      "  If DirOnly set:  skip non-directory entries.",
+      "  If FileOnly set: skip directory entries."
+    ],
+    "01A4": [
+      "Column layout decision:",
+      "  ColWidth=0 \u2192 single column mode \u2192 branch to $01FB",
+      "  ColWidth=1 \u2192 multi-column mode \u2192 continue here",
+      "  Compare filename length against remaining column space.",
+      "  If fits: write filename, pad spaces, update ColmPos.",
+      "  If doesn't fit: emit CR, reset ColmPos, write filename on new line."
+    ],
+    "01B0": [
+      "Filename fits on current line.",
+      "I$Write the filename (not WritLn \u2014 no CR yet, more entries may follow).",
+      "Compute padding: subtract filename len from ColmPos in steps of 16.",
+      "Write padding spaces from Dat_0519 (19-space pad string).",
+      "Loop back to $0126."
+    ],
+    "01DF": [
+      "Filename didn't fit \u2014 start new line.",
+      "I$WritLn cwdAndCR (just a CR byte) to terminate current line.",
+      "Reset ColmPos to LastCol (full width again).",
+      "If BSS.ColFlag set (something was on this line before): loop to pad logic.",
+      "Otherwise loop to $0126."
+    ],
+    "01FB": [
+      "Single-column narrow mode entry point.",
+      "Reached when ColWidth=0 (set by -s, or forced by narrow terminal).",
+      "If ExtFlag set \u2192 format full extended line via Loc_036E.",
+      "If ExtFlag clear \u2192 simple I$WritLn of filename (30 bytes)."
+    ],
+    "036E": [
+      "Extended listing formatter.",
+      "Reached when -e/-l AND single-column mode.",
+      "Copies filename portion from dirMsg03 format template to BSS.PathBuf.",
+      "Then fills in metadata fields by reading from file descriptor sector.",
+      "Uses wLSN0/1/2 to locate the file descriptor sector.",
+      "Field order in output: user#, date, time, attributes, sector, size, filename.",
+      "Sub_041A: converts byte to 2 decimal ASCII digits in output buffer.",
+      "Sub_042B: converts byte to 2 hex ASCII digits.",
+      "Sub_0442: strips leading \"space+zero\" for cleaner numeric fields."
+    ],
+    "0451": [
+      "Error/exit handler.",
+      "Error $D3 = end-of-directory (I$Read past last entry) = normal termination.",
+      "If multi-column and ColWidth still set: emit final CR to terminate last line.",
+      "F$Exit with B = 0 (normal) or error code."
+    ],
+    "0519": [
+      "The last line is a format template \u2014 fields updated in place."
+    ]
+  },
+  "substitutions": {},
+  "routines": [],
+  "footnotes": {},
+  "forced_equs": {},
+  "patches": {},
+  "hex_offsets": [
+    "U"
+  ],
+  "bss_comments": {
+    "0": "path number for the directory opened for reading",
+    "1": "path number for CWD (opened when -e flag set)",
+    "2": "pointer to current directory path string (CR terminated)",
+    "4": "pointer to end of current token in command line",
+    "6": "pointer to wildcard pattern string (CR terminated)",
+    "8": "flag: set by -c option (case-insensitive match)",
+    "9": "Sub_0317 result: 1=match 0=no match",
+    "10": "set when at least one entry written to current output line",
+    "11": "OR of $0D|$0E|$0F \u2014 extended|dirs-only|files-only active",
+    "12": "set when wildcard pattern specified",
+    "13": "set by -e or -l: extended listing mode",
+    "14": "set by -d: show only directory entries",
+    "15": "set by -f: show only non-directory entries",
+    "16": "0=single column (-s), 1=multi-column (default)",
+    "17": "terminal column width (from SS.ScSiz, default 80=$50)",
+    "18": "remaining columns on current line \u2014 resets to LastCol each new line",
+    "19": "length of current filename after FCS\u2192CR reformat",
+    "21": "temp char storage during wildcard pattern matching in Sub_0317",
+    "23": "I$Open/I$ChgDir mode byte \u2014 built from flags",
+    "37": "output buffer: copy of NextDir path, reformatted for display",
+    "88": "RBF directory entry buffer (32 bytes from I$Read)",
+    "117": "byte 28 of dir entry \u2014 last char of FCS name OR CR terminator",
+    "118": "working LSN high byte (shifted from $75 before name reformat)",
+    "119": "working LSN middle byte",
+    "120": "working LSN low byte",
+    "121": "purpose unknown \u2014 cleared at init, not seen used after",
+    "122": "dot-file filter char (init='.', cleared by -a to show all)"
+  }
+}
