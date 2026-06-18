@@ -123,37 +123,38 @@ F$SigMask EQU   $27
 F$NMLink EQU    $28
 ; ================================================================
 
-; ── BSS Variable Equates ─────────────────────────────────────
-BSS.ParamStr  EQU    $02      ; 2 bytes
-BSS.ParamBase EQU    $04      ; 2 bytes
-BSS.RxBufPtr  EQU    $06      ; 2 bytes
-BSS.TxBufPtr  EQU    $08      ; 3 bytes
-BSS.Var000B   EQU    $0B      ; 19 bytes
-BSS.CurrChar  EQU    $1E      ; 1 byte
-BSS.PrevChar  EQU    $1F      ; 1 byte
-BSS.StateFlag EQU    $20      ; 13 bytes
-BSS.Counter1  EQU    $2D      ; 6 bytes
-BSS.TermMode  EQU    $33      ; 19 bytes
-BSS.EchoFlag  EQU    $46      ; 4 bytes
-BSS.FlowCtrl  EQU    $4A      ; 3 bytes
-BSS.Counter2  EQU    $4D      ; 1 byte
-BSS.Counter3  EQU    $4E      ; 12 bytes
-BSS.ConnState EQU    $5A      ; 1 byte
-BSS.ConnWord  EQU    $5B      ; 2 bytes
-BSS.BufPtr1   EQU    $5D      ; 2 bytes
-BSS.BufCount  EQU    $5F      ; 4 bytes
-BSS.BufPtr2   EQU    $63      ; 2 bytes
-BSS.BufPtr3   EQU    $65      ; 2 bytes
-BSS.Counter4  EQU    $67      ; 3557 bytes
-BSS.CommPtr   EQU    $E4C      ; 5 bytes
-BSS.CommState EQU    $E51      ; 6 bytes
-BSS.CommSz1   EQU    $E57      ; 2 bytes
-BSS.CommSz2   EQU    $E59      ; 3 bytes
-BSS.CommOff   EQU    $E5C      ; 17 bytes
-BSS.CommFlag  EQU    $E6D      ; 6 bytes
-BSS.BaudState EQU    $E73      ; 4 bytes
-BSS.FlowState EQU    $E77      ; 2910 bytes
-BSS.IoBuf     EQU    $19D5      ; ?
+; ── BSS Variable Declarations ────────────────────────────────
+BSS.ParamStr  rmb    2 ; 2 bytes
+BSS.ParamBase rmb    2 ; 2 bytes
+BSS.RxBufPtr  rmb    2 ; 2 bytes
+BSS.TxBufPtr  rmb    3 ; 3 bytes
+BSS.Var000B   rmb    19 ; 19 bytes
+BSS.CurrChar  rmb    1 ; 1 byte
+BSS.PrevChar  rmb    1 ; 1 byte
+BSS.StateFlag rmb    13 ; 13 bytes
+BSS.Counter1  rmb    6 ; 6 bytes
+BSS.TermMode  rmb    19 ; 19 bytes
+BSS.EchoFlag  rmb    4 ; 4 bytes
+BSS.FlowCtrl  rmb    3 ; 3 bytes
+BSS.Counter2  rmb    1 ; 1 byte
+BSS.Counter3  rmb    12 ; 12 bytes
+BSS.ConnState rmb    1 ; 1 byte
+BSS.ConnWord  rmb    2 ; 2 bytes
+BSS.BufPtr1   rmb    2 ; 2 bytes
+BSS.BufCount  rmb    4 ; 4 bytes
+BSS.BufPtr2   rmb    2 ; 2 bytes
+BSS.BufPtr3   rmb    2 ; 2 bytes
+BSS.Counter4  rmb    3557 ; 3557 bytes
+BSS.CommPtr   rmb    5 ; 5 bytes
+BSS.CommState rmb    6 ; 6 bytes
+BSS.CommSz1   rmb    2 ; 2 bytes
+BSS.CommSz2   rmb    3 ; 3 bytes
+BSS.CommOff   rmb    17 ; 17 bytes
+BSS.CommFlag  rmb    6 ; 6 bytes
+BSS.BaudState rmb    4 ; 4 bytes
+BSS.FlowState rmb    2910 ; 2910 bytes
+BSS.IoBuf     rmb    1 ; 1 byte
+size     equ   .
 
 ; ==============================================================
 ; Disassembly:  supercomm22
@@ -178,19 +179,20 @@ BSS.IoBuf     EQU    $19D5      ; ?
 ; ==============================================================
 
 ; ----- Module Header -----
-ModHeader
-         FDB    $87CD             ; OS-9 module sync bytes
-         FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)
-         FDB    ModName           ; name offset
-         FCB    $11               ; type: program
-         FCB    $81               ; language
-         FCB    $A8               ; attributes/parity
-         FDB    Init              ; execution entry
-         FDB    $2000             ; BSS size
+         nam   SuperComm
+         ttl   SuperComm
+
+edition  set   1
+
+tylg     set   $11
+atrv     set   $A8
+
+         mod   eom,name,tylg,atrv,Init,size
 
 ; ----- Module Name -----
-ModName
-         FCS    "SuperComm"
+name
+         fcs   "SuperComm"
+         fcb   edition
 
 ; ==============================================================
 ; Pre-exec data  (post-name)—$0A70
@@ -7794,10 +7796,7 @@ $45BC  6C C9 00 9B                        INC 155,U
 $45C0  20 B3                              BRA Loc_4575          
 
 ; ==============================================================
-; ModEnd — CRC-24 appended by fixmod (not in source)
 ; ==============================================================
-ModEnd
-; CRC-24 (3 bytes) appended here by fixmod
-         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
-ModCRC
-ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+         emod
+eom      equ   *
+         end

@@ -8,7 +8,7 @@ corresponding proj.json with the changes. Safe to run multiple times
 visible until the analyst regenerates from the disassembler.
 
 Usage:
-    python3 markup.py appname_proj.asm [appname_proj.json]
+    python3 markup.py appname_proj.dasm [appname_proj.json]
 
 If the JSON path is not specified, it is inferred from the ASM filename
 by replacing _proj.asm with _proj.json (or .asm → .json).
@@ -767,7 +767,7 @@ def merge_into_json(json_path, changes, warn):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: edits_to_json.py appname_proj.asm [appname_proj.json]")
+        print("Usage: edits_to_json.py appname_proj.dasm [appname_proj.json]")
         sys.exit(1)
 
     asm_path  = sys.argv[1]

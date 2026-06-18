@@ -472,7 +472,7 @@ class Project:
         """Create a minimal project scaffold for a new binary."""
         p = cls()
         p.binary = binary_path
-        p.output = output_path or binary_path + '_proj.asm'
+        p.output = output_path or binary_path + '_proj.dasm'
         p.module_notes = ["Add notes about this module here."]
         p.cpu = '6809'  # change to '6309' for Hitachi HD6309 binaries
         # Compute and store binary CRC for future mismatch detection
@@ -2675,7 +2675,7 @@ MARKUP_QUICK_REF = """
 ; MARKUP QUICK REFERENCE  (markup.py directives)
 ; ══════════════════════════════════════════════════════════════
 ;
-; Run:  python markup.py proj.asm [proj.json]
+; Run:  python markup.py proj.dasm [proj.json]
 ; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
 ;
 ; ── Labeling ──────────────────────────────────────────────────
@@ -2871,7 +2871,7 @@ Examples:
                 if stem.endswith(suffix):
                     stem = stem[:-len(suffix)]
                     break
-            proj = Project.scaffold(source, stem + '_proj.asm')
+            proj = Project.scaffold(source, stem + '_proj.dasm')
             proj.to_json(json_path)
             print(f"  Created:    {json_path}")
             print(f"  Binary:     {source}")
@@ -2985,7 +2985,7 @@ Examples:
                     stem = stem[:-len(suffix)]
                     break
 
-            proj = Project.scaffold(source, stem + '_proj.asm')
+            proj = Project.scaffold(source, stem + '_proj.dasm')
             proj.to_json(json_path)
             print()
             print(f"  Created: {json_path}")
@@ -3036,7 +3036,7 @@ Examples:
     asm = eng.render()
     if args.markup:
         asm = asm + MARKUP_QUICK_REF
-    out_path = proj.output or (stem + '_proj.asm')
+    out_path = proj.output or (stem + '_proj.dasm')
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(asm)
     print(f"Written: {out_path}  ({len(asm.splitlines())} lines)",

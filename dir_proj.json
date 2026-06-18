@@ -2,7 +2,7 @@
   "binary": "dir",
   "binary_crc": "EAF8307096C720C1",
   "cpu": "6809",
-  "output": "dir_proj.asm",
+  "output": "dir_proj.dasm",
   "entry": null,
   "module_notes": [
     "Add notes about this module here."

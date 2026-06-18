@@ -2,7 +2,7 @@
   "binary": "supercomm22",
   "binary_crc": "4AF84343827B17B3",
   "cpu": "6809",
-  "output": "supercomm22_proj.asm",
+  "output": "supercomm22_proj.dasm",
   "entry": null,
   "module_notes": [
     "SuperComm v2.2 \u2014 OS-9 Level II terminal / communications program",
