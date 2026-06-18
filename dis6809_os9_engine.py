@@ -326,6 +326,7 @@ class Project:
         self.substitutions= {}        # int_addr -> {replace_lines, with_lines}
         self.routines     = []        # [{name, start, end}] routine boundaries
         self.hex_offsets  = []        # list of registers to show hex offset comments: X Y U S PC
+        self.target       = 'os9'     # output style: 'os9' (idiomatic) or 'raw'
 
     @classmethod
     def from_json(cls, path):
@@ -343,6 +344,7 @@ class Project:
         p.emit_equates  = d.get('emit_equates', True)
         p.defs_file     = d.get('defs_file', None)
         p.hex_offsets   = d.get('hex_offsets', [])
+        p.target        = d.get('target', 'os9')
 
         # entry: hex string or None
         entry = d.get('entry', None)
@@ -431,6 +433,7 @@ class Project:
             'emit_equates':   self.emit_equates,
             'defs_file':      self.defs_file,
             'hex_offsets':    self.hex_offsets,
+            'target':         self.target,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
             'bss_comments':   {str(k): v for k,v in sorted(self.bss_comments.items())},
@@ -1682,19 +1685,32 @@ class Engine:
             out.append("")
 
         if proj.bss:
-            out.append("; ── BSS Variable Equates ─────────────────────────────────────")
-            sorted_bss = sorted(proj.bss.keys())
-            for i, off in enumerate(sorted_bss):
-                name_str = proj.bss[off]
-                # Determine size from gap to next named offset
-                if i + 1 < len(sorted_bss):
-                    gap = sorted_bss[i+1] - off
-                    size_cmt = f"{gap} byte{'s' if gap != 1 else ''}"
-                else:
-                    size_cmt = "?"
-                extra = proj.bss_comments.get(off, '')
-                cmt = extra if extra else size_cmt
-                out.append(f"{name_str:<14}EQU    ${off:02X}      ; {cmt}")
+            if proj.target == 'os9':
+                out.append("; ── BSS Variable Declarations ────────────────────────────────")
+                sorted_bss = sorted(proj.bss.keys())
+                for i, off in enumerate(sorted_bss):
+                    name_str = proj.bss[off]
+                    if i + 1 < len(sorted_bss):
+                        gap = sorted_bss[i+1] - off
+                    else:
+                        gap = 1  # unknown, default 1
+                    extra = proj.bss_comments.get(off, '')
+                    cmt = f" ; {extra}" if extra else f" ; {gap} byte{'s' if gap != 1 else ''}"
+                    out.append(f"{name_str:<14}rmb    {gap}{cmt}")
+                out.append("size     equ   .")
+            else:
+                out.append("; ── BSS Variable Equates ─────────────────────────────────────")
+                sorted_bss = sorted(proj.bss.keys())
+                for i, off in enumerate(sorted_bss):
+                    name_str = proj.bss[off]
+                    if i + 1 < len(sorted_bss):
+                        gap = sorted_bss[i+1] - off
+                        size_cmt = f"{gap} byte{'s' if gap != 1 else ''}"
+                    else:
+                        size_cmt = "?"
+                    extra = proj.bss_comments.get(off, '')
+                    cmt = extra if extra else size_cmt
+                    out.append(f"{name_str:<14}EQU    ${off:02X}      ; {cmt}")
             out.append("")
 
         out += [
@@ -1723,21 +1739,44 @@ class Engine:
             f"; {'='*62}",
             "",
             "; ----- Module Header -----",
-            "ModHeader",
-            "         FDB    $87CD             ; OS-9 module sync bytes",
-            "         FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)",
-            "         FDB    ModName           ; name offset",
-            f"         FCB    ${hdr['mod_type']:02X}               ; type: {hdr['type_name']}",
-            f"         FCB    ${hdr['lang']:02X}               ; language",
-            f"         FCB    ${hdr['attr']:02X}               ; attributes/parity",
-            "         FDB    Init              ; execution entry",
-            f"         FDB    ${hdr['bss_size']:04X}             ; BSS size",
-            "",
-            "; ----- Module Name -----",
-            "ModName",
-            f"         FCS    \"{name}\"",
-            "",
         ]
+        if proj.target == 'os9':
+            tylg = f"${hdr['mod_type']:02X}"
+            atrv = f"${hdr['attr']:02X}"
+            out += [
+                f"         nam   {name}",
+                f"         ttl   {name}",
+                "",
+                f"edition  set   1",
+                "",
+                f"tylg     set   {tylg}",
+                f"atrv     set   {atrv}",
+                "",
+                f"         mod   eom,name,tylg,atrv,Init,size",
+                "",
+                "; ----- Module Name -----",
+                "name",
+                f"         fcs   \"{name}\"",
+                f"         fcb   edition",
+                "",
+            ]
+        else:
+            out += [
+                "ModHeader",
+                "         FDB    $87CD             ; OS-9 module sync bytes",
+                "         FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)",
+                "         FDB    ModName           ; name offset",
+                f"         FCB    ${hdr['mod_type']:02X}               ; type: {hdr['type_name']}",
+                f"         FCB    ${hdr['lang']:02X}               ; language",
+                f"         FCB    ${hdr['attr']:02X}               ; attributes/parity",
+                "         FDB    Init              ; execution entry",
+                f"         FDB    ${hdr['bss_size']:04X}             ; BSS size",
+                "",
+                "; ----- Module Name -----",
+                "ModName",
+                f"         FCS    \"{name}\"",
+                "",
+            ]
 
         # ── Pre-exec data region ──────────────────────────────────────
         if exec_off > 0x13:
@@ -2215,17 +2254,27 @@ class Engine:
                                 gap_pos = gnxt
                         pos = nxt; prev_ret = False
 
-        out += [
-            "",
-            f"; {'='*62}",
-            "; ModEnd — CRC-24 appended by fixmod (not in source)",
-            f"; {'='*62}",
-            "ModEnd",
-            "; CRC-24 (3 bytes) appended here by fixmod",
-            "         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod",
-            "ModCRC",
-            "ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes"
-        ]
+        if proj.target == 'os9':
+            out += [
+                "",
+                f"; {'='*62}",
+                f"; {'='*62}",
+                "         emod",
+                "eom      equ   *",
+                "         end",
+            ]
+        else:
+            out += [
+                "",
+                f"; {'='*62}",
+                "; ModEnd — CRC-24 appended by fixmod (not in source)",
+                f"; {'='*62}",
+                "ModEnd",
+                "; CRC-24 (3 bytes) appended here by fixmod",
+                "         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod",
+                "ModCRC",
+                "ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes"
+            ]
 
         # ── Analyst footnotes ──────────────────────────────────────────────
         if footnote_detail:
