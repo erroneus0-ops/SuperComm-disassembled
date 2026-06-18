@@ -1,21 +1,21 @@
-10 rem hello world -- humble beginnings
-20 rem 6809 assembly language tutorial
-30 rem
-40 rem reserve string space safely
+10 REM hello world -- humble beginnings
+20 REM 6809 assembly language tutorial
+30 REM
+40 REM reserve string space safely
 50 CLEAR 200
-60 rem
-70 rem declare all variables before varptr
-80 rem to prevent basic from moving the string
+60 REM
+70 REM declare all variables before varptr
+80 REM to prevent basic from moving the string
 90 A$=STRING$(78,0):V=0:A=0
-100 rem
-110 rem varptr returns address of string descriptor
-120 rem descriptor bytes 1-2 = address of string data
+100 REM
+110 REM varptr returns address of string descriptor
+120 REM descriptor bytes 1-2 = address of string data
 130 V=VARPTR(A$)
-140 rem
-150 rem get actual address of string data
+140 REM
+150 REM get actual address of string data
 160 A=PEEK(V+1)*256+PEEK(V+2)
-170 rem
-180 rem poke machine code into the string
+170 REM
+180 REM poke machine code into the string
 190 POKE A+0,189:POKE A+1,169:POKE A+2,40:POKE A+3,142
 200 POKE A+4,4:POKE A+5,234:POKE A+6,49:POKE A+7,141
 210 POKE A+8,0:POKE A+9,55:POKE A+10,198:POKE A+11,6
@@ -36,6 +36,6 @@
 360 POKE A+68,76:POKE A+69,79:POKE A+70,32:POKE A+71,87
 370 POKE A+72,79:POKE A+73,82:POKE A+74,76:POKE A+75,68
 380 POKE A+76,33:POKE A+77,0
-390 rem
-400 rem execute -- basic runs our machine code
+390 REM
+400 REM execute -- basic runs our machine code
 410 EXEC A
