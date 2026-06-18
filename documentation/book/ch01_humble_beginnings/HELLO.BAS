@@ -1,8 +1,8 @@
 10 REM hello world -- humble beginnings
 20 REM 6809 assembly language tutorial
 30 REM
-40 L=80
-50 CLEAR 200
+40 CLEAR 200
+50 L=80
 60 B$=""
 70 FOR I=1 TO L:READ A:B$=B$+CHR$(A):NEXT I
 80 V=VARPTR(B$)
