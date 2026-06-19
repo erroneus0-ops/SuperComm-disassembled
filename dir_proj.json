@@ -204,5 +204,6 @@
   ],
   "bss_comments": {
     "19": "byte count of file name"
-  }
+  },
+  "target": "raw"
 }
