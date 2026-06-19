@@ -215,7 +215,7 @@ $004F  17 01 C2                           LBSR Sub_0214          ; call Sub_0214
 $0052  20 03                              BRA Loc_0057          
 
 ; --------------------------------------------------------------
-$0054  17 02 1D            CLinNonFlag:   LBSR Sub_0274          ; call Sub_0274
+$0054  17 02 1D            CLinNonFlag:   LBSR CLinNamP          ; call CLinNamP
 $0057  9E 04               Loc_0057:      LDX <BSS.BufPtr       
 $0059  20 D2                              BRA CLinPars          
 
@@ -489,7 +489,6 @@ $0270  0F 7A               Loc_0270:      CLR <BSS.DotChar
 $0272  20 A0                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-<<<<<<< HEAD
 $0274  9F 02               CLinNamP:      STX <BSS.NextDir       ; filename or "*,?" matching is expected!
 $0276  A6 80               CLinNamP1:     LDA ,X+                ; Sample char, X+1
 $0278  81 5F                              CMPA #$5F              ; compare A with '_'
@@ -510,61 +509,32 @@ $0294  81 7A                              CMPA #$7A              ; compare A wit
 $0296  23 DE                              BLS CLinNamP1          ; Good char, get another
 $0298  81 0D               ClinNoNam:     CMPA #$0D              ; Is this EOL?
 $029A  27 08                              BEQ CLinEnd            ; if so, get out, we're done!
-=======
-$0274  9F 02               Sub_0274:      STX <BSS.NextDir       ; This is where filenames are expected
-$0276  A6 80               Loc_0276:      LDA ,X+                ; Sample char, X+1
-$0278  81 5F                              CMPA #$5F              ; compare A with '_'
-$027A  27 FA                              BEQ Loc_0276           ; invalid char, get another
-$027C  81 2D                              CMPA #$2D              ; compare A with '-'
-$027E  27 F6                              BEQ Loc_0276           ; invalid char, get another
-$0280  81 2E                              CMPA #$2E              ; compare A with '.'
-$0282  25 14                              BCS Loc_0298           ; unsigned BLO, this character is invalid for filemame
-$0284  81 39                              CMPA #$39              ; compare A with '9'
-$0286  23 EE                              BLS Loc_0276          
-$0288  81 41                              CMPA #$41              ; compare A with 'A'
-$028A  25 0C                              BCS Loc_0298           ; C=1 (BLO)
-$028C  81 5A                              CMPA #$5A              ; compare A with 'Z'
-$028E  23 E6                              BLS Loc_0276          
-$0290  81 61                              CMPA #$61              ; compare A with 'a'
-$0292  25 04                              BCS Loc_0298           ; C=1 (BLO)
-$0294  81 7A                              CMPA #$7A              ; compare A with 'z'
-$0296  23 DE                              BLS Loc_0276          
-$0298  81 0D               Loc_0298:      CMPA #$0D              ; Is this EOL?
-$029A  27 08                              BEQ Loc_02A4           ; if so, get out, we're done!
->>>>>>> 889da31b8f4d44824eb0e462f9ffafe054212ad6
 $029C  81 20                              CMPA #$20              ; compare A with ' '
-$029E  26 05                              BNE CLinWldCd          ; Ah, not a space, process the chars (wildcard)
+$029E  26 05                              BNE CLinWCCheck        ; Ah, not a space, process the chars (wildcard)
 $02A0  86 0D                              LDA #$0D               ; load up a CR for EOL
-$02A2  A7 82                              STA ,-X                ; put it at the end of this filename, X-1
-<<<<<<< HEAD
+$02A2  A7 82                              STA ,-X                ; X=X-1. put it at the end of this filename
 $02A4  39                  CLinEnd:       RTS                   
-; 
-; --------------------------------------------------------------
-$02A5  81 2A               CLinWldCd:     CMPA #$2A              ; is it wildcard '*' ?
-=======
-$02A4  39                  Loc_02A4:      RTS                   
 
 ; --------------------------------------------------------------
-$02A5  81 2A               Loc_02A5:      CMPA #$2A              ; is it wildcard '*' ?
->>>>>>> 889da31b8f4d44824eb0e462f9ffafe054212ad6
-$02A7  27 0B                              BEQ Loc_02B4           ; yes? Go to wild handler
+$02A5  81 2A               CLinWCCheck:   CMPA #$2A              ; is it wildcard '*' ?
+$02A7  27 0B                              BEQ CLinWCprc          ; yes? Go to wild handler
 $02A9  81 3F                              CMPA #$3F              ; is it wildchar '?' ?
-$02AB  27 07                              BEQ Loc_02B4           ; yes? Go to wild handler
+$02AB  27 07                              BEQ CLinWCprc          ; yes? Go to wild handler
 $02AD  C6 EB                              LDB #$EB               ; Set error code $EB BAD NAME: illegal name syntax
 $02AF  1A 01                              ORCC #$01              ; set CC: C -- gotta be convincing with error report
 $02B1  16 01 9D                           LBRA ErrExit           ; this is invalid input bail out!
 
 ; --------------------------------------------------------------
-$02B4  9F 06               Loc_02B4:      STX <BSS.PatPtr       
-$02B6  A6 80               Loc_02B6:      LDA ,X+               
-$02B8  81 0D                              CMPA #$0D              ; compare A with CR
-$02BA  27 08                              BEQ Loc_02C4          
+$02B4  9F 06               CLinWCprc:     STX <BSS.PatPtr        ; X marks the Wildcard character
+$02B6  A6 80               CLinWCpr1:     LDA ,X+                ; get the next character, X=X+1
+$02B8  81 0D                              CMPA #$0D              ; EOL?
+$02BA  27 08                              BEQ Loc_02C4           ; If so, we're done with this part
 $02BC  81 20                              CMPA #$20              ; compare A with ' '
-$02BE  26 F6                              BNE Loc_02B6          
-$02C0  86 0D                              LDA #$0D               ; A = CR
-$02C2  A7 82                              STA ,-X               
-$02C4  9E 06               Loc_02C4:      LDX <BSS.PatPtr       
-$02C6  A6 82               Loc_02C6:      LDA ,-X               
+$02BE  26 F6                              BNE CLinWCpr1          ; if not loop back
+$02C0  86 0D                              LDA #$0D               ; else
+$02C2  A7 82                              STA ,-X                ; X=X-1, replace the space with an EOL
+$02C4  9E 06               Loc_02C4:      LDX <BSS.PatPtr        ; re-point X back to last wildcard char
+$02C6  A6 82               Loc_02C6:      LDA ,-X                ; X=X-1, Load char before the wildchar
 $02C8  9C 02                              CMPX <BSS.NextDir     
 $02CA  26 0A                              BNE Loc_02D6          
 $02CC  9F 06                              STX <BSS.PatPtr       
@@ -902,3 +872,131 @@ ModEnd
          FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
 ModCRC
 ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.dasm [proj.json]
+; Then: python dis6x09.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next $XXXX address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /label/ $addr Name
+;     Name a specific address directly — works for data labels too.
+;     Example:
+;         /label/ $046A cwdChar
+;         /label/ $046B cwdAndCR
+;
+; /rename-label/ OldName NewName
+;     Rename an existing label by its current name.
+;     Works for both code and data labels — no address scanning needed.
+;     Example:
+;         /rename-label/ Dat_046A cwdChar
+;         /rename-label/ Dat_046B cwdAndCR
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page or U-relative offset $XX.
+;     Optional quoted comment appended to the EQU line.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $58 BSS.DEntName "29-byte filename field of RBF directory entry"
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+; /dlabel/ $start $end [format] [label] [endlabel]
+;     Declare a data region. /dlabel/ is an alias for /region/ with a name
+;     that signals "this is a named data label".
+;     Format: auto text fdb hexdump raw writeblock
+;     +endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /dlabel/ $046A $046B auto cwdChar
+;         /dlabel/ $046B $046C auto cwdAndCR
+;         /region/ $052C $06A7 text +endlabel
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
