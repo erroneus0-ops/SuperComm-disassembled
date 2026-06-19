@@ -123,33 +123,6 @@ F$SigMask EQU   $27
 F$NMLink EQU    $28
 ; ================================================================
 
-<<<<<<< HEAD
-; ── BSS Variable Declarations ────────────────────────────────
-BSS.DirPath   rmb    2 ; 2 bytes
-BSS.NextDir   rmb    2 ; 2 bytes
-BSS.BufPtr    rmb    2 ; 2 bytes
-BSS.PatPtr    rmb    2 ; 2 bytes
-BSS.DirCount  rmb    3 ; 3 bytes
-BSS.$0B       rmb    1 ; 1 byte
-BSS.$0C       rmb    1 ; 1 byte
-BSS.$0D       rmb    1 ; 1 byte
-BSS.$0E       rmb    1 ; 1 byte
-BSS.$0F       rmb    1 ; 1 byte
-BSS.ColWidth  rmb    1 ; 1 byte
-BSS.LastCol   rmb    1 ; 1 byte
-BSS.ColmPos   rmb    1 ; 1 byte
-BSS.DENameLen rmb    4 ; byte count of file name
-BSS.$17       rmb    14 ; 14 bytes
-BSS.$25       rmb    51 ; 51 bytes
-BSS.DEName    rmb    29 ; 29 bytes
-BSS.DENend    rmb    1 ; 1 byte
-BSS.wLSN0     rmb    1 ; 1 byte
-BSS.wLSN1     rmb    1 ; 1 byte
-BSS.wLSN2     rmb    1 ; 1 byte
-BSS.$79       rmb    1 ; 1 byte
-BSS.DotChar   rmb    1 ; 1 byte
-size     equ   .
-=======
 ; ── BSS Variable Equates ─────────────────────────────────────
 BSS.DirPath   EQU    $00      ; 2 bytes
 BSS.NextDir   EQU    $02      ; 2 bytes
@@ -174,7 +147,6 @@ BSS.wLSN1     EQU    $77      ; 1 byte
 BSS.wLSN2     EQU    $78      ; 1 byte
 BSS.$79       EQU    $79      ; 1 byte
 BSS.DotChar   EQU    $7A      ; ?
->>>>>>> a5bef915ddb39e70dc4e6d501625a6b905241052
 
 ; ==============================================================
 ; Disassembly:  dir
@@ -189,22 +161,6 @@ BSS.DotChar   EQU    $7A      ; ?
 ; ==============================================================
 
 ; ----- Module Header -----
-<<<<<<< HEAD
-         nam   dir
-         ttl   dir
-
-edition  set   1
-
-tylg     set   $11
-atrv     set   $EE
-
-         mod   eom,name,tylg,atrv,Init,size
-
-; ----- Module Name -----
-name
-         fcs   "dir"
-         fcb   edition
-=======
 ModHeader
          FDB    $87CD             ; OS-9 module sync bytes
          FDB    ModCRC-ModHeader   ; module size (content + 3 CRC bytes)
@@ -218,7 +174,6 @@ ModHeader
 ; ----- Module Name -----
 ModName
          FCS    "dir"
->>>>>>> a5bef915ddb39e70dc4e6d501625a6b905241052
 
 ; ==============================================================
 ; Code section  $0011—$06BC  (1708 bytes)
@@ -255,20 +210,12 @@ $0045  9F 04               CLinPEnd:      STX <BSS.BufPtr        ; Save the "end
 $0047  35 10                              PULS X                 ; restore X to beginning of parm
 $0049  A6 84                              LDA ,X                 ; Now we read the parm
 $004B  81 2D                              CMPA #$2D              ; is it a '-' flag?
-<<<<<<< HEAD
 $004D  26 05                              BNE CLinNonFlag        ; No?  Must be something else
-=======
-$004D  26 05                              BNE Loc_0054           ; No?  Must be something else
->>>>>>> a5bef915ddb39e70dc4e6d501625a6b905241052
 $004F  17 01 C2                           LBSR Sub_0214          ; call Sub_0214
 $0052  20 03                              BRA Loc_0057          
 
 ; --------------------------------------------------------------
-<<<<<<< HEAD
-$0054  17 02 1D            CLinNonFlag:   LBSR Sub_0274          ; call Sub_0274
-=======
-$0054  17 02 1D            Loc_0054:      LBSR Sub_0274          ; call Sub_0274
->>>>>>> a5bef915ddb39e70dc4e6d501625a6b905241052
+$0054  17 02 1D            CLinNonFlag:   LBSR CLinNamP          ; call CLinNamP
 $0057  9E 04               Loc_0057:      LDX <BSS.BufPtr       
 $0059  20 D2                              BRA CLinPars          
 
@@ -540,25 +487,25 @@ $0270  0F 7A               Loc_0270:      CLR <BSS.DotChar
 $0272  20 A0                              BRA Sub_0214          
 
 ; --------------------------------------------------------------
-$0274  9F 02               Sub_0274:      STX <BSS.NextDir       ; This is where filenames are expected
-$0276  A6 80               Loc_0276:      LDA ,X+                ; Sample char, X+1
+$0274  9F 02               CLinNamP:      STX <BSS.NextDir       /; filename or matching is expected!/
+$0276  A6 80               CLinNamP1:     LDA ,X+                ; Sample char, X+1
 $0278  81 5F                              CMPA #$5F              ; compare A with '_'
-$027A  27 FA                              BEQ Loc_0276           ; invalid char, get another
+$027A  27 FA                              BEQ CLinNamP1          ; invalid char, get another
 $027C  81 2D                              CMPA #$2D              ; compare A with '-'
-$027E  27 F6                              BEQ Loc_0276           ; invalid char, get another
+$027E  27 F6                              BEQ CLinNamP1          ; invalid char, get another
 $0280  81 2E                              CMPA #$2E              ; compare A with '.'
-$0282  25 14                              BCS Loc_0298           ; unsigned BLO, this character is invalid for filemame
+$0282  25 14                              BCS ClinNoNam          ; Branch if unsign < $2e: Invalid as filename
 $0284  81 39                              CMPA #$39              ; compare A with '9'
-$0286  23 EE                              BLS Loc_0276          
+$0286  23 EE                              BLS CLinNamP1         
 $0288  81 41                              CMPA #$41              ; compare A with 'A'
-$028A  25 0C                              BCS Loc_0298           ; C=1 (BLO)
+$028A  25 0C                              BCS ClinNoNam          ; C=1 (BLO)
 $028C  81 5A                              CMPA #$5A              ; compare A with 'Z'
-$028E  23 E6                              BLS Loc_0276          
+$028E  23 E6                              BLS CLinNamP1         
 $0290  81 61                              CMPA #$61              ; compare A with 'a'
-$0292  25 04                              BCS Loc_0298           ; C=1 (BLO)
+$0292  25 04                              BCS ClinNoNam          ; C=1 (BLO)
 $0294  81 7A                              CMPA #$7A              ; compare A with 'z'
-$0296  23 DE                              BLS Loc_0276          
-$0298  81 0D               Loc_0298:      CMPA #$0D              ; Is this EOL?
+$0296  23 DE                              BLS CLinNamP1         
+$0298  81 0D               ClinNoNam:     CMPA #$0D              ; Is this EOL?
 $029A  27 08                              BEQ Loc_02A4           ; if so, get out, we're done!
 $029C  81 20                              CMPA #$20              ; compare A with ' '
 $029E  26 05                              BNE Loc_02A5           ; Ah, not a space, process the chars (wildcard)
@@ -908,17 +855,19 @@ $06BA  26 EB                              BNE WritBlines         ; If not loop b
 $06BC  39                  endWritBlines: RTS                   
 
 ; ==============================================================
-<<<<<<< HEAD
+; ModEnd — CRC-24 appended by fixmod (not in source)
 ; ==============================================================
-         emod
-eom      equ   *
-         end
+ModEnd
+; CRC-24 (3 bytes) appended here by fixmod
+         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
+ModCRC
+ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
 ; ══════════════════════════════════════════════════════════════
 ; MARKUP QUICK REFERENCE  (markup.py directives)
 ; ══════════════════════════════════════════════════════════════
 ;
 ; Run:  python markup.py proj.dasm [proj.json]
-; Then: python dis6809_os9_engine.py --source bin --proj proj.json -n
+; Then: python dis6x09.py --source bin --proj proj.json -n
 ;
 ; ── Labeling ──────────────────────────────────────────────────
 ;
@@ -1041,12 +990,3 @@ eom      equ   *
 ;     Mark a routine boundary for structural annotation.
 ;
 ; ══════════════════════════════════════════════════════════════
-=======
-; ModEnd — CRC-24 appended by fixmod (not in source)
-; ==============================================================
-ModEnd
-; CRC-24 (3 bytes) appended here by fixmod
-         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
-ModCRC
-ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes
->>>>>>> a5bef915ddb39e70dc4e6d501625a6b905241052
