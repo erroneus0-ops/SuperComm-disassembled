@@ -70,9 +70,70 @@ def process(infile, outfile, target='asm6809'):
     with open(infile, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
+    # ── Pre-scan: collect BSS EQU offsets to calculate sizes ─────────────────
+    import re
+    bss_equ_re = re.compile(
+        r'^(\S+)\s+EQU\s+\$([0-9A-Fa-f]+)\s*(?:;\s*(\d+)\s*bytes?\s*(?:—\s*(.+))?|;\s*(.+))?$'
+    )
+
+    # Collect all BSS EQU entries: (name, offset, comment)
+    in_bss = False
+    bss_entries = []  # [(name, offset, comment)]
+    for l in lines:
+        raw = l.rstrip('\n')
+        if '── BSS Variable Equates' in raw or '── BSS Variable Declarations' in raw:
+            in_bss = True; continue
+        if in_bss and raw.strip() == '':
+            in_bss = False; continue
+        if in_bss and 'EQU' in raw and not raw.strip().startswith(';'):
+            m = bss_equ_re.match(raw.strip())
+            if m:
+                name = m.group(1)
+                off  = int(m.group(2), 16)
+                # Extract analyst comment (group 4 = after "— ", group 5 = simple)
+                analyst = m.group(4) or m.group(5) or ''
+                # Strip leading size annotation if present
+                if analyst and re.match(r'^\d+\s+bytes?\s*$', analyst.strip()):
+                    analyst = ''
+                bss_entries.append((name, off, analyst))
+
+    # Build offset→size map from gaps
+    bss_size = {}
+    for i, (name, off, cmt) in enumerate(bss_entries):
+        if i + 1 < len(bss_entries):
+            bss_size[name] = bss_entries[i+1][1] - off
+        else:
+            bss_size[name] = 1  # last entry unknown
+    bss_comment = {name: cmt for name, off, cmt in bss_entries}
+
+    in_bss_block = False
+
     out = []
     for line in lines:
         raw = line.rstrip("\n")
+
+        # Detect BSS block start/end
+        if '── BSS Variable Equates' in raw or '── BSS Variable Declarations' in raw:
+            in_bss_block = True
+            out.append(line)
+            continue
+        if in_bss_block and raw.strip() == '':
+            in_bss_block = False
+            out.append(line)
+            continue
+
+        # Convert BSS EQU to RMB
+        if in_bss_block and 'EQU' in raw and not raw.strip().startswith(';'):
+            m = bss_equ_re.match(raw.strip())
+            if m:
+                name = m.group(1)
+                size = bss_size.get(name, 1)
+                cmt  = bss_comment.get(name, '')
+                if cmt:
+                    out.append(f"{name:<14}rmb    {size:<6} ; {cmt}\n")
+                else:
+                    out.append(f"{name:<14}rmb    {size}\n")
+                continue
 
         if not raw.strip() or raw.strip().startswith(";") or raw.strip().startswith("*"):
             out.append(line)
