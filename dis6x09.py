@@ -2838,11 +2838,20 @@ Examples:
         help='Non-interactive mode — skip confirmation prompts')
     args = parser.parse_args()
 
-    # ── --source is always required ───────────────────────────────────────
+    # ── --source: required unless proj.binary provides it ─────────────────
     if not args.source:
-        parser.print_usage()
-        print("error: --source BINARY is required")
-        sys.exit(1)
+        # Try to get binary from JSON if proj is specified
+        if args.proj and os.path.exists(args.proj):
+            import json as _json
+            try:
+                _d = _json.load(open(args.proj))
+                args.source = _d.get('binary')
+            except Exception:
+                pass
+        if not args.source:
+            parser.print_usage()
+            print("error: --source BINARY is required (or set 'binary' in proj JSON)")
+            sys.exit(1)
 
     source = args.source
     if not os.path.exists(source):
