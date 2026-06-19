@@ -32,29 +32,98 @@
     "06BC": "endWritBlines"
   },
   "bss": {
-    "0": "BSS.DirPath",
-    "2": "BSS.NextDir",
-    "4": "BSS.BufPtr",
-    "6": "BSS.PatPtr",
-    "8": "BSS.DirCount",
-    "11": "BSS.$0B",
-    "12": "BSS.$0C",
-    "13": "BSS.$0D",
-    "14": "BSS.$0E",
-    "15": "BSS.$0F",
-    "16": "BSS.ColWidth",
-    "17": "BSS.LastCol",
-    "18": "BSS.ColmPos",
-    "19": "BSS.DENameLen",
-    "23": "BSS.$17",
-    "37": "BSS.$25",
-    "88": "BSS.DEName",
-    "117": "BSS.DENend",
-    "118": "BSS.wLSN0",
-    "119": "BSS.wLSN1",
-    "120": "BSS.wLSN2",
-    "121": "BSS.$79",
-    "122": "BSS.DotChar"
+    "0": {
+      "name": "BSS.DirPath",
+      "comment": ""
+    },
+    "2": {
+      "name": "BSS.NextDir",
+      "comment": ""
+    },
+    "4": {
+      "name": "BSS.BufPtr",
+      "comment": ""
+    },
+    "6": {
+      "name": "BSS.PatPtr",
+      "comment": ""
+    },
+    "8": {
+      "name": "BSS.DirCount",
+      "comment": ""
+    },
+    "11": {
+      "name": "BSS.$0B",
+      "comment": ""
+    },
+    "12": {
+      "name": "BSS.$0C",
+      "comment": ""
+    },
+    "13": {
+      "name": "BSS.$0D",
+      "comment": ""
+    },
+    "14": {
+      "name": "BSS.$0E",
+      "comment": ""
+    },
+    "15": {
+      "name": "BSS.$0F",
+      "comment": ""
+    },
+    "16": {
+      "name": "BSS.ColWidth",
+      "comment": ""
+    },
+    "17": {
+      "name": "BSS.LastCol",
+      "comment": ""
+    },
+    "18": {
+      "name": "BSS.ColmPos",
+      "comment": ""
+    },
+    "19": {
+      "name": "BSS.DENameLen",
+      "comment": "byte count of file name"
+    },
+    "23": {
+      "name": "BSS.$17",
+      "comment": ""
+    },
+    "37": {
+      "name": "BSS.$25",
+      "comment": ""
+    },
+    "88": {
+      "name": "BSS.DEName",
+      "comment": ""
+    },
+    "117": {
+      "name": "BSS.DENend",
+      "comment": ""
+    },
+    "118": {
+      "name": "BSS.wLSN0",
+      "comment": ""
+    },
+    "119": {
+      "name": "BSS.wLSN1",
+      "comment": ""
+    },
+    "120": {
+      "name": "BSS.wLSN2",
+      "comment": ""
+    },
+    "121": {
+      "name": "BSS.$79",
+      "comment": ""
+    },
+    "122": {
+      "name": "BSS.DotChar",
+      "comment": ""
+    }
   },
   "data_regions": [
     {
@@ -224,8 +293,5 @@
   "hex_offsets": [
     "U"
   ],
-  "bss_comments": {
-    "19": "byte count of file name"
-  },
   "target": "raw"
 }

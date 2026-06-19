@@ -312,8 +312,7 @@ class Project:
         self.entry        = None      # override entry point (int hex)
         self.module_notes = []        # free-form notes about the module
         self.labels       = {}        # int_addr -> label_str
-        self.bss          = {}        # int_offset -> name_str
-        self.bss_comments = {}        # int_offset -> comment string
+        self.bss          = {}        # int_offset -> {'name': str, 'comment': str}
         self.data_regions = []        # [{start, end, label, comment}]
         self.line_comments= {}        # int_addr -> comment_str
         self.block_comments={}        # int_addr -> [lines] before instruction
@@ -355,9 +354,20 @@ class Project:
 
         # bss: decimal int or "D" -> "Name"  (support both "51" and 51)
         for k,v in d.get('bss', {}).items():
-            p.bss[int(k)] = v
+            off = int(k)
+            if isinstance(v, dict):
+                # New format: {"name": "...", "comment": "..."}
+                p.bss[off] = {'name': v.get('name', f'BSS.${off:02X}'), 'comment': v.get('comment', '')}
+            else:
+                # Old format: plain string name
+                p.bss[off] = {'name': v, 'comment': ''}
+        # Migrate old bss_comments into bss
         for k,v in d.get('bss_comments', {}).items():
-            p.bss_comments[int(k)] = v
+            off = int(k)
+            if off in p.bss:
+                p.bss[off]['comment'] = v
+            else:
+                p.bss[off] = {'name': f'BSS.${off:02X}', 'comment': v}
 
         # data_regions: [{start:"HHHH", end:"HHHH", label:"X", comment:"Y"}]
         for r in d.get('data_regions', []):
@@ -436,7 +446,6 @@ class Project:
             'target':         self.target,
             'labels':         {f'{k:04X}': v for k,v in sorted(self.labels.items())},
             'bss':            {str(k): v for k,v in sorted(self.bss.items())},
-            'bss_comments':   {str(k): v for k,v in sorted(self.bss_comments.items())},
             'data_regions':   [
                 {'start': f'{r["start"]:04X}', 'end': f'{r["end"]:04X}',
                  'label': r['label'], 'comment': r['comment'],
@@ -928,7 +937,7 @@ class Engine:
             off = pb & 0x1F
             if off >= 16: off -= 32
             if rn == 'U' and not ind:
-                bn = self.project.bss.get(off,'')
+                bn = (self.project.bss[off]['name'] if off in self.project.bss else '')
                 if bn: return f"{bn},U", pos
             cmt = maybe_hex(off, rn, 1)
             return f"{off},{rn}{cmt}", pos
@@ -944,14 +953,14 @@ class Engine:
         elif md == 0x08:
             off = s8(d[pos]); pos += 1
             if rn == 'U' and not ind:
-                bn = self.project.bss.get(off,'')
+                bn = (self.project.bss[off]['name'] if off in self.project.bss else '')
                 if bn: return f"{bn},U", pos
             cmt = maybe_hex(off, rn, 1)
             return w(f"{off},{rn}{cmt}"), pos
         elif md == 0x09:
             off = s16((d[pos]<<8)|d[pos+1]); pos += 2
             if rn == 'U' and not ind:
-                bn = self.project.bss.get(off,'')
+                bn = (self.project.bss[off]['name'] if off in self.project.bss else '')
                 if bn: return f"{bn},U", pos
             cmt = maybe_hex(off, rn, 2)
             return w(f"{off},{rn}{cmt}"), pos
@@ -1029,7 +1038,7 @@ class Engine:
 
         def dp(v):
             """Format a direct page operand, substituting BSS name if known."""
-            bn = self.project.bss.get(v, '')
+            bn = (self.project.bss[v]['name'] if v in self.project.bss else '')
             return f'<{bn}' if bn else f'<${v:02X}'
 
         op = rb()
@@ -1689,12 +1698,12 @@ class Engine:
                 out.append("; ── BSS Variable Declarations ────────────────────────────────")
                 sorted_bss = sorted(proj.bss.keys())
                 for i, off in enumerate(sorted_bss):
-                    name_str = proj.bss[off]
+                    name_str = proj.bss[off]['name']
+                    extra    = proj.bss[off]['comment']
                     if i + 1 < len(sorted_bss):
                         gap = sorted_bss[i+1] - off
                     else:
-                        gap = 1  # unknown, default 1
-                    extra = proj.bss_comments.get(off, '')
+                        gap = 1
                     cmt = f" ; {extra}" if extra else f" ; {gap} byte{'s' if gap != 1 else ''}"
                     out.append(f"{name_str:<14}rmb    {gap}{cmt}")
                 out.append("size     equ   .")
@@ -1702,13 +1711,13 @@ class Engine:
                 out.append("; ── BSS Variable Equates ─────────────────────────────────────")
                 sorted_bss = sorted(proj.bss.keys())
                 for i, off in enumerate(sorted_bss):
-                    name_str = proj.bss[off]
+                    name_str = proj.bss[off]['name']
+                    extra    = proj.bss[off]['comment']
                     if i + 1 < len(sorted_bss):
                         gap = sorted_bss[i+1] - off
                         size_cmt = f"{gap} byte{'s' if gap != 1 else ''}"
                     else:
                         size_cmt = "?"
-                    extra = proj.bss_comments.get(off, '')
                     cmt = extra if extra else size_cmt
                     out.append(f"{name_str:<14}EQU    ${off:02X}      ; {cmt}")
             out.append("")
@@ -2498,7 +2507,7 @@ def _import_project(old_proj, old_json_path, new_json_path, actual_crc):
     new.module_notes   = list(old_proj.module_notes)
     new.custom_equates = list(old_proj.custom_equates)
     new.labels         = dict(old_proj.labels)
-    new.bss            = dict(old_proj.bss)
+    new.bss            = {k: dict(v) for k,v in old_proj.bss.items()}
     new.line_comments  = dict(old_proj.line_comments)
     new.block_comments = dict(old_proj.block_comments)
     new.data_regions   = list(old_proj.data_regions)

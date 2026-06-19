@@ -637,18 +637,30 @@ def merge_into_json(json_path, changes, warn):
 
     # ── bss ──────────────────────────────────────────────────────────────────
     existing_bss = d.get('bss', {})
+    # Migrate old format (plain string) to new format (dict)
+    for key in list(existing_bss.keys()):
+        if isinstance(existing_bss[key], str):
+            existing_bss[key] = {'name': existing_bss[key], 'comment': ''}
+    # Apply new names
     for offset, name in changes['bss'].items():
         key = str(offset)
-        if key in existing_bss and existing_bss[key] != name:
-            warn(f"BSS at ${offset:04X} renamed: '{existing_bss[key]}' → '{name}'")
-        existing_bss[key] = name
-    d['bss'] = dict(sorted(existing_bss.items(), key=lambda x: int(x[0])))
-    # Merge bss_comments
-    existing_bss_comments = d.get('bss_comments', {})
+        if key in existing_bss:
+            old_name = existing_bss[key]['name']
+            if old_name != name:
+                warn(f"BSS at ${offset:04X} renamed: '{old_name}' → '{name}'")
+            existing_bss[key]['name'] = name
+        else:
+            existing_bss[key] = {'name': name, 'comment': ''}
+    # Apply comments
     for offset, cmt in changes.get('bss_comments', {}).items():
-        existing_bss_comments[str(offset)] = cmt
-    if existing_bss_comments:
-        d['bss_comments'] = dict(sorted(existing_bss_comments.items(), key=lambda x: int(x[0])))
+        key = str(offset)
+        if key in existing_bss:
+            existing_bss[key]['comment'] = cmt
+        else:
+            existing_bss[key] = {'name': f'BSS.${offset:02X}', 'comment': cmt}
+    d['bss'] = dict(sorted(existing_bss.items(), key=lambda x: int(x[0])))
+    # Remove old bss_comments key if present
+    d.pop('bss_comments', None)
     bc = d.get('block_comments', {})
     for addr, lines in changes['block_comments'].items():
         bc[f'{addr:04X}'] = lines

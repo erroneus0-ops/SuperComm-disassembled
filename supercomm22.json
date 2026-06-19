@@ -27,36 +27,126 @@
     "3C0F": "CrcTable"
   },
   "bss": {
-    "2": "BSS.ParamStr",
-    "4": "BSS.ParamBase",
-    "6": "BSS.RxBufPtr",
-    "8": "BSS.TxBufPtr",
-    "11": "BSS.Var000B",
-    "30": "BSS.CurrChar",
-    "31": "BSS.PrevChar",
-    "32": "BSS.StateFlag",
-    "45": "BSS.Counter1",
-    "51": "BSS.TermMode",
-    "70": "BSS.EchoFlag",
-    "74": "BSS.FlowCtrl",
-    "77": "BSS.Counter2",
-    "78": "BSS.Counter3",
-    "90": "BSS.ConnState",
-    "91": "BSS.ConnWord",
-    "93": "BSS.BufPtr1",
-    "95": "BSS.BufCount",
-    "99": "BSS.BufPtr2",
-    "101": "BSS.BufPtr3",
-    "103": "BSS.Counter4",
-    "3660": "BSS.CommPtr",
-    "3665": "BSS.CommState",
-    "3671": "BSS.CommSz1",
-    "3673": "BSS.CommSz2",
-    "3676": "BSS.CommOff",
-    "3693": "BSS.CommFlag",
-    "3699": "BSS.BaudState",
-    "3703": "BSS.FlowState",
-    "6613": "BSS.IoBuf"
+    "2": {
+      "name": "BSS.ParamStr",
+      "comment": ""
+    },
+    "4": {
+      "name": "BSS.ParamBase",
+      "comment": ""
+    },
+    "6": {
+      "name": "BSS.RxBufPtr",
+      "comment": ""
+    },
+    "8": {
+      "name": "BSS.TxBufPtr",
+      "comment": ""
+    },
+    "11": {
+      "name": "BSS.Var000B",
+      "comment": ""
+    },
+    "30": {
+      "name": "BSS.CurrChar",
+      "comment": ""
+    },
+    "31": {
+      "name": "BSS.PrevChar",
+      "comment": ""
+    },
+    "32": {
+      "name": "BSS.StateFlag",
+      "comment": ""
+    },
+    "45": {
+      "name": "BSS.Counter1",
+      "comment": ""
+    },
+    "51": {
+      "name": "BSS.TermMode",
+      "comment": ""
+    },
+    "70": {
+      "name": "BSS.EchoFlag",
+      "comment": ""
+    },
+    "74": {
+      "name": "BSS.FlowCtrl",
+      "comment": ""
+    },
+    "77": {
+      "name": "BSS.Counter2",
+      "comment": ""
+    },
+    "78": {
+      "name": "BSS.Counter3",
+      "comment": ""
+    },
+    "90": {
+      "name": "BSS.ConnState",
+      "comment": ""
+    },
+    "91": {
+      "name": "BSS.ConnWord",
+      "comment": ""
+    },
+    "93": {
+      "name": "BSS.BufPtr1",
+      "comment": ""
+    },
+    "95": {
+      "name": "BSS.BufCount",
+      "comment": ""
+    },
+    "99": {
+      "name": "BSS.BufPtr2",
+      "comment": ""
+    },
+    "101": {
+      "name": "BSS.BufPtr3",
+      "comment": ""
+    },
+    "103": {
+      "name": "BSS.Counter4",
+      "comment": ""
+    },
+    "3660": {
+      "name": "BSS.CommPtr",
+      "comment": ""
+    },
+    "3665": {
+      "name": "BSS.CommState",
+      "comment": ""
+    },
+    "3671": {
+      "name": "BSS.CommSz1",
+      "comment": ""
+    },
+    "3673": {
+      "name": "BSS.CommSz2",
+      "comment": ""
+    },
+    "3676": {
+      "name": "BSS.CommOff",
+      "comment": ""
+    },
+    "3693": {
+      "name": "BSS.CommFlag",
+      "comment": ""
+    },
+    "3699": {
+      "name": "BSS.BaudState",
+      "comment": ""
+    },
+    "3703": {
+      "name": "BSS.FlowState",
+      "comment": ""
+    },
+    "6613": {
+      "name": "BSS.IoBuf",
+      "comment": ""
+    }
   },
   "data_regions": [
     {
