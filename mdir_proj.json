@@ -1,0 +1,19 @@
+{
+  "binary": "mdir",
+  "binary_crc": "E257AF922E4A5FDF",
+  "cpu": "6809",
+  "output": "mdir_proj.dasm",
+  "entry": null,
+  "module_notes": [],
+  "emit_equates": true,
+  "defs_file": null,
+  "hex_offsets": [],
+  "labels": {},
+  "bss": {},
+  "data_regions": [],
+  "block_comments": {},
+  "line_comments": {},
+  "substitutions": {},
+  "forced_equs": {},
+  "routines": []
+}
