@@ -2209,7 +2209,7 @@ class Engine:
                 is_ret = (mn in ('RTS','RTI','LBRA','BRA') or
                           (mn=='PULS' and 'PC' in op_str) or
                           (mn=='PULU' and 'PC' in op_str))
-                prev_ret = is_ret and not lbl_here
+                prev_ret = is_ret
                 pos = pos2
 
                 if is_ret and pos < span_end:
