@@ -217,6 +217,7 @@ $004F  17 01 C2                           LBSR Sub_0214          ; call Sub_0214
 $0052  20 03                              BRA Loc_0057          
 
 ; --------------------------------------------------------------
+/label/ $0054 CLinNonFlag
 $0054  17 02 1D            Loc_0054:      LBSR Sub_0274          ; call Sub_0274
 $0057  9E 04               Loc_0057:      LDX <BSS.BufPtr       
 $0059  20 D2                              BRA CLinPars          

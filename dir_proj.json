@@ -14,6 +14,7 @@
     "002D": "CLinPars",
     "0039": "CLinParmG",
     "0045": "CLinPEnd",
+    "0054": "CLinNonFlag",
     "005B": "CLinLoopB",
     "0451": "ErrExit",
     "0456": "ErrCode",
