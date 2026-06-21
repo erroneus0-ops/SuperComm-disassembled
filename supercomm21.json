@@ -1,0 +1,20 @@
+{
+  "binary": "supercomm21",
+  "binary_crc": "671D2A7D17175885",
+  "cpu": "6809",
+  "output": "supercomm21_proj.dasm",
+  "target": "raw",
+  "emit_equates": true,
+  "defs_file": null,
+  "hex_offsets": [],
+  "labels": {},
+  "bss": {},
+  "data_regions": [],
+  "block_comments": {},
+  "line_comments": {},
+  "substitutions": {},
+  "forced_equs": {},
+  "routines": [],
+  "module_notes": [],
+  "custom_equates": []
+}
