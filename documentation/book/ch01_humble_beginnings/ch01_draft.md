@@ -1,10 +1,9 @@
 # Chapter 1: Humble Beginnings
 
-## Type It In
-
-This is a type-in program. That is how things worked. You found a listing in a
-magazine or a book, you sat down at the keyboard, and you typed. If you made a
-mistake you found it, fixed it, and ran it again. Eventually it worked.
+This is a type-in program. If you were reading a computer magazine in 1982, you
+know what that means. You found a listing, you sat down at the keyboard, and you
+typed. If you made a mistake you found it, fixed it, and tried again. Eventually
+it worked. The satisfaction was real.
 
 Type this into your Color Computer:
 
@@ -28,7 +27,7 @@ Type this into your Color Computer:
 
 Type `RUN` and press Enter.
 
-The screen clears. Centered on row seven you see:
+The screen clears. Centered on row seven:
 
 ```
         HELLO WORLD!
@@ -36,23 +35,43 @@ The screen clears. Centered on row seven you see:
 
 The cursor sits at row thirteen. Press any key and BASIC returns with `OK`.
 
-That is a machine language program running on your Color Computer. The DATA
-statements contain the program — 80 bytes of 6809 machine code. BASIC loaded
-those bytes into memory and handed control to them. The code ran, did its work,
-and handed control back to BASIC.
+The DATA statements in that listing contain a machine language program — 80 bytes
+of 6809 instructions. BASIC read those bytes one at a time, placed them into
+memory starting at address `$3F00`, and then handed control to them. The machine
+code ran, did its work, and handed control back to BASIC.
 
-The rest of this chapter explains what those 80 bytes do and why.
+That is what this book is about: what those 80 bytes do, why they do it, and how
+to write your own.
 
 ---
 
-## The Assembly Source
+## What You Need to Know First
 
-Machine language is bytes. Programmers don't write bytes directly — they write
-assembly language, a human-readable notation where each instruction has a name
-and each address can have a label. An assembler translates that notation into
-bytes.
+You do not have to understand the BASIC program to get started. What BASIC did
+is simple enough to explain in one paragraph.
 
-Here is the assembly source for the program you just ran:
+`CLEAR 200` reserves some memory and resets variables. `A=&H3F00` is the address
+where the machine code will go — `&H` is BASIC's notation for hexadecimal.
+The FOR loop reads each number from the DATA statements and POKEs it into
+memory, one byte at a time, starting at that address. `EXEC A` tells BASIC to
+jump to that address and run whatever is there.
+
+That is the entire mechanism. BASIC is just a delivery vehicle. The machine
+code is the program.
+
+---
+
+## The Same Program in Assembly Language
+
+Machine code is bytes. Programmers do not write bytes directly — not because it
+cannot be done (it can, and people did), but because it is slow, error-prone,
+and produces code that nobody including the author can read a week later.
+Instead, programmers write assembly language: a notation where each instruction
+has a name, each address can have a label, and the computer translates it into
+bytes. That translation program is called an assembler.
+
+Here is the assembly language source for the program you just ran. The numbers
+on the left are line references used throughout this chapter.
 
 ```
   1  POLCAT    EQU     $A000
@@ -106,10 +125,14 @@ Here is the assembly source for the program you just ran:
  49            END     Start
 ```
 
-49 lines of source produce 80 bytes of machine code. The rest of this chapter
-works through those lines, section by section, explaining what each instruction
-does and why it is there. The line numbers are reference points — when the text
-says "line 17" you can find it in the listing above.
+49 lines of assembly language produced 80 bytes of machine code. The DATA
+values in the BASIC listing are those same 80 bytes, expressed as decimal
+numbers. `189,169,40` at the start of the DATA is `$BD $A9 $28` — the three
+bytes of the `JSR CLRSCR` instruction at line 12.
+
+The rest of this chapter works through the assembly source section by section.
+When the text refers to "line 17" or "lines 20-21", find them in the listing
+above.
 
 ---
 
@@ -117,7 +140,9 @@ says "line 17" you can find it in the listing above.
 
 ### Names for Numbers
 
-Lines 1 through 9 produce no machine code. They give names to numbers.
+Lines 1 through 9 produce no machine code at all. They are `EQU` directives.
+`EQU` is short for *equate* — each line gives a name to a number, and wherever
+that name appears in the program the assembler substitutes the number.
 
 ```
   1  POLCAT    EQU     $A000
@@ -131,43 +156,34 @@ Lines 1 through 9 produce no machine code. They give names to numbers.
   9  EXIT_POS  EQU     SCREEN+(13*COLS)+0
 ```
 
-`EQU` is short for *equate*. When the assembler sees `CLRSCR` later in the
-program, it substitutes `$A928`. The names exist only during assembly — they
-help the programmer, not the machine.
+The addresses are written with four hex digits — `$A000`, `$0088`, `$0400`.
+Two digits would be technically correct too. Four digits signals at a glance
+that these are memory addresses, not arbitrary constants. It is a convention
+worth keeping.
 
-The addresses written with four hex digits — `$A000`, `$0088`, `$0400` — are
-memory addresses. Two digits would be valid too, but four digits make the intent
-clear at a glance. `$88` could be a constant. `$0088` is an address.
+Lines 7 through 9 show something useful about assemblers: they do arithmetic.
+`SCREEN+(7*COLS)+10` means start of screen memory, plus seven complete rows of
+32 columns, plus 10 more — the position on row 7 where HELLO begins. The
+assembler computes the answer and puts the number `$04EA` into the machine code.
+The CPU never sees the expression. When you want a number that is calculated
+from other numbers, let the assembler do it.
 
 ### What These Addresses Are
 
-`$A000`, `$A002`, and `$A928` are in the Color BASIC ROM. This is firmware
-burned permanently into the CoCo's chips. `POLCAT` polls the keyboard. `CHROUT`
-sends a character to the screen. `CLRSCR` clears the screen and moves the
-cursor to the top left. These addresses are the same on every CoCo ever made.
+`$A000`, `$A002`, and `$A928` are in the Color BASIC ROM — firmware burned
+permanently into chips on the CoCo's circuit board. `POLCAT` polls the keyboard.
+`CHROUT` sends a character to the screen. `CLRSCR` clears the screen. Every
+CoCo ever made has these routines at these addresses. We call them the same way
+BASIC does.
 
-`$0088` is different. It is in RAM, not ROM. BASIC uses the two bytes at
-`$0088` and `$0089` as its cursor position register — when BASIC writes a
-character to the screen, it reads this address to find out where to put it. The
-program writes to `$0088` directly to control where CHROUT will place characters.
+`$0400` is the start of the VDG text screen. The CoCo displays text by reading
+512 bytes of RAM starting here — 32 columns, 16 rows, one byte per character
+position. Write a byte to this area and it appears on screen immediately.
 
-`$0400` is the start of the VDG text screen. The Color Computer displays text
-by reading 512 bytes of RAM starting at this address — 32 columns across, 16
-rows down, one byte per character position. Writing a byte to this area puts a
-character on screen immediately.
-
-### Screen Position Arithmetic
-
-Lines 7 through 9 use the assembler as a calculator:
-
-```
-  7  HELLO_POS EQU     SCREEN+(7*COLS)+10
-```
-
-This is: start of screen, plus seven complete rows of 32 columns, plus 10
-columns into that row. The assembler computes the result and bakes the number
-`$04EA` into the machine code. The CPU never sees the arithmetic — only the
-answer.
+`$0088` is in RAM. BASIC uses the two bytes at `$0088` and `$0089` as its cursor
+position register — when BASIC writes a character, it reads this address to
+know where to put it. The program writes here directly to control where the
+next CHROUT call will place its character.
 
 ### Position Independent Code
 
@@ -177,14 +193,13 @@ Line 10:
  10            ORG     0
 ```
 
-This tells the assembler to generate code as if the program starts at address
-zero. The BASIC loader puts the code at `$3F00`. Both are correct.
-
-The program contains no references to its own absolute address. Every reference
-to data or code within the program is expressed as an offset from the current
-position. Move the program anywhere in memory and those offsets remain correct
-because the distance between instructions and their data does not change.
-This is called position independent code.
+The BASIC loader puts the machine code at `$3F00`. `ORG 0` tells the assembler
+to generate code as if the program starts at address zero. Both are correct
+because the program contains no references to its own absolute location. Every
+reference to code or data within the program is expressed as an offset from the
+current position. Move the program anywhere in memory and those offsets remain
+valid. This is called position independent code, and it is why the same DATA
+bytes work regardless of where BASIC happens to place them.
 
 ---
 
@@ -194,61 +209,54 @@ This is called position independent code.
  12            JSR     CLRSCR
 ```
 
-`JSR` is *Jump to SubRoutine*. It pushes the address of the next instruction
-onto the hardware stack and jumps to `$A928`. The ROM routine runs, clears the
-screen, moves the cursor to the top left, and executes `RTS` — *Return from
-SubRoutine* — which pops the saved address and returns here. Execution continues
-at line 13.
-
-The ROM routine is dozens of instructions. We call it with one.
+`JSR` is *Jump to SubRoutine*. It does two things: pushes the address of the
+next instruction onto the hardware stack, then jumps to `CLRSCR` (`$A928`).
+The ROM routine runs, clears the screen, moves the cursor to the top left, and
+executes `RTS` — *Return from SubRoutine*. `RTS` pops the saved address from
+the stack and jumps there. Execution returns to line 13 as if nothing happened
+except the screen is now clear.
 
 **The Stack**
 
-The 6809 maintains a hardware stack — a region of RAM used for saving and
-restoring addresses automatically. `JSR` pushes a 2-byte return address onto the
-stack. `RTS` pops it off and jumps there. The stack grows downward in memory.
-Every `JSR` must have a corresponding `RTS` or the program will not return
-correctly.
+The 6809 has a hardware stack — a region of RAM used automatically for saving
+and restoring addresses. `JSR` pushes a 2-byte return address. `RTS` pops it.
+The stack grows downward in memory. Every `JSR` needs a corresponding `RTS` or
+the program will not return correctly. This pairing is one of the few absolute
+rules in assembly programming.
 
 ---
 
 ## Writing HELLO to the Screen: Lines 13-28
 
-The Color Computer's text screen does not use ASCII. The Video Display Generator
-chip has its own character encoding. Understanding why requires a brief detour.
+The CoCo's text screen does not use ASCII. The Video Display Generator chip has
+its own character encoding, and understanding it explains lines 20 and 21.
 
 **The VDG Character Set**
 
-The normal display on a CoCo is green characters on a black background. This is
-not inverted — this is the default. In most other contexts green-on-black would
-be considered reversed, but the CoCo's phosphor screen simply looks that way
-normally.
+The normal display on a CoCo is green characters on a black background. This
+is not inverted — it is the default. Bit 6 of each screen byte controls the
+display mode: bit 6 clear gives green on black, bit 6 set gives dark on green.
+The program uses this to make HELLO look visually different from WORLD!.
 
-The VDG character codes map to a character set where `$01` is 'A', `$02` is
-'B', and so on through `$1A` for 'Z'. ASCII uppercase letters run from `$41`
-('A') through `$5A` ('Z'). The relationship between the two:
+The VDG character codes for uppercase letters start at `$01` for A, `$02` for
+B, and so on. ASCII uppercase letters start at `$41` for A, `$42` for B.
+Stripping bits 7 and 6 from an ASCII letter gives the VDG code:
 
 ```
 ASCII 'H' = $48 = %01001000
-VDG  'H'  = $08 = %00001000
+             ↓  ANDA #$3F
+VDG   'H' = $08 = %00001000
+             ↓  ORA #$40
+displayed   $48 = %01001000  (dark H on green background)
 ```
 
-Strip bits 7 and 6 from the ASCII code and you have the VDG code. The
-instruction `ANDA #$3F` does this — `$3F` is `%00111111`, which zeroes bits 7
-and 6 while leaving the rest unchanged.
-
-Bit 6 of a VDG character byte controls display mode. Bit 6 clear produces a
-normal green character on black. Bit 6 set produces a dark character on a green
-background. The instruction `ORA #$40` sets bit 6 — `$40` is `%01000000`.
-
-In this program, `HELLO ` is written with bit 6 set and `WORLD!` is written
-without. The two words appear visually different on screen — one with a green
-background behind each character, the other without.
+`ANDA #$3F` strips bits 7 and 6. `ORA #$40` sets bit 6. Two instructions
+perform the conversion and choose the display mode. The result is visible on
+screen.
 
 Space is a special case. The VDG space — a blank character cell — is `$60`.
-Stripping bits 7 and 6 from ASCII space (`$20`) gives `$00`, which is the VDG
-`@` character, not a space. So the space character is handled separately rather
-than going through the conversion.
+Converting ASCII space (`$20`) the same way gives `$00`, which is the VDG `@`
+character. So the space in HELLO is handled separately at line 24.
 
 ### Setting Up: Lines 13-15
 
@@ -260,18 +268,16 @@ than going through the conversion.
 
 Three registers, three purposes.
 
-`LDX #HELLO_POS` loads the address `$04EA` into X. The `#` means the value is
-encoded directly in the instruction — this is *immediate addressing*. X will
-point to the screen position where HELLO begins and will advance as characters
-are written.
+`LDX #HELLO_POS` loads the screen address `$04EA` into X. X will walk forward
+through screen memory as characters are written. The `#` means the value is
+encoded directly in the instruction — *immediate addressing*.
 
 `LEAY Hello,PCR` loads the address of the string data at line 46 into Y. `PCR`
-means the address is calculated as an offset from the current program counter.
-This keeps the code position independent — wherever the program lives in memory,
-Y will correctly point to the Hello string within it.
+means the address is calculated as an offset from the program counter — wherever
+the program happens to be in memory, Y will correctly point to the Hello data
+within it. This is position independent data access.
 
-`LDB #6` loads the number 6 into B. This is the loop counter — six characters
-to write.
+`LDB #6` loads 6 into B. Six characters to write.
 
 ### The Loop: Lines 16-28
 
@@ -291,38 +297,35 @@ to write.
  28            BNE     WriteHello
 ```
 
-`WriteHello` is a label — a name for this memory address. It marks the top of
-the loop.
+`WriteHello` is a label — a name for this address in memory. It marks the top
+of the loop.
 
-**Line 17: `LDA ,Y+`** loads the byte at Y into A, then advances Y. The `,Y+`
-notation is *post-increment indexed addressing*: use the register, then
-increment it. Each pass through the loop Y moves one byte forward in the
-string data.
+**Line 17: `LDA ,Y+`** loads the byte at Y into A, then advances Y to the next
+byte. The `,Y+` notation is *post-increment indexed addressing*: use the
+register, then increment it. Y moves one character forward through the string
+data on each pass through the loop.
 
-**Lines 18-19: `CMPA #' '` / `BEQ WriteSpace`** compares A to the ASCII space
-character. `CMPA` performs a subtraction and sets condition flags based on the
-result but does not store the result. `BEQ` — *Branch if Equal* — jumps to
-`WriteSpace` if the result was zero, meaning the characters were equal. If the
-character is not a space, execution continues at line 20.
+**Lines 18-19: `CMPA #' '` / `BEQ WriteSpace`** compare A to the ASCII space
+character. `CMPA` subtracts without storing the result, setting condition flags.
+`BEQ` (*Branch if Equal*) jumps to `WriteSpace` if the result was zero. If the
+character is not a space, execution falls through to line 20.
 
-**Lines 20-21: `ANDA #$3F` / `ORA #$40`** perform the ASCII-to-VDG conversion
-described above. Strip the high bits, then set bit 6 for the alternate display
-mode. The result written to screen memory will display as a dark character on a
-green background.
+**Lines 20-21: `ANDA #$3F` / `ORA #$40`** perform the ASCII-to-VDG conversion.
+Strip the high bits, set bit 6. The converted value written to screen memory
+will display as a dark character on a green background.
 
-**Line 22: `BRA StoreChar`** branches unconditionally past the WriteSpace
-handling.
+**Line 22: `BRA StoreChar`** branches unconditionally past the WriteSpace path.
 
-**Lines 23-24: `WriteSpace` / `LDA #$60`** handles the space character by
-loading the VDG space code directly.
+**Lines 23-24: `WriteSpace` / `LDA #$60`** loads the VDG space code directly,
+bypassing the conversion.
 
-**Lines 25-26: `StoreChar` / `STA ,X+`** stores the prepared VDG code to the
-screen memory address in X, then advances X. The character appears on screen at
-the moment this instruction executes.
+**Lines 25-26: `StoreChar` / `STA ,X+`** stores the VDG code to screen memory
+at X, then advances X. The character appears on screen at that moment.
 
 **Lines 27-28: `DECB` / `BNE WriteHello`** decrement B and branch back to
-`WriteHello` if B is not yet zero. When B reaches zero `BNE` does not branch
-and execution falls through to line 29. This is the counted loop pattern.
+`WriteHello` if B is not zero. When B reaches zero `BNE` does not branch and
+execution continues to line 29. This is the counted loop: load a count, do
+work, decrement, branch if not done.
 
 ---
 
@@ -333,14 +336,15 @@ and execution falls through to line 29. This is the counted loop pattern.
  30            STD     <CURPOS
 ```
 
-The D register is A and B treated as a 16-bit pair — A is the high byte, B is
-the low byte. `LDD #WORLD_POS` loads the address `$04F0` into D in one
-instruction, setting both bytes at once.
+D is A and B treated as one 16-bit register — A is the high byte, B is the low
+byte. `LDD #WORLD_POS` loads the address `$04F0` into D in a single instruction,
+setting both bytes at once.
 
-`STD <CURPOS` stores D to `$0088` and `$0089`. The `<` prefix means *direct
-page addressing* — the 6809 can address the first 256 bytes of memory with a
-shorter, faster instruction. `<CURPOS` uses this form. The result is that BASIC's
-cursor position register now holds `$04F0`, which is row 7, column 16.
+`STD <CURPOS` stores D to addresses `$0088` and `$0089`. The `<` prefix means
+*direct page addressing* — the 6809 can address the first 256 bytes of memory
+with a shorter, faster two-byte instruction form rather than three bytes.
+`<CURPOS` uses this form. After this instruction, BASIC's cursor register points
+to row 7, column 16, where WORLD! will begin.
 
 ---
 
@@ -351,26 +355,26 @@ cursor position register now holds `$04F0`, which is row 7, column 16.
  32            BSR     PrintStr
 ```
 
-`LEAX World,PCR` loads the address of the World string data into X using
-PC-relative addressing, the same technique used for Y at line 14.
+`LEAX World,PCR` loads the address of the World string data into X, using the
+same PC-relative technique as line 14.
 
 `BSR PrintStr` — *Branch to SubRoutine* — pushes a return address and jumps to
 the `PrintStr` subroutine at line 39. Unlike `JSR`, `BSR` uses a signed offset
-from the current program counter rather than an absolute address. It is one byte
-shorter than `JSR` and inherently position independent.
+from the current program counter rather than an absolute address. It is one
+byte shorter and is inherently position independent.
 
 ---
 
-## Setting the Exit Cursor Position: Lines 33-34
+## Positioning the Cursor for Exit: Lines 33-34
 
 ```
  33            LDD     #EXIT_POS
  34            STD     <CURPOS
 ```
 
-The same pattern as lines 29-30. The cursor moves to row 13, column 0. When the
-program returns to BASIC, BASIC prints `OK` at the cursor position. Placing the
-cursor here keeps the BASIC output clear of the displayed text.
+The cursor moves to row 13, column 0. When the program returns to BASIC, BASIC
+prints `OK` at whatever address is in the cursor register. Placing it here
+keeps the BASIC output clear of the display.
 
 ---
 
@@ -382,15 +386,14 @@ cursor here keeps the BASIC output clear of the displayed text.
  37            BEQ     WaitKey
 ```
 
-`JSR [POLCAT]` uses indirect addressing — the square brackets mean "jump to the
-address stored at `$A000`" rather than jumping to `$A000` itself. The ROM
-keyboard routine address can be redirected by other software. Using the indirect
-form respects any such redirection, consistent with how the BASIC ROM itself
-calls the routine.
+`JSR [POLCAT]` uses *indirect addressing* — the square brackets mean jump to
+the address stored at `$A000`, not to `$A000` itself. The ROM keyboard routine
+address can be redirected by other software. Using the indirect form respects
+that, the same way the BASIC ROM does.
 
-`POLCAT` returns the ASCII code of any pressed key in A, or zero if no key is
-pressed. `BEQ WaitKey` loops back when A is zero. When a key is pressed A is
-non-zero, `BEQ` does not branch, and execution continues to line 38.
+`POLCAT` returns the key pressed in A, or zero if no key is pressed. `BEQ
+WaitKey` loops back when A is zero. When a key is pressed, execution falls
+through to line 38.
 
 ---
 
@@ -400,9 +403,8 @@ non-zero, `BEQ` does not branch, and execution continues to line 38.
  38            RTS
 ```
 
-`EXEC` in BASIC pushed a return address before jumping to the program. `RTS`
-pops it and returns — BASIC resumes and prints `OK` at the cursor position set
-at line 34.
+`EXEC` in BASIC pushed a return address before jumping here. `RTS` pops it and
+returns. BASIC resumes and prints `OK` at the cursor position set at line 34.
 
 ---
 
@@ -420,19 +422,16 @@ at line 34.
 
 `PrintStr` prints a null-terminated string. X must point to the string on entry.
 
-**Line 40: `LDA ,X+`** loads the character at X into A and advances X.
+Line 40 loads the character at X into A and advances X. Line 41 checks for a
+zero byte — the null terminator — and branches to `PrintDone` if found. Line 42
+calls the ROM character output routine via indirect addressing. `CHROUT` reads
+the cursor register, writes the character in A to that screen location, and
+advances the cursor. Line 43 loops back for the next character. Line 45 returns
+to the caller.
 
-**Line 41: `BEQ PrintDone`** — a zero byte signals the end of the string. Branch
-to `PrintDone` and return.
-
-**Line 42: `JSR [CHROUT]`** calls the ROM character output routine via indirect
-addressing. `CHROUT` reads the cursor position from `$0088`/`$0089`, writes the
-character in A to that screen location, and advances the cursor.
-
-**Line 43: `BRA PrintStr`** loops back for the next character.
-
-**Line 45: `RTS`** returns to the caller. The return address was pushed by `BSR`
-at line 32.
+`PrintStr` does not know or care that it was called to print WORLD!. Pass it
+any null-terminated string and it works the same way. That generality is the
+point of a subroutine.
 
 ---
 
@@ -444,79 +443,79 @@ at line 32.
  48            FCB     0
 ```
 
-`FCC` — *Form Constant Characters* — places the ASCII codes of the string
-directly into the binary output. `FCB` places a single byte. The zero at line 48
-is the null terminator that `PrintStr` uses to detect the end of the string.
+`FCC` (*Form Constant Characters*) places the ASCII codes of the string
+directly into the binary output. `FCB` (*Form Constant Byte*) places a single
+byte. The zero at line 48 is the null terminator for `PrintStr`.
 
-`Hello` and `World` are labels. Lines 14 and 31 reference them by name. The
-assembler calculates the PC-relative offsets to each.
+`Hello` and `World` are labels that mark these addresses. The assembler
+calculates PC-relative offsets to them from lines 14 and 31.
 
-The two strings are adjacent in memory. The null terminator at line 48 follows
-immediately after `WORLD!` and serves only that string — `Hello` is accessed
-directly via the loop at lines 16-28 and does not need one.
+The two strings are adjacent in memory. `Hello` is six bytes, ending just
+before `World` begins. Only `World` needs the null terminator because only
+`World` is passed to `PrintStr`.
 
 ---
 
-## The Six Concepts
+## Six Things This Program Demonstrates
 
-This program demonstrates six things that appear in every assembly language
-program ever written for any processor:
+Every assembly language program uses the same building blocks regardless of
+which processor it runs on. This program uses all six.
 
 **Data Movement** — loading values into registers (`LDA`, `LDB`, `LDD`, `LDX`),
-storing them to memory (`STA`, `STD`), and the addressing modes that determine
-where the data comes from or goes.
+storing them to memory (`STA`, `STD`). The `#` prefix means the value is in the
+instruction itself. The `<` prefix means use the shorter direct page form.
 
-**Arithmetic** — the assembler computed `SCREEN+(7*COLS)+10` before producing a
-single byte of output. At runtime, `DECB` decrements a counter. The counted
-loop — load a count, do work, decrement, branch if not done — is one of the
-most common structures in assembly programming.
+**Arithmetic** — the assembler calculated screen positions before producing any
+code. At runtime, `DECB` counts down the loop. The counted loop pattern — load
+a count, do work, decrement, branch back if not zero — is one of the most
+common structures in assembly programming.
 
 **Logic** — `ANDA #$3F` clears bits. `ORA #$40` sets a bit. Two instructions
-convert an ASCII character code to a VDG display code. The result is visible on
-screen.
+converted ASCII to VDG codes and selected a display mode. The result was visible
+immediately on screen.
 
-**Compare and Branch** — `CMPA` sets condition flags. `BEQ` and `BNE` act on
-those flags. `BRA` branches regardless of flags. These are the building blocks
-of all control flow in assembly language.
+**Compare and Branch** — `CMPA` sets flags without storing a result. `BEQ` and
+`BNE` act on those flags. `BRA` branches regardless. These instructions are the
+only way a sequential machine can make decisions.
 
-**Stack and Subroutines** — `JSR` and `BSR` save a return address on the stack
-and jump. `RTS` retrieves that address and returns. The hardware stack makes
-subroutines possible. Every call must be paired with a return.
+**Stack and Subroutines** — `JSR` and `BSR` push a return address and jump.
+`RTS` retrieves it and returns. The hardware stack makes subroutines possible.
+`BSR` is the position independent form. Every call must pair with a return.
 
-**Indexed Addressing** — `,Y+` and `,X+` read or write through a register and
-advance it. This is how you work through strings, arrays, and blocks of memory.
-`PCR` addressing locates data by offset from the current program counter,
-keeping the code position independent.
+**Indexed Addressing** — `,Y+` and `,X+` load or store through a register and
+advance it. This is how you move through strings, arrays, and blocks of memory.
+`PCR` addressing locates data relative to the program counter, keeping the code
+position independent.
 
-These six concepts are the subject of the chapters that follow. Each will be
-developed further using examples from real programs — not contrived exercises,
-but working code that does something useful.
+These six concepts are the subject of the chapters that follow.
 
 ---
 
 ## About the BASIC Loader
 
-The BASIC program that loaded the machine code is worth understanding briefly,
-because it uses a technique with implications worth knowing.
+The BASIC program that delivered the machine code uses a technique worth
+understanding, because it raises a question that has a non-obvious answer.
 
-`CLEAR 200` reserves 200 bytes of string space at the top of RAM. It also resets
-all variable values — which is why `A` is assigned on the next line rather than
-assuming any prior value. `CLEAR` clears everything.
+`CLEAR 200` reserves memory and resets all variable values. `A=&H3F00` sets A
+to the hexadecimal address `$3F00`. The FOR loop reads each DATA value into D
+and POKEs it to memory. `EXEC A` transfers control to that address — the same
+as `JSR $3F00` in assembly language, except BASIC pushes a return address first
+so `RTS` at the end of the machine code brings BASIC back.
 
-`A=&H3F00` uses BASIC's `&H` prefix for hexadecimal. The address `$3F00` is in
-the upper RAM area, below BASIC's program space, and available for machine
-language use.
+A more elegant approach would build the machine code into a string variable
+using `CHR$()`, then use `VARPTR` to find where BASIC stored the string data,
+and `EXEC` from that address. This way the code lives wherever BASIC decides to
+put it, which is precisely what position independent code is designed to handle.
 
-The loop reads each DATA value and POKEs it to the corresponding address. `POKE`
-writes a byte to an arbitrary memory location — the same operation as `STA` in
-assembly language, just expressed in BASIC. After 80 iterations the machine code
-sits at `$3F00` through `$3F4F`.
+In practice, `CHR$(0)` — the null byte that appears in the machine code — caused
+BASIC to terminate the string early, breaking the approach. The direct POKE to
+a known address works reliably and is straightforward to understand. But the
+string variable technique is not wrong in principle — it demonstrates exactly
+why position independent code matters, and that story is worth telling in its
+own right.
 
-`EXEC A` transfers control to address A. BASIC pushes a return address and jumps
-to the machine code. When the machine code executes `RTS`, BASIC resumes.
-
-The DATA values are the machine code bytes expressed as decimal numbers.
-`189,169,40` is `$BD $A9 $28` — the three bytes of `JSR $A928`, which is the
-CLRSCR call at line 12 of the assembly listing. Every instruction in the program
-is encoded in those DATA statements.
-
+`VARPTR` returns the address of a variable's internal descriptor. For a string
+variable, the descriptor contains the string's length and the address of its
+data. Decoding that descriptor by hand — `A=PEEK(V+1)*256+PEEK(V+2)` — is a
+window into how BASIC manages memory. The string is not an abstraction. It is
+bytes in RAM, and BASIC knows exactly where.
