@@ -310,3 +310,61 @@ Key ones: /label/, /bss/, /comment/…/end-comment/, /; line comment/,
 - Chapters 2-6: one per foundational concept
 - HTML format for final book output (documentation/html as template)
 - Consider SAL as "next step" chapter after teaching raw assembly
+
+---
+
+## cocotools — Python Toolkit (NEW)
+
+Goal: fully self-contained Python replacement for lwasm + toolshed + decb.
+Enables: write ASM -> assemble in Python -> build DSK -> run in XRoar WASM,
+all without platform-specific binaries. Python is everywhere.
+
+### Files
+
+    cocotools/
+      DESIGN.md     -- architecture document, read this first
+      instab.py     -- 6809 instruction table (139 instructions, verified)
+      lwasm.py      -- assembler (NOT YET WRITTEN)
+      decb.py       -- DSK builder (partial, needs cleanup)
+      basic.py      -- BASIC tokenizer (NOT YET WRITTEN)
+    cocotools.py    -- CLI entry point (NOT YET WRITTEN)
+
+### Design Decisions
+
+- Faithful translation of lwasm C source (GPL v3, William Astle)
+  Source: http://lwtools.projects.l-w.ca/
+- NOT a shortcut -- proper two-pass assembler matching lwasm behavior exactly
+- Verification: byte-for-byte match against lwasm output for every program
+- instab.py uses same table structure as lwasm instab.c:
+  imm/dir/idx/ext/inh opcodes per instruction, None = mode not supported
+  Prefixed opcodes: 0x1000 = 0x10 prefix, 0x1100 = 0x11 prefix
+
+### Instruction Table Structure (instab.py)
+
+  INSTAB[mnemonic] = {
+    imm: opcode or None,   # immediate mode
+    dir: opcode or None,   # direct page mode
+    idx: opcode or None,   # indexed mode
+    ext: opcode or None,   # extended mode
+    inh: opcode or None,   # inherent (no operand)
+    rel: opcode or None,   # relative (branches)
+    parse: class_name,     # parser class: gen8/gen16/gen0/inh/rel8/etc.
+  }
+
+### Next Steps for cocotools
+
+1. Write lwasm.py -- the assembler proper:
+   - Tokenizer (parse label, mnemonic, operand, comment)
+   - Expression evaluator (handles arithmetic, hex, labels)
+   - Symbol table (two-pass: collect then resolve)
+   - Addressing mode detection (see DESIGN.md)
+   - Indexed postbyte encoder (the complex part -- see DESIGN.md)
+   - Branch offset calculator
+   - Directive handlers (ORG, EQU, FCB, FDB, FCC, RMB, END)
+   - Output: DECB format and raw binary
+
+2. Verify against lwasm:
+   - GUESS.ASM (30 bytes, simple) -- first target
+   - HELLO.ASM (80 bytes) -- second target
+
+3. Package as cocotools.py CLI
