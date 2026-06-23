@@ -1,5 +1,5 @@
 @echo off
-cd /d C:\DATA\supercomm
+cd /d D:\git\supercomm
 echo.
 echo Current status:
 git status
@@ -12,4 +12,3 @@ git commit -m "%MSG%"
 git push
 echo.
 echo Done.
-pause
