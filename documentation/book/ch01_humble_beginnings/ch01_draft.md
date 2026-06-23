@@ -8,6 +8,8 @@ mistake you found it, fixed it, and ran it again. Eventually it worked.
 
 Type this into your Color Computer:
 
+| | |
+|---|---|
 | `10 REM HELLO WORLD      ` | `140 DATA 138,64,32,2    ` |
 | `20 REM HUMBLE BEGINNINGS` | `150 DATA 134,96,167,128 ` |
 | `30 REM                  ` | `160 DATA 90,38,237,204  ` |
