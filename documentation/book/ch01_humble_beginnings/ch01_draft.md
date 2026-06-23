@@ -8,23 +8,21 @@ mistake you found it, fixed it, and ran it again. Eventually it worked.
 
 Type this into your Color Computer:
 
-| | |
-|---|---|
-| `10 REM HELLO WORLD` | `140 DATA 138,64,32,2` |
-| `20 REM HUMBLE BEGINNINGS` | `150 DATA 134,96,167,128` |
-| `30 REM` | `160 DATA 90,38,237,204` |
-| `40 CLEAR 200` | `170 DATA 4,240,221,136` |
-| `50 A=&H3F00` | `180 DATA 48,141,0,33` |
-| `60 FOR I=0 TO 79` | `190 DATA 141,14,204,5` |
-| `61 READ D:POKE A+I,D` | `200 DATA 160,221,136,28` |
-| `62 NEXT I` | `210 DATA 239,173,159,160` |
-| `70 EXEC A` | `220 DATA 0,39,248,57` |
-| `80 REM DATA` | `230 DATA 166,128,39,6` |
-| `90 DATA 189,169,40,142` | `240 DATA 173,159,160,2` |
-| `100 DATA 4,234,49,141` | `250 DATA 32,246,57,72` |
-| `110 DATA 0,57,198,6` | `260 DATA 69,76,76,79` |
-| `120 DATA 166,160,129,32` | `270 DATA 32,87,79,82` |
-| `130 DATA 39,6,132,63` | `280 DATA 76,68,33,0` |
+| `10 REM HELLO WORLD      ` | `140 DATA 138,64,32,2    ` |
+| `20 REM HUMBLE BEGINNINGS` | `150 DATA 134,96,167,128 ` |
+| `30 REM                  ` | `160 DATA 90,38,237,204  ` |
+| `40 CLEAR 200            ` | `170 DATA 4,240,221,136  ` |
+| `50 A=&H3F00             ` | `180 DATA 48,141,0,33    ` |
+| `60 FOR I=0 TO 79        ` | `190 DATA 141,14,204,5   ` |
+| `61 READ D:POKE A+I,D    ` | `200 DATA 160,221,136,28 ` |
+| `62 NEXT I               ` | `210 DATA 239,173,159,160` |
+| `70 EXEC A               ` | `220 DATA 0,39,248,57    ` |
+| `80 REM DATA             ` | `230 DATA 166,128,39,6   ` |
+| `90 DATA 189,169,40,142  ` | `240 DATA 173,159,160,2  ` |
+| `100 DATA 4,234,49,141   ` | `250 DATA 32,246,57,72   ` |
+| `110 DATA 0,57,198,6     ` | `260 DATA 69,76,76,79    ` |
+| `120 DATA 166,160,129,32 ` | `270 DATA 32,87,79,82    ` |
+| `130 DATA 39,6,132,63    ` | `280 DATA 76,68,33,0     ` |
 
 Type `RUN` and press Enter.
 
