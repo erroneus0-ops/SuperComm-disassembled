@@ -222,22 +222,39 @@ Hello World in 49 lines / 80 bytes of PIC 6809 code.
 - ASCII to VDG: ANDA #$3F strips bits 7-6, ORA #$40 sets bit 6
 - Space special case: VDG space = $60 (already has bit 6 set)
 
-### Chapter Draft Status
+### Book Structure (Progressive Reveal)
 
-ch01_draft.md restructured:
-- BASIC listing first (two-column Markdown table for space efficiency)
-- Assembly listing second
-- Plain direct voice (avoiding AI dramatic-reading style)
-- VDG display description corrected
-- Sidebars integrated into main text
-- "About the BASIC Loader" at end
+The assembly listing is NOT shown in full in chapter 1. It is revealed
+section by section across chapters 2-7, one concept per chapter.
+Chapter 1 shows only the BASIC loader and a pseudocode outline.
+
+- Ch 1: BASIC listing (hook) + pseudocode shape of program
+- Ch 2: Data Movement -- EQU names, LDA/STD/LDD, addressing modes
+- Ch 3: Arithmetic -- assembler-time EQU expressions, DECB, ORG
+- Ch 4: Logic -- ANDA/ORA, VDG encoding fully explained
+- Ch 5: Compare and Branch -- CMPA/BEQ/BNE/BRA, POLCAT polling loop
+- Ch 6: Stack and Subroutines -- BSR/JSR/RTS, PrintStr subroutine
+- Ch 7: Indexed Addressing -- LEAY/LDA,Y+/STA,X+, PCR for PIC
+- Final: Complete annotated listing with HelloLen/WorldLen/CodeSize EQUs
+
+See BOOK_OUTLINE.md for the full chapter map with lines revealed per chapter.
+
+### Chapter 1 Draft Status
+
+ch01_draft.md current version:
+- BASIC listing first (two-column Markdown table)
+- Plain English pseudocode outline of the program
+- Assembly language introduced conceptually -- no instructions shown yet
+- Ends with a question that leads into chapter 2
+- No hex in introduction -- decimal only, hex deferred
+- Address 16128 described as a safe place to put the code
 
 ### Writing Style Notes
 
-Avoid: short punchy sentences with em-dashes, performed enthusiasm,
-"Forty-nine lines. The program is complete." style.
+Avoid: short punchy sentences with em-dashes, performed enthusiasm.
 Aim for: direct, plain, trusts the reader, states things once clearly.
-Reference: Daniel's 3am notes have the right register.
+Reference: Leventhal style -- why before what, direct you, honest about
+difficulty. See Leventhal sample text in book notes.
 
 ---
 

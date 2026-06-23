@@ -44,6 +44,12 @@
  44  PrintDone
  45            RTS
  46  Hello     FCC     "HELLO "
- 47  World     FCC     "WORLD!"
- 48            FCB     0
- 49            END     Start
+ 47  Hello_end
+ 48  HelloLen  EQU     Hello_end-Hello
+ 49  World     FCC     "WORLD!"
+ 50  World_end
+ 51  WorldLen  EQU     World_end-World
+ 52            FCB     0
+ 53  ProgramEnd EQU    *
+ 54  CodeSize  EQU     ProgramEnd-Start
+ 55            END     Start
