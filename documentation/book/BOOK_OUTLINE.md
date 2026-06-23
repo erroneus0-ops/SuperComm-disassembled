@@ -182,3 +182,62 @@ Full source with comments explaining each section in terms of all six concepts.
 The full 6809 assembly source with all comments, all directives, line numbers.
 This is the reference copy — everything in one place for the reader who has
 completed all seven chapters and wants the program in its entirety.
+
+---
+
+## Chapter 3: The Number Guessing Game
+
+A second complete program, building on everything from chapters 1 and 2.
+Introduces new concepts while using familiar structure.
+
+### New Concepts
+
+- **Signed comparison** — higher/lower requires different branch instructions
+  than equality. `CMPD` with `BGT`/`BLT` vs `BEQ`/`BNE`.
+- **Persistent loop** — program does not return to BASIC until player wins.
+  A loop that spans the entire program execution.
+- **Calling BASIC ROM math** — RND() is in ROM, reachable from assembly.
+  The relationship goes both directions: BASIC launches machine code,
+  machine code uses BASIC's routines.
+- **Simple decimal output** — displaying the guess count introduces
+  divide-by-10 and digit extraction.
+
+### The COMTRAN TEN Story
+
+Brief personal account: an unfamiliar machine, a table of mnemonics,
+translating by hand on paper to hex, keying it in, making it work.
+A guessing game was the program then too.
+
+Three purposes:
+1. Personal connection — this is how the author first understood that
+   machine code is just numbers with meaning attached
+2. Foreshadow hand compilation — you did it by hand. The reader is
+   about to learn exactly what you did and why it works.
+3. Universality — the concepts transfer. A guessing game is a guessing
+   game on any machine. The mnemonics change. The ideas do not.
+
+### "Playing With It"
+
+Change the range. Change the number of allowed guesses. Add a message
+for winning quickly vs. taking many tries. The reader now has enough
+understanding to make these changes without retyping everything.
+
+---
+
+## Hand Compilation (Appendix or Chapter 4 interlude)
+
+After the reader understands assembly language — its mnemonics, its
+addressing modes, its structure — a section on hand compilation closes
+the loop between the concept and the DATA statements they typed in
+chapter 1.
+
+Show the process: take a short sequence of instructions, look up each
+opcode and addressing mode in a table, write down the bytes. Then verify
+against the DATA statements from chapter 1. The reader sees that those
+80 numbers are not magic — they are the direct mechanical result of a
+process they can now perform themselves.
+
+This is what was done on the COMTRAN TEN. It is what programmers did
+before assemblers were widely available. Understanding it makes the
+assembler's job obvious — and makes the reader appreciate both the
+tedium it replaces and the clarity it provides.
