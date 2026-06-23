@@ -322,7 +322,8 @@ python cocotools.py makedsk GUESS.DSK GUESS.BIN GUESS.BAS
 |------|--------|-------|
 | cocotools/DESIGN.md | DONE | Full architecture document |
 | cocotools/instab.py | DONE | 139 instructions, 15 spot checks pass |
-| cocotools/lwasm.py | DONE | Phase 1 complete — GUESS.ASM + HELLO.ASM byte-perfect vs lwasm |
+| cocotools/lw_expr.py | DONE | Faithful translation of lw_expr.c — expression trees, simplify, parser |
+| cocotools/lwasm.py | STUB | Phase 1 reimplementation (not a translation) — to be replaced |
 | cocotools/decb.py | DONE | DSK builder + BIN formatter, Dsk class |
 | cocotools/basic.py | NOT STARTED | BASIC tokenizer |
 | cocotools.py | DONE | CLI: assemble, makedsk, binin, dskls |
