@@ -3,3 +3,4 @@
 *.VHD
 __pycache__/
 *.pyc
+git_update.bat 
