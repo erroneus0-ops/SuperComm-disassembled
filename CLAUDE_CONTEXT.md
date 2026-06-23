@@ -1,24 +1,26 @@
 # CLAUDE_CONTEXT.md
 # Project continuity file — paste this at the start of a new conversation
-# Last updated: by Claude at end of session
+# Last updated: end of session (June 23 2026)
 
 ## Project Overview
 
-Reverse-engineering SuperComm v2.2 (OS-9 Level II terminal/comms program) toward
-byte-perfect reassembly. Secondary goal: 6809 assembly language book.
+Two parallel tracks:
+1. Reverse-engineering SuperComm v2.2 (OS-9 Level II terminal/comms program)
+   toward byte-perfect reassembly
+2. Writing a 6809 assembly language book for the CoCo DECB environment,
+   with a companion Python toolkit replacing platform-specific binaries
 
 **Repo:** https://github.com/erroneus0-ops/SuperComm-disassembled
-**Daniel's local:** C:\DATA\supercomm (work) and D:\git\supercomm (home)
+**Daniel's local:** C:\DATA\supercomm (work), D:\git\supercomm (home)
 **Claude's local:** /home/claude/SuperComm/ (cloned fresh each session)
-
-**Daniel's pseudonym:** 三浦按針 (Miura Anjin / Anjin Miura)
+**Daniel's pseudonym:** 三浦按針 (Miura Anjin)
 
 ---
 
-## Pushing from Claude's Environment
+## GitHub Authentication
 
-At the start of each session, Daniel provides a base64-encoded, reversed GitHub
-token. Decode and reverse it, then configure git:
+Daniel provides a base64-encoded, REVERSED token at session start.
+Decode and reverse it, configure git:
 
 ```python
 import base64, subprocess, os
@@ -33,46 +35,67 @@ subprocess.run(['git', 'config', '--global', 'user.name', 'Claude'])
 
 ---
 
-## Key Files
+## Repository Structure
 
-    dis6x09.py              main disassembler (6809/6309)
-    markup.py               applies analyst annotations to JSON
-    prepasm.py              strips .dasm to assembleable .asm
-                            also converts BSS EQU → RMB
-    asm6809.py              internal assembler/validator
-    compare_bins.py         binary comparison
+```
+dis6x09.py              main disassembler (6809/6309) -- PRIMARY TOOL
+markup.py               applies analyst annotations to JSON
+prepasm.py              strips .dasm to assembleable .asm
+                        also converts BSS EQU → RMB with gap-based sizes
+asm6809.py              internal assembler/validator (Python)
+compare_bins.py         binary comparison utility
+strip_listing.py        kept for backward compatibility (use prepasm.py)
 
-    dir                     VHD-extracted dir binary (1728 bytes)
-    dir_proj.json           dir project -- active analysis
-    dir_proj.dasm           dir disassembly listing
+dir                     VHD-extracted dir binary (1728 bytes)
+dir_proj.json           dir project -- ACTIVE ANALYSIS
+dir_proj.dasm           dir disassembly listing
 
-    supercomm22             SuperComm v2.2 binary (17861 bytes)
-    supercomm22.json        SuperComm project -- byte-perfect
-    supercomm22_proj.dasm   SuperComm listing
+supercomm22             SuperComm v2.2 binary (17861 bytes) -- BYTE-PERFECT
+supercomm22.json        SuperComm v2.2 project
+supercomm22_proj.dasm   SuperComm v2.2 listing
 
-    supercomm21             SuperComm v2.1 binary -- corrupt CRC
-    supercomm21.json        minimal project, not fully annotated
+supercomm21             SuperComm v2.1 binary -- corrupt CRC
+supercomm21.json        minimal project, not fully annotated
+supercomm21_proj.dasm   SuperComm v2.1 listing
 
-    mdir, mdir.asm, mdir.hlp    NitrOS-9 mdir binary with source
+supercomm23             SuperComm v2.3 binary
+supercomm23.json        SuperComm v2.3 project
 
-    documentation/
-      generate.py           generates HTML opcode reference
-      opcodes/              12 JSON files, 131 instructions total
-      html/                 generated HTML reference site
-      book/
-        ch01_humble_beginnings/
-          HELLO.ASM         fully annotated source
-          HELLO_book.ASM    stripped 49-line numbered listing
-          HELLO_numbered.ASM  annotated with line numbers
-          HELLO.BAS         BASIC loader (POKE to $3F00, EXEC)
-          HELLO.DSK         CoCo DSK image (HELLO.BIN + HELLO.BAS)
-          HELLO.BIN         DECB binary
-          ch01_draft.md     chapter 1 first draft (restructured)
-          assemble.py       Python assembler for Hello World
+mdir, mdir.asm, mdir.hlp    NitrOS-9 mdir binary with source (reference)
+
+getting_started_windows.md  Setup guide for new Windows machines
+
+cocotools/
+  DESIGN.md             Architecture document -- READ THIS FIRST
+  instab.py             6809 instruction table (139 instructions, verified)
+  lwasm.py              PLANNED -- assembler (not yet written)
+  decb.py               PLANNED -- DSK builder cleanup
+  basic.py              PLANNED -- BASIC tokenizer
+
+documentation/
+  generate.py           generates HTML opcode reference from JSON
+  opcodes/              12 JSON files, 131 instructions total
+  html/                 generated HTML opcode reference
+  book/
+    BOOK_OUTLINE.md     full chapter map with progressive reveal plan
+    ch01_humble_beginnings/
+      HELLO.ASM         fully annotated assembly source
+      HELLO_book.ASM    55-line numbered listing (final form with size EQUs)
+      HELLO_numbered.ASM  annotated with line numbers
+      HELLO.BAS         BASIC loader (POKE to $3F00=16128, EXEC)
+      HELLO.BIN         DECB binary (80 bytes)
+      HELLO.DSK         CoCo DSK image
+      ch01_draft.md     CHAPTER 1 FIRST DRAFT -- current working document
+    ch03_guess_the_number/
+      GUESS.ASM         Stage 1 assembly source (comparison only, 30 bytes)
+      GUESS.BAS         BASIC loader for Stage 1
+      GUESS.DSK         Working DSK (verified on XRoar)
+      GUESS_test.BIN    lwasm-assembled reference binary
+```
 
 ---
 
-## Toolchain & Workflow
+## Toolchain & NPP Workflow
 
 ```
 # Disasm pass (NPP Run command):
@@ -83,27 +106,28 @@ cmd /c cd /d $(CURRENT_DIRECTORY) && python markup.py $(NAME_PART).dasm $(NAME_P
 ```
 
 File extensions:
-- `.dasm` — disassembler output, not directly assembleable, edit annotations here
-- `.asm`  — prepasm.py output, assembleable by lwasm
+- `.dasm` -- disassembler output, annotated, NOT directly assembleable
+- `.asm`  -- prepasm.py output, assembleable by lwasm
 
-BSS format in JSON (unified since refactor):
+BSS format in JSON (unified):
 ```json
 "bss": {
   "88": {"name": "BSS.DEName", "comment": "29-byte filename field"}
 }
 ```
+Auto-migrates old plain-string format on load.
 
 ---
 
 ## SuperComm22 Status
 
-**BYTE-PERFECT** — assembles to exact match of original binary including CRC.
+**BYTE-PERFECT** -- assembles to exact match of original binary including CRC.
 
 ```
 python dis6x09.py --proj supercomm22.json -n
 python prepasm.py supercomm22_proj.dasm /tmp/sc22.asm
 python asm6809.py /tmp/sc22.asm /tmp/sc22.bin
-# CRC verification produces BYTE-PERFECT
+# CRC verification -> BYTE-PERFECT
 ```
 
 forced_equs: $3BC5, $3F3A (genuine mid-instruction overlaps from indirect branches)
@@ -112,15 +136,15 @@ forced_equs: $3BC5, $3F3A (genuine mid-instruction overlaps from indirect branch
 
 ## dir Binary Status
 
-Active analysis in progress. 1728 bytes, OS-9 Level II `dir` command.
+**ACTIVE ANALYSIS.** 1728 bytes, OS-9 Level II `dir` command.
 NitrOS-9 additions confirmed: wildcard matching, -d/-f/-c/-a/-s/-l options
-were added to the original Microware dir which only had -e and -x.
+added to original Microware dir which only had -e and -x.
 
 ### BSS Map (confirmed)
 
 | Offset | Name | Description |
 |--------|------|-------------|
-| $00 | BSS.DirPath | path number for directory opened for reading |
+| $00 | BSS.DirPath | path number for directory opened |
 | $01 | BSS.CWDPath | path for CWD (opened when extended mode) |
 | $02 | BSS.NextDir | pointer to current directory path string |
 | $04 | BSS.BufPtr | end-of-token pointer in command line |
@@ -136,13 +160,13 @@ were added to the original Microware dir which only had -e and -x.
 | $10 | BSS.ColWidth | 0=single column, 1=multi-column |
 | $11 | BSS.LastCol | terminal width (default $50=80) |
 | $12 | BSS.ColmPos | remaining columns on current line |
-| $13 | BSS.DENameLen | filename length after FCS→CR reformat |
+| $13 | BSS.DENameLen | filename length after FCS->CR reformat |
 | $15 | BSS.PatTmp | temp char in Sub_0317 |
 | $17 | BSS.OpenMode | I$Open mode byte |
 | $25 | BSS.PathBuf | output buffer for path display |
-| $58 | BSS.DEName | RBF directory entry buffer (32 bytes from I$Read) |
-| $75 | BSS.DENend | last byte of FCS name / CR terminator position |
-| $76 | BSS.wLSN0 | working LSN high byte (shifted from $75 before reformat) |
+| $58 | BSS.DEName | RBF dir entry buffer (32 bytes from I$Read) |
+| $75 | BSS.DENend | last byte of FCS name / CR terminator |
+| $76 | BSS.wLSN0 | working LSN high byte |
 | $77 | BSS.wLSN1 | working LSN middle byte |
 | $78 | BSS.wLSN2 | working LSN low byte |
 | $79 | BSS.$79 | purpose unknown |
@@ -154,107 +178,186 @@ were added to the original Microware dir which only had -e and -x.
 |---------|-------|-------------|
 | $0011 | Init | program entry point |
 | $002D | CLinPars | command line parse loop |
-| $0214 | Sub_0214 | option parser (-e -s -d -f -x -c -a) |
+| $0214 | Sub_0214 | option parser |
 | $0274 | Sub_0274 | path/pattern argument parser |
 | $0317 | Sub_0317 | wildcard pattern matcher |
-| $035F | Sub_035F | conditional uppercase for case-insensitive match |
+| $035F | Sub_035F | conditional uppercase |
 | $036E | Loc_036E | extended listing formatter |
 | $041A | Sub_041A | decimal digit formatter |
 | $042B | Sub_042B | byte to two hex digits |
-| $0437 | Sub_0437 | nibble to hex ASCII |
 | $0442 | Sub_0442 | leading space trimmer |
-| $0451 | ErrExit | error/exit handler ($D3=normal EOF, else error) |
+| $0451 | ErrExit | error/exit handler |
 | $06A7 | WritBLines | write multiple lines utility |
 
-### RBF Directory Entry Structure (32 bytes from I$Read)
-
-The dir program reads 32-byte RBF directory entries. After reading, it
-pre-shifts the 3-byte LSN one position to make room for CR terminator:
-
-- Bytes 0-28: filename in FCS format (last char has bit 7 set)
-- Byte 29: LSN high byte (BSS.DENend/$75 — overwritten by CR after reformat)
-- Byte 30: LSN middle byte (BSS.wLSN0/$76 — shifted here before reformat)
-- Byte 31: LSN low byte (BSS.wLSN1/$77)
-- Beyond: BSS.wLSN2/$78 receives old $77 value
-
-Working structure after shift:
-- $58-$75: CR-terminated filename string
-- $76-$78: 3-byte file descriptor LSN
-
-### Open Questions
-
-1. Sub_035F case logic — does -c mean case-sensitive or insensitive?
-   TST BSS.DirCount, BNE skip_uppercase. If flag SET, skips uppercase.
-   Help text says "case insensitive" — logic seems inverted.
-2. BSS.$14/$16 — between DENameLen and PatTmp, purpose unknown
-3. BSS.$79 — cleared at init, never seen written again
-4. BSS.$18 — loaded at $0190 to check directory attribute bit
-5. $D3 error code — is this standard OS-9 RBF EOF?
-6. -x option (OptX: ADDB #4) — mode $09 meaning?
+### Pending dir Work
+- Continue annotating $0274 onward (path/pattern parser)
+- Sub_0317 wildcard matcher
+- Sub_035F case logic -- -c flag behavior
+- Loc_036E extended listing formatter
+- $D3 error code -- is this standard OS-9 RBF EOF?
 
 ---
 
-## Book: Chapter 1 — Humble Beginnings
+## Book: Structure and Status
 
 Target: CoCo 2, ECB 1.1, DECB environment
+Style: Leventhal-influenced -- why before what, direct "you", plain voice
+See: documentation/book/BOOK_OUTLINE.md for full chapter map
 
-### Program Summary
+### Chapter 1: Humble Beginnings -- DRAFT EXISTS (ch01_draft.md)
 
-Hello World in 49 lines / 80 bytes of PIC 6809 code.
-- "HELLO " written directly to VDG screen memory with ASCII→VDG conversion
-- "WORLD!" written via ROM CHROUT routine
-- Loaded via BASIC POKE loop to $3F00, EXEC'd
+- BASIC type-in listing first (two-column Markdown table, decimal only)
+- "Good times." opener
+- Assembly language introduced -- no instructions shown yet
+- Pseudocode outline of program shape
+- Mnemonic discussion includes Spanish angle (no localized assembly mnemonics exist)
+- Ends with question leading into chapter 2
+- VDG: green-on-black is CoCo default; bit 6 set = dark-on-green (NOT inverted)
 
-### Six Concepts Demonstrated
+### Chapter 2: The Six Concepts (SIX SECTIONS)
 
-1. Data Movement — LDA/STD/LDX, immediate/direct page/indexed addressing
-2. Arithmetic — assembler-time address calculation, DECB loop counter
-3. Logic — ANDA #$3F / ORA #$40 to convert ASCII to VDG with inverted video
-4. Compare and Branch — BEQ/BNE loop control, BEQ polling loop
-5. Stack and Subroutines — BSR/JSR/RTS, hardware stack
-6. Indexed Addressing — ,Y+ ,X+ auto-increment, PCR for PIC data
+Assembly listing revealed section by section. Each section = one concept.
+See BOOK_OUTLINE.md for line-by-line reveal map.
 
-### VDG Display Notes
+1. Data Movement -- EQU names, LDA/STD/LDD, addressing modes
+2. Arithmetic -- assembler-time EQU expressions, DECB, ORG
+3. Logic -- ANDA/ORA, VDG encoding fully explained
+4. Compare and Branch -- CMPA/BEQ/BNE/BRA, POLCAT polling loop
+5. Stack and Subroutines -- BSR/JSR/RTS, PrintStr subroutine
+6. Indexed Addressing -- LEAY/LDA,Y+/STA,X+, PCR for PIC
 
-- CoCo default display: green characters on black background (NOT inverted)
-- VDG bit 6 set = dark character on green background (the "other" mode)
-- HELLO written with bit 6 set, WORLD! via CHROUT without — visually different
-- ASCII to VDG: ANDA #$3F strips bits 7-6, ORA #$40 sets bit 6
-- Space special case: VDG space = $60 (already has bit 6 set)
+End of Ch2 "Playing With It": VARPTR/name patch experiment -- player inputs
+name, BASIC uses VARPTR to find string data address, POKEs into machine code
+to personalize greeting. Demonstrates self-modifying code gently.
 
-### Book Structure (Progressive Reveal)
+### Chapter 3: The Number Guessing Game (INCREMENTAL BUILD)
 
-The assembly listing is NOT shown in full in chapter 1. It is revealed
-section by section across chapters 2-7, one concept per chapter.
-Chapter 1 shows only the BASIC loader and a pseudocode outline.
+Starts mostly BASIC, ends mostly assembly. Six stages:
 
-- Ch 1: BASIC listing (hook) + pseudocode shape of program
-- Ch 2: Data Movement -- EQU names, LDA/STD/LDD, addressing modes
-- Ch 3: Arithmetic -- assembler-time EQU expressions, DECB, ORG
-- Ch 4: Logic -- ANDA/ORA, VDG encoding fully explained
-- Ch 5: Compare and Branch -- CMPA/BEQ/BNE/BRA, POLCAT polling loop
-- Ch 6: Stack and Subroutines -- BSR/JSR/RTS, PrintStr subroutine
-- Ch 7: Indexed Addressing -- LEAY/LDA,Y+/STA,X+, PCR for PIC
-- Final: Complete annotated listing with HelloLen/WorldLen/CodeSize EQUs
+- Stage 1 (current GUESS.ASM): compare only in ML, BASIC does everything else
+- Stage 2: ML takes screen (CLRSCR + header display)
+- Stage 3: ML handles result messages with cursor positioning
+- Stage 4: ML displays guess count (decimal output routine)
+- Stage 5: ML owns game loop (POLCAT replaces INPUT)
+- Stage 6: BASIC only does RND(100) + POKE secret + one EXEC
 
-See BOOK_OUTLINE.md for the full chapter map with lines revealed per chapter.
+COMTRAN TEN story told in ch3: personal account of hand-translating mnemonics
+to hex for unfamiliar machine, writing guessing game. Triple purpose:
+connection, foreshadow hand compilation, universality.
 
-### Chapter 1 Draft Status
+### HELLO_book.ASM (55 lines, final form)
 
-ch01_draft.md current version:
-- BASIC listing first (two-column Markdown table)
-- Plain English pseudocode outline of the program
-- Assembly language introduced conceptually -- no instructions shown yet
-- Ends with a question that leads into chapter 2
-- No hex in introduction -- decimal only, hex deferred
-- Address 16128 described as a safe place to put the code
+Includes: HelloLen EQU Hello_end-Hello, WorldLen, ProgramEnd EQU *,
+CodeSize EQU ProgramEnd-Start, END Start
+
+### Hand Compilation (Appendix/Interlude)
+
+Show process: take instructions, look up opcodes, write bytes, verify against
+DATA statements from ch1. Closes loop from COMTRAN TEN story.
 
 ### Writing Style Notes
 
-Avoid: short punchy sentences with em-dashes, performed enthusiasm.
-Aim for: direct, plain, trusts the reader, states things once clearly.
-Reference: Leventhal style -- why before what, direct you, honest about
-difficulty. See Leventhal sample text in book notes.
+Avoid: short punchy sentences with em-dashes, performed enthusiasm,
+"Forty-nine lines. The program is complete." style (AI dramatic-reading).
+Aim for: direct, plain, trusts the reader.
+Reference: Leventhal 6809 Assembly Language Programming book (scanned at
+https://colorcomputerarchive.com/repo/Documents/Books/6809%20Assembly%20Language%20Programming%20(Lance%20Leventhal).pdf
+and at https://archive.org/details/6809_Assembly_Language_Programming_by_Lance_Leventhal)
+
+---
+
+## cocotools -- Python Toolkit (IN PROGRESS)
+
+**Goal:** Fully self-contained Python replacement for lwasm + toolshed + decb.
+Python is everywhere. No platform binaries. Works in browser via XRoar WASM.
+
+**Workflow vision:**
+```
+python cocotools.py assemble GUESS.ASM -o GUESS.BIN
+python cocotools.py makedsk GUESS.DSK GUESS.BIN GUESS.BAS
+# Mount GUESS.DSK in XRoar WASM -- done
+```
+
+### Source References for Translation
+
+**lwasm (assembler):**
+- Source: http://www.lwtools.ca/hg/index.cgi/file/tip/lwasm/
+- Language: C (GPL v3), author: William Astle <lost@l-w.ca>
+- Also mirrored: https://github.com/stahta01/LWTools
+- Also mirrored: https://github.com/jmatzen/LWTools
+- Key files to translate:
+  - lwasm/instab.c (47KB) -- instruction table (DONE in instab.py)
+  - lwasm/instab.h -- structure definitions
+  - lwasm/insn_gen.c -- general addressing mode handling
+  - lwasm/insn_indexed.c (13KB) -- indexed postbyte encoding (COMPLEX)
+  - lwasm/insn_rel.c -- branch instruction encoding
+  - lwasm/insn_inh.c -- inherent instructions
+  - lwasm/insn_rlist.c -- register list (PSHS/PULS)
+  - lwasm/insn_rtor.c -- register-to-register (TFR/EXG)
+  - lwasm/pass1.c -- first pass (parse, symbol collection)
+  - lwasm/pass2.c through pass6.c -- resolution and emission passes
+  - lwasm/output.c -- DECB and raw output format
+  - lwasm/os9.c -- OS-9 module output
+  - lwasm/lwasm.c -- main assembler logic
+  - lwasm/main.c -- CLI entry point
+
+**toolshed/decb (disk image tools):**
+- Source: https://github.com/hathaway3/toolshed
+- Also: https://github.com/n6il/toolshed
+- Language: C (GPL), key tool: decb (Disk Extended Color BASIC utility)
+- Key operations needed: dskini, copy, dir, dump
+
+**BASIC tokenizer:**
+- No single authoritative source
+- CoCo BASIC token table documented in "Color BASIC Unravelled" series
+- Scanned copies at: https://techheap.packetizer.com/computers/coco/unravelled_series/
+
+**XRoar WASM:**
+- https://www.6809.org.uk/xroar/
+- Browser-based CoCo emulator -- no installation needed
+
+### cocotools Status
+
+| File | Status | Notes |
+|------|--------|-------|
+| cocotools/DESIGN.md | DONE | Full architecture document |
+| cocotools/instab.py | DONE | 139 instructions, 15 spot checks pass |
+| cocotools/lwasm.py | NOT STARTED | Next priority |
+| cocotools/decb.py | NOT STARTED | Cleanup of existing DSK builder |
+| cocotools/basic.py | NOT STARTED | BASIC tokenizer |
+| cocotools.py | NOT STARTED | CLI entry point |
+
+### instab.py Design (for lwasm.py author)
+
+INSTAB dict structure:
+```python
+INSTAB['LDA'] = {
+  'imm': 0x86,   # immediate opcode
+  'dir': 0x96,   # direct page opcode
+  'idx': 0xA6,   # indexed opcode
+  'ext': 0xB6,   # extended opcode
+  'parse': 'gen8'  # parser class
+}
+# Prefixed opcodes: P10 = 0x1000, P11 = 0x1100
+# None = mode not supported for this instruction
+```
+
+Parser classes: inh, gen8, gen16, gen0, rel8, rel16, relgen,
+                rtor, rlist, imm8, leax, mem
+
+Indexed register postbyte bits [6:5]: X=00, Y=01, U=10, S=11
+PCR addressing uses postbyte 0x8C (8-bit) or 0x8D (16-bit)
+
+### Verification Strategy
+
+For each program:
+1. Assemble with lwasm -> reference binary
+2. Assemble with Python cocotools -> test binary
+3. Compare byte-for-byte -> must match exactly
+
+Start with GUESS.ASM (30 bytes, simple)
+Then HELLO.ASM (80 bytes)
+Then dir/supercomm22 (real-world)
 
 ---
 
@@ -263,108 +366,33 @@ difficulty. See Leventhal sample text in book notes.
 - `target`: "os9" emits mod/emod/rmb/size idioms; "raw" keeps EQU output
 - `hex_offsets`: ["U"] shows hex offsets on unnamed U-relative addressing
 - `--source` optional when `binary` field set in JSON
-- BSS format: unified dict `{"name": "...", "comment": "..."}` — auto-migrates old format
-- `prev_ret = is_ret` — separator fires after labeled RTS too
-- `/bss/ $XX Name "comment"` — quoted comment replaces size annotation
+- BSS: unified dict format, auto-migrates old plain-string format
+- `prev_ret = is_ret` -- separator fires after labeled RTS too
+- `/bss/ $XX Name "comment"` -- quoted comment replaces size annotation
 
 ## prepasm.py Features
 
-- Converts BSS EQU → RMB with gap-based size calculation
+- Converts BSS EQU -> RMB with gap-based size calculation
 - Preserves analyst comments on RMB lines
-- Handles both "raw" (.dasm EQU style) input
+- Handles "raw" (.dasm EQU style) input
 
 ## markup.py Directives (quick reference)
 
-See the MARKUP QUICK REFERENCE at the bottom of any .dasm file.
-Key ones: /label/, /bss/, /comment/…/end-comment/, /; line comment/,
+Key ones: /label/, /bss/, /comment/.../end-comment/, /; line comment/,
 /region/, /routine/, /rename-label/, /remove-comment/
+Full reference in any .dasm file at bottom as MARKUP QUICK REFERENCE
 
 ---
 
-## Notepad++ Setup
+## Misc Notes
 
-- .dasm extension: Settings → Style Configurator → ASM → User ext: add "dasm"
-- Run commands:
-  - Markup Pass: `cmd /c cd /d $(CURRENT_DIRECTORY) && python markup.py $(NAME_PART).dasm $(NAME_PART).json`
-  - Disasm Pass: `cmd /c cd /d $(CURRENT_DIRECTORY) && python dis6x09.py --proj $(NAME_PART).json -n --markup`
-
----
-
-## Pending Work
-
-### dir Analysis
-- Continue annotating $0274 onward (path/pattern parser)
-- Sub_0317 wildcard matcher
-- Sub_035F case logic — verify -c flag behavior
-- Loc_036E extended listing formatter ($036E through $0451)
-- Confirm $D3 = EOF on RBF directory read
-
-### Engine
-- Interactive trace/debugger mode (simulated 6809 for pass1 visualization)
-- SAL output mode (structured assembly language) — Keith Frechette's SAL for LWTools
-- "Referenced by" xref comments on code labels
-
-### Book
-- Chapter 1: Daniel to rewrite sections in his own voice as style reference
-- Chapter 1: BASIC loader explanation needs VARPTR sidebar
-- Chapters 2-6: one per foundational concept
-- HTML format for final book output (documentation/html as template)
-- Consider SAL as "next step" chapter after teaching raw assembly
-
----
-
-## cocotools — Python Toolkit (NEW)
-
-Goal: fully self-contained Python replacement for lwasm + toolshed + decb.
-Enables: write ASM -> assemble in Python -> build DSK -> run in XRoar WASM,
-all without platform-specific binaries. Python is everywhere.
-
-### Files
-
-    cocotools/
-      DESIGN.md     -- architecture document, read this first
-      instab.py     -- 6809 instruction table (139 instructions, verified)
-      lwasm.py      -- assembler (NOT YET WRITTEN)
-      decb.py       -- DSK builder (partial, needs cleanup)
-      basic.py      -- BASIC tokenizer (NOT YET WRITTEN)
-    cocotools.py    -- CLI entry point (NOT YET WRITTEN)
-
-### Design Decisions
-
-- Faithful translation of lwasm C source (GPL v3, William Astle)
-  Source: http://lwtools.projects.l-w.ca/
-- NOT a shortcut -- proper two-pass assembler matching lwasm behavior exactly
-- Verification: byte-for-byte match against lwasm output for every program
-- instab.py uses same table structure as lwasm instab.c:
-  imm/dir/idx/ext/inh opcodes per instruction, None = mode not supported
-  Prefixed opcodes: 0x1000 = 0x10 prefix, 0x1100 = 0x11 prefix
-
-### Instruction Table Structure (instab.py)
-
-  INSTAB[mnemonic] = {
-    imm: opcode or None,   # immediate mode
-    dir: opcode or None,   # direct page mode
-    idx: opcode or None,   # indexed mode
-    ext: opcode or None,   # extended mode
-    inh: opcode or None,   # inherent (no operand)
-    rel: opcode or None,   # relative (branches)
-    parse: class_name,     # parser class: gen8/gen16/gen0/inh/rel8/etc.
-  }
-
-### Next Steps for cocotools
-
-1. Write lwasm.py -- the assembler proper:
-   - Tokenizer (parse label, mnemonic, operand, comment)
-   - Expression evaluator (handles arithmetic, hex, labels)
-   - Symbol table (two-pass: collect then resolve)
-   - Addressing mode detection (see DESIGN.md)
-   - Indexed postbyte encoder (the complex part -- see DESIGN.md)
-   - Branch offset calculator
-   - Directive handlers (ORG, EQU, FCB, FDB, FCC, RMB, END)
-   - Output: DECB format and raw binary
-
-2. Verify against lwasm:
-   - GUESS.ASM (30 bytes, simple) -- first target
-   - HELLO.ASM (80 bytes) -- second target
-
-3. Package as cocotools.py CLI
+- argv[0] in CoCo C programs = module name only, NOT full path
+- SAL for LWTools (Keith Frechette) -- structured assembly language preprocessor
+  Proof-of-concept, planned for Microsoft Store release
+  See: https://github.com/DarkChocoholicDev/ColorTRSDOS (same author)
+- Motorola 6809 programming manual: https://github.com/M6809-Docs/m6809pm
+- Leventhal source code: https://github.com/jmatzen/leventhal-6809
+- CoCo ROM source: https://github.com/tomctomc/coco_roms
+- SuperComm21 has corrupt CRC -- LEAX instructions point to module header
+  ($0000 and $000D) -- likely from settings save process gone wrong
+  No factory-fresh 2.1 binary found yet
