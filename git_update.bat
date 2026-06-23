@@ -1,5 +1,5 @@
 @echo off
-cd /d D:\git\supercomm
+cd /d C:\DATA\supercomm
 echo.
 echo Current status:
 git status
