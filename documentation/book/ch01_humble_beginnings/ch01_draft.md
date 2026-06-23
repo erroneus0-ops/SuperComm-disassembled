@@ -13,7 +13,7 @@ Type this into your Color Computer:
 | `20 REM HUMBLE BEGINNINGS` | `150 DATA 134,96,167,128 ` |
 | `30 REM                  ` | `160 DATA 90,38,237,204  ` |
 | `40 CLEAR 200            ` | `170 DATA 4,240,221,136  ` |
-| `50 A=&H3F00             ` | `180 DATA 48,141,0,33    ` |
+| `50 A=16128              ` | `180 DATA 48,141,0,33    ` |
 | `60 FOR I=0 TO 79        ` | `190 DATA 141,14,204,5   ` |
 | `61 READ D:POKE A+I,D    ` | `200 DATA 160,221,136,28 ` |
 | `62 NEXT I               ` | `210 DATA 239,173,159,160` |
@@ -37,7 +37,7 @@ The cursor sits at row thirteen. Press any key and BASIC returns with `OK`.
 
 The DATA statements in that listing contain a machine language program — 80 bytes
 of 6809 instructions. BASIC read those bytes one at a time, placed them into
-memory starting at address `$3F00`, and then handed control to them. The machine
+memory starting at that address, and then handed control to them. The machine
 code ran, did its work, and handed control back to BASIC.
 
 That is what this book is about: what those 80 bytes do, why they do it, and how
@@ -50,8 +50,8 @@ to write your own.
 You do not have to understand the BASIC program to get started. What BASIC did
 is simple enough to explain in one paragraph.
 
-`CLEAR 200` reserves some memory and resets variables. `A=&H3F00` is the address
-where the machine code will go — `&H` is BASIC's notation for hexadecimal.
+`CLEAR 200` reserves some memory and resets variables. `A=16128` puts a
+specific address into A — for now, accept it as a safe place to put the code.
 The FOR loop reads each number from the DATA statements and POKEs it into
 memory, one byte at a time, starting at that address. `EXEC A` tells BASIC to
 jump to that address and run whatever is there.
@@ -193,7 +193,7 @@ Line 10:
  10            ORG     0
 ```
 
-The BASIC loader puts the machine code at `$3F00`. `ORG 0` tells the assembler
+The BASIC loader puts the machine code at address 16128. `ORG 0` tells the assembler
 to generate code as if the program starts at address zero. Both are correct
 because the program contains no references to its own absolute location. Every
 reference to code or data within the program is expressed as an offset from the
@@ -496,10 +496,10 @@ These six concepts are the subject of the chapters that follow.
 The BASIC program that delivered the machine code uses a technique worth
 understanding, because it raises a question that has a non-obvious answer.
 
-`CLEAR 200` reserves memory and resets all variable values. `A=&H3F00` sets A
-to the hexadecimal address `$3F00`. The FOR loop reads each DATA value into D
-and POKEs it to memory. `EXEC A` transfers control to that address — the same
-as `JSR $3F00` in assembly language, except BASIC pushes a return address first
+`CLEAR 200` reserves memory and resets all variable values. `A=16128` puts a
+specific address into A — a safe place to put the code. The FOR loop reads
+each DATA value into D and POKEs it to memory. `EXEC A` transfers control to that address — the same
+as a JSR instruction to that address in assembly language, except BASIC pushes a return address first
 so `RTS` at the end of the machine code brings BASIC back.
 
 A more elegant approach would build the machine code into a string variable
