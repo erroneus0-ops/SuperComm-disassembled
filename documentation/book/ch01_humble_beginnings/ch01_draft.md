@@ -91,7 +91,7 @@ to anyone else who has.
 ## The Shape of the Program
 
 Before looking at a single instruction, here is what the program does, expressed
-in plain language. This is the outline. The chapters that follow fill it in.
+in plain language. This is the outline. The ~~chapters~~ sections that follow fill it in.
 
 ```
 ; --- Names for fixed addresses and constants ---
@@ -155,7 +155,7 @@ program. The CPU never sees them.
 
 ## What Comes Next
 
-Each of the following chapters develops one concept from this program. In each
+Each of the following ~~chapters~~ sections develops one concept from this program. In each
 chapter, the relevant lines of assembly source are revealed and explained. By
 the end, the complete annotated listing will have emerged one section at a time.
 
@@ -182,7 +182,7 @@ The six concepts, in order:
 
 When all six are covered, the complete program will be assembled in full —
 with comments, assembler directives, and a few techniques that will make more
-sense then than they would now.
+sense ~~then~~ than they would now.
 
 ---
 
