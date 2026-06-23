@@ -1,3 +1,4 @@
+*.exe
 *.vhd
 *.VHD
 __pycache__/
