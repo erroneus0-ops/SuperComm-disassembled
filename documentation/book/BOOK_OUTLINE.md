@@ -187,20 +187,9 @@ completed all seven chapters and wants the program in its entirety.
 
 ## Chapter 3: The Number Guessing Game
 
-A second complete program, building on everything from chapters 1 and 2.
-Introduces new concepts while using familiar structure.
-
-### New Concepts
-
-- **Signed comparison** — higher/lower requires different branch instructions
-  than equality. `CMPD` with `BGT`/`BLT` vs `BEQ`/`BNE`.
-- **Persistent loop** — program does not return to BASIC until player wins.
-  A loop that spans the entire program execution.
-- **Calling BASIC ROM math** — RND() is in ROM, reachable from assembly.
-  The relationship goes both directions: BASIC launches machine code,
-  machine code uses BASIC's routines.
-- **Simple decimal output** — displaying the guess count introduces
-  divide-by-10 and digit extraction.
+A second complete program, built incrementally. Starts mostly in BASIC,
+ends mostly in assembly. Each section hands one more piece to the machine
+code. The reader sees exactly why each piece moved.
 
 ### The COMTRAN TEN Story
 
@@ -216,11 +205,47 @@ Three purposes:
 3. Universality — the concepts transfer. A guessing game is a guessing
    game on any machine. The mnemonics change. The ideas do not.
 
+### Incremental Build — BASIC to Assembly
+
+**Stage 1: Comparison only (starting point)**
+BASIC: RND, CLS, header, INPUT, loop, result display.
+Assembly: compare guess to secret, return result code (0/1/2).
+
+**Stage 2: Machine code takes the screen**
+Assembly adds: JSR CLRSCR, write header to screen memory.
+BASIC loses: CLS, PRINT header.
+
+**Stage 3: Machine code handles result display**
+Assembly adds: cursor positioning, TOO HIGH/TOO LOW/YOU GOT IT messages.
+BASIC loses: IF R= THEN PRINT result.
+
+**Stage 4: Machine code displays guess count**
+Assembly adds: decimal digit output routine.
+BASIC loses: PRINT tries count.
+New concept: divide-by-10, digit extraction.
+
+**Stage 5: Machine code owns the game loop**
+Assembly adds: loop back for next guess, POLCAT keyboard poll.
+BASIC loses: loop, GOTO.
+New concept: persistent loop, keyboard polling replacing INPUT.
+
+**Stage 6: Final form**
+BASIC: RND(100), POKE secret, one EXEC.
+Assembly: everything else.
+
+### New Concepts Introduced
+
+- Signed comparison -- CMPB with BHI/BLO for higher/lower
+- Persistent loop -- program does not return to BASIC until player wins
+- Decimal output -- divide-by-10 and digit extraction
+- Keyboard polling -- JSR [POLCAT] loop replacing BASIC INPUT
+- Screen management -- clear, position, write at specific locations
+
 ### "Playing With It"
 
 Change the range. Change the number of allowed guesses. Add a message
-for winning quickly vs. taking many tries. The reader now has enough
-understanding to make these changes without retyping everything.
+for winning in fewer than 7 tries (optimal binary search). The reader
+now has enough understanding to make these changes themselves.
 
 ---
 
