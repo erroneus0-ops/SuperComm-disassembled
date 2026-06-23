@@ -73,9 +73,18 @@ notation into bytes. The name for an instruction is its *mnemonic* — a short
 word that hints at what the instruction does. `LDA` loads a value. `STA` stores
 one. `JSR` jumps to a subroutine. `RTS` returns from one.
 
-You do not have to use the manufacturer's mnemonics. There is nothing sacred
-about them. But they are standard — understood by everyone who works with the
-6809 — and that is reason enough to use them.
+The mnemonics Motorola chose work well enough. `LDA` hints at loading.
+`STA` hints at storing. Some are less obvious — `LEAX` takes a moment. If you
+have ever wondered whether a Spanish-speaking programmer sees `CARGA` where you
+see `LDA`, the answer is probably not — assembly language mnemonics have always
+been English-derived regardless of where the programmer lives. The machine does
+not care either way.
+
+You could invent your own. `LoadA` is unambiguous. `StoreA` leaves nothing to
+the imagination. Nothing stops you. But the Motorola mnemonics are what you will
+find in every manual, every listing, every tool. They are the shared language of
+anyone who has worked with this processor. Using them means your code is readable
+to anyone else who has.
 
 ---
 
