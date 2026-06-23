@@ -322,10 +322,10 @@ python cocotools.py makedsk GUESS.DSK GUESS.BIN GUESS.BAS
 |------|--------|-------|
 | cocotools/DESIGN.md | DONE | Full architecture document |
 | cocotools/instab.py | DONE | 139 instructions, 15 spot checks pass |
-| cocotools/lwasm.py | NOT STARTED | Next priority |
-| cocotools/decb.py | NOT STARTED | Cleanup of existing DSK builder |
+| cocotools/lwasm.py | DONE | Phase 1 complete — GUESS.ASM + HELLO.ASM byte-perfect vs lwasm |
+| cocotools/decb.py | DONE | DSK builder + BIN formatter, Dsk class |
 | cocotools/basic.py | NOT STARTED | BASIC tokenizer |
-| cocotools.py | NOT STARTED | CLI entry point |
+| cocotools.py | DONE | CLI: assemble, makedsk, binin, dskls |
 
 ### instab.py Design (for lwasm.py author)
 
