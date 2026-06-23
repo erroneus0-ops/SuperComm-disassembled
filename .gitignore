@@ -1,4 +1,3 @@
-*.dsk
 *.vhd
 *.VHD
 __pycache__/
