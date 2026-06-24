@@ -1,6 +1,6 @@
 # Chapter 2: Data Movement
 
-The question left hanging at the end of Chapter 1: why does `HELLO` need special
+The question left hanging at the end of Chapter 1: ~~w~~Why does `HELLO` need special
 handling to appear on screen, while `WORLD!` can simply be passed to a ROM
 routine?
 
@@ -11,8 +11,8 @@ The answer is the screen itself.
 ## The CoCo Screen Is Not a Terminal
 
 When you PRINT something in BASIC, the ROM handles the translation. You hand it
-a character, it decides where to put it and what byte to write. The screen looks
-like a terminal because the ROM makes it look that way.
+a character, it decides where to put it and what byte to write. <<The screen looks
+like a terminal because the ROM makes it look that way.>> (this doesn't make sense to me at all.  in what ways does the screen look like a terminal and in what ways does the ROM [code] make it look like a terminal?)
 
 The CoCo's display hardware — the MC6847 Video Display Generator, VDG for short
 — does not think in ASCII. It has its own encoding. The screen is a block of 512
@@ -22,7 +22,7 @@ the VDG displays the corresponding character in the corresponding cell,
 immediately, no ROM involved.
 
 The VDG character set has uppercase letters, digits, and a handful of symbols.
-Its codes do not match ASCII. The letter `A` in ASCII is `$41`. In VDG codes it
+Its codes do not match ASCII. The letter `A` in ASCII is `$41`(65). In VDG codes it
 is `$01`. The letter `H` is `$48` in ASCII and `$08` in VDG. The pattern holds
 for the whole alphabet: strip the high two bits and you get the VDG code.
 
