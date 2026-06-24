@@ -96,13 +96,14 @@ Start
 WriteHello
         LDA     ,Y+             ; load next ASCII char, advance Y
         CMPA    #' '            ; is it a space?
-        BEQ     WriteSpace      ; spaces need special handling
+        BEQ     WriteSpace      ; spaces need special handling because the next opcode will result in $00 
+		                        ; the $00 becomes $40 after the ORA #$40 and what character is that?
         ANDA    #$3F            ; map ASCII to VDG character set
         ORA     #$40            ; select normal video (black on green)
         BRA     StoreChar
 
 WriteSpace
-        LDA     #$60            ; VDG space (inverted space = $60)
+        LDA     #$60            ; CoCo BASIC space character (Black printing, Green background)
 
 StoreChar
         STA     ,X+             ; write VDG code to screen, advance X

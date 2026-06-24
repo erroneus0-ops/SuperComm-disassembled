@@ -11,9 +11,9 @@ The answer is the screen itself.
 ## The CoCo Screen Is Not a Terminal
 
 When you PRINT something in BASIC, the ROM does the work. You hand it a character
-and it figures out where to put it: it maintains a cursor position, converts the
-character to the right byte value, writes that byte to screen memory, and advances
-the cursor. The result acts like a terminal — characters appear, the cursor moves
+and it figures out where to put it.  Tt maintains a cursor position (where the next character is to be printed), converts the
+character to the right byte value, places that byte value to screen memory, and advances
+the cursor to the next position. The result acts like a terminal — characters appear, the cursor moves
 — but BASIC is building that behavior on top of something much simpler.
 
 The CoCo's display hardware — the MC6847 Video Display Generator, VDG for short
@@ -28,7 +28,7 @@ Try it yourself. Type `POKE 1056,30` and press Enter. Address 1056 (`$0420`) is
 the first cell of the second row on screen. The value 30 (`$1E`) is an up-arrow
 character in the VDG's first character set. You should see the up-arrow replace
 whatever character was there — green on black, standing out from the surrounding
-text. One byte, one cell, instant result. No ROM involved.
+text. ~~One byte, one cell, instant result.~~ (this is the AI slop people hate instead be more normal and less dramatic.  The byte was written to one location in memory, the VDG displays it immediately. No ROM involved.
 
 ---
 
@@ -69,7 +69,7 @@ to the screen.
 
 You will also see `0x` for hex and `0b` for binary in other contexts — these mean
 the same thing as `$` and `%`. Decimal numbers carry no prefix; a number without
-one is just a number.
+one is just a number.  Also in CoCo BASIC &H appears before hexadecimal notated values but there is no notational marker for binary.
 
 It comes with practice and it comes with use. Take your time. It will come to you
 as we go along.
@@ -99,7 +99,7 @@ symbols. The high 32 of each group (`$20`–`$3F` and `$60`–`$7F`) are more
 symbols and the digits zero through nine.
 
 CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
-set for lowercase — since the VDG has no actual lowercase shapes, BASIC uses the
+set for lowercase — since the original VDG has no actual lowercase shapes, BASIC uses the
 inverted set as a stand-in. Lowercase `a` appears on screen as an inverted `A`:
 green on black.
 
@@ -108,18 +108,18 @@ inverted video, green on black — by loading VDG codes in the `$01`–`$1A` ran
 The space after HELLO is `$20`, also in the first set: an inverted blank, green
 on black, matching the surrounding letters.
 
-Later, in Chapter 4, you will see two instructions that place a character in
-normal video:
+~~Later, in Chapter 4, you will see two instructions that place a character in~~
+~~normal video:~~
 
-```asm
-        ANDA    #$3F            ; map ASCII to VDG character set
-        ORA     #$40            ; select normal video (black on green)
-```
+~~```asm~~
+~~        ANDA    #$3F            ; map ASCII to VDG character set~~
+~~        ORA     #$40            ; select normal video (black on green)~~
+~~```~~
 
-`ANDA #$3F` strips the top two bits, mapping the character into the `$00`–`$3F`
-range — the first, inverted set. `ORA #$40` then pushes it into `$40`–`$7F` —
-the second, normal set. Without `ORA #$40`, the character stays inverted. The
-HELLO letters skip this step deliberately, staying in the inverted range.
+~~`ANDA #$3F` strips the top two bits, mapping the character into the `$00`–`$3F`~~
+~~range — the first, inverted set. `ORA #$40` then pushes it into `$40`–`$7F` —~~
+~~the second, normal set. Without `ORA #$40`, the character stays inverted. The~~
+~~HELLO letters skip this step deliberately, staying in the inverted range.~~
 
 That is why `HELLO` needs special handling: the program writes to screen memory
 directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
