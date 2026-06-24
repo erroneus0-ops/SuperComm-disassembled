@@ -1,6 +1,6 @@
 # Chapter 2: Data Movement
 
-The question left hanging at the end of Chapter 1: ~~w~~Why does `HELLO` need special
+The question left hanging at the end of Chapter 1: Why does `HELLO` need special
 handling to appear on screen, while `WORLD!` can simply be passed to a ROM
 routine?
 
@@ -10,29 +10,46 @@ The answer is the screen itself.
 
 ## The CoCo Screen Is Not a Terminal
 
-When you PRINT something in BASIC, the ROM handles the translation. You hand it
-a character, it decides where to put it and what byte to write. <<The screen looks
-like a terminal because the ROM makes it look that way.>> (this doesn't make sense to me at all.  in what ways does the screen look like a terminal and in what ways does the ROM [code] make it look like a terminal?)
+When you PRINT something in BASIC, the ROM does the work. You hand it a character
+and it figures out where to put it: it maintains a cursor position, converts the
+character to the right byte value, writes that byte to screen memory, and advances
+the cursor. The result acts like a terminal — characters appear, the cursor moves
+— but BASIC is building that behavior on top of something much simpler.
 
 The CoCo's display hardware — the MC6847 Video Display Generator, VDG for short
-— does not think in ASCII. It has its own encoding. The screen is a block of 512
-bytes of RAM starting at address `$0400`. Each byte corresponds to one character
-cell: 32 columns across, 16 rows down. Write a byte to one of those addresses and
-the VDG displays the corresponding character in the corresponding cell,
-immediately, no ROM involved.
+— does not act on characters at all. It reads memory. The screen is a block of
+512 bytes of RAM starting at address `$0400`. Each byte corresponds to one
+character cell: 32 columns across, 16 rows down. Write a byte to one of those
+addresses and the VDG displays the corresponding character in the corresponding
+cell, immediately, no ROM involved. The ROM is not the screen. The ROM is a layer
+on top of the screen.
 
-The VDG character set has uppercase letters, digits, and a handful of symbols.
-Its codes do not match ASCII. The letter `A` in ASCII is `$41`(65). In VDG codes it
-is `$01`. The letter `H` is `$48` in ASCII and `$08` in VDG. The pattern holds
-for the whole alphabet: strip the high two bits and you get the VDG code.
+The VDG has its own character encoding, and it has little in common with ASCII.
+There are 128 possible byte values. The low 64 (`$00`–`$3F`) produce normal-video
+characters: black shapes on a bright green background. The high 64 (`$40`–`$7F`)
+produce the same shapes inverted: green shapes on a black background. Each cell
+in screen memory is independent — adjacent cells can use different modes.
 
-Space is the odd one out. VDG space is `$60`, which has bit 6 set. In normal
-video the character appears as a blank green cell. With bit 6 set throughout,
-the display shifts to dark characters on a light background — inverted video.
+The character shapes themselves occupy the low 32 of each group. `$00` through
+`$1F` are the normal-video characters: `@`, then `A` through `Z`, then a handful
+of punctuation symbols. `$20` through `$3F` are more symbols and the digits
+zero through nine. The inverted versions occupy `$40`–`$5F` and `$60`–`$7F`
+respectively.
+
+CoCo BASIC uses the inverted range for lowercase display. When CHROUT receives a
+lowercase letter, it writes to the inverted range in screen memory — so lowercase
+`a` appears on screen as a green `A` on black. The VDG has no lowercase shapes.
+BASIC makes do with what the hardware provides.
+
+The space character the program writes for HELLO is `$60` — inverted space, from
+the second inverted group. VDG `$20` is normal space: a blank green cell. VDG
+`$60` is inverted space: a blank black cell. The program uses `$60` because
+`HELLO` is written in inverted video, and the trailing space needs to match
+that background.
 
 That is why `HELLO` needs special handling: the program writes to screen memory
-directly, using VDG codes, bypassing the ROM entirely. `WORLD!` goes through
-`CHROUT`, which is a ROM routine that handles the ASCII-to-VDG conversion
+directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
+goes through `CHROUT`, which handles the conversion from ASCII to VDG codes
 internally. Both end up on screen. They just take different routes.
 
 ---
@@ -128,7 +145,7 @@ A few lines later, the space character gets the same treatment:
 
 ```asm
 WriteSpace
-        LDA     #$60            ; VDG space (inverted space = $60)
+        LDA     #$60            ; VDG inverted space
 ```
 
 `LDA #$60` loads the byte `$60` directly into A. No memory access, no lookup —
