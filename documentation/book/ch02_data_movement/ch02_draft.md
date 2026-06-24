@@ -22,44 +22,104 @@ The CoCo's display hardware — the MC6847 Video Display Generator, VDG for shor
 character cell: 32 columns across, 16 rows down. Write a byte to one of those
 addresses and the VDG displays the corresponding character in the corresponding
 cell, immediately, no ROM involved. The ROM is not the screen. The ROM is a layer
-on top of the screen.  Try it yourself.  POKE to a place on the screen memory from 1024 to 1536 (or &H400 to %H600) any value from 0 to 255 (or &H00 to &HFF).  POKE 1056,30 for example.  What you probably saw was an inverted color, up arrow character (caret).
+on top of the screen.
 
-At this point you may be wondering about the weird numbers.  It turns out that computers as we know them are based on binary numbers.  People can't use binary numbers so easily.  We can both (people and computers) count from 0 to 9 with consistency, but the moment we reach 10, the computer reaches a different value.
+Try it yourself. Type `POKE 1056,30` and press Enter. Address 1056 (`$0420`) is
+the first cell of the second row on screen. The value 30 (`$1E`) is an up-arrow
+character in the VDG's first character set. You should see the up-arrow replace
+whatever character was there — green on black, standing out from the surrounding
+text. One byte, one cell, instant result. No ROM involved.
 
-So let's go over binary briefly.  A value of 0 is %00000000 (the % indicates we're using binary notation). 
-   A value of  3 is %00000011.  
-   A value of  7 is %00000111. 
-   A value of 15 is %00001111.
-   A value of 31 is %00011111.
-To keep it simple, converting from regular base 10 numbers can easily become very tedious.  So let's do it again with something both computers and humans can make some sense of:
-   A value of  3 is $03.
-   A value of  7 is $07.
-   A value of 15 is $0F.
-   A value of 31 is $1F.
-In order to make a "number" fit into the same even increments as binary digit spaces we call "bytes" we had to represent all values in a byte larger than 9 with a single representative value.  So 10 becomes A, 11, becomes B and ends with 15 becomes F.  This is base 16 notation and is called "hexadecimal."  Machine coders think of "hex" (hexadecimal) notation is binary shorthand.  With practice, they see a "$09" and think %00001001.  In this and the next few chapters we will use both decimal and hexadecimal and occasionally binary notation as the context of the discussion fits.  It comes with practice and it comes with use.  Take your time.  It will come to you as we go along.  Just know that $ or 0x mean hexadecimal values are expressed and that % or 0b mean binary values are expressed.  Nothing special in decimal.
+---
 
-The VDG has its own character encoding, and it has little in common with ASCII.
-There are 128 possible byte values. The low 64 (`$00`–`$3F`) produce normal-video
-characters: black shapes on a bright green background. The high 64 (`$40`–`$7F`)
-produce the same shapes inverted: green shapes on a black background. Each cell
-in screen memory is independent — adjacent cells can use different modes.
+## A Note on Numbers
 
-The character shapes themselves occupy the low 32 of each group. `$00` through
-`$1F` are the normal-video characters: `@`, then `A` through `Z`, then a handful
-of punctuation symbols. `$20` through `$3F` are more symbols and the digits
-zero through nine. The inverted versions occupy `$40`–`$5F` and `$60`–`$7F`
-respectively.
+Before going further, a word about the notation you will see throughout this book.
 
-CoCo BASIC uses the inverted range for lowercase display. When CHROUT receives a
-lowercase letter, it writes to the inverted range in screen memory — so lowercase
-`a` appears on screen as a green `A` on black. The VDG has no lowercase shapes.
-BASIC makes do with what the hardware provides.
+Computers work in binary — base 2, where every value is a pattern of ones and
+zeros. A single binary digit is a *bit*. Eight bits make a *byte*, and a byte can
+hold any value from 0 to 255. In binary those look like this:
 
-The space character the program writes for HELLO is `$60` — inverted space, from
-the second inverted group. VDG `$20` is normal space: a blank green cell. VDG
-`$60` is inverted space: a blank black cell. The program uses `$60` because
-`HELLO` is written in inverted video, and the trailing space needs to match
-that background.
+```
+ 3 = %00000011
+ 7 = %00000111
+15 = %00001111
+31 = %00011111
+```
+
+The `%` prefix signals binary notation. Binary is precise but tedious to read and
+write. Hexadecimal — base 16 — solves that. Where decimal runs out of single
+digits at 9, hexadecimal continues: A (10), B (11), C (12), D (13), E (14),
+F (15). The same values in hex:
+
+```
+ 3 = $03
+ 7 = $07
+15 = $0F
+31 = $1F
+```
+
+The `$` prefix signals hexadecimal. The reason machine coders prefer hex over
+decimal is not arbitrary: one hex digit maps exactly to four binary bits, always.
+Two hex digits is one byte, always. `$1F` is `%00011111` — the `1` in hex is
+`0001` in binary, the `F` is `1111`. Once that clicks, hex stops feeling like a
+foreign language and starts feeling like a compressed view of the actual bits.
+With practice, you see `$1E` and think `%00011110` — the up-arrow you just POKEd
+to the screen.
+
+You will also see `0x` for hex and `0b` for binary in other contexts — these mean
+the same thing as `$` and `%`. Decimal numbers carry no prefix; a number without
+one is just a number.
+
+It comes with practice and it comes with use. Take your time. It will come to you
+as we go along.
+
+---
+
+## The VDG Character Set
+
+The VDG has its own character encoding. A byte written to screen memory can be
+any value from 0 to 255, and each value produces a specific result. The 256
+values divide into three groups:
+
+- `$00`–`$3F` (0–63): the **first character set** — on the CoCo, inverted video:
+  green characters on a black background
+- `$40`–`$7F` (64–127): the **second character set** — on the CoCo, normal video:
+  black characters on a bright green background
+- `$80`–`$FF` (128–255): semigraphics — colored block patterns, not text
+
+The VDG chip itself does not decide which set is "normal." That is a design
+decision made by whoever builds the computer around it. Tandy chose to treat the
+second character set as normal — which is why everyday CoCo text is black on
+green. A different designer could have gone the other way.
+
+Both character sets contain the same 64 shapes. The low 32 of each group
+(`$00`–`$1F` and `$40`–`$5F`) are: `@`, then `A` through `Z`, then a handful of
+symbols. The high 32 of each group (`$20`–`$3F` and `$60`–`$7F`) are more
+symbols and the digits zero through nine.
+
+CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
+set for lowercase — since the VDG has no actual lowercase shapes, BASIC uses the
+inverted set as a stand-in. Lowercase `a` appears on screen as an inverted `A`:
+green on black.
+
+The HELLO program writes its letters directly into the first character set —
+inverted video, green on black — by loading VDG codes in the `$01`–`$1A` range.
+The space after HELLO is `$20`, also in the first set: an inverted blank, green
+on black, matching the surrounding letters.
+
+Later, in Chapter 4, you will see two instructions that place a character in
+normal video:
+
+```asm
+        ANDA    #$3F            ; map ASCII to VDG character set
+        ORA     #$40            ; select normal video (black on green)
+```
+
+`ANDA #$3F` strips the top two bits, mapping the character into the `$00`–`$3F`
+range — the first, inverted set. `ORA #$40` then pushes it into `$40`–`$7F` —
+the second, normal set. Without `ORA #$40`, the character stays inverted. The
+HELLO letters skip this step deliberately, staying in the inverted range.
 
 That is why `HELLO` needs special handling: the program writes to screen memory
 directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
@@ -159,10 +219,10 @@ A few lines later, the space character gets the same treatment:
 
 ```asm
 WriteSpace
-        LDA     #$60            ; VDG inverted space
+        LDA     #$20            ; VDG inverted space (first character set)
 ```
 
-`LDA #$60` loads the byte `$60` directly into A. No memory access, no lookup —
+`LDA #$20` loads the byte `$20` directly into A. No memory access, no lookup —
 the value is embedded in the instruction.
 
 For setting up the cursor, the program uses the sixteen-bit accumulator:
@@ -266,7 +326,7 @@ WriteHello
         ; BRA  StoreChar        — Chapter 5
 
 WriteSpace
-        LDA     #$60            ; *
+        LDA     #$20            ; *
 
 StoreChar
         STA     ,X+             ; *

@@ -45,18 +45,24 @@ WORLD_POS EQU  SCREEN+(7*COLS)+16   ; row 7, col 16 = $04F0
 EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
 
 ; ── VDG Character Encoding ───────────────────────────────────────
-; The VDG chip does NOT use ASCII.
-; Codes $00-$1F = letters (@, A-Z, [, \, ], ^, _)
-; Code $60      = space (blank)
-; Bit 6 set ($40) = inverted video (dark char on light background)
+; The VDG chip does NOT use ASCII. It has two character sets:
 ;
-; To convert uppercase ASCII to VDG:
-;   ANDA #$3F   strips bits 7 and 6, giving the VDG letter code
-;               'H'=$48 -> $48 & $3F = $08 (VDG 'H')
-;   ORA  #$40   sets bit 6 for inverted video
-;               $08 | $40 = $48 (inverted 'H')
+;   $00-$3F  first set  — on the CoCo: inverted video (green on black)
+;   $40-$7F  second set — on the CoCo: normal video  (black on green)
+;   $80-$FF  semigraphics block characters
 ;
-; Space is special: VDG space = $60 (already has bit 6 set)
+; To place an uppercase ASCII letter in normal video:
+;   ANDA #$3F   map ASCII to VDG character set (strips bits 7-6)
+;               'H'=$48 -> $48 & $3F = $08
+;   ORA  #$40   select normal video (black on green)
+;               $08 | $40 = $48
+;
+; Without ORA #$40 the character stays in the first set and appears
+; inverted (green on black) — which is what HELLO uses deliberately.
+;
+; Space: $20 is inverted space (green on black, first set)
+;        $60 is normal space  (black on green, second set)
+; HELLO uses $20 for its trailing space to match the inverted letters.
 
 ; ================================================================
 ; MAIN PROGRAM
@@ -91,8 +97,8 @@ WriteHello
         LDA     ,Y+             ; load next ASCII char, advance Y
         CMPA    #' '            ; is it a space?
         BEQ     WriteSpace      ; spaces need special handling
-        ANDA    #$3F            ; strip bits 7-6: ASCII -> VDG code
-        ORA     #$40            ; set bit 6: normal -> inverted video
+        ANDA    #$3F            ; map ASCII to VDG character set
+        ORA     #$40            ; select normal video (black on green)
         BRA     StoreChar
 
 WriteSpace
