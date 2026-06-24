@@ -107,8 +107,7 @@ symbols and the digits zero through nine.
 CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
 set for lowercase — since the original VDG has no actual lowercase shapes, BASIC
 uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
-inverted `A`: green on black. A later variant of the chip, the MC6847T1, included
-a true lowercase character set; some CoCo 2 models shipped with it.
+inverted `A`: green on black.
 
 The HELLO program writes its letters directly into the first character set —
 inverted video, green on black — by loading VDG codes in the `$01`–`$1A` range.
