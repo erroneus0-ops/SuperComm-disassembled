@@ -11,24 +11,25 @@ The answer is the screen itself.
 ## The CoCo Screen Is Not a Terminal
 
 When you PRINT something in BASIC, the ROM does the work. You hand it a character
-and it figures out where to put it.  Tt maintains a cursor position (where the next character is to be printed), converts the
-character to the right byte value, places that byte value to screen memory, and advances
-the cursor to the next position. The result acts like a terminal — characters appear, the cursor moves
-— but BASIC is building that behavior on top of something much simpler.
+and it figures out where to put it. It maintains a cursor position (where the next
+character is to be printed), converts the character to the right byte value,
+places that byte in screen memory, and advances the cursor to the next position.
+The result acts like a terminal — characters appear, the cursor moves — but BASIC
+is building that behavior on top of something much simpler.
 
 The CoCo's display hardware — the MC6847 Video Display Generator, VDG for short
 — does not act on characters at all. It reads memory. The screen is a block of
 512 bytes of RAM starting at address `$0400`. Each byte corresponds to one
 character cell: 32 columns across, 16 rows down. Write a byte to one of those
 addresses and the VDG displays the corresponding character in the corresponding
-cell, immediately, no ROM involved. The ROM is not the screen. The ROM is a layer
-on top of the screen.
+cell. The ROM is not the screen. The ROM is a layer on top of the screen.
 
 Try it yourself. Type `POKE 1056,30` and press Enter. Address 1056 (`$0420`) is
 the first cell of the second row on screen. The value 30 (`$1E`) is an up-arrow
 character in the VDG's first character set. You should see the up-arrow replace
 whatever character was there — green on black, standing out from the surrounding
-text. ~~One byte, one cell, instant result.~~ (this is the AI slop people hate instead be more normal and less dramatic.  The byte was written to one location in memory, the VDG displays it immediately. No ROM involved.
+text. The byte was written to one location in memory; the VDG displays it
+immediately. No ROM involved.
 
 ---
 
@@ -68,8 +69,9 @@ With practice, you see `$1E` and think `%00011110` — the up-arrow you just POK
 to the screen.
 
 You will also see `0x` for hex and `0b` for binary in other contexts — these mean
-the same thing as `$` and `%`. Decimal numbers carry no prefix; a number without
-one is just a number.  Also in CoCo BASIC &H appears before hexadecimal notated values but there is no notational marker for binary.
+the same thing as `$` and `%`. In CoCo BASIC, `&H` appears before hexadecimal
+values; there is no notation marker for binary in BASIC. Decimal numbers carry no
+prefix; a number without one is just a number.
 
 It comes with practice and it comes with use. Take your time. It will come to you
 as we go along.
@@ -88,10 +90,14 @@ values divide into three groups:
   black characters on a bright green background
 - `$80`–`$FF` (128–255): semigraphics — colored block patterns, not text
 
-The VDG chip itself does not decide which set is "normal." That is a design
-decision made by whoever builds the computer around it. Tandy chose to treat the
-second character set as normal — which is why everyday CoCo text is black on
-green. A different designer could have gone the other way.
+The VDG also supports an orange color mode — dark characters on an orange
+background, or orange characters on dark — as an alternative to green. Some CoCos
+display this depending on the video output and the television or monitor used.
+
+The VDG chip itself does not decide which character set is "normal." That is a
+design decision made by whoever builds the computer around it. Tandy chose to
+treat the second character set as normal — which is why everyday CoCo text is
+black on green. A different designer could have gone the other way.
 
 Both character sets contain the same 64 shapes. The low 32 of each group
 (`$00`–`$1F` and `$40`–`$5F`) are: `@`, then `A` through `Z`, then a handful of
@@ -99,27 +105,15 @@ symbols. The high 32 of each group (`$20`–`$3F` and `$60`–`$7F`) are more
 symbols and the digits zero through nine.
 
 CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
-set for lowercase — since the original VDG has no actual lowercase shapes, BASIC uses the
-inverted set as a stand-in. Lowercase `a` appears on screen as an inverted `A`:
-green on black.
+set for lowercase — since the original VDG has no actual lowercase shapes, BASIC
+uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
+inverted `A`: green on black. A later variant of the chip, the MC6847T1, included
+a true lowercase character set; some CoCo 2 models shipped with it.
 
 The HELLO program writes its letters directly into the first character set —
 inverted video, green on black — by loading VDG codes in the `$01`–`$1A` range.
 The space after HELLO is `$20`, also in the first set: an inverted blank, green
 on black, matching the surrounding letters.
-
-~~Later, in Chapter 4, you will see two instructions that place a character in~~
-~~normal video:~~
-
-~~```asm~~
-~~        ANDA    #$3F            ; map ASCII to VDG character set~~
-~~        ORA     #$40            ; select normal video (black on green)~~
-~~```~~
-
-~~`ANDA #$3F` strips the top two bits, mapping the character into the `$00`–`$3F`~~
-~~range — the first, inverted set. `ORA #$40` then pushes it into `$40`–`$7F` —~~
-~~the second, normal set. Without `ORA #$40`, the character stays inverted. The~~
-~~HELLO letters skip this step deliberately, staying in the inverted range.~~
 
 That is why `HELLO` needs special handling: the program writes to screen memory
 directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
