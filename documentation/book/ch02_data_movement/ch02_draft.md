@@ -22,7 +22,21 @@ The CoCo's display hardware — the MC6847 Video Display Generator, VDG for shor
 character cell: 32 columns across, 16 rows down. Write a byte to one of those
 addresses and the VDG displays the corresponding character in the corresponding
 cell, immediately, no ROM involved. The ROM is not the screen. The ROM is a layer
-on top of the screen.
+on top of the screen.  Try it yourself.  POKE to a place on the screen memory from 1024 to 1536 (or &H400 to %H600) any value from 0 to 255 (or &H00 to &HFF).  POKE 1056,30 for example.  What you probably saw was an inverted color, up arrow character (caret).
+
+At this point you may be wondering about the weird numbers.  It turns out that computers as we know them are based on binary numbers.  People can't use binary numbers so easily.  We can both (people and computers) count from 0 to 9 with consistency, but the moment we reach 10, the computer reaches a different value.
+
+So let's go over binary briefly.  A value of 0 is %00000000 (the % indicates we're using binary notation). 
+   A value of  3 is %00000011.  
+   A value of  7 is %00000111. 
+   A value of 15 is %00001111.
+   A value of 31 is %00011111.
+To keep it simple, converting from regular base 10 numbers can easily become very tedious.  So let's do it again with something both computers and humans can make some sense of:
+   A value of  3 is $03.
+   A value of  7 is $07.
+   A value of 15 is $0F.
+   A value of 31 is $1F.
+In order to make a "number" fit into the same even increments as binary digit spaces we call "bytes" we had to represent all values in a byte larger than 9 with a single representative value.  So 10 becomes A, 11, becomes B and ends with 15 becomes F.  This is base 16 notation and is called "hexadecimal."  Machine coders think of "hex" (hexadecimal) notation is binary shorthand.  With practice, they see a "$09" and think %00001001.  In this and the next few chapters we will use both decimal and hexadecimal and occasionally binary notation as the context of the discussion fits.  It comes with practice and it comes with use.  Take your time.  It will come to you as we go along.  Just know that $ or 0x mean hexadecimal values are expressed and that % or 0b mean binary values are expressed.  Nothing special in decimal.
 
 The VDG has its own character encoding, and it has little in common with ASCII.
 There are 128 possible byte values. The low 64 (`$00`–`$3F`) produce normal-video
