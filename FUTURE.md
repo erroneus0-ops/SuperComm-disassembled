@@ -89,9 +89,9 @@ characters. Cycling through a carefully chosen sequence of these values
 produces an animated "slinky" cursor effect — more interesting than a
 simple on/off blink.
 
-Example sequence discovered: 14, 6, 2, 3, 11, 15, 11, 3, 2, 6
-(oscillating through semigraphics block patterns, giving the appearance
-of something bouncing or flowing in the cursor position)
+Example sequence discovered (1-based index as printed, actual VDG value = $7F+index):
+  Index:  14,   6,   2,   3,  11,  15,  11,   3,   2,   6
+  VDG:  $8D, $85, $81, $82, $8A, $8E, $8A, $82, $81, $85
 
 This would be "fun with this" level 3, building on:
   1. BLINKKY ROM routine (current)
