@@ -148,11 +148,10 @@ The CPU never sees the names. By the time the program becomes bytes, every name
 has been replaced by its value.
 
 This matters because `$A000` says nothing about what lives there. `POLCAT` says
-exactly what it is — unless you happen to think it means skunk, in which case it
-doesn't. Code that reads `JSR [POLCAT]` communicates its intent to anyone reading
-it. Code that reads `JSR [$A000]` requires the reader to look up the address.
-The bracket notation is a specific addressing mode; it will be covered in its own
-section.
+exactly what it is. Code that reads `JSR [POLCAT]` communicates its intent to
+anyone reading it. Code that reads `JSR [$A000]` requires the reader to look up
+the address. The bracket notation is a specific addressing mode; it will be
+covered in its own section.
 
 The addresses themselves are fixed in the Color BASIC ROM. Tandy published them.
 They have not changed across CoCo generations. Programs that use these addresses
