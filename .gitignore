@@ -4,4 +4,5 @@
 __pycache__/
 *.pyc
 git_update.bat
-git_sleep.bat
+git_sleep.bata.out
+*.out
