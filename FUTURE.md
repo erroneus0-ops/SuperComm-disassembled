@@ -116,3 +116,26 @@ Reference: translate decb.exe faithfully as was done with lwasm.
 This would give us a complete DECB toolchain in Python.
 
 ---
+
+## Book -- Slinky cursor: bit manipulation animation
+
+The assembly version of the slinky cursor will NOT use a lookup table.
+Instead it will progressively AND/OR bits on the character byte to cycle
+through semigraphics patterns and character set transitions.
+
+The character byte encodes both the shape and the color set relationship,
+so masking and combining bits produces the animation frames naturally.
+No table needed -- the arithmetic drives the animation.
+
+This makes a perfect introduction to AND/OR in a visual context:
+each bit operation produces an immediately visible change on screen.
+The reader can see exactly what each instruction does.
+
+The BASIC proof-of-concept used:
+  DATA 14,6,2,3,11,15,11,3,2,6  (1-based index, VDG = 127+val)
+  Actual VDG values: $8D,$85,$81,$82,$8A,$8E,$8A,$82,$81,$85
+
+The assembly version will derive these values through bit operations
+rather than storing them in a FCB table.
+
+---
