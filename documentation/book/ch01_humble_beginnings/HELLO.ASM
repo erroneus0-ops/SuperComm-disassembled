@@ -96,8 +96,8 @@ Start
 WriteHello
         LDA     ,Y+             ; load next ASCII char, advance Y
         CMPA    #' '            ; is it a space?
-        BEQ     WriteSpace      ; spaces need special handling because the next opcode will result in $00 
-		                        ; the $00 becomes $40 after the ORA #$40 and what character is that?
+        BEQ     WriteSpace      ; load space directly: ANDA+ORA gives $60 either way,
+	        		                ; but intent is clearer with an explicit load
         ANDA    #$3F            ; map ASCII to VDG character set
         ORA     #$40            ; select normal video (black on green)
         BRA     StoreChar

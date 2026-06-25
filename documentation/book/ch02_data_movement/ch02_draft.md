@@ -111,15 +111,17 @@ set for lowercase — since the original VDG has no actual lowercase shapes, BAS
 uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
 inverted `A`: green on black.
 
-The HELLO program writes its letters directly into the first character set —
-green on black — by loading VDG codes in the `$01`–`$1A` range.
-The space after HELLO is `$20`, also in the first set: a light-on-dark blank,
-matching the surrounding letters.
+The HELLO program reads each letter from its string data, converts it to a VDG
+code via ANDA and ORA, and writes the result into the second character set —
+normal video, dark on light. The space after HELLO is loaded directly as `$60`,
+which is also in the second character set: a normal-video blank, matching the
+surrounding letters.
 
 That is why `HELLO` needs special handling: the program writes to screen memory
-directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
-goes through `CHROUT`, which handles the conversion from ASCII to VDG codes
-internally. Both end up on screen. They just take different routes.
+directly, choosing specific VDG byte values for a specific screen location,
+bypassing the ROM entirely. `WORLD!` goes through `CHROUT`, which handles the
+conversion internally. Both end up looking the same on screen. They just take
+different routes to get there.
 
 ---
 
