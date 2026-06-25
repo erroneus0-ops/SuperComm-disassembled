@@ -8,15 +8,16 @@ programs on a TRS-80 Color Computer (emulated via XRoar WASM).
 No external dependencies.  Python 3.8+ required.
 
 Commands:
-  assemble  FILE.ASM [-o FILE.BIN] [--format decb|raw] [--dp N]
-  makedsk   FILE.DSK FILE... [--name NAME] [--org ADDR]
-  binin     FILE.BIN            Show info about a DECB .BIN file
-  dskls     FILE.DSK            List files in a DSK image
+  assemble  FILE.ASM [-o FILE.BIN] [--format decb|raw] [-- assembler flags]
+  makedsk   FILE.DSK FILE...
+  binfo     FILE.BIN [-e] [--hex]
+  dskls     FILE.DSK
 
 Usage examples:
-  python cocotools.py assemble GUESS.ASM -o GUESS.BIN
+  python cocotools.py assemble HELLO.ASM
+  python cocotools.py assemble HELLO.ASM -o HELLO.BIN -- -b $3F00
   python cocotools.py makedsk GAME.DSK GAME.BIN GAME.BAS
-  python cocotools.py binin HELLO.BIN
+  python cocotools.py binfo HELLO.BIN -e
   python cocotools.py dskls HELLO.DSK
 """
 
@@ -39,6 +40,126 @@ from cocotools.decb  import (
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# lwasm-style flag parser for -- passthrough
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _parse_asm_flags(as_, flags):
+    """
+    Parse lwasm-style flags passed after -- and apply them to AsmState.
+    Unknown flags are reported but do not stop assembly.
+
+    Supported flags:
+      -b / --base ADDR      Base address for PIC output (hex: $3F00 or 0x3F00)
+      -I / --include DIR    Add directory to include search path
+      -D / --define SYM[=VAL]  Pre-define a symbol (default value: 1)
+      -9 / --6309           Enable HD6309 instruction set
+    """
+    from cocotools.lwasm_types import PRAGMA_6809
+
+    base_addr = None
+    i = 0
+    # strip leading -- separator if present
+    if flags and flags[0] == '--':
+        i = 1
+
+    while i < len(flags):
+        f = flags[i]
+
+        if f in ('-b', '--base'):
+            i += 1
+            if i < len(flags):
+                try:
+                    base_addr = _parse_addr(flags[i])
+                except ValueError:
+                    die(f"invalid base address: {flags[i]}")
+            else:
+                die(f"{f} requires an address argument")
+
+        elif f in ('-I', '--include'):
+            i += 1
+            if i < len(flags):
+                as_.include_list.append(flags[i])
+            else:
+                die(f"{f} requires a directory argument")
+
+        elif f in ('-D', '--define'):
+            i += 1
+            if i < len(flags):
+                spec = flags[i]
+                if '=' in spec:
+                    sym, val_str = spec.split('=', 1)
+                    try:
+                        val = _parse_addr(val_str)
+                    except ValueError:
+                        die(f"invalid value in -D {spec}")
+                else:
+                    sym, val = spec, 1
+                # Store for pre-registration before pass1
+                if not hasattr(as_, '_cmdline_defines'):
+                    as_._cmdline_defines = {}
+                as_._cmdline_defines[sym.upper()] = val
+            else:
+                die(f"{f} requires a SYM[=VAL] argument")
+
+        elif f in ('-9', '--6309'):
+            as_.pragmas &= ~PRAGMA_6809
+
+        elif f in ('-f', '--format'):
+            i += 1   # format handled by --format in cocotools args; skip value
+
+        else:
+            print(f"  note: assembler flag '{f}' not supported, ignored",
+                  file=sys.stderr)
+
+        i += 1
+
+    return base_addr   # caller applies to output if not None
+
+
+def _parse_addr(s):
+    """Parse $XXXX, 0xXXXX, or decimal address string to int."""
+    s = s.strip()
+    if s.startswith('$'):
+        return int(s[1:], 16)
+    if s.lower().startswith('0x'):
+        return int(s[2:], 16)
+    return int(s, 0)
+
+
+def _apply_base(binary, base_addr):
+    """
+    Rewrite a single-segment DECB binary to load at base_addr instead of $0000.
+    The exec address is also set to base_addr.
+    Only applied when load address in the binary is $0000 (PIC code).
+    """
+    if len(binary) < 10:
+        return binary   # too short to be valid
+
+    data = bytearray(binary)
+
+    # Walk preamble records and patch load addresses
+    pos = 0
+    while pos < len(data) - 4:
+        if data[pos] == 0xFF:
+            # Postamble — patch exec address to base_addr
+            data[pos+3] = (base_addr >> 8) & 0xFF
+            data[pos+4] =  base_addr       & 0xFF
+            break
+        if data[pos] != 0x00:
+            break
+        seg_len  = (data[pos+1] << 8) | data[pos+2]
+        load_hi  =  data[pos+3]
+        load_lo  =  data[pos+4]
+        load     = (load_hi << 8) | load_lo
+        if load == 0x0000:
+            data[pos+3] = (base_addr >> 8) & 0xFF
+            data[pos+4] =  base_addr       & 0xFF
+        pos += 5 + seg_len
+
+    return bytes(data)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # assemble command
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -58,6 +179,18 @@ def cmd_assemble(args):
 
     as_ = AsmState(output_fmt)
     as_.input = InputSystem(as_)
+
+    # Apply -- passthrough flags before opening source
+    base_addr = None
+    if hasattr(args, 'asm_flags') and args.asm_flags:
+        base_addr = _parse_asm_flags(as_, args.asm_flags)
+
+    # Pre-register any -D defines
+    if hasattr(as_, '_cmdline_defines'):
+        from cocotools.lw_expr import Expr
+        for sym, val in as_._cmdline_defines.items():
+            as_.register_symbol(None, sym, Expr.int(val), 0)
+
     as_.input.open(src_path)
 
     do_pass1(as_)
@@ -81,6 +214,8 @@ def cmd_assemble(args):
 
     if args.format == 'decb':
         binary = collect_decb_bytes(as_)
+        if base_addr is not None:
+            binary = _apply_base(binary, base_addr)
     else:
         binary = bytes(_collect_raw(as_))
 
@@ -95,6 +230,8 @@ def cmd_assemble(args):
             print(f"  output:    {out_path}  ({len(binary)} bytes)")
             for load, data in segs:
                 print(f"  segment:   load=${load:04X}  size={len(data)} bytes")
+            if base_addr is not None:
+                print(f"  base:      ${base_addr:04X}  (applied)")
             print(f"  exec:      ${exec_addr:04X}" if exec_addr else "  exec:      (none)")
         except Exception:
             print(f"  assembled {src_path} -> {out_path}  ({len(binary)} bytes)")
@@ -290,12 +427,28 @@ def main():
     sub = parser.add_subparsers(dest='command', required=True)
 
     # assemble
+    _asm_epilog = """\
+assembler flags (passed after --):
+  -b / --base ADDR        Set load and exec address for PIC output
+  -I / --include DIR      Add directory to include file search path
+  -D / --define SYM[=VAL] Pre-define a symbol (default value: 1)
+  -9 / --6309             Enable HD6309 instruction set
+
+examples:
+  python cocotools.py assemble HELLO.ASM
+  python cocotools.py assemble HELLO.ASM -o HELLO.BIN
+  python cocotools.py assemble HELLO.ASM -o HELLO.BIN -- -b $3F00
+  python cocotools.py assemble HELLO.ASM -- -I ./include -D DEBUG=1
+  python cocotools.py assemble HELLO.ASM --format raw -o HELLO.RAW
+"""
     p_asm = sub.add_parser('assemble', aliases=['asm'],
-                            help='Assemble a .ASM file to DECB .BIN')
+                            help='Assemble a .ASM source file',
+                            formatter_class=argparse.RawDescriptionHelpFormatter,
+                            epilog=_asm_epilog)
     p_asm.add_argument('source',           help='Source file (.ASM)')
-    p_asm.add_argument('-o', '--output',   help='Output file (default: same name, .BIN)')
+    p_asm.add_argument('-o', '--output',   help='Output file (default: source name with .BIN)')
     p_asm.add_argument('--format',         choices=['decb', 'raw'], default='decb',
-                       help='Output format (default: decb)')
+                       help='Output format: decb (default) or raw')
 
     # makedsk
     p_dsk = sub.add_parser('makedsk',
@@ -317,7 +470,18 @@ def main():
                             help='List files in a DSK image')
     p_ls.add_argument('dskfile',           help='DSK image file')
 
-    args = parser.parse_args()
+    # Split sys.argv at -- so assembler flags never reach argparse
+    argv = sys.argv[1:]
+    if '--' in argv:
+        split_at = argv.index('--')
+        cocotools_argv = argv[:split_at]
+        asm_flags      = argv[split_at+1:]
+    else:
+        cocotools_argv = argv
+        asm_flags      = []
+
+    args = parser.parse_args(cocotools_argv)
+    args.asm_flags = asm_flags
 
     if args.command in ('assemble', 'asm'):
         cmd_assemble(args)
