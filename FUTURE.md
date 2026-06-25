@@ -102,3 +102,17 @@ Also introduces the semigraphics character range ($80-$FF) which has
 not appeared in the book yet.
 
 ---
+
+## cocotools — makedsk disk image management
+
+Currently makedsk always creates a blank disk from scratch.
+Future operations to implement (mirroring DECB.EXE functionality):
+
+  makedsk -a FILE IMAGE.DSK    Add file to existing image; prompt if exists
+  makedsk -k FILE IMAGE.DSK    Kill (delete) a file from image (DECB uses KILL)
+  makedsk --overwrite          Create/overwrite without prompt (already done)
+
+Reference: translate decb.exe faithfully as was done with lwasm.
+This would give us a complete DECB toolchain in Python.
+
+---

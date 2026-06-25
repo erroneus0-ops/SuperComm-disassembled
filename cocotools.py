@@ -286,6 +286,13 @@ def cmd_assemble(args):
 
 def cmd_makedsk(args):
     dsk_path = args.dsk
+
+    if os.path.isfile(dsk_path) and not args.overwrite:
+        answer = input(f"{dsk_path} already exists. Overwrite? (y/N): ").strip().lower()
+        if answer != 'y':
+            print("Cancelled.")
+            return
+
     dsk = Dsk.blank()
 
     for file_path in args.files:
@@ -592,6 +599,8 @@ examples:
                             help='Build a CoCo DSK image from files')
     p_dsk.add_argument('dsk',              help='Output DSK file')
     p_dsk.add_argument('files', nargs='+', help='Files to add to the disk')
+    p_dsk.add_argument('-o', '--overwrite', action='store_true',
+                       help='Overwrite existing disk image without prompting')
 
     # binfo
     p_bin = sub.add_parser('binfo',
