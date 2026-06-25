@@ -134,6 +134,81 @@ def cmd_makedsk(args):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CoCo memory map for binfo -e analysis
+# ─────────────────────────────────────────────────────────────────────────────
+
+_COCO_REGIONS = [
+    (0x0000, 0x00FF, 'direct page / system variables'),
+    (0x0100, 0x01FF, 'system stack area'),
+    (0x0200, 0x03FF, 'BASIC/DOS work area'),
+    (0x0400, 0x05FF, 'VDG text screen (512 bytes)'),
+    (0x0600, 0x7FFF, 'free RAM (typical program area)'),
+    (0x8000, 0x9FFF, 'cartridge ROM / pak space'),
+    (0xA000, 0xBFFF, 'Color BASIC ROM'),
+    (0xC000, 0xFEFF, 'Extended BASIC ROM'),
+    (0xFF00, 0xFFFF, 'hardware registers'),
+]
+
+def _region(addr):
+    for start, end, name in _COCO_REGIONS:
+        if start <= addr <= end:
+            return name
+    return 'unknown'
+
+def _binfo_enhanced(segs, exec_addr):
+    notes = []
+
+    for i, (load, data) in enumerate(segs):
+        seg_end = load + len(data) - 1
+
+        if load == 0x0000:
+            notes.append(
+                f"segment {i+1}: load=$0000 — position-independent code (PIC)\n"
+                f"           use LOADM\"file\",offset,offset to place at runtime")
+        else:
+            region = _region(load)
+            if load >= 0xFF00:
+                notes.append(
+                    f"segment {i+1}: load=${load:04X} — loads into hardware registers\n"
+                    f"           almost certainly wrong")
+            elif load >= 0xA000:
+                notes.append(
+                    f"segment {i+1}: load=${load:04X} — loads into {region}\n"
+                    f"           this will overwrite ROM (probably not intended)")
+            elif load < 0x0600:
+                notes.append(
+                    f"segment {i+1}: load=${load:04X} — loads into {region}\n"
+                    f"           may conflict with system use")
+
+        # Check if segment spans a region boundary
+        if _region(load) != _region(seg_end):
+            notes.append(
+                f"segment {i+1}: spans region boundary "
+                f"${load:04X}–${seg_end:04X} "
+                f"({_region(load)} \u2192 {_region(seg_end)})")
+
+    # Check exec address
+    if exec_addr is not None:
+        in_seg = any(load <= exec_addr <= load + len(data) - 1
+                     for load, data in segs)
+        if not in_seg and not any(load == 0 for load, _ in segs):
+            notes.append(
+                f"exec=${exec_addr:04X} — falls outside all loaded segments")
+        if exec_addr >= 0xA000:
+            notes.append(
+                f"exec=${exec_addr:04X} — jumps into {_region(exec_addr)}")
+
+    if not notes:
+        notes.append("nothing unusual detected")
+
+    print()
+    print("  enhanced analysis:")
+    for note in notes:
+        for line in note.splitlines():
+            print(f"    {line}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # binin command  (show info about a .BIN file)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -166,6 +241,9 @@ def cmd_binin(args):
                 hex_part = ' '.join(f'{b:02X}' for b in chunk)
                 asc_part = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
                 print(f"    {load+i:04X}  {hex_part:<47}  {asc_part}")
+
+    if args.enhanced:
+        _binfo_enhanced(segs, exec_addr)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -236,7 +314,9 @@ def main():
                             help='Show info about a DECB .BIN file')
     p_bin.add_argument('binfile',          help='DECB binary file')
     p_bin.add_argument('--hex', action='store_true',
-                       help='Also show hex dump of code')
+                       help='Show hex dump of code')
+    p_bin.add_argument('-e', '--enhanced', action='store_true',
+                       help='Show enhanced analysis (memory regions, unusual patterns)')
 
     # dskls
     p_ls  = sub.add_parser('dskls',
