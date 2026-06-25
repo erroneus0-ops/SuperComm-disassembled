@@ -49,14 +49,16 @@ def _parse_asm_flags(as_, flags):
     Unknown flags are reported but do not stop assembly.
 
     Supported flags:
-      -b / --base ADDR      Base address for PIC output (hex: $3F00 or 0x3F00)
+      -I / --include DIR    Add directory to include search path
       -I / --include DIR    Add directory to include search path
       -D / --define SYM[=VAL]  Pre-define a symbol (default value: 1)
-      -9 / --6309           Enable HD6309 instruction set
+      -9 / --6809           6809-only mode
+      -3 / --6309           Enable HD6309 instruction set (default)
+      --6800compat           Enable 6800 compatibility instructions
     """
     from cocotools.lwasm_types import PRAGMA_6809
 
-    base_addr = None
+
     i = 0
     # strip leading -- separator if present
     if flags and flags[0] == '--':
@@ -65,17 +67,7 @@ def _parse_asm_flags(as_, flags):
     while i < len(flags):
         f = flags[i]
 
-        if f in ('-b', '--base'):
-            i += 1
-            if i < len(flags):
-                try:
-                    base_addr = _parse_addr(flags[i])
-                except ValueError:
-                    die(f"invalid base address: {flags[i]}")
-            else:
-                die(f"{f} requires an address argument")
-
-        elif f in ('-I', '--include'):
+        if f in ('-I', '--include', '--includedir'):
             i += 1
             if i < len(flags):
                 as_.include_list.append(flags[i])
@@ -113,7 +105,7 @@ def _parse_asm_flags(as_, flags):
 
         i += 1
 
-    return base_addr   # caller applies to output if not None
+    return
 
 
 def _parse_addr(s):
@@ -126,34 +118,78 @@ def _parse_addr(s):
     return int(s, 0)
 
 
-def _apply_base(binary, base_addr):
+# ─────────────────────────────────────────────────────────────────────────────
+# Post-processor  (-pp key=val,key=val,...)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _parse_pp(pp_str):
     """
-    Rewrite a single-segment DECB binary to load at base_addr instead of $0000.
-    The exec address is also set to base_addr.
-    Only applied when load address in the binary is $0000 (PIC code).
+    Parse -pp argument string into a dict of post-processor options.
+
+    Supported keys (aliases accepted):
+      b=ADDR  / load=ADDR    Set load address (patches DECB preamble)
+      e=ADDR  / exec=ADDR    Set exec address (patches DECB postamble)
+
+    Address values: $3F00, 0x3F00, or decimal.
+
+    Example: -pp b=$3F00,e=$3F10
+             -pp load=$3F00,exec=$3F00
     """
-    if len(binary) < 10:
-        return binary   # too short to be valid
+    opts = {}
+    for pair in pp_str.split(','):
+        pair = pair.strip()
+        if not pair:
+            continue
+        if '=' not in pair:
+            die(f"-pp: expected key=value, got '{pair}'")
+        key, val = pair.split('=', 1)
+        key = key.strip().lower()
+        val = val.strip()
+        try:
+            addr = _parse_addr(val)
+        except ValueError:
+            die(f"-pp: invalid address '{val}' for key '{key}'")
+
+        if key in ('b', 'load'):
+            opts['load'] = addr
+        elif key in ('e', 'exec'):
+            opts['exec'] = addr
+        else:
+            die(f"-pp: unknown key '{key}'")
+
+    return opts
+
+
+def _apply_pp(binary, pp_opts):
+    """
+    Apply post-processor options to a DECB binary.
+    Returns modified bytes.
+    """
+    if not pp_opts:
+        return binary
 
     data = bytearray(binary)
+    load_addr = pp_opts.get('load')
+    exec_addr = pp_opts.get('exec')
 
-    # Walk preamble records and patch load addresses
     pos = 0
     while pos < len(data) - 4:
         if data[pos] == 0xFF:
-            # Postamble — patch exec address to base_addr
-            data[pos+3] = (base_addr >> 8) & 0xFF
-            data[pos+4] =  base_addr       & 0xFF
+            # Postamble
+            if exec_addr is not None:
+                data[pos+3] = (exec_addr >> 8) & 0xFF
+                data[pos+4] =  exec_addr       & 0xFF
+            elif load_addr is not None and 'exec' not in pp_opts:
+                # If only load specified, set exec to match
+                data[pos+3] = (load_addr >> 8) & 0xFF
+                data[pos+4] =  load_addr       & 0xFF
             break
         if data[pos] != 0x00:
             break
-        seg_len  = (data[pos+1] << 8) | data[pos+2]
-        load_hi  =  data[pos+3]
-        load_lo  =  data[pos+4]
-        load     = (load_hi << 8) | load_lo
-        if load == 0x0000:
-            data[pos+3] = (base_addr >> 8) & 0xFF
-            data[pos+4] =  base_addr       & 0xFF
+        seg_len = (data[pos+1] << 8) | data[pos+2]
+        if load_addr is not None:
+            data[pos+3] = (load_addr >> 8) & 0xFF
+            data[pos+4] =  load_addr       & 0xFF
         pos += 5 + seg_len
 
     return bytes(data)
@@ -181,9 +217,13 @@ def cmd_assemble(args):
     as_.input = InputSystem(as_)
 
     # Apply -- passthrough flags before opening source
-    base_addr = None
     if hasattr(args, 'asm_flags') and args.asm_flags:
-        base_addr = _parse_asm_flags(as_, args.asm_flags)
+        _parse_asm_flags(as_, args.asm_flags)
+
+    # Parse post-processor options
+    pp_opts = {}
+    if hasattr(args, 'pp') and args.pp:
+        pp_opts = _parse_pp(args.pp)
 
     # Pre-register any -D defines
     if hasattr(as_, '_cmdline_defines'):
@@ -214,8 +254,8 @@ def cmd_assemble(args):
 
     if args.format == 'decb':
         binary = collect_decb_bytes(as_)
-        if base_addr is not None:
-            binary = _apply_base(binary, base_addr)
+        if pp_opts:
+            binary = _apply_pp(binary, pp_opts)
     else:
         binary = bytes(_collect_raw(as_))
 
@@ -230,8 +270,9 @@ def cmd_assemble(args):
             print(f"  output:    {out_path}  ({len(binary)} bytes)")
             for load, data in segs:
                 print(f"  segment:   load=${load:04X}  size={len(data)} bytes")
-            if base_addr is not None:
-                print(f"  base:      ${base_addr:04X}  (applied)")
+            if pp_opts:
+                applied = ', '.join(f"{k}=${v:04X}" for k,v in pp_opts.items())
+                print(f"  post-proc: {applied}")
             print(f"  exec:      ${exec_addr:04X}" if exec_addr else "  exec:      (none)")
         except Exception:
             print(f"  assembled {src_path} -> {out_path}  ({len(binary)} bytes)")
@@ -428,17 +469,25 @@ def main():
 
     # assemble
     _asm_epilog = """\
+post-processor options (-pp key=value,...):
+  b=ADDR  / load=ADDR    Set load address in DECB preamble
+  e=ADDR  / exec=ADDR    Set exec address in DECB postamble
+  (aliases b/load and e/exec are equivalent)
+
 assembler flags (passed after --):
-  -b / --base ADDR        Set load and exec address for PIC output
-  -I / --include DIR      Add directory to include file search path
+  -I / --includedir DIR   Add directory to include file search path
   -D / --define SYM[=VAL] Pre-define a symbol (default value: 1)
-  -9 / --6309             Enable HD6309 instruction set
+  -9 / --6809             6809-only mode
+  -3 / --6309             Enable HD6309 instruction set (default)
+  --6800compat            Enable 6800 compatibility instructions
+  -p / --pragma PRAGMA    Set assembler pragma
 
 examples:
   python cocotools.py assemble HELLO.ASM
   python cocotools.py assemble HELLO.ASM -o HELLO.BIN
-  python cocotools.py assemble HELLO.ASM -o HELLO.BIN -- -b $3F00
-  python cocotools.py assemble HELLO.ASM -- -I ./include -D DEBUG=1
+  python cocotools.py assemble HELLO.ASM -pp b=$3F00
+  python cocotools.py assemble HELLO.ASM -pp load=$3F00,exec=$3F10
+  python cocotools.py assemble HELLO.ASM -pp b=$3F00 -- -I ./include
   python cocotools.py assemble HELLO.ASM --format raw -o HELLO.RAW
 """
     p_asm = sub.add_parser('assemble', aliases=['asm'],
@@ -449,6 +498,8 @@ examples:
     p_asm.add_argument('-o', '--output',   help='Output file (default: source name with .BIN)')
     p_asm.add_argument('--format',         choices=['decb', 'raw'], default='decb',
                        help='Output format: decb (default) or raw')
+    p_asm.add_argument('-pp',              metavar='KEY=VAL,...',
+                       help='Post-processor options (e.g. -pp b=$3F00,e=$3F00)')
 
     # makedsk
     p_dsk = sub.add_parser('makedsk',
