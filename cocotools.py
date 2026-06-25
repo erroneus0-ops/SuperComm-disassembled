@@ -11,14 +11,14 @@ Commands:
   assemble  FILE.ASM [-o FILE.BIN] [--format decb|raw] [-- assembler flags]
   makedsk   FILE.DSK FILE...
   binfo     FILE.BIN [-e] [--hex]
-  dskls     FILE.DSK
+  dskdir     FILE.DSK
 
 Usage examples:
   python cocotools.py assemble HELLO.ASM
   python cocotools.py assemble HELLO.ASM -o HELLO.BIN -- -b $3F00
   python cocotools.py makedsk GAME.DSK GAME.BIN GAME.BAS
   python cocotools.py binfo HELLO.BIN -e
-  python cocotools.py dskls HELLO.DSK
+  python cocotools.py dskdir HELLO.DSK
 """
 
 import sys
@@ -371,10 +371,10 @@ def _binfo_enhanced(segs, exec_addr):
                 f"exec=${exec_addr:04X} — {_region(exec_addr)}")
 
     if not notes:
-        notes.append("nothing unusual to report")
+        notes.append("all checks passed")
 
     print()
-    print("  enhanced analysis:")
+    print("  extended information:")
     for note in notes:
         for line in note.splitlines():
             print(f"    {line}")
@@ -419,12 +419,12 @@ def cmd_binin(args):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# dskls command  (list files in DSK image)
+# dskdir command  (list files in DSK image)
 # ─────────────────────────────────────────────────────────────────────────────
 
 FTYPE_NAMES = {0: 'BASIC', 1: 'DATA', 2: 'ML', 3: 'TEXT'}
 
-def cmd_dskls(args):
+def cmd_dskdir(args):
     path = args.dskfile
     if not os.path.isfile(path):
         die(f"file not found: {path}")
@@ -514,10 +514,10 @@ examples:
     p_bin.add_argument('--hex', action='store_true',
                        help='Show hex dump of code')
     p_bin.add_argument('-e', '--enhanced', action='store_true',
-                       help='Show enhanced analysis (memory regions, unusual patterns)')
+                       help='Show extended information (memory regions, unusual patterns)')
 
-    # dskls
-    p_ls  = sub.add_parser('dskls',
+    # dskdir
+    p_ls  = sub.add_parser('dskdir',
                             help='List files in a DSK image')
     p_ls.add_argument('dskfile',           help='DSK image file')
 
@@ -540,8 +540,8 @@ examples:
         cmd_makedsk(args)
     elif args.command == 'binfo':
         cmd_binin(args)
-    elif args.command == 'dskls':
-        cmd_dskls(args)
+    elif args.command == 'dskdir':
+        cmd_dskdir(args)
 
 
 if __name__ == '__main__':
