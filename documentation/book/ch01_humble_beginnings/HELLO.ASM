@@ -24,9 +24,9 @@
 ; Assemble: lwasm --decb -o HELLO.BIN HELLO.ASM
 ; ================================================================
 
-; ── ROM Entry Points ─────────────────────────────────────────────
+; -- ROM Entry Points ---------------------------------------------
 ; These are fixed addresses in the Color BASIC ROM.
-; They are indirect jump vectors — the ROM may change which
+; They are indirect jump vectors -- the ROM may change which
 ; routine they point to between versions, so we use JSR [addr]
 ; (indirect) rather than JSR addr (direct) for portability.
 
@@ -35,11 +35,11 @@ CHROUT  EQU     $A002           ; output char in A to screen via ROM
 CLRSCR  EQU     $A928           ; clear text screen (direct call, stable)
 BLINKKY EQU     $A1B1           ; blink cursor at CURPOS, wait for key (ROM-version dependent)
 
-; ── RAM Variables ────────────────────────────────────────────────
+; -- RAM Variables ------------------------------------------------
 CURPOS  EQU     $88             ; cursor position: 16-bit address at $88/$89
                                 ; CHROUT reads this to know where to write
 
-; ── Screen Layout ────────────────────────────────────────────────
+; -- Screen Layout ------------------------------------------------
 SCREEN  EQU     $0400           ; VDG text screen: 32 cols x 16 rows = 512 bytes
 COLS    EQU     32
 
@@ -48,11 +48,11 @@ HELLO_POS EQU  SCREEN+(7*COLS)+10   ; row 7, col 10 = $04EA
 WORLD_POS EQU  SCREEN+(7*COLS)+16   ; row 7, col 16 = $04F0
 EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
 
-; ── VDG Character Encoding ───────────────────────────────────────
+; -- VDG Character Encoding ---------------------------------------
 ; The VDG chip does NOT use ASCII. It has two character sets:
 ;
-;   $00-$3F  first set  — on the CoCo: inverted video (green on black)
-;   $40-$7F  second set — on the CoCo: normal video  (black on green)
+;   $00-$3F  first set  -- on the CoCo: inverted video (green on black)
+;   $40-$7F  second set -- on the CoCo: normal video  (black on green)
 ;   $80-$FF  semigraphics block characters
 ;
 ; To place an uppercase ASCII letter in normal video:
@@ -62,7 +62,7 @@ EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
 ;               $08 | $40 = $48
 ;
 ; Without ORA #$40 the character stays in the first set and appears
-; inverted (green on black) — which is what HELLO uses deliberately.
+; inverted (green on black) -- which is what HELLO uses deliberately.
 ;
 ; Space: $20 is inverted space (green on black, first set)
 ;        $60 is normal space  (black on green, second set)
@@ -74,15 +74,15 @@ EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
 
         ORG     0               ; PIC: assemble at 0, runs anywhere
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 1: Clear the screen
 ; Concept: Subroutine call (JSR)
-;          The ROM does the work — we just call it.
-; ─────────────────────────────────────────────────────────────────
+;          The ROM does the work -- we just call it.
+; -----------------------------------------------------------------
 Start
         JSR     CLRSCR          ; clear screen, home cursor
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 2: Write "HELLO " inverted to VDG screen memory directly
 ; Concepts: Indexed addressing (,X+ ,Y+)
 ;           Logic (ANDA, ORA) to convert ASCII to VDG
@@ -92,7 +92,7 @@ Start
 ; X points into screen memory (destination)
 ; Y points into our string data (source)
 ; B counts characters remaining
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
         LDX     #HELLO_POS      ; X = screen address for "HELLO "
         LEAY    Hello,PCR       ; Y = address of "HELLO " data (PIC)
         LDB     #6              ; B = 6 characters to write
@@ -114,51 +114,51 @@ StoreChar
         DECB                    ; one fewer character to write
         BNE     WriteHello      ; loop until B = 0
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 3: Position cursor for CHROUT
 ; Concept: Data movement (LDD, STD)
 ;          Arithmetic (screen address calculation, done at assemble time)
 ;
 ; CHROUT writes to the screen address stored at $88/$89.
 ; We set it to row 7, col 16 so "WORLD!" follows "HELLO ".
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
         LDD     #WORLD_POS      ; D = screen address for "WORLD!"
         STD     <CURPOS         ; store to cursor position register
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 4: Write "WORLD!" via ROM CHROUT
-; Concept: BSR (Branch to SubRoutine) — our own subroutine
+; Concept: BSR (Branch to SubRoutine) -- our own subroutine
 ;          The stack: BSR pushes the return address automatically
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
         LEAX    World,PCR       ; X = address of "WORLD!" data (PIC)
-        BSR     PrintStr        ; call our subroutine — stack saves return
+        BSR     PrintStr        ; call our subroutine -- stack saves return
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 5: Position cursor for clean BASIC return
 ; When we RTS back to BASIC, it prints "OK" at the cursor position.
 ; We place it at row 13, col 0.
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
         LDD     #EXIT_POS       ; D = row 13, col 0
         STD     <CURPOS         ; position cursor for BASIC return
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 6: Wait for keypress with blinking cursor
 ; Concept: Compare and branch (polling loop)
 ;          JSR [indirect]: calls via ROM jump vector
 ;
 ; BLINKKY ($A1B1) blinks the cursor at the current CURPOS and
 ; waits for a keypress, returning the key in A.
-; NOTE: address is ROM-version dependent — verify before shipping.
-; ─────────────────────────────────────────────────────────────────
+; NOTE: address is ROM-version dependent -- verify before shipping.
+; -----------------------------------------------------------------
 WaitKey
-        JSR     BLINKKY         ; blink cursor, wait for key — returns char in A
+        JSR     BLINKKY         ; blink cursor, wait for key -- returns char in A
 
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
 ; STEP 7: Return to BASIC
 ; RTS pops the return address from the stack and jumps there.
 ; BASIC called us via EXEC, so we return to BASIC cleanly.
 ; BASIC will print "OK" at the cursor position we set in Step 5.
-; ─────────────────────────────────────────────────────────────────
+; -----------------------------------------------------------------
         RTS
 
 ; ================================================================
@@ -184,7 +184,7 @@ PrintDone
 ; ================================================================
 ; STRING DATA
 ; ================================================================
-Hello   FCC     "HELLO "        ; 6 bytes — converted to VDG in WriteHello
+Hello   FCC     "HELLO "        ; 6 bytes -- converted to VDG in WriteHello
 World   FCC     "WORLD!"        ; printed via CHROUT (ASCII, ROM converts)
         FCB     0               ; null terminator for PrintStr
 
