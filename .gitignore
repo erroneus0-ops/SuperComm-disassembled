@@ -8,6 +8,8 @@ git_update.bat
 git_sleep.bat
 a.out
 =======
-git_sleep.bata.out
+git_sleep.bat*.lst
+*.sym
+a.out
 *.out
 >>>>>>> f8e74572c63889eae1c6860f373e22d74853de49
