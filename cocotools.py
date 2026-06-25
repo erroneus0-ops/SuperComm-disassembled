@@ -35,7 +35,7 @@ from cocotools.input_system import InputSystem
 from cocotools.pass1        import do_pass1
 from cocotools.passes       import assemble as _run_passes, collect_decb_bytes, _collect_raw
 from cocotools.decb  import (
-    Dsk, make_bin, parse_bin, infer_ftype,
+    Dsk, DskError, make_bin, parse_bin, infer_ftype,
     FTYPE_ML, FTYPE_BASIC, FTYPE_DATA, FTYPE_TEXT,
 )
 
@@ -483,8 +483,49 @@ def cmd_binin(args):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# dskdir command  (list files in DSK image)
+# dskget command  (extract a file from a DSK image)
 # ─────────────────────────────────────────────────────────────────────────────
+
+def cmd_dskget(args):
+    dsk_path  = args.dskfile
+    coco_path = args.cocofile    # format: NAME.EXT
+    out_path  = args.output
+
+    if not os.path.isfile(dsk_path):
+        die(f"file not found: {dsk_path}")
+
+    # Parse CoCo filename
+    parts = coco_path.upper().split('.')
+    name  = parts[0]
+    ext   = parts[1] if len(parts) > 1 else ''
+
+    if out_path is None:
+        out_path = coco_path   # write to current directory with same name
+
+    data = open(dsk_path, 'rb').read()
+    try:
+        dsk = Dsk.from_bytes(data)
+    except Exception as e:
+        die(str(e))
+
+    try:
+        file_data, ftype, ascii_flag = dsk.read_file(name, ext)
+    except DskError as e:
+        die(str(e))
+
+    if os.path.isfile(out_path) and not args.overwrite:
+        answer = input(f"{out_path} already exists. Overwrite? (y/N): ").strip().lower()
+        if answer != 'y':
+            print("Cancelled.")
+            return
+
+    with open(out_path, 'wb') as f:
+        f.write(file_data)
+
+    FTYPE_NAMES = {0: 'BASIC', 1: 'DATA', 2: 'ML', 3: 'TEXT'}
+    tname = FTYPE_NAMES.get(ftype, f'?{ftype}')
+    print(f"  extracted: {name}.{ext}  ({len(file_data)} bytes, type={tname})")
+    print(f"  output:    {out_path}")
 
 FTYPE_NAMES = {0: 'BASIC', 1: 'DATA', 2: 'ML', 3: 'TEXT'}
 
@@ -668,6 +709,15 @@ examples:
     p_bin.add_argument('-e', '--enhanced', action='store_true',
                        help='Show extended information (memory regions, unusual patterns)')
 
+    # dskget
+    p_get = sub.add_parser('dskget',
+                            help='Extract a file from a DSK image')
+    p_get.add_argument('dskfile',          help='DSK image file')
+    p_get.add_argument('cocofile',         help='File to extract (NAME.EXT)')
+    p_get.add_argument('-o', '--output',   help='Output file (default: same name)')
+    p_get.add_argument('--overwrite', action='store_true',
+                       help='Overwrite existing file without prompting')
+
     # dskdir
     p_ls  = sub.add_parser('dskdir',
                             help='List files in a DSK image')
@@ -682,6 +732,8 @@ examples:
         cmd_makedsk(args)
     elif args.command == 'binfo':
         cmd_binin(args)
+    elif args.command == 'dskget':
+        cmd_dskget(args)
     elif args.command == 'dskdir':
         cmd_dskdir(args)
 
