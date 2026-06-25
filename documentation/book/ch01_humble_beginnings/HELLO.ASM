@@ -1,3 +1,6 @@
+;
+;  This needs to be updated and also syncronized with the Ch02
+;
 ; ================================================================
 ; HELLO.ASM -- Humble Beginnings
 ; Chapter 1: A 6809 Assembly Language Tutorial
