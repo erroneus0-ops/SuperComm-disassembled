@@ -90,18 +90,11 @@ values divide into three groups:
   black characters on a bright green background
 - `$80`–`$FF` (128–255): semigraphics — colored block patterns, not text
 
-The VDG also supports an orange color mode — the same light-on-dark and
-dark-on-light relationship, but in orange rather than green. Some CoCos display
-this depending on the video output and the television or monitor used. There are
-also hardware timing techniques that allow both color modes to appear on screen
-simultaneously, but that is a topic for much later.
+~~The VDG also supports an orange color mode — the same light-on-dark and dark-on-light relationship, but in orange rather than green. Some CoCos display this depending on the video output and the television or monitor used. There are also hardware timing techniques that allow both color modes to appear on screen simultaneously, but that is a topic for much later.~~ (not just yet)
 
-The VDG chip itself does not decide which character set is "normal." That is a
-design decision made by whoever builds the computer around it. Tandy chose to
-treat the second character set as normal — which is why everyday CoCo text is
-dark on light. A different designer could have gone the other way.
+~~The VDG chip itself does not decide which character set is "normal." That is a design decision made by whoever builds the computer around it. Tandy chose to treat the second character set as normal — which is why everyday CoCo text is dark on light. A different designer could have gone the other way.~~ (we can get into this if it supports a given point in the future the main reason I mentioned that to you is to help you to understand the difference between the hardware system and how it's implemented)
 
-Both character sets contain the same 64 shapes. The low 32 of each group
+Both character sets contain the same 64 ~~shapes~~glyphs (https://en.wikipedia.org/wiki/Glyph). The low 32 of each group
 (`$00`–`$1F` and `$40`–`$5F`) are: `@`, then `A` through `Z`, then a handful of
 symbols. The high 32 of each group (`$20`–`$3F` and `$60`–`$7F`) are more
 symbols and the digits zero through nine.
@@ -109,19 +102,17 @@ symbols and the digits zero through nine.
 CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
 set for lowercase — since the original VDG has no actual lowercase shapes, BASIC
 uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
-inverted `A`: green on black.
+inverted `A`: green on ~~black~~dark.
 
-The HELLO program reads each letter from its string data, converts it to a VDG
-code via ANDA and ORA, and writes the result into the second character set —
-normal video, dark on light. The space after HELLO is loaded directly as `$60`,
-which is also in the second character set: a normal-video blank, matching the
-surrounding letters.
+====== move this section to discus logical bit manipulation instruction 
+  ====    The HELLO program reads each letter from its string data, converts it to a VDG
+  ====    code via ANDA and ORA, and writes the result into the second character set —
+  ====    normal video, dark on light. The space after HELLO is loaded directly as `$60`,
+  ====    which is also in the second character set: a normal-video blank, matching the
+  ====    surrounding letters.
+======
 
-That is why `HELLO` needs special handling: the program writes to screen memory
-directly, choosing specific VDG byte values for a specific screen location,
-bypassing the ROM entirely. `WORLD!` goes through `CHROUT`, which handles the
-conversion internally. Both end up looking the same on screen. They just take
-different routes to get there.
+That is why `HELLO` needs special handling.  The program reads the line of text from its own memory, trasforms it to match Color BASIC's display scheme, and writes to screen memory directly at a specific screen location, bypassing the ROM entirely. `WORLD!` goes through `CHROUT`, which handles the conversion internally. Both end up looking the same on screen. They just take different routes to get there.  In this example, the difference is for demonstration.  In the future you may choose one, the other or create your own way to accomplish this.  There is definitely more than one way.
 
 ---
 
@@ -138,13 +129,13 @@ into B. `STA` stores A to memory. `STB` stores B.
 
 **D** is the sixteen-bit accumulator. It is not separate hardware — D is simply
 A and B treated as one sixteen-bit register, with A holding the high byte and B
-the low byte. `LDD` loads sixteen bits. `STD` stores sixteen bits.
+the low byte. (D=$AABB) `LDD` loads sixteen bits. `STD` stores sixteen bits.
 
 **X** and **Y** are sixteen-bit index registers. They hold addresses. You can
 point X at a location in memory and then use indexed addressing to read or write
 through it — and optionally advance the pointer automatically as you go.
 
-There are others. They will appear when they are needed.
+There are others. They will be discussed as we continue.
 
 ---
 
@@ -164,15 +155,15 @@ SCREEN  EQU     $0400           ; VDG text screen: 32 cols x 16 rows = 512 bytes
 COLS    EQU     32
 ```
 
-`EQU` stands for equate. It is not an instruction — it produces no machine code.
-It tells the assembler: whenever you see `POLCAT`, substitute `$A000`. Whenever
-you see `SCREEN`, substitute `$0400`. The CPU never sees the names. By the time
+`EQU` stands for equate. It is an assembler directive.  
+It tells the assembler, "whenever you see `POLCAT`, substitute `$A000`. Whenever
+you see `SCREEN`, substitute `$0400`." The CPU never sees the names. By the time
 the program becomes bytes, every name has been replaced by its value.
 
 This matters because `$A000` says nothing about what lives there. `POLCAT` says
-exactly what it is. Code that reads `JSR [POLCAT]` communicates its intent to
+exactly what it is. (unless you think it means skunk and then it doesn't) Code that reads `JSR [POLCAT]` communicates its intent to
 anyone reading it. Code that reads `JSR [$A000]` requires the reader to look up
-the address.
+the address.  This is special notation and will be discussed as we go over addressing modes.
 
 The addresses themselves are fixed in the Color BASIC ROM. Tandy published them.
 They have not changed across CoCo generations. Programs that use these addresses
@@ -189,6 +180,7 @@ Start
         JSR     CLRSCR          ; clear screen, home cursor
 ```
 
+(You should also mention the Start label and make mention that this is the entry point of this program)
 `JSR` is Jump to SubRoutine. It calls `CLRSCR` — which the assembler replaces
 with `$A928` — and the ROM routine clears the text screen and moves the cursor to
 row 0, column 0. When the ROM routine finishes, control returns here and
@@ -358,3 +350,7 @@ thirty-two columns plus an offset. The program never calculates these values at
 runtime. The assembler computed them before producing a single byte of output.
 
 That is the next chapter: the assembler as a calculator.
+
+==== additional comments ====
+OK, I'm not sure where this part of the plan has been lost, but each code example is one chapter.  The interesting aspects of the code are highlighted and discussed in different sections of the chapter.  So the title lines within the chapter are sections.  We can call them section one or just let the section exist by title.  But we will refer to the sections by section.  "This will be covered in the logical and bit manipulation section" for example.  And at the end of each chapter we will do something creative or interesting to enhance the example code.  In the case of "Hello World" we will improve on the "press any key to continue" by adding, in some form, the CoCo's iconic blinking cursor... or maybe make a unique one of our own.
+=============================
