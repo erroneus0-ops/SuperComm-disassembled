@@ -231,8 +231,8 @@ def main():
     p_dsk.add_argument('dsk',              help='Output DSK file')
     p_dsk.add_argument('files', nargs='+', help='Files to add to the disk')
 
-    # binin
-    p_bin = sub.add_parser('binin',
+    # binfo
+    p_bin = sub.add_parser('binfo',
                             help='Show info about a DECB .BIN file')
     p_bin.add_argument('binfile',          help='DECB binary file')
     p_bin.add_argument('--hex', action='store_true',
@@ -249,7 +249,7 @@ def main():
         cmd_assemble(args)
     elif args.command == 'makedsk':
         cmd_makedsk(args)
-    elif args.command == 'binin':
+    elif args.command == 'binfo':
         cmd_binin(args)
     elif args.command == 'dskls':
         cmd_dskls(args)
