@@ -11,25 +11,23 @@ The answer is the screen itself.
 ## The CoCo Screen Is Not a Terminal
 
 When you PRINT something in BASIC, the ROM does the work. You hand it a character
-and it figures out where to put it. It maintains a cursor position (where the next
-character is to be printed), converts the character to the right byte value,
-places that byte in screen memory, and advances the cursor to the next position.
-The result acts like a terminal — characters appear, the cursor moves — but BASIC
-is building that behavior on top of something much simpler.
+and it figures out where to put it. It maintains a cursor position, converts the
+character to the right byte value, places that byte in screen memory, and advances
+the cursor. The result acts like a terminal — characters appear, the cursor moves
+— but BASIC is building that behavior on top of something much simpler.
 
 The CoCo's display hardware — the MC6847 Video Display Generator, VDG for short
-— does not act on characters at all. It reads memory. The screen is a block of
-512 bytes of RAM starting at address `$0400`. Each byte corresponds to one
-character cell: 32 columns across, 16 rows down. Write a byte to one of those
-addresses and the VDG displays the corresponding character in the corresponding
-cell. The ROM is not the screen. The ROM is a layer on top of the screen.
+— reads memory. The screen is a block of 512 bytes of RAM starting at address
+`$0400`. Each byte corresponds to one character cell: 32 columns across, 16 rows
+down. Write a byte to one of those addresses and the VDG displays the
+corresponding character in the corresponding cell. The ROM is a layer on top of
+that. The screen is just memory.
 
 Try it yourself. Type `POKE 1056,30` and press Enter. Address 1056 (`$0420`) is
 the first cell of the second row on screen. The value 30 (`$1E`) is an up-arrow
-character in the VDG's first character set. You should see the up-arrow replace
-whatever character was there — green on black, standing out from the surrounding
-text. The byte was written to one location in memory; the VDG displays it
-immediately. No ROM involved.
+glyph in the VDG's first character set. You should see it replace whatever
+character was there — light on dark, standing out from the surrounding text. One
+byte written to one memory location, displayed immediately. No ROM involved.
 
 ---
 
@@ -69,12 +67,10 @@ With practice, you see `$1E` and think `%00011110` — the up-arrow you just POK
 to the screen.
 
 You will also see `0x` for hex and `0b` for binary in other contexts — these mean
-the same thing as `$` and `%`. In CoCo BASIC, `&H` appears before hexadecimal
-values; there is no notation marker for binary in BASIC. Decimal numbers carry no
-prefix; a number without one is just a number.
+the same thing as `$` and `%`. In CoCo BASIC, `&H` precedes a hexadecimal value.
+Decimal numbers carry no prefix; a number without one is just a number.
 
-It comes with practice and it comes with use. Take your time. It will come to you
-as we go along.
+It comes with practice. Take your time. It will come to you as we go along.
 
 ---
 
@@ -85,40 +81,30 @@ any value from 0 to 255, and each value produces a specific result. The 256
 values divide into three groups:
 
 - `$00`–`$3F` (0–63): the **first character set** — on the CoCo, light on dark:
-  green characters on a black background
+  green glyphs on a black background
 - `$40`–`$7F` (64–127): the **second character set** — on the CoCo, dark on light:
-  black characters on a bright green background
+  black glyphs on a bright green background
 - `$80`–`$FF` (128–255): semigraphics — colored block patterns, not text
 
-~~The VDG also supports an orange color mode — the same light-on-dark and dark-on-light relationship, but in orange rather than green. Some CoCos display this depending on the video output and the television or monitor used. There are also hardware timing techniques that allow both color modes to appear on screen simultaneously, but that is a topic for much later.~~ (not just yet)
-
-~~The VDG chip itself does not decide which character set is "normal." That is a design decision made by whoever builds the computer around it. Tandy chose to treat the second character set as normal — which is why everyday CoCo text is dark on light. A different designer could have gone the other way.~~ (we can get into this if it supports a given point in the future the main reason I mentioned that to you is to help you to understand the difference between the hardware system and how it's implemented)
-
-Both character sets contain the same 64 ~~shapes~~glyphs (https://en.wikipedia.org/wiki/Glyph). The low 32 of each group
+Both character sets contain the same 64 glyphs. The low 32 of each group
 (`$00`–`$1F` and `$40`–`$5F`) are: `@`, then `A` through `Z`, then a handful of
 symbols. The high 32 of each group (`$20`–`$3F` and `$60`–`$7F`) are more
 symbols and the digits zero through nine.
 
-CoCo BASIC uses the second (normal) set for uppercase and the first (inverted)
-set for lowercase — since the original VDG has no actual lowercase shapes, BASIC
-uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
-inverted `A`: green on ~~black~~dark.
+CoCo BASIC uses the second set for uppercase and the first for lowercase — since
+the original VDG has no actual lowercase glyphs, BASIC uses the first set as a
+stand-in. Lowercase `a` appears on screen as an inverted `A`: light on dark.
 
-====== move this section to discus logical bit manipulation instruction 
-  ====    The HELLO program reads each letter from its string data, converts it to a VDG
-  ====    code via ANDA and ORA, and writes the result into the second character set —
-  ====    normal video, dark on light. The space after HELLO is loaded directly as `$60`,
-  ====    which is also in the second character set: a normal-video blank, matching the
-  ====    surrounding letters.
-======
-
-That is why `HELLO` needs special handling.  The program reads the line of text from its own memory, trasforms it to match Color BASIC's display scheme, and writes to screen memory directly at a specific screen location, bypassing the ROM entirely. `WORLD!` goes through `CHROUT`, which handles the conversion internally. Both end up looking the same on screen. They just take different routes to get there.  In this example, the difference is for demonstration.  In the future you may choose one, the other or create your own way to accomplish this.  There is definitely more than one way.
+That is why `HELLO` needs special handling. The program reads text from its own
+memory, transforms it to match Color BASIC's display scheme, and writes to screen
+memory directly at a specific location, bypassing the ROM entirely. `WORLD!` goes
+through `CHROUT`, which handles the conversion internally. Both end up looking the
+same on screen — the difference here is for demonstration. In practice you may
+choose one approach, the other, or invent your own. There is more than one way.
 
 ---
 
 ## Registers
-
-Before looking at the instructions, a word about registers.
 
 A register is a small, fast storage location inside the processor itself. The
 6809 has a handful of them. The ones that matter for this chapter:
@@ -127,9 +113,10 @@ A register is a small, fast storage location inside the processor itself. The
 logic work happens in A or B. `LDA` loads a value into A. `LDB` loads a value
 into B. `STA` stores A to memory. `STB` stores B.
 
-**D** is the sixteen-bit accumulator. It is not separate hardware — D is simply
-A and B treated as one sixteen-bit register, with A holding the high byte and B
-the low byte. (D=$AABB) `LDD` loads sixteen bits. `STD` stores sixteen bits.
+**D** is the sixteen-bit accumulator. A and B treated as one register, with A
+holding the high byte and B the low byte — so if A contains `$AA` and B contains
+`$BB`, D holds `$AABB`. `LDD` loads sixteen bits at once. `STD` stores sixteen
+bits at once.
 
 **X** and **Y** are sixteen-bit index registers. They hold addresses. You can
 point X at a location in memory and then use indexed addressing to read or write
@@ -155,15 +142,16 @@ SCREEN  EQU     $0400           ; VDG text screen: 32 cols x 16 rows = 512 bytes
 COLS    EQU     32
 ```
 
-`EQU` stands for equate. It is an assembler directive.  
-It tells the assembler, "whenever you see `POLCAT`, substitute `$A000`. Whenever
-you see `SCREEN`, substitute `$0400`." The CPU never sees the names. By the time
-the program becomes bytes, every name has been replaced by its value.
+`EQU` is an assembler directive — equate. It tells the assembler: "whenever you
+see `POLCAT`, substitute `$A000`. Whenever you see `SCREEN`, substitute `$0400`."
+The CPU never sees the names. By the time the program becomes bytes, every name
+has been replaced by its value.
 
 This matters because `$A000` says nothing about what lives there. `POLCAT` says
-exactly what it is. (unless you think it means skunk and then it doesn't) Code that reads `JSR [POLCAT]` communicates its intent to
+exactly what it is. Code that reads `JSR [POLCAT]` communicates its intent to
 anyone reading it. Code that reads `JSR [$A000]` requires the reader to look up
-the address.  This is special notation and will be discussed as we go over addressing modes.
+the address. The bracket notation is a specific addressing mode; it will be
+covered in its own section.
 
 The addresses themselves are fixed in the Color BASIC ROM. Tandy published them.
 They have not changed across CoCo generations. Programs that use these addresses
@@ -180,11 +168,11 @@ Start
         JSR     CLRSCR          ; clear screen, home cursor
 ```
 
-(You should also mention the Start label and make mention that this is the entry point of this program)
-`JSR` is Jump to SubRoutine. It calls `CLRSCR` — which the assembler replaces
-with `$A928` — and the ROM routine clears the text screen and moves the cursor to
-row 0, column 0. When the ROM routine finishes, control returns here and
-execution continues with the next instruction.
+`Start` is a label — a name the assembler assigns to this address in memory. When
+the program is loaded and run, execution begins here. `JSR` is Jump to
+SubRoutine. It calls `CLRSCR` — which the assembler replaces with `$A928` — and
+the ROM routine clears the text screen and moves the cursor to row 0, column 0.
+When the routine finishes, control returns to the next instruction.
 
 Next, the program sets up to write `HELLO ` to screen memory:
 
@@ -193,16 +181,15 @@ Next, the program sets up to write `HELLO ` to screen memory:
         LDB     #6              ; B = 6 characters to write
 ```
 
-`LDX` loads a sixteen-bit value into the index register X. `LDB` loads an
-eight-bit value into accumulator B. Both use *immediate addressing*, signalled by
-the `#` prefix. Immediate means the value is right there in the instruction — not
-the contents of some memory address, but the number itself. `LDX #HELLO_POS`
-loads the value of `HELLO_POS` directly into X. `LDB #6` loads the number six
-directly into B.
+`LDX` loads a sixteen-bit value into X. `LDB` loads an eight-bit value into B.
+Both use *immediate addressing*, signalled by the `#` prefix. The value is right
+there in the instruction — not the contents of some memory address, but the
+number itself. `LDX #HELLO_POS` loads the address `HELLO_POS` directly into X.
+`LDB #6` loads the number six directly into B.
 
 The distinction matters. `LDB $06` would load whatever byte is stored at address
-`$0006` — which is somewhere in RAM and could be anything. `LDB #6` loads the
-number six, always, unconditionally. The `#` is the signal.
+`$0006` — somewhere in RAM, could be anything. `LDB #6` loads the number six,
+always, unconditionally. The `#` is the signal.
 
 A few lines later, the space character gets the same treatment:
 
@@ -211,8 +198,7 @@ WriteSpace
         LDA     #$20            ; VDG inverted space (first character set)
 ```
 
-`LDA #$20` loads the byte `$20` directly into A. No memory access, no lookup —
-the value is embedded in the instruction.
+`LDA #$20` loads `$20` directly into A. The value is embedded in the instruction.
 
 For setting up the cursor, the program uses the sixteen-bit accumulator:
 
@@ -220,27 +206,25 @@ For setting up the cursor, the program uses the sixteen-bit accumulator:
         LDD     #WORLD_POS      ; D = screen address for "WORLD!"
 ```
 
-`LDD #WORLD_POS` loads the address `WORLD_POS` as a sixteen-bit immediate value.
-D is two bytes wide, so this one instruction sets both A (the high byte of the
-address) and B (the low byte). You could achieve the same result with separate
-`LDA` and `LDB` instructions, but `LDD` does it in one.
+`LDD #WORLD_POS` loads a sixteen-bit address directly into D — both A and B at
+once. You could achieve the same result with separate `LDA` and `LDB`
+instructions, but `LDD` does it in one.
 
 ---
 
 ## Storing Values to Memory
 
-Loading fills a register. Storing empties it — writes the register's content to
-a memory address.
+Loading fills a register. Storing writes its content to a memory address.
 
 ```asm
         STA     ,X+             ; write VDG code to screen, advance X
 ```
 
-This is *indexed addressing*. `,X+` means: store A at the address currently in
-X, then increment X by one. Each time this instruction executes, the character
-goes to the next screen cell and X advances to point at the cell after that. The
-full mechanics of indexed addressing are the subject of a later chapter. For now,
-the picture is: X is a pointer moving through screen memory, one cell at a time.
+This is *indexed addressing*. `,X+` means: store A at the address in X, then
+increment X by one. Each time this instruction executes, the character goes to the
+next screen cell and X moves forward. X is a pointer walking through screen
+memory, one cell at a time. The full mechanics of indexed addressing have their
+own section later in the book.
 
 The cursor register uses a different addressing mode:
 
@@ -248,12 +232,10 @@ The cursor register uses a different addressing mode:
         STD     <CURPOS         ; store to cursor position register
 ```
 
-The `<` signals *direct page addressing*. The Color BASIC direct page — the
-processor's page zero — lives at addresses `$00` through `$FF`. `CURPOS` is
-`$88`, which is in that range. Direct page addressing uses a one-byte address
-instead of two, making the instruction one byte shorter and one cycle faster. The
-`<` tells the assembler to use the short form explicitly, rather than the
-two-byte extended form it might otherwise choose.
+The `<` signals *direct page addressing*. The direct page lives at addresses `$00`
+through `$FF`. `CURPOS` is `$88`, which is in that range. Direct page addressing
+uses a one-byte address instead of two — one byte shorter, one cycle faster. The
+`<` tells the assembler to use the short form explicitly.
 
 The program stores to `CURPOS` twice:
 
@@ -268,9 +250,9 @@ The program stores to `CURPOS` twice:
 ```
 
 `CHROUT` reads the cursor position from `$88`/`$89` and writes each character
-there, advancing the cursor automatically. Setting `CURPOS` before calling
-`CHROUT` puts the output wherever the program wants it. Setting it again
-afterward positions the cursor where `OK` will appear when BASIC resumes.
+there, advancing automatically. Setting `CURPOS` before calling `CHROUT` puts the
+output wherever the program wants it. Setting it again afterward positions the
+cursor where BASIC's `OK` prompt will appear.
 
 ---
 
@@ -280,11 +262,10 @@ Six lines of equates, a JSR, two LDX/LDB loads, a space-character load, a store
 through an indexed pointer, and two LDD/STD pairs moving sixteen-bit addresses
 around. That is the data movement layer of this program.
 
-The addressing modes introduced here — immediate, direct page, indexed — are
-three of the four the 6809 supports. Extended (full two-byte address) is the
-fourth. You have already seen it implicitly: `JSR CLRSCR` uses an extended
-address. The complete picture of addressing modes, including the full power of
-indexed, is Chapter 7's territory.
+Three of the 6809's four addressing modes appeared here: immediate, direct page,
+and indexed. The fourth — extended — is already present but unannounced: `JSR
+CLRSCR` uses a full two-byte address. The complete picture of addressing modes,
+including the full depth of indexed, has its own section later.
 
 Here is the program as it stands after this chapter. Newly revealed lines are
 marked:
@@ -303,41 +284,41 @@ Start
         JSR     CLRSCR          ; *
 
         LDX     #HELLO_POS      ; *
-        ; LEAY Hello,PCR        — Chapter 7
+        ; LEAY Hello,PCR        — indexed addressing section
         LDB     #6              ; *
 
 WriteHello
-        ; LDA ,Y+               — Chapter 7
-        ; CMPA #' '             — Chapter 5
-        ; BEQ  WriteSpace       — Chapter 5
-        ; ANDA #$3F             — Chapter 4
-        ; ORA  #$40             — Chapter 4
-        ; BRA  StoreChar        — Chapter 5
+        ; LDA ,Y+               — indexed addressing section
+        ; CMPA #' '             — conditionals section
+        ; BEQ  WriteSpace       — conditionals section
+        ; ANDA #$3F             — logic and bit manipulation section
+        ; ORA  #$40             — logic and bit manipulation section
+        ; BRA  StoreChar        — conditionals section
 
 WriteSpace
         LDA     #$20            ; *
 
 StoreChar
         STA     ,X+             ; *
-        ; DECB                  — Chapter 3
-        ; BNE  WriteHello       — Chapter 5
+        ; DECB                  — arithmetic section
+        ; BNE  WriteHello       — conditionals section
 
         LDD     #WORLD_POS      ; *
         STD     <CURPOS         ; *
-        ; LEAX World,PCR        — Chapter 7
-        ; BSR  PrintStr         — Chapter 6
+        ; LEAX World,PCR        — indexed addressing section
+        ; BSR  PrintStr         — subroutines section
 
         LDD     #EXIT_POS       ; *
         STD     <CURPOS         ; *
 
 WaitKey
-        ; JSR [POLCAT]          — Chapter 5
-        ; BEQ  WaitKey          — Chapter 5
+        ; JSR [POLCAT]          — conditionals section
+        ; BEQ  WaitKey          — conditionals section
 
-        ; RTS                   — Chapter 6
+        ; RTS                   — subroutines section
 ```
 
-Gaps remain. They will be filled, one concept at a time.
+Gaps remain. They will be filled, one section at a time.
 
 ---
 
@@ -345,12 +326,8 @@ Gaps remain. They will be filled, one concept at a time.
 
 The program knows six screen positions: `HELLO_POS`, `WORLD_POS`, `EXIT_POS`,
 `SCREEN`, `COLS`, and the load address `ORG`. Only `SCREEN` and `COLS` have
-appeared so far. The others are expressed as arithmetic: row seven times
-thirty-two columns plus an offset. The program never calculates these values at
-runtime. The assembler computed them before producing a single byte of output.
+appeared so far. The others are expressed as arithmetic: row times columns plus
+an offset. The program never calculates these at runtime. The assembler computed
+them before producing a single byte of output.
 
 That is the next chapter: the assembler as a calculator.
-
-==== additional comments ====
-OK, I'm not sure where this part of the plan has been lost, but each code example is one chapter.  The interesting aspects of the code are highlighted and discussed in different sections of the chapter.  So the title lines within the chapter are sections.  We can call them section one or just let the section exist by title.  But we will refer to the sections by section.  "This will be covered in the logical and bit manipulation section" for example.  And at the end of each chapter we will do something creative or interesting to enhance the example code.  In the case of "Hello World" we will improve on the "press any key to continue" by adding, in some form, the CoCo's iconic blinking cursor... or maybe make a unique one of our own.
-=============================
