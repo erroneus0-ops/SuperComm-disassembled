@@ -30,6 +30,7 @@
 POLCAT  EQU     $A000           ; poll keyboard: returns char in A, 0=none
 CHROUT  EQU     $A002           ; output char in A to screen via ROM
 CLRSCR  EQU     $A928           ; clear text screen (direct call, stable)
+BLINKKY EQU     $A1B1           ; blink cursor at CURPOS, wait for key (ROM-version dependent)
 
 ; ── RAM Variables ────────────────────────────────────────────────
 CURPOS  EQU     $88             ; cursor position: 16-bit address at $88/$89
@@ -138,16 +139,16 @@ StoreChar
         STD     <CURPOS         ; position cursor for BASIC return
 
 ; ─────────────────────────────────────────────────────────────────
-; STEP 6: Wait for keypress
+; STEP 6: Wait for keypress with blinking cursor
 ; Concept: Compare and branch (polling loop)
 ;          JSR [indirect]: calls via ROM jump vector
 ;
-; POLCAT returns the key pressed in A, or 0 if no key.
-; We loop until A is non-zero.
+; BLINKKY ($A1B1) blinks the cursor at the current CURPOS and
+; waits for a keypress, returning the key in A.
+; NOTE: address is ROM-version dependent — verify before shipping.
 ; ─────────────────────────────────────────────────────────────────
 WaitKey
-        JSR     [POLCAT]        ; poll keyboard via ROM indirect vector
-        BEQ     WaitKey         ; A=0 means no key — keep waiting
+        JSR     BLINKKY         ; blink cursor, wait for key — returns char in A
 
 ; ─────────────────────────────────────────────────────────────────
 ; STEP 7: Return to BASIC
