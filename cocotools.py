@@ -27,7 +27,11 @@ import argparse
 # Allow running from the repo root without installing
 sys.path.insert(0, os.path.dirname(__file__))
 
-from cocotools.lwasm import assemble as asm_assemble, AsmError
+from cocotools.lwasm_types import OUTPUT_DECB, OUTPUT_RAW
+from cocotools.lwasm_core  import AsmState
+from cocotools.input_system import InputSystem
+from cocotools.pass1        import do_pass1
+from cocotools.passes       import assemble as _run_passes, collect_decb_bytes, _collect_raw
 from cocotools.decb  import (
     Dsk, make_bin, parse_bin, infer_ftype,
     FTYPE_ML, FTYPE_BASIC, FTYPE_DATA, FTYPE_TEXT,
@@ -49,12 +53,36 @@ def cmd_assemble(args):
         base = os.path.splitext(src_path)[0]
         out_path = base + '.BIN'
 
-    source = open(src_path, 'r', encoding='utf-8', errors='replace').read()
+    fmt_map = {'decb': OUTPUT_DECB, 'raw': OUTPUT_RAW}
+    output_fmt = fmt_map.get(args.format, OUTPUT_DECB)
 
-    try:
-        binary = asm_assemble(source, fmt=args.format, dp=args.dp)
-    except AsmError as e:
-        die(str(e))
+    as_ = AsmState(output_fmt)
+    as_.input = InputSystem(as_)
+    as_.input.open(src_path)
+
+    do_pass1(as_)
+    _run_passes(as_)
+
+    # Collect and display errors
+    errors = []
+    cl = as_.line_head
+    while cl:
+        if cl.err:
+            e = cl.err
+            while e:
+                errors.append(f"{src_path}:{cl.lineno}: {e.mess}")
+                e = e.next
+        cl = cl.next
+
+    if errors:
+        for msg in errors:
+            print(msg, file=sys.stderr)
+        die(f"assembly failed: {as_.errorcount} error(s)")
+
+    if args.format == 'decb':
+        binary = collect_decb_bytes(as_)
+    else:
+        binary = bytes(_collect_raw(as_))
 
     with open(out_path, 'wb') as f:
         f.write(binary)
@@ -63,7 +91,6 @@ def cmd_assemble(args):
     if args.format == 'decb':
         try:
             segs, exec_addr = parse_bin(binary)
-            total_code = sum(len(d) for _, d in segs)
             print(f"  assembled: {src_path}")
             print(f"  output:    {out_path}  ({len(binary)} bytes)")
             for load, data in segs:
@@ -197,8 +224,6 @@ def main():
     p_asm.add_argument('-o', '--output',   help='Output file (default: same name, .BIN)')
     p_asm.add_argument('--format',         choices=['decb', 'raw'], default='decb',
                        help='Output format (default: decb)')
-    p_asm.add_argument('--dp',             type=lambda x: int(x, 0), default=0,
-                       help='Initial direct page register (default: 0)')
 
     # makedsk
     p_dsk = sub.add_parser('makedsk',
