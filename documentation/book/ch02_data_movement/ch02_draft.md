@@ -84,20 +84,22 @@ The VDG has its own character encoding. A byte written to screen memory can be
 any value from 0 to 255, and each value produces a specific result. The 256
 values divide into three groups:
 
-- `$00`–`$3F` (0–63): the **first character set** — on the CoCo, inverted video:
+- `$00`–`$3F` (0–63): the **first character set** — on the CoCo, light on dark:
   green characters on a black background
-- `$40`–`$7F` (64–127): the **second character set** — on the CoCo, normal video:
+- `$40`–`$7F` (64–127): the **second character set** — on the CoCo, dark on light:
   black characters on a bright green background
 - `$80`–`$FF` (128–255): semigraphics — colored block patterns, not text
 
-The VDG also supports an orange color mode — dark characters on an orange
-background, or orange characters on dark — as an alternative to green. Some CoCos
-display this depending on the video output and the television or monitor used.
+The VDG also supports an orange color mode — the same light-on-dark and
+dark-on-light relationship, but in orange rather than green. Some CoCos display
+this depending on the video output and the television or monitor used. There are
+also hardware timing techniques that allow both color modes to appear on screen
+simultaneously, but that is a topic for much later.
 
 The VDG chip itself does not decide which character set is "normal." That is a
 design decision made by whoever builds the computer around it. Tandy chose to
 treat the second character set as normal — which is why everyday CoCo text is
-black on green. A different designer could have gone the other way.
+dark on light. A different designer could have gone the other way.
 
 Both character sets contain the same 64 shapes. The low 32 of each group
 (`$00`–`$1F` and `$40`–`$5F`) are: `@`, then `A` through `Z`, then a handful of
@@ -110,9 +112,9 @@ uses the inverted set as a stand-in. Lowercase `a` appears on screen as an
 inverted `A`: green on black.
 
 The HELLO program writes its letters directly into the first character set —
-inverted video, green on black — by loading VDG codes in the `$01`–`$1A` range.
-The space after HELLO is `$20`, also in the first set: an inverted blank, green
-on black, matching the surrounding letters.
+green on black — by loading VDG codes in the `$01`–`$1A` range.
+The space after HELLO is `$20`, also in the first set: a light-on-dark blank,
+matching the surrounding letters.
 
 That is why `HELLO` needs special handling: the program writes to screen memory
 directly, choosing specific VDG byte values, bypassing the ROM entirely. `WORLD!`
