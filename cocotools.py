@@ -513,6 +513,16 @@ def cmd_dskget(args):
     except DskError as e:
         die(str(e))
 
+    # Apply token translation if requested or if ASCII file
+    if args.translate:
+        if ascii_flag:
+            # Already ASCII — just decode, normalise line endings
+            file_data = bytes(file_data).replace(b'\r', b'\n').strip(b'\n') + b'\n'
+        else:
+            # Tokenized binary — detokenize to ASCII
+            from cocotools.decb import detoken_basic
+            file_data = detoken_basic(file_data).encode('ascii', errors='replace') + b'\n'
+
     if os.path.isfile(out_path) and not args.overwrite:
         answer = input(f"{out_path} already exists. Overwrite? (y/N): ").strip().lower()
         if answer != 'y':
@@ -715,6 +725,8 @@ examples:
     p_get.add_argument('dskfile',          help='DSK image file')
     p_get.add_argument('cocofile',         help='File to extract (NAME.EXT)')
     p_get.add_argument('-o', '--output',   help='Output file (default: same name)')
+    p_get.add_argument('-t', '--translate', action='store_true',
+                       help='Translate BASIC tokens to ASCII text on extraction')
     p_get.add_argument('--overwrite', action='store_true',
                        help='Overwrite existing file without prompting')
 
