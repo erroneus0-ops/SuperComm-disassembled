@@ -28,7 +28,8 @@ import argparse
 # Allow running from the repo root without installing
 sys.path.insert(0, os.path.dirname(__file__))
 
-from cocotools.lwasm_types import OUTPUT_DECB, OUTPUT_RAW
+from cocotools.lwasm_types import OUTPUT_DECB, OUTPUT_RAW, FLAG_LIST, FLAG_SYMDUMP, \
+                                   FLAG_SYMBOLS, FLAG_SYMBOLS_NOLOCALS
 from cocotools.lwasm_core  import AsmState
 from cocotools.input_system import InputSystem
 from cocotools.pass1        import do_pass1
@@ -93,11 +94,57 @@ def _parse_asm_flags(as_, flags):
             else:
                 die(f"{f} requires a SYM[=VAL] argument")
 
-        elif f in ('-9', '--6309'):
+        elif f in ('-9', '--6809'):
             as_.pragmas &= ~PRAGMA_6809
 
-        elif f in ('-f', '--format'):
-            i += 1   # format handled by --format in cocotools args; skip value
+        elif f in ('-3', '--6309'):
+            from cocotools.lwasm_types import PRAGMA_6809
+            as_.pragmas &= ~PRAGMA_6809   # already default; ensure cleared
+
+        elif f in ('--6800compat',):
+            from cocotools.lwasm_types import PRAGMA_6800COMPAT
+            as_.pragmas |= PRAGMA_6800COMPAT
+
+        elif f in ('-l', '--list'):
+            as_.flags |= FLAG_LIST
+            i += 1
+            if i < len(flags) and (flags[i] == '-' or not flags[i].startswith('-')):
+                as_.list_file = flags[i]
+            else:
+                as_.list_file = '-'   # stdout
+                i -= 1
+
+        elif f in ('-s', '--symbols'):
+            as_.flags |= FLAG_SYMBOLS
+
+        elif f in ('--symbols-nolocals',):
+            as_.flags |= FLAG_SYMBOLS_NOLOCALS
+
+        elif f in ('--symbol-dump',):
+            as_.flags |= FLAG_SYMDUMP
+            i += 1
+            if i < len(flags) and (flags[i] == '-' or not flags[i].startswith('-')):
+                as_.symbol_dump_file = flags[i]
+            else:
+                as_.symbol_dump_file = '-'
+                i -= 1
+
+        elif f in ('--list-nofiles',):
+            as_.listnofile = 1
+
+        elif f in ('-t', '--tabs'):
+            i += 1
+            if i < len(flags):
+                try:
+                    as_.tabwidth = int(flags[i])
+                except ValueError:
+                    die(f"invalid tab width: {flags[i]}")
+
+        elif f in ('-p', '--pragma'):
+            i += 1
+            # pragma handling is a stub — pragmas are complex
+            if i < len(flags):
+                print(f"  note: --pragma not yet fully implemented", file=sys.stderr)
 
         else:
             print(f"  note: assembler flag '{f}' not supported, ignored",
@@ -251,6 +298,16 @@ def cmd_assemble(args):
         for msg in errors:
             print(msg, file=sys.stderr)
         die(f"assembly failed: {as_.errorcount} error(s)")
+
+    # Generate listing if requested
+    if as_.flags & FLAG_LIST:
+        from cocotools.listing import do_list
+        do_list(as_, as_.list_file)
+
+    # Generate symbol dump if requested
+    if as_.flags & FLAG_SYMDUMP:
+        from cocotools.listing import do_symdump
+        do_symdump(as_, as_.symbol_dump_file)
 
     if args.format == 'decb':
         binary = collect_decb_bytes(as_)
@@ -508,7 +565,7 @@ assembler flags (passed after --):
   -f, --format=TYPE           Output format: decb, basic, raw, obj, os9,
                               ihex, srec, dragon, abs
   -I, --includedir=PATH       Add entry to include path
-  -l, --list[=FILE]           Generate list [to FILE]
+  -l, --list[=FILE]           Generate listing [to FILE, default stdout]
       --list-nofiles          Omit file names in list output
   -m, --map[=FILE]            Generate map [to FILE]
       --no-output             Inhibit creation of output file
