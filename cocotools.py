@@ -167,18 +167,12 @@ def _binfo_enhanced(segs, exec_addr):
                 f"           use LOADM\"file\",offset,offset to place at runtime")
         else:
             region = _region(load)
-            if load >= 0xFF00:
+            if load < 0x0600:
                 notes.append(
-                    f"segment {i+1}: load=${load:04X} — loads into hardware registers\n"
-                    f"           almost certainly wrong")
-            elif load >= 0xA000:
+                    f"segment {i+1}: load=${load:04X} — {region}")
+            elif load >= 0x8000:
                 notes.append(
-                    f"segment {i+1}: load=${load:04X} — loads into {region}\n"
-                    f"           this will overwrite ROM (probably not intended)")
-            elif load < 0x0600:
-                notes.append(
-                    f"segment {i+1}: load=${load:04X} — loads into {region}\n"
-                    f"           may conflict with system use")
+                    f"segment {i+1}: load=${load:04X} — {region}")
 
         # Check if segment spans a region boundary
         if _region(load) != _region(seg_end):
@@ -193,13 +187,13 @@ def _binfo_enhanced(segs, exec_addr):
                      for load, data in segs)
         if not in_seg and not any(load == 0 for load, _ in segs):
             notes.append(
-                f"exec=${exec_addr:04X} — falls outside all loaded segments")
-        if exec_addr >= 0xA000:
+                f"exec=${exec_addr:04X} — outside all loaded segments")
+        if exec_addr >= 0x8000:
             notes.append(
-                f"exec=${exec_addr:04X} — jumps into {_region(exec_addr)}")
+                f"exec=${exec_addr:04X} — {_region(exec_addr)}")
 
     if not notes:
-        notes.append("nothing unusual detected")
+        notes.append("nothing unusual to report")
 
     print()
     print("  enhanced analysis:")
