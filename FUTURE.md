@@ -81,3 +81,24 @@ Need to:
    value-controlled loops already in the program
 
 ---
+
+## Book — Animated cursor using VDG semigraphics
+
+VDG values $80-$FF produce semigraphics block patterns rather than text
+characters. Cycling through a carefully chosen sequence of these values
+produces an animated "slinky" cursor effect — more interesting than a
+simple on/off blink.
+
+Example sequence discovered: 14, 6, 2, 3, 11, 15, 11, 3, 2, 6
+(oscillating through semigraphics block patterns, giving the appearance
+of something bouncing or flowing in the cursor position)
+
+This would be "fun with this" level 3, building on:
+  1. BLINKKY ROM routine (current)
+  2. Our own blink using POLCAT + counter toggle
+  3. Animated slinky cursor using semigraphics sequence
+
+Also introduces the semigraphics character range ($80-$FF) which has
+not appeared in the book yet.
+
+---
