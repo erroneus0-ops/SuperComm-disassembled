@@ -460,7 +460,93 @@ def die(msg):
 # Argument parser
 # ─────────────────────────────────────────────────────────────────────────────
 
+_ASM_HELP = """\
+usage: cocotools assemble [options] SOURCE
+
+options:
+  -o FILE            Output file (default: source name with .BIN)
+  --format TYPE      Output format: decb (default) or raw
+  -pp KEY=VAL,...    Post-processor options (see below)
+  --                 Pass remaining arguments to the assembler
+  -? / --help        Show this help
+
+post-processor options (-pp):
+  b=ADDR / load=ADDR    Set load address in DECB preamble
+  e=ADDR / exec=ADDR    Set exec address in DECB postamble
+
+assembler flags (after --):
+  use:  python cocotools.py asm -- --help
+  or:   python cocotools.py asm -- -?
+
+examples:
+  python cocotools.py assemble HELLO.ASM
+  python cocotools.py assemble HELLO.ASM -o HELLO.BIN
+  python cocotools.py assemble HELLO.ASM -pp b=$3F00
+  python cocotools.py assemble HELLO.ASM -pp load=$3F00,exec=$3F10
+  python cocotools.py assemble HELLO.ASM -pp b=$3F00 -- -I ./include
+  python cocotools.py assemble HELLO.ASM --format raw -o HELLO.RAW
+"""
+
+_LWASM_HELP = """\
+assembler flags (passed after --):
+  -3, --6309                  Set assembler to 6309 mode (default)
+      --6800compat            Enable 6800 compatibility instructions,
+                              equivalent to --pragma=6800compat
+  -9, --6809                  Set assembler to 6809 only mode
+  -d, --debug[=LEVEL]         Set debug mode
+  -b, --decb                  Generate DECB .bin format output
+  -D, --define=SYM[=VAL]      Automatically define SYM to be VAL (or 1)
+      --depend                Output dependency list to stdout
+      --dependnoerr           Output dependency list; don't bail on missing includes
+  -f, --format=TYPE           Output format: decb, basic, raw, obj, os9,
+                              ihex, srec, dragon, abs
+  -I, --includedir=PATH       Add entry to include path
+  -l, --list[=FILE]           Generate list [to FILE]
+      --list-nofiles          Omit file names in list output
+  -m, --map[=FILE]            Generate map [to FILE]
+      --no-output             Inhibit creation of output file
+      --no-warn=FLAG          Suppress warnings of the specified type
+      --obj                   Generate object file format for linking
+  -o, --output=FILE           Output to FILE
+  -p, --pragma=PRAGMA         Set assembler pragma
+  -P, --preprocess            Preprocess and output revised source to stdout
+  -r, --raw                   Generate raw binary format output
+      --symbol-dump[=FILE]    Dump global symbol table in assembly format
+  -s, --symbols               Generate symbol list in listing
+      --symbols-nolocals      Same as --symbols but ignore local labels
+  -t, --tabs=WIDTH            Set tab spacing in listing
+  -?, --help                  Show this help
+"""
+
 def main():
+    # Pre-process argv before argparse sees it
+    argv = sys.argv[1:]
+
+    # Split at -- first
+    if '--' in argv:
+        split_at       = argv.index('--')
+        cocotools_argv = argv[:split_at]
+        asm_flags      = argv[split_at+1:]
+    else:
+        cocotools_argv = argv
+        asm_flags      = []
+
+    # asm -- --help / asm -- -?  →  lwasm flag reference
+    if asm_flags and asm_flags[0] in ('--help', '-?'):
+        print(_LWASM_HELP)
+        sys.exit(0)
+
+    # asm --  (bare separator, nothing after)  →  cocotools assemble help
+    if '--' in argv and not asm_flags:
+        print(_ASM_HELP)
+        sys.exit(0)
+
+    # asm -?  →  cocotools assemble help
+    if len(cocotools_argv) >= 1 and cocotools_argv[0] in ('asm', 'assemble'):
+        if '-?' in cocotools_argv:
+            print(_ASM_HELP)
+            sys.exit(0)
+
     parser = argparse.ArgumentParser(
         prog='cocotools',
         description='CoCo 6809 assembly and disk image toolkit',
@@ -520,16 +606,6 @@ examples:
     p_ls  = sub.add_parser('dskdir',
                             help='List files in a DSK image')
     p_ls.add_argument('dskfile',           help='DSK image file')
-
-    # Split sys.argv at -- so assembler flags never reach argparse
-    argv = sys.argv[1:]
-    if '--' in argv:
-        split_at = argv.index('--')
-        cocotools_argv = argv[:split_at]
-        asm_flags      = argv[split_at+1:]
-    else:
-        cocotools_argv = argv
-        asm_flags      = []
 
     args = parser.parse_args(cocotools_argv)
     args.asm_flags = asm_flags
