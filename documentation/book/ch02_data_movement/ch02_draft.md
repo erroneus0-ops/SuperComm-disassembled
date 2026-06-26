@@ -132,7 +132,7 @@ Here are the first lines of the program source:
 
 ```asm
 POLCAT  EQU     $A000           ; poll keyboard: returns char in A, 0=none
-CHROUT  EQU     $A002           ; output char in A to screen via ROM
+CHROUT  EQU     $A002           ; output char in A to screen via ROM and move CURPOS
 CLRSCR  EQU     $A928           ; clear text screen (direct call, stable)
 
 CURPOS  EQU     $88             ; cursor position: 16-bit address at $88/$89
