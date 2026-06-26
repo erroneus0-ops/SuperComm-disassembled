@@ -284,38 +284,38 @@ Start
         JSR     CLRSCR          ; *
 
         LDX     #HELLO_POS      ; *
-        ; LEAY Hello,PCR        — indexed addressing section
+        ; point to Hello string in memory  (indexed addressing)
         LDB     #6              ; *
 
 WriteHello
-        ; LDA ,Y+               — indexed addressing section
-        ; CMPA #' '             — conditionals section
-        ; BEQ  WriteSpace       — conditionals section
-        ; ANDA #$3F             — logic and bit manipulation section
-        ; ORA  #$40             — logic and bit manipulation section
-        ; BRA  StoreChar        — conditionals section
+        ; read next character from string  (indexed addressing)
+        ; is it a space?                   (conditionals)
+        ; if so, skip the conversion       (conditionals)
+        ; map ASCII to VDG character set   (logic and bit manipulation)
+        ; select normal video              (logic and bit manipulation)
+        ; go store the character           (conditionals)
 
 WriteSpace
         LDA     #$20            ; *
 
 StoreChar
         STA     ,X+             ; *
-        ; DECB                  — arithmetic section
-        ; BNE  WriteHello       — conditionals section
+        ; one fewer character to write     (arithmetic)
+        ; loop back if not done            (conditionals)
 
         LDD     #WORLD_POS      ; *
         STD     <CURPOS         ; *
-        ; LEAX World,PCR        — indexed addressing section
-        ; BSR  PrintStr         — subroutines section
+        ; point to World! string           (indexed addressing)
+        ; print the string via ROM         (subroutines)
 
         LDD     #EXIT_POS       ; *
         STD     <CURPOS         ; *
 
 WaitKey
-        ; JSR [POLCAT]          — conditionals section
-        ; BEQ  WaitKey          — conditionals section
+        ; any key pressed?                 (conditionals)
+        ; if not, keep waiting             (conditionals)
 
-        ; RTS                   — subroutines section
+        ; return to BASIC                  (subroutines)
 ```
 
 Gaps remain. They will be filled, one section at a time.
