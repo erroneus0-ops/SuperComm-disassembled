@@ -83,7 +83,8 @@ def should_include(path, last_backup_mtime, full):
 def rotate_backups():
     """Delete oldest backups beyond MAX_BACKUPS."""
     zips = sorted(
-        BACKUP_DIR.glob(f'{PREFIX}*.zip'),
+        list(BACKUP_DIR.glob(f'{PREFIX}*_daily.zip')) +
+        list(BACKUP_DIR.glob(f'{PREFIX}*_full.zip')),
         key=lambda p: p.stat().st_mtime,
         reverse=True
     )
@@ -146,7 +147,8 @@ def main():
     # Create zip
     now      = datetime.now()
     stamp    = f"{now.year:04d}{now.month:02d}{now.day:02d}_{now.hour:02d}{now.minute:02d}"
-    zip_path = BACKUP_DIR / f'{PREFIX}{stamp}.zip'
+    suffix   = '_full' if full else '_daily'
+    zip_path = BACKUP_DIR / f'{PREFIX}{stamp}{suffix}.zip'
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         for file in included:
