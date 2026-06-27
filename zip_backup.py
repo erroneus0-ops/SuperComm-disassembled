@@ -46,7 +46,7 @@ def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s  %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
+        datefmt='%d%b%Y %H:%M:%S',
         handlers=handlers
     )
 
@@ -144,7 +144,7 @@ def main():
         return
 
     # Create zip
-    stamp    = datetime.now().strftime('%Y%m%d_%H%M')
+    stamp    = datetime.now().strftime('%d%b%Y_%H%M').upper()  # e.g. 27JUN2026_1435
     zip_path = BACKUP_DIR / f'{PREFIX}{stamp}.zip'
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
