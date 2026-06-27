@@ -6,6 +6,8 @@ Rules:
   Non-zip files:   always included.
   .zip files:      only included if newer than the most recent backup,
                    OR if running a full backup (--full flag).
+  .git directory:  excluded from incremental backups (history is on GitHub).
+                   Included in full backups for self-contained restoration.
 
 Usage:
     python zip_backup.py              incremental backup (default)
@@ -118,8 +120,9 @@ def main():
     for file in SOURCE_DIR.rglob('*'):
         if not file.is_file():
             continue
-        # Skip the .git directory entirely -- history lives on GitHub
-        if '.git' in file.parts:
+        # Skip the .git directory on incremental backups
+        # Full backups include it for complete history restoration
+        if '.git' in file.parts and not full:
             continue
         inc, reason = should_include(file, last_mtime, full)
         if inc:
