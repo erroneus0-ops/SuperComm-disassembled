@@ -144,7 +144,8 @@ def main():
         return
 
     # Create zip
-    stamp    = datetime.now().strftime('%d%b%Y_%H%M').upper()  # e.g. 27JUN2026_1435
+    now      = datetime.now()
+    stamp    = f"{now.year:04d}{now.month:02d}{now.day:02d}_{now.hour:02d}{now.minute:02d}"
     zip_path = BACKUP_DIR / f'{PREFIX}{stamp}.zip'
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
