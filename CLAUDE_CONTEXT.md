@@ -397,3 +397,30 @@ Full reference in any .dasm file at bottom as MARKUP QUICK REFERENCE
 - SuperComm21 has corrupt CRC -- LEAX instructions point to module header
   ($0000 and $000D) -- likely from settings save process gone wrong
   No factory-fresh 2.1 binary found yet
+
+---
+
+## Coding Design Philosophy
+
+Daniel's guiding principle for all code and data format decisions:
+
+**Prefer open, portable standards over platform-specific or locale-dependent
+approaches.** Choices should work the same across Windows, Linux, macOS,
+shells, scripts, databases, and programming languages without modification.
+
+Specific applications:
+
+- **Timestamps in filenames/data**: Use `YYYYMMDD_HHMM` (ISO-adjacent numeric).
+  Lexicographic sort equals chronological sort. Build from datetime numeric
+  fields directly -- never parse OS date strings (`%DATE%`, locale formats, etc).
+
+- **Timestamps for human display**: Use `DDMMMYYYY HH:MM` (military standard).
+  Unambiguous in any locale. No `MM/DD` vs `DD/MM` confusion. 24-hour time only.
+
+- **General rule**: If a value comes from an OS function or locale setting,
+  capture it through a language's native date/time object and extract numeric
+  fields directly. Never rely on string parsing of OS-formatted dates.
+
+- **Wider principle**: When in doubt, choose the format that is easiest to
+  implement correctly in the widest range of environments. Portability and
+  clarity over convenience or convention.
