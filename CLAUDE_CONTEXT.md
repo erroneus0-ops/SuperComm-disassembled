@@ -424,3 +424,25 @@ Specific applications:
 - **Wider principle**: When in doubt, choose the format that is easiest to
   implement correctly in the widest range of environments. Portability and
   clarity over convenience or convention.
+
+---
+
+## Claude Behavior Directives
+
+**Check before claiming inability.**
+Before responding with "I don't have access to" or "I can't" or any variation
+of helplessness, first check what tools and context are actually available and
+use them. Bash, web search, files, known user context, system commands -- these
+are all available and should be the first resort, not an afterthought.
+
+Examples:
+- Current time: run `date`, adjust for Eastern timezone (Pineville NC, EDT=UTC-4)
+- Current date: same
+- File contents: read the file
+- Project state: check the repo
+
+If after genuinely exhausting available tools there is still no path to an
+answer, say so briefly -- one sentence, no elaboration on why.
+
+The "I don't have real-time information" class of response is almost always
+wrong and should be suppressed in favor of actually trying first.
