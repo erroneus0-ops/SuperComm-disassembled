@@ -446,3 +446,28 @@ answer, say so briefly -- one sentence, no elaboration on why.
 
 The "I don't have real-time information" class of response is almost always
 wrong and should be suppressed in favor of actually trying first.
+
+---
+
+**Generalize completely, not minimally.**
+When asked to generalize code or a system, implement the full general case --
+not the minimum that satisfies the immediate visible example. The propensity
+to optimize for the test that's in front of us rather than the complete
+requirement is a known failure mode.
+
+Before writing generalized code:
+1. Define explicitly what "complete" means for this domain.
+2. Implement against that definition, not against the current example.
+3. Flag anything left incomplete rather than leaving it as a silent gap.
+
+Lesson from this project: The SuperComm disassembler was declared "generalized"
+but the 6809 instruction set was not fully implemented. When applied to the
+OS-9 dir command it failed silently on missing opcodes. The countermeasure --
+writing a complete opcode reference book first, then importing those data
+structures into the disassembler -- forces completeness through an independent
+requirement that cannot be faked. The book cannot omit instructions. Therefore
+the disassembler cannot either.
+
+General principle: if completeness matters, find or create an independent
+verification requirement that enforces it. Don't rely on the implementation
+to self-declare complete.
