@@ -46,6 +46,7 @@ WINDOWS_USER = 'ALPHA\\Daniel'   # domain\user or just username
 
 # Scripts to copy from repo to scripts folder
 SCRIPTS_TO_COPY = [
+    'git_pull.py',
     'zip_backup.py',
 ]
 
@@ -105,8 +106,8 @@ TASKS = [
     {
         'name':        'git pull',
         'description': 'Pull latest changes from GitHub every 8 hours',
-        'program':     str(GIT_EXE),
-        'arguments':   f'-C "{GIT_DIR}" pull --no-rebase >> "{LOG_FILE}" 2>&1',
+        'program':     str(PYTHON_EXE),
+        'arguments':   f'"{SCRIPTS_DIR / "git_pull.py"}"',
         'trigger':     """\
     <CalendarTrigger>
       <StartBoundary>2026-06-27T09:00:00</StartBoundary>
