@@ -114,22 +114,51 @@ def main():
     else:
         logging.info(f'  last backup: none (first run)')
 
-    # Collect files
+    # Collect files with per-folder granularity
     included = []
     skipped  = []
-    for file in SOURCE_DIR.rglob('*'):
-        if not file.is_file():
-            continue
-        # Skip the .git directory on incremental backups
-        # Full backups include it for complete history restoration
-        if '.git' in file.parts and not full:
-            continue
+
+    # Separate top-level items into folders and loose files
+    top_folders = [p for p in SOURCE_DIR.iterdir() if p.is_dir()]
+    top_files   = [p for p in SOURCE_DIR.iterdir() if p.is_file()]
+
+    # Top-level loose files: apply zip/non-zip rule individually
+    for file in top_files:
         inc, reason = should_include(file, last_mtime, full)
         if inc:
             included.append(file)
         else:
             skipped.append(file)
 
+    # Subdirectories: include entire tree if ANY file inside changed,
+    # or if running a full backup
+    for folder in top_folders:
+        if '.git' in folder.parts and not full:
+            continue
+
+        if full:
+            # Full backup: include everything in this folder
+            for file in folder.rglob('*'):
+                if file.is_file():
+                    included.append(file)
+        else:
+            # Check if anything in this folder changed since last backup
+            newest_mtime = None
+            folder_files = [f for f in folder.rglob('*') if f.is_file()]
+
+            if not folder_files:
+                continue
+
+            newest_mtime = max(f.stat().st_mtime for f in folder_files)
+
+            if last_mtime is None or newest_mtime > last_mtime:
+                # Something changed -- include the whole folder tree
+                for file in folder_files:
+                    included.append(file)
+                logging.info(f'  folder included: {folder.name}')
+            else:
+                skipped.extend(folder_files)
+                logging.info(f'  folder skipped:  {folder.name} (no changes)')
     logging.info(f'  files to include: {len(included)}  skipped: {len(skipped)}')
 
     if dry_run:
