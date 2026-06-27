@@ -118,6 +118,9 @@ def main():
     for file in SOURCE_DIR.rglob('*'):
         if not file.is_file():
             continue
+        # Skip the .git directory entirely -- history lives on GitHub
+        if '.git' in file.parts:
+            continue
         inc, reason = should_include(file, last_mtime, full)
         if inc:
             included.append(file)
