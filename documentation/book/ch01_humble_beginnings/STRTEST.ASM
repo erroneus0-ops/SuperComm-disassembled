@@ -50,7 +50,7 @@ Start
 ; STRING DATA
 ; length byte immediately followed by characters -- no null needed
 ; ================================================================
-HelloStr FCB    5               ; length = 5
-         FCC    "HELLO"         ; characters
+HelloStr FCB    21              ; length = 21
+         FCC    "HELLO WORLD! --CLAUDE" ; characters
 
         END     Start
