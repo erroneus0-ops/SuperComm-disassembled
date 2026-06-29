@@ -51,8 +51,8 @@ Start
 ; length byte + characters + null terminator ($00)
 ; STRINOUT scans to $00, not the length byte
 ; ================================================================
-HelloStr FCB    21              ; length = 21
-         FCC    "HELLO WORLD! --CLAUDE" ; characters
-         FCB    0               ; one null -- retest
+HelloStr FCB    5               ; length = 5
+         FCC    "HELLO"         ; characters
+         FCB    0               ; null terminator
 
         END     Start
