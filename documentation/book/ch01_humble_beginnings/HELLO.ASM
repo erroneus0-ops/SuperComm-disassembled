@@ -45,8 +45,14 @@ COLS    EQU     32
 
 ; Screen position formula: SCREEN + (row * COLS) + col
 HELLO_POS EQU  SCREEN+(7*COLS)+10   ; row 7, col 10 = $04EA
+HELLO_X   EQU  10
+HELLO_Y   EQU  7
 WORLD_POS EQU  SCREEN+(7*COLS)+16   ; row 7, col 16 = $04F0
+WORLD_X   EQU  16
+WORLD_Y   EQU  7
 EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
+EXIT_X    EQU  0
+EXIT_Y    EQU  13
 
 ; -- VDG Character Encoding ---------------------------------------
 ; The VDG chip does NOT use ASCII. It has two character sets:
@@ -112,8 +118,8 @@ WriteHello
 ; CHROUT writes to the screen address stored at $88/$89.
 ; We set it to row 7, col 16 so "WORLD!" follows "HELLO ".
 ; -----------------------------------------------------------------
-        LDD     #WORLD_POS      ; D = screen address for "WORLD!"
-        STD     <CURPOS         ; store to cursor position register
+        LDD     #WORLD_POS      ; D = screen location for "WORLD!" (row * 32 + column) + start address of screen
+        STD     <CURPOS         ; store to BASIC cursor position register
 
 ; -----------------------------------------------------------------
 ; STEP 4: Write "WORLD!" via ROM CHROUT
