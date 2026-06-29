@@ -192,8 +192,8 @@ sense ~~then~~ than they would now.
 
 ## Before the Next Chapter
 
-One question this program raises is worth sitting with: why does `HELLO` need
-special handling to appear on screen, while `WORLD!` can simply be passed to
+One question this program raises is worth sitting with: why does `HELLO` use
+special handling to appear on screen, while `WORLD!` simply be passes data to
 a ROM routine?
 
 The answer has to do with how the CoCo's screen works — and that is where
