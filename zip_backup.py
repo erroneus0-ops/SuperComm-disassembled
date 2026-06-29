@@ -31,11 +31,11 @@ from datetime import datetime
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-SOURCE_DIR  = Path(r'D:\git')
-BACKUP_DIR  = Path(r'D:\git_backups')
+SOURCE_DIR  = Path(r'C:\DATA\SuperComm')
+BACKUP_DIR  = Path(r'C:\DATA\git_backup')
 MAX_BACKUPS = 20
 PREFIX      = 'git_'
-LOG_FILE    = Path(r'D:\git\git_pull_log.txt')
+LOG_FILE    = Path(r'C:\DATA\git_backup\git_pull_log.txt')
 
 # ── Setup ──────────────────────────────────────────────────────────────────────
 

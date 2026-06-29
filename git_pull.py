@@ -21,9 +21,9 @@ from datetime import datetime
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
-REPO_DIR = Path(r'D:\git\supercomm')
-GIT_EXE  = Path(r'D:\PortableGit\bin\git.exe')
-LOG_FILE = Path(r'D:\git\git_pull_log.txt')
+REPO_DIR = Path(r'C:\DATA\supercomm')
+GIT_EXE  = Path(r'C:\Program Files\Git\cmd\git.exe')
+LOG_FILE = Path(r'C:\DATA\git_backup\git_pull_log.txt')
 
 # ── Setup ──────────────────────────────────────────────────────────────────────
 
