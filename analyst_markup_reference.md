@@ -348,7 +348,7 @@ All branch references updated throughout the listing.
 python markup.py appname_proj.asm appname_proj.json
 
 ; 3. Regenerate disassembly:
-python dis6809_os9_engine.py --source appname --proj appname_proj.json
+python dis6x09.py --source appname --proj appname_proj.json
 
 ; 4. When ready to test assembly (product stage):
 python strip_listing.py appname_proj.asm appname_clean.asm

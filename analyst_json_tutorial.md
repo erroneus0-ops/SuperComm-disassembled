@@ -16,7 +16,7 @@ The analyst never edits the JSON file directly.
 **First run** (no JSON exists yet):
 
 ```
-python3 dis6809_os9_engine.py appname
+python3 dis6x09.py appname
 
 → JSON not found — scaffold created automatically (appname_proj.json)
 → Binary CRC recorded in JSON
@@ -29,7 +29,7 @@ python3 dis6809_os9_engine.py appname
 ```
 appname_proj.json + binary
         ↓
-    dis6809_os9_engine.py          ← verifies binary CRC matches JSON
+    dis6x09.py          ← verifies binary CRC matches JSON
         ↓
 appname_proj.asm            ← analyst adds directives here
         ↓
@@ -41,7 +41,7 @@ markup.py            ← reads directives, updates appname_proj.json
 **If the binary changes** (e.g. a patched or restored version):
 
 ```
-dis6809_os9_engine.py detects CRC mismatch and offers:
+dis6x09.py detects CRC mismatch and offers:
   [1] Create new JSON importing analyst work — labels, comments,
       routines carry over; binary-specific workarounds do not
   [2] Proceed anyway
@@ -221,7 +221,7 @@ updates the JSON entry rather than duplicating it.
 After running the script, regenerate the disassembly to see the changes:
 
 ```
-python3 dis6809_os9_engine.py appname_proj.json
+python3 dis6x09.py appname_proj.json
 ```
 
 ---
@@ -301,7 +301,7 @@ python3 markup.py supercomm22_proj.asm
 Regenerate:
 
 ```
-python3 dis6809_os9_engine.py supercomm22_proj.json
+python3 dis6x09.py supercomm22_proj.json
 ```
 
 The next disassembly run produces:
@@ -541,7 +541,7 @@ the disassembler to fail or produce incorrect output at that address.
 3. **Hex addresses are strings** — all addresses are stored as 4-character
    uppercase hex strings: `"0BCC"` not `0BCC` or `$0BCC` or `3020`.
 
-4. **Regenerate after every edit** — run `dis6809_os9_engine.py` after any JSON
+4. **Regenerate after every edit** — run `dis6x09.py` after any JSON
    change to confirm the output is what you expected before continuing.
 
 5. **The binary is always the ground truth** — no JSON edit can corrupt
