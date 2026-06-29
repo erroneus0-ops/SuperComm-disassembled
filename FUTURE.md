@@ -139,3 +139,9 @@ The assembly version will derive these values through bit operations
 rather than storing them in a FCB table.
 
 ---
+
+## Housekeeping
+- Clean up old/stale project files and folders in the repo (supercomm21, supercomm22-restored, etc.)
+- Reconcile analyst_json_tutorial.md and analyst_markup_reference.md into one authoritative document
+- Document missing directives in markup reference: /rename-label/, /bss/, /remove-comment/, /remove-line-comment/, /region/
+- Ch03 draft not yet started
