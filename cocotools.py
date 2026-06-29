@@ -338,6 +338,40 @@ def cmd_assemble(args):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# makerom command
+# ─────────────────────────────────────────────────────────────────────────────
+
+ROM_SIZE = 8192   # Standard CoCo cartridge ROM size
+ROM_FILL = 0x12   # NOP -- safe padding if CPU wanders into unused space
+
+def cmd_makerom(args):
+    raw_path = args.raw
+    rom_path = args.rom
+
+    if not os.path.isfile(raw_path):
+        die(f"file not found: {raw_path}")
+
+    data = open(raw_path, 'rb').read()
+
+    if len(data) > ROM_SIZE:
+        die(f"raw binary is {len(data)} bytes -- exceeds 8K ROM size ({ROM_SIZE} bytes)")
+
+    if os.path.isfile(rom_path) and not args.overwrite:
+        answer = input(f"{rom_path} already exists. Overwrite? (y/N): ").strip().lower()
+        if answer != 'y':
+            print("Cancelled.")
+            return
+
+    padded = data + bytes([ROM_FILL] * (ROM_SIZE - len(data)))
+
+    with open(rom_path, 'wb') as f:
+        f.write(padded)
+
+    print(f"  input:   {raw_path}  ({len(data)} bytes)")
+    print(f"  padded:  {ROM_SIZE - len(data)} bytes of $FF")
+    print(f"  written: {rom_path}  ({ROM_SIZE} bytes)")
+
+
 # makedsk command
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -702,6 +736,14 @@ examples:
     p_asm.add_argument('-pp',              metavar='KEY=VAL,...',
                        help='Post-processor options (e.g. -pp b=$3F00,e=$3F00)')
 
+    # makerom
+    p_rom = sub.add_parser('makerom',
+                            help='Pad a raw binary to 8K CoCo cartridge ROM image')
+    p_rom.add_argument('raw',              help='Raw binary input file')
+    p_rom.add_argument('rom',              help='Output ROM file (padded to 8192 bytes)')
+    p_rom.add_argument('-o', '--overwrite', action='store_true',
+                       help='Overwrite existing ROM file without prompting')
+
     # makedsk
     p_dsk = sub.add_parser('makedsk',
                             help='Build a CoCo DSK image from files')
@@ -740,6 +782,8 @@ examples:
 
     if args.command in ('assemble', 'asm'):
         cmd_assemble(args)
+    elif args.command == 'makerom':
+        cmd_makerom(args)
     elif args.command == 'makedsk':
         cmd_makedsk(args)
     elif args.command == 'binfo':
