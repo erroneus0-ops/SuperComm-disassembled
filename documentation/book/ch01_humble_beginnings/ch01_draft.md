@@ -86,6 +86,10 @@ find in every manual, every listing, every tool. They are the shared language of
 anyone who has worked with this processor. Using them means your code is readable
 to anyone else who has.
 
+Different assemblers may offer their own extensions and expressions beyond the
+Motorola standard, though all should implement the standard itself. We will cover
+more on this in a more advanced discussion.
+
 ---
 
 ## The Shape of the Program
