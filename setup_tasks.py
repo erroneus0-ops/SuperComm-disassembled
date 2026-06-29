@@ -19,8 +19,8 @@ Usage:
 
 Requirements:
   - Run from an elevated command prompt (Administrator) if UAC is enabled.
-  - D:\\PortablePython\\python.exe must exist.
-  - D:\\PortableGit\\bin\\git.exe must exist.
+  - C:\\Users\\dhauck\\AppData\\Local\\Python\\bin\\python.exe must exist.
+  - C:\\Program Files\\Git\\cmd\\git.exe must exist.
 """
 
 import os
@@ -34,15 +34,15 @@ from datetime import datetime
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
-REPO_DIR    = Path(r'D:\git\supercomm')
-SCRIPTS_DIR = Path(r'C:\Users\Daniel\AppData\Local\scripts')
-PYTHON_EXE  = Path(r'D:\PortablePython\python.exe')
-GIT_EXE     = Path(r'D:\PortableGit\bin\git.exe')
-LOG_FILE    = Path(r'D:\git\git_pull_log.txt')
-BACKUP_DIR  = Path(r'D:\git_backups')
-GIT_DIR     = Path(r'D:\git\supercomm')
+REPO_DIR    = Path(r'C:\DATA\supercomm')
+SCRIPTS_DIR = Path(r'C:\Users\dhauck\AppData\Local\scripts')
+PYTHON_EXE  = Path(r'C:\Users\dhauck\AppData\Local\Python\bin\python.exe')
+GIT_EXE     = Path(r'C:\Program Files\Git\cmd\git.exe')
+LOG_FILE    = Path(r'C:\DATA\git_backup\git_pull_log.txt')
+BACKUP_DIR  = Path(r'C:\DATA\git_backup')
+GIT_DIR     = Path(r'C:\DATA\supercomm')
 
-WINDOWS_USER = 'ALPHA\\Daniel'   # domain\user or just username
+WINDOWS_USER = 'FINANCE\\dhauck'   # domain\user or just username
 
 # Scripts to copy from repo to scripts folder
 SCRIPTS_TO_COPY = [
