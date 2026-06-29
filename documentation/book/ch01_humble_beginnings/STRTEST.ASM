@@ -52,5 +52,6 @@ Start
 ; ================================================================
 HelloStr FCB    21              ; length = 21
          FCC    "HELLO WORLD! --CLAUDE" ; characters
+         FCB    0               ; null terminator -- STRINOUT scans to $00
 
         END     Start
