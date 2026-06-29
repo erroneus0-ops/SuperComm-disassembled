@@ -53,6 +53,6 @@ Start
 ; ================================================================
 HelloStr FCB    21              ; length = 21
          FCC    "HELLO WORLD! --CLAUDE" ; characters
-         FCB    0,0,0           ; null padding -- confirm where STRINOUT stops
+         FCB    0,0             ; two nulls -- narrowing down requirement
 
         END     Start
