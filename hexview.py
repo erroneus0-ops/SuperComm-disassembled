@@ -15,16 +15,16 @@ Platforms: Windows, Linux, macOS
 
 import sys
 import os
+import readchar
 
 BYTES_PER_LINE = 16
-IS_WINDOWS = sys.platform == 'win32'
 
 
 # ── Windows ANSI support ──────────────────────────────────────────────────────
 
 def enable_ansi():
     """Enable ANSI escape processing on the Windows console. No-op on other platforms."""
-    if not IS_WINDOWS:
+    if sys.platform != 'win32':
         return
     try:
         import ctypes
@@ -120,58 +120,18 @@ def draw(data, top_line, filename, cols, rows):
     sys.stdout.flush()
 
 
-# ── Keyboard input -- Windows ─────────────────────────────────────────────────
-
-def get_key_windows():
-    import msvcrt
-    b = msvcrt.getch()
-    if b in (b'\x00', b'\xe0'):
-        b2 = msvcrt.getch()
-        return {
-            b'H': 'UP',
-            b'P': 'DOWN',
-            b'I': 'PAGEUP',
-            b'Q': 'PAGEDOWN',
-            b'G': 'HOME',
-            b'O': 'END',
-        }.get(b2, 'UNKNOWN')
-    if b in (b'\x1b', b'q', b'Q'):
-        return 'QUIT'
-    return 'OTHER'
-
-
-# ── Keyboard input -- Linux / macOS ──────────────────────────────────────────
-
-def get_key_unix():
-    import tty, termios
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        b = sys.stdin.buffer.read(1)
-        if b == b'\x1b':
-            # Escape sequence -- read up to 2 more bytes
-            b2 = sys.stdin.buffer.read(1)
-            if b2 == b'[':
-                b3 = sys.stdin.buffer.read(1)
-                return {
-                    b'A': 'UP',
-                    b'B': 'DOWN',
-                    b'5': 'PAGEUP',   # PgUp sends \x1b[5~
-                    b'6': 'PAGEDOWN', # PgDn sends \x1b[6~
-                    b'H': 'HOME',
-                    b'F': 'END',
-                }.get(b3, 'UNKNOWN')
-            return 'QUIT'   # bare Escape
-        if b in (b'q', b'Q'):
-            return 'QUIT'
-        return 'OTHER'
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-
+# ── Keyboard input -- cross-platform via readchar ───────────────────────────
 
 def get_key():
-    return get_key_windows() if IS_WINDOWS else get_key_unix()
+    k = readchar.readkey()
+    if k in (readchar.key.UP,):                          return 'UP'
+    if k in (readchar.key.DOWN,):                        return 'DOWN'
+    if k in (readchar.key.PAGE_UP,):                     return 'PAGEUP'
+    if k in (readchar.key.PAGE_DOWN,):                   return 'PAGEDOWN'
+    if k in (readchar.key.HOME,):                        return 'HOME'
+    if k in (readchar.key.END,):                         return 'END'
+    if k in (readchar.key.ESC, 'q', 'Q'):                return 'QUIT'
+    return 'OTHER'
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
