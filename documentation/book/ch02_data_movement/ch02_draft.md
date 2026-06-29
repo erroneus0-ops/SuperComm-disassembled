@@ -35,7 +35,7 @@ byte written to one memory location, displayed immediately. No ROM involved.
 
 Before going further, a word about the notation you will see throughout this book.
 
-Computers work in binary — base 2, <!-- two characters to represent values before another character is placed before the previous character position.  We could use Xs and Os which would make it looks like a lot of hugs and kisses. yes.... this is a joke that doesn't deserve to be in this book --> where every value is a pattern of ones and
+Computers work in binary — base 2, where every value is a pattern of ones and
 zeros. A single binary digit is a *bit*. Eight bits make a *byte*, and a byte can
 hold any value from 0 to 255. In binary those look like this:
 
