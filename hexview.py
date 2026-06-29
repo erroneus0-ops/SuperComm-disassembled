@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-hexview.py — interactive hex file viewer for Windows terminal
+hexview.py — interactive hex file viewer, cross-platform
 
 Usage: python hexview.py <filename>
 
@@ -9,19 +9,23 @@ Keys:
   PgUp / PgDn   scroll one page
   Home / End     jump to first / last line
   Q or Esc       quit
+
+Platforms: Windows, Linux, macOS
 """
 
 import sys
 import os
-import msvcrt
 
 BYTES_PER_LINE = 16
+IS_WINDOWS = sys.platform == 'win32'
 
 
-# ── Windows ANSI support ─────────────────────────────────────────────────────
+# ── Windows ANSI support ──────────────────────────────────────────────────────
 
 def enable_ansi():
-    """Enable ANSI escape processing on the Windows console."""
+    """Enable ANSI escape processing on the Windows console. No-op on other platforms."""
+    if not IS_WINDOWS:
+        return
     try:
         import ctypes
         k32    = ctypes.windll.kernel32
@@ -61,7 +65,6 @@ def hex_line(offset, chunk):
     left_hex  = ' '.join(f'{b:02X}' for b in left)
     right_hex = ' '.join(f'{b:02X}' for b in right)
 
-    # Each half is up to 8 bytes: "XX XX XX XX XX XX XX XX" = 23 chars
     left_hex  = left_hex.ljust(23)
     right_hex = right_hex.ljust(23)
 
@@ -69,18 +72,11 @@ def hex_line(offset, chunk):
     asc = asc.ljust(16)
 
     return f'{offset:08X}  {left_hex}  {right_hex}  |{asc}|'
-    # Total width: 8 + 2 + 23 + 2 + 23 + 2 + 1 + 16 + 1 = 78 columns
 
 
 # ── Title bar ────────────────────────────────────────────────────────────────
 
 def title_bar(filename, top_line, data_len, cols):
-    """
-    Build the inverse-video title line.
-    Left side:  ' HEXVIEW  <filename>'
-    Right side: '<offset> / <total>  <pct>%  Q:quit '
-    Padded to fill the terminal width.
-    """
     total_lines = max(1, (data_len + BYTES_PER_LINE - 1) // BYTES_PER_LINE)
     cur_offset  = top_line * BYTES_PER_LINE
     pct         = min(100, cur_offset * 100 // max(1, data_len - 1))
@@ -88,7 +84,6 @@ def title_bar(filename, top_line, data_len, cols):
     left  = f' HEXVIEW  \u2014  {os.path.basename(filename)}'
     right = f' {cur_offset:08X} / {data_len:08X}  {pct:3d}%  Q:quit '
 
-    # Truncate filename portion if terminal is narrow
     gap   = cols - len(right)
     left  = left[:gap] if len(left) > gap else left
     bar   = left.ljust(gap) + right
@@ -99,48 +94,36 @@ def title_bar(filename, top_line, data_len, cols):
 # ── Screen draw ───────────────────────────────────────────────────────────────
 
 def draw(data, top_line, filename, cols, rows):
-    """
-    Redraw the entire screen without clearing (overwrites in place to avoid flicker).
-    Row 1 (ANSI 1-based): title bar in inverse video.
-    Rows 2..rows: hex content lines.
-    """
     content_rows = rows - 1
     out = []
 
-    # ── Title bar ──────────────────────────────────────────────────────────
-    out.append('\033[1;1H')         # cursor to row 1, col 1
-    out.append('\033[7m')           # inverse video
+    out.append('\033[1;1H')
+    out.append('\033[7m')
     out.append(title_bar(filename, top_line, len(data), cols))
-    out.append('\033[0m')           # reset attributes
+    out.append('\033[0m')
 
-    # ── Content lines ──────────────────────────────────────────────────────
     for i in range(content_rows):
-        row       = i + 2           # ANSI row (1-based)
-        line_num  = top_line + i
-        offset    = line_num * BYTES_PER_LINE
+        row      = i + 2
+        line_num = top_line + i
+        offset   = line_num * BYTES_PER_LINE
 
-        out.append(f'\033[{row};1H')   # position cursor
+        out.append(f'\033[{row};1H')
 
         if offset < len(data):
             chunk = data[offset:offset + BYTES_PER_LINE]
             line  = hex_line(offset, chunk)
-            # Pad or truncate to cols-1 (leave last column clear to avoid wrap)
             out.append(line.ljust(cols - 1)[:cols - 1])
         else:
-            out.append(' ' * (cols - 1))    # blank out lines past end-of-file
+            out.append(' ' * (cols - 1))
 
     sys.stdout.write(''.join(out))
     sys.stdout.flush()
 
 
-# ── Keyboard input ────────────────────────────────────────────────────────────
+# ── Keyboard input -- Windows ─────────────────────────────────────────────────
 
-def get_key():
-    """
-    Read one keypress from the Windows console.
-    Extended keys (arrows, PgUp, etc.) arrive as two bytes: 0x00 or 0xE0 + scan code.
-    Returns a string token: 'UP', 'DOWN', 'PAGEUP', 'PAGEDOWN', 'HOME', 'END', 'QUIT'.
-    """
+def get_key_windows():
+    import msvcrt
     b = msvcrt.getch()
     if b in (b'\x00', b'\xe0'):
         b2 = msvcrt.getch()
@@ -155,6 +138,40 @@ def get_key():
     if b in (b'\x1b', b'q', b'Q'):
         return 'QUIT'
     return 'OTHER'
+
+
+# ── Keyboard input -- Linux / macOS ──────────────────────────────────────────
+
+def get_key_unix():
+    import tty, termios
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        b = sys.stdin.buffer.read(1)
+        if b == b'\x1b':
+            # Escape sequence -- read up to 2 more bytes
+            b2 = sys.stdin.buffer.read(1)
+            if b2 == b'[':
+                b3 = sys.stdin.buffer.read(1)
+                return {
+                    b'A': 'UP',
+                    b'B': 'DOWN',
+                    b'5': 'PAGEUP',   # PgUp sends \x1b[5~
+                    b'6': 'PAGEDOWN', # PgDn sends \x1b[6~
+                    b'H': 'HOME',
+                    b'F': 'END',
+                }.get(b3, 'UNKNOWN')
+            return 'QUIT'   # bare Escape
+        if b in (b'q', b'Q'):
+            return 'QUIT'
+        return 'OTHER'
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
+
+def get_key():
+    return get_key_windows() if IS_WINDOWS else get_key_unix()
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -182,19 +199,19 @@ def main():
 
     enable_ansi()
 
-    # Hide cursor; don't clear the screen — we'll overwrite every cell.
-    sys.stdout.write('\033[?25l')
-    sys.stdout.flush()
+    cols, rows  = term_size()
+    total_lines = (len(data) + BYTES_PER_LINE - 1) // BYTES_PER_LINE
+    top_line    = 0
 
-    cols, rows      = term_size()
-    total_lines     = (len(data) + BYTES_PER_LINE - 1) // BYTES_PER_LINE
-    top_line        = 0
+    # Hide cursor; clear screen once to push prior content into scrollback
+    sys.stdout.write('\033[?25l\033[2J')
+    sys.stdout.flush()
 
     try:
         draw(data, top_line, filename, cols, rows)
 
         while True:
-            cols, rows   = term_size()              # re-check on each keypress
+            cols, rows   = term_size()
             content_rows = rows - 1
             max_top      = max(0, total_lines - content_rows)
 
@@ -215,12 +232,12 @@ def main():
             elif key == 'END':
                 top_line = max_top
             else:
-                continue                            # unknown key — no redraw needed
+                continue
 
             draw(data, top_line, filename, cols, rows)
 
     finally:
-        # Restore cursor; move to a clean line below the content.
+        # Restore cursor; move to clean line
         sys.stdout.write(f'\033[?25h\033[0m\033[{rows};1H\n')
         sys.stdout.flush()
 
