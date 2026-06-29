@@ -342,7 +342,7 @@ def cmd_assemble(args):
 # ─────────────────────────────────────────────────────────────────────────────
 
 ROM_SIZE = 8192   # Standard CoCo cartridge ROM size
-ROM_FILL = 0xFF   # Uninitialized ROM byte pattern
+ROM_FILL = 0x12   # NOP -- safe padding if CPU wanders into unused space
 
 def cmd_makerom(args):
     raw_path = args.raw
