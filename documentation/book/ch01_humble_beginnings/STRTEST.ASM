@@ -48,7 +48,8 @@ Start
 
 ; ================================================================
 ; STRING DATA
-; length byte immediately followed by characters -- no null needed
+; length byte + characters + null terminator ($00)
+; STRINOUT scans to $00, not the length byte
 ; ================================================================
 HelloStr FCB    21              ; length = 21
          FCC    "HELLO WORLD! --CLAUDE" ; characters
