@@ -53,6 +53,6 @@ Start
 ; ================================================================
 HelloStr FCB    21              ; length = 21
          FCC    "HELLO WORLD! --CLAUDE" ; characters
-         FCB    0,0             ; two nulls -- narrowing down requirement
+         FCB    0               ; one null -- retest
 
         END     Start
