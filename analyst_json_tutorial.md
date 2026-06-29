@@ -16,7 +16,7 @@ The analyst never edits the JSON file directly.
 **First run** (no JSON exists yet):
 
 ```
-python3 dis_project.py appname
+python3 dis6809_os9_engine.py appname
 
 → JSON not found — scaffold created automatically (appname_proj.json)
 → Binary CRC recorded in JSON
@@ -29,11 +29,11 @@ python3 dis_project.py appname
 ```
 appname_proj.json + binary
         ↓
-    dis_project.py          ← verifies binary CRC matches JSON
+    dis6809_os9_engine.py          ← verifies binary CRC matches JSON
         ↓
 appname_proj.asm            ← analyst adds directives here
         ↓
-edits_to_json.py            ← reads directives, updates appname_proj.json
+markup.py            ← reads directives, updates appname_proj.json
         ↓
     repeat
 ```
@@ -41,7 +41,7 @@ edits_to_json.py            ← reads directives, updates appname_proj.json
 **If the binary changes** (e.g. a patched or restored version):
 
 ```
-dis_project.py detects CRC mismatch and offers:
+dis6809_os9_engine.py detects CRC mismatch and offers:
   [1] Create new JSON importing analyst work — labels, comments,
       routines carry over; binary-specific workarounds do not
   [2] Proceed anyway
@@ -206,13 +206,13 @@ A `Initend` label is emitted at the `/routine-end/` address.
 ## Running the script
 
 ```
-python3 edits_to_json.py appname_proj.asm
+python3 markup.py appname_proj.asm
 ```
 
 The JSON file is inferred from the ASM filename. Or specify it explicitly:
 
 ```
-python3 edits_to_json.py appname_proj.asm appname_proj.json
+python3 markup.py appname_proj.asm appname_proj.json
 ```
 
 The script is safe to run multiple times. Applying the same directive twice
@@ -221,7 +221,7 @@ updates the JSON entry rather than duplicating it.
 After running the script, regenerate the disassembly to see the changes:
 
 ```
-python3 dis_project.py appname_proj.json
+python3 dis6809_os9_engine.py appname_proj.json
 ```
 
 ---
@@ -295,13 +295,13 @@ $0BD0  17 0F 30                           LBSR WriteBlock
 Run the script:
 
 ```
-python3 edits_to_json.py supercomm22_proj.asm
+python3 markup.py supercomm22_proj.asm
 ```
 
 Regenerate:
 
 ```
-python3 dis_project.py supercomm22_proj.json
+python3 dis6809_os9_engine.py supercomm22_proj.json
 ```
 
 The next disassembly run produces:
@@ -332,7 +332,7 @@ $0BD0  17 0F 30                      LBSR WriteBlock
 
 ## Appendix: JSON field reference
 
-The following fields in `appname_proj.json` are managed by `edits_to_json.py`.
+The following fields in `appname_proj.json` are managed by `markup.py`.
 This is provided for reference only — the analyst does not edit these directly.
 
 | Field | Type | Purpose |
@@ -541,7 +541,7 @@ the disassembler to fail or produce incorrect output at that address.
 3. **Hex addresses are strings** — all addresses are stored as 4-character
    uppercase hex strings: `"0BCC"` not `0BCC` or `$0BCC` or `3020`.
 
-4. **Regenerate after every edit** — run `dis_project.py` after any JSON
+4. **Regenerate after every edit** — run `dis6809_os9_engine.py` after any JSON
    change to confirm the output is what you expected before continuing.
 
 5. **The binary is always the ground truth** — no JSON edit can corrupt

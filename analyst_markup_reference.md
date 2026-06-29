@@ -1,6 +1,6 @@
 # Analyst Markup Reference — Working Examples
 
-All directives begin with `/` in column 1. They are consumed by `edits_to_json.py`
+All directives begin with `/` in column 1. They are consumed by `markup.py`
 and stored in the project JSON. The disassembler applies them on the next run.
 The stripped clean.asm never contains directives.
 
@@ -244,7 +244,7 @@ Known formats:
 
 **Notes:**
 - `fdb` and `hexdump` emit a plain `FCB` for an odd trailing byte, with a console
-  warning from `edits_to_json.py` if the region size is odd.
+  warning from `markup.py` if the region size is odd.
 - `hexdump` ASCII column shows printable characters as-is, dots for non-printable.
   No FCS high-bit translation.
 - `text` is the right choice for human-readable string data: help text, error messages,
@@ -345,7 +345,7 @@ All branch references updated throughout the listing.
 ```
 ; 1. Add directives to proj.asm and save
 ; 2. Process directives into JSON:
-python edits_to_json.py appname_proj.asm appname_proj.json
+python markup.py appname_proj.asm appname_proj.json
 
 ; 3. Regenerate disassembly:
 python dis6809_os9_engine.py --source appname --proj appname_proj.json
