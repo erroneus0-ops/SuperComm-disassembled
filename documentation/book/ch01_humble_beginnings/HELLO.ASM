@@ -64,9 +64,8 @@ EXIT_POS  EQU  SCREEN+(13*COLS)+0   ; row 13, col 0 = $0560
 ; Without ORA #$40 the character stays in the first set and appears
 ; inverted (green on black) -- which is what HELLO uses deliberately.
 ;
-; Space: $20 is inverted space (green on black, first set)
-;        $60 is normal space  (black on green, second set)
-; HELLO uses $20 for its trailing space to match the inverted letters.
+; Space: $20 AND $3F = $20, OR $40 = $60 -- the transformation works
+;        uniformly for all characters including space.
 
 ; ================================================================
 ; MAIN PROGRAM
@@ -99,17 +98,8 @@ Start
 
 WriteHello
         LDA     ,Y+             ; load next ASCII char, advance Y
-        CMPA    #' '            ; is it a space?
-        BEQ     WriteSpace      ; load space directly: ANDA+ORA gives $60 either way,
-	        		                ; but intent is clearer with an explicit load
         ANDA    #$3F            ; map ASCII to VDG character set
         ORA     #$40            ; select normal video (black on green)
-        BRA     StoreChar
-
-WriteSpace
-        LDA     #$60            ; CoCo BASIC space character (Black printing, Green background)
-
-StoreChar
         STA     ,X+             ; write VDG code to screen, advance X
         DECB                    ; one fewer character to write
         BNE     WriteHello      ; loop until B = 0
