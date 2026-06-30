@@ -145,3 +145,31 @@ rather than storing them in a FCB table.
 - Reconcile analyst_json_tutorial.md and analyst_markup_reference.md into one authoritative document
 - Document missing directives in markup reference: /rename-label/, /bss/, /remove-comment/, /remove-line-comment/, /region/
 - Ch03 draft not yet started
+
+## 6809 Optimization Techniques (collected from community)
+
+### Keyboard scan loop -- carry flag as state carrier
+Source: CoCo Discord #assembly channel
+
+Standard approach (29 cycles/loop): separate COMB/LSLB/BNE for column advance.
+
+Optimized (25 cycles/loop, 3 bytes smaller): COMA sets carry as a side effect
+of inverting the keyboard read. ROL on the memory-mapped PIA register pulls
+that carry bit in directly as the next column strobe -- no separate shift
+register needed. The carry flag carries state between two unrelated
+operations for free.
+
+```asm
+        lda     #%11111110      ; start reading column 0
+        sta     PIA0SideBDataRegister_FF02
+
+loop    lda     PIA0SideADataRegister_FF00
+        ora     #%10000000
+        coma                    ; sets carry as side effect
+        sta     ,x+             ; doesn't affect carry
+        rol     PIA0SideBDataRegister_FF02
+        bcs     loop            ; if carry set, not done
+```
+
+Worth a "tricks and idioms" reference section later, possibly its own
+chapter or appendix once the core teaching chapters are done.
