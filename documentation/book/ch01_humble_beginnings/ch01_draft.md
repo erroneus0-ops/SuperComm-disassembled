@@ -192,9 +192,10 @@ sense ~~then~~ than they would now.
 
 ## Before the Next Chapter
 
-One question this program raises is worth sitting with: why does `HELLO` use
-special handling to appear on screen, while `WORLD!` simply be passes data to
-a ROM routine?
+This program puts characters on screen two different ways. `HELLO ` is written
+directly into screen memory, one byte at a time. `WORLD!` is handed to a ROM
+routine that handles the details. Both produce the same result — so why write
+the code yourself when the ROM will do it for you?
 
-The answer has to do with how the CoCo's screen works — and that is where
-chapter 2 begins.
+The answer has to do with control, and with how the CoCo's screen actually works.
+That is where chapter 2 begins.
