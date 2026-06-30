@@ -4,6 +4,36 @@
 # Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
 # philosophy document, not just context.
 
+## Getting a New Claude Session Up to Speed
+
+Two scenarios, depending on what kind of Claude you're starting:
+
+**A) Claude with computer/bash/file access (e.g. claude.ai with the
+computer use tool, or any agent environment with shell access):**
+1. Give Claude the repo URL:
+   https://github.com/erroneus0-ops/SuperComm-disassembled
+2. Ask Claude to clone or pull the repo into its working directory.
+3. Ask Claude to read CLAUDE_MANIFESTO.md (this file) in full before
+   doing anything else. Everything needed -- project structure, coding
+   philosophy, known pitfalls, current status -- lives in this one file.
+4. Mention FUTURE.md as the place to check for open items and deferred
+   work before starting something new.
+
+**B) Claude in a plain chat with no file/repo access:**
+1. Open CLAUDE_MANIFESTO.md directly on GitHub (raw view) or in a local
+   editor.
+2. Copy the entire file contents.
+3. Paste the full contents as the first message of the new conversation,
+   with a short note like "this is my project continuity file, please
+   read it before we start."
+4. If specific files are needed for the task at hand (a particular .ASM
+   file, a chapter draft, etc.), paste or upload those too -- the
+   manifesto describes the project, it doesn't contain the project.
+
+Either way: the manifesto is the bridge between sessions. A fresh Claude
+has no memory of prior conversations, so this file carries forward
+everything that would otherwise have to be relearned the hard way.
+
 ## Project Overview
 
 Two parallel tracks:
@@ -531,3 +561,106 @@ housekeeping never fires again.
   cartridge size (8192 bytes) with NOP ($12), not $FF (SWI) -- chosen
   deliberately so that if the CPU ever wanders into the padding it
   slides through harmlessly rather than trapping.
+
+---
+
+## XRoar WASM Page (wasm/index.html) -- Development History
+
+### Why a rewrite instead of incremental edits
+
+The original page came from the upstream XRoar Online distribution
+(https://www.6809.org.uk/xroar/online/) -- a single index.html with all
+CSS, layout, and the XRoar control panel markup tightly interwoven. The
+goal was to add a CM-8 monitor bezel overlay around the emulator canvas
+and restyle the controls panel. Attempting this as incremental CSS edits
+against the original markup did not work cleanly -- the existing layout
+rules fought the new bezel positioning and panel restyling at every
+turn, producing fragile, hard-to-reason-about results.
+
+The decision was made to build new scaffolding from scratch (clean CSS,
+new layout structure, the bezel overlay system, the controls panel
+redesign) as index_new.html, then import the *functional* guts of the
+original page -- the actual working JS that talks to the compiled
+xroar.wasm module -- into that new scaffolding, rather than trying to
+reconcile two competing sets of CSS.
+
+### What went wrong during the import, and how it surfaced
+
+Some functional pieces ported cleanly (file loading, the type-text
+modal, keyboard capture/blur logic). Two small pieces did not survive
+the port intact: the Machine and Cartridge dropdown onchange handlers.
+They were small enough to look trivial and got reinvented inline
+(`wasm_set_machine(value)` / `wasm_set_cart(value)`, passing string
+values) instead of being copied verbatim from the original, which used
+`wasm_set_int('machine', value, 1)` / `wasm_set_int('cartridge', value, 1)`
+-- XRoar's compiled WASM module expects integer index values for these
+two controls, not strings.
+
+The bug was invisible for days: the dropdowns rendered correctly, the
+onchange fired, there was no console error -- the calls simply did
+nothing downstream. It was only caught when machine/cartridge switching
+was actually exercised, well after the rewrite session ended.
+
+**Lesson:** when porting functional code into new scaffolding, copy-paste
+the wiring verbatim first, before refactoring it -- even for handlers
+that look trivial. The trivial-looking ones are exactly where a
+plausible-but-wrong rewrite slips in unnoticed, because nothing about
+the failure is visible without specifically exercising that control.
+
+### CM-8 bezel: PNG -> hand-patched SVG
+
+The bezel went through several iterations (see wasm/cm8_bezel_v2.svg
+through v6, and the various cm8_rebuilt_*.png files) before settling on
+a fully vector approach:
+
+1. A clean screenshot was sourced from a YouTuber's 3D CM-8 model as the
+   most accurate available reference (better than any owner's-manual
+   line drawing).
+2. Inkscape's trace function was run against that screenshot to get a
+   vector starting point -- but the trace was never going to resolve
+   the TANDY label correctly (the trace artifacts inside the CRT opening
+   were also a known limitation of this approach, later patched over).
+3. The TANDY label was hand-crafted separately and precisely, not
+   traced: Microgramma D Extended font (a close match to the real label),
+   three RGB color bars drawn by hand, and the whole label group given a
+   `skewY(0.41435463)` transform (arrived at by eye, iterating until it
+   matched the slight off-axis angle visible in the reference photo) to
+   match the perspective of the rest of the traced image.
+4. Trace artifacts inside the screen opening were masked with a black
+   filled path placed on top -- invisible to users since the XRoar
+   canvas sits on top of the bezel's transparent screen cutout anyway
+   (z-index layering: canvas behind, bezel overlay on top, canvas shows
+   through the transparent CRT opening).
+5. The original bitmap PNGs were removed from the SVG entirely once the
+   vector version was complete -- wasm/cm8_bezel.svg is now the single
+   source of truth for the bezel, referenced directly in index.html's
+   background-image.
+
+This is why the bezel scales cleanly to any size with no blurring --
+there's no embedded raster image left in the file at all.
+
+### Size slider
+
+`var monitorWidth` already existed as the single config value driving
+`applyMonitorLayout()` (canvas position/size computed as a scale factor
+against the bezel's native 1073x967 dimensions). The slider in the title
+bar is a thin UI layer on top of that existing mechanism:
+- Steps through standard display widths (400, 480, 640, 800, 1024, 1280,
+  1366, 1400) rather than arbitrary increments, snapping to the nearest
+  standard resolution.
+- Clicking the pixel readout swaps it for a number input to type a
+  custom value directly (any integer 400-1400), Enter/blur commits,
+  Escape cancels.
+- Implementation note: `sizeSteps`, `nearestIndex()`, and `applySize()`
+  must live in GLOBAL scope, not inside a DOMContentLoaded closure --
+  an earlier version scoped them locally and the slider silently did
+  nothing because the inline `oninput` HTML attribute couldn't see them.
+  The working version uses inline `oninput="applySize(...)"` directly on
+  the `<input type=range>` element rather than an addEventListener,
+  since addEventListener attachment timing proved unreliable against
+  whatever DOM activity XRoar's own init does on load.
+
+### Future development
+See FUTURE.md for open items: vertical slider alternative (left-side
+column, knob-style), cartridge ROM chapter material, and the
+-cart-autorun investigation.
