@@ -1,27 +1,34 @@
 ; ================================================================
-; STRTEST_CART.ASM -- Cartridge ROM variant, ORG $C000
+; STRTEST_CART_PASSIVE.ASM -- $C000 cartridge ROM, passive variant
 ;
-; Same test as STRTEST.ASM, but built as an 8K cartridge ROM image
-; rather than a DECB-loadable .BIN file.
+; Pairs with XRoar's -cart-autorun no -- the CART* signal never
+; asserts, so no FIRQ ever fires and BASIC boots completely
+; normally. This is the software equivalent of taping over pin 8
+; on a real cartridge edge connector.
 ;
-; On real hardware, a cartridge with pin 8 tied to pin 7 generates
-; a CART* signal that triggers an FIRQ. The CPU pushes only PC and
-; CC (FIRQ does not save the full register set), then jumps via
-; $FFF6/$FFF7 into BASIC's FIRQ handler, which JMPs (not JSRs) to
-; $C000 after confirming the autostart condition. There is no
-; JSR-style return frame waiting for an RTS -- the routine must
-; end in RTI to correctly restore CC (unmasking interrupts) and
-; PC, the same way any other FIRQ handler would.
+; Entry is via a manual call from BASIC:
+;
+;   EXEC &HC000
+;
+; EXEC pushes a normal return address the same way any subroutine
+; call does, so this routine correctly ends in RTS -- NOT RTI.
+; (Contrast with STRTEST_CART.ASM, which is entered via the
+; hardware FIRQ autostart path and must end in RTI instead.)
 ;
 ; Screen result:
 ;   Row 7, col 10: HELLO
 ;
 ; Assemble:
-;   python3 cocotools.py asm STRTEST_CART.ASM -o STRTEST_CART.RAW
-;   python3 cocotools.py makerom STRTEST_CART.RAW STRTEST_CART.ROM
+;   python3 cocotools.py asm STRTEST_CART_PASSIVE.ASM \
+;       -o STRTEST_CART_PASSIVE.RAW --format raw
+;   python3 cocotools.py makerom STRTEST_CART_PASSIVE.RAW \
+;       STRTEST_CART_PASSIVE.ROM
 ;
-; XRoar cart profile (passive, no autostart):
-;   -cart-type rom -cart-rom STRTEST_CART.ROM -cart-autorun no
+; XRoar arguments (passive load, manual EXEC required):
+;   -cart-type rom -cart-rom STRTEST_CART_PASSIVE.ROM -cart-autorun no
+;
+; Then from the BASIC prompt:
+;   EXEC &HC000
 ; ================================================================
 
 ; -- ROM Entry Points ---------------------------------------------
@@ -38,7 +45,7 @@ COLS    EQU     32
 HELLO_POS EQU  SCREEN+(7*COLS)+10   ; row 7, col 10
 
 ; ================================================================
-; MAIN -- entry point for cartridge autostart (CART* IRQ -> $C000)
+; MAIN -- entry point for manual EXEC &HC000 (no autostart)
 ; ================================================================
 
         ORG     $C000
@@ -52,9 +59,9 @@ Start
         LDX     #HelloStr       ; X = pointer to length byte
         JSR     >STRINOUT       ; print it
 
-        RTI                     ; restore CC and PC from FIRQ entry, not RTS --
-                                ; we were JMP'd here, not JSR'd, so there is no
-                                ; return-address frame for RTS to consume
+        RTS                     ; EXEC pushed a normal return address --
+                                ; RTS is correct here, unlike the FIRQ-
+                                ; entered autostart variant
 
 ; ================================================================
 ; STRING DATA
