@@ -368,7 +368,7 @@ def cmd_makerom(args):
         f.write(padded)
 
     print(f"  input:   {raw_path}  ({len(data)} bytes)")
-    print(f"  padded:  {ROM_SIZE - len(data)} bytes of $FF")
+    print(f"  padded:  {ROM_SIZE - len(data)} bytes of NOP (\\$12)")
     print(f"  written: {rom_path}  ({ROM_SIZE} bytes)")
 
 
