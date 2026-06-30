@@ -20,14 +20,13 @@ The CoCo's display hardware — the MC6847 Video Display Generator, VDG for shor
 — reads memory. The screen is a block of 512 bytes of RAM starting at address
 `$0400`. Each byte corresponds to one character cell: 32 columns across, 16 rows
 down. Write a byte to one of those addresses and the VDG displays the
-corresponding character in the corresponding cell. The ROM is a layer on top of
-that. The screen is just memory.
+corresponding character. The Color BASIC ROM builds on that foundation. Programs
+you write in BASIC build on those routines.
 
 Try it yourself. Type `POKE 1056,30` and press Enter. Address 1056 (`$0420`) is
-the first cell of the second row on screen. The value 30 (`$1E`) is an up-arrow
-glyph in the VDG's first character set. You should see it replace whatever
-character was there — light on dark, standing out from the surrounding text. One
-byte written to one memory location, displayed immediately. No ROM involved.
+the first cell of the second row. The value 30 (`$1E`) is an up-arrow glyph in
+the VDG's first character set — light on dark, standing out from the surrounding
+text.
 
 ---
 
@@ -194,15 +193,6 @@ The distinction matters. `LDB $06` would load whatever byte is stored at address
 `$0006` — somewhere in RAM, could be anything. `LDB #6` loads the number six,
 always, unconditionally. The `#` is the signal.
 
-A few lines later, the space character gets the same treatment:
-
-```asm
-WriteSpace
-        LDA     #$20            ; VDG inverted space (first character set)
-```
-
-`LDA #$20` loads `$20` directly into A. The value is embedded in the instruction.
-
 For setting up the cursor, the program uses the sixteen-bit accumulator:
 
 ```asm
@@ -216,8 +206,6 @@ instructions, but `LDD` does it in one.
 ---
 
 ## Storing Values to Memory
-
-Loading fills a register. Storing writes its content to a memory address.
 
 ```asm
         STA     ,X+             ; write VDG code to screen, advance X
@@ -259,19 +247,14 @@ cursor where BASIC's `OK` prompt will appear.
 
 ---
 
-## What This Chapter Revealed
-
-Six lines of equates, a JSR, two LDX/LDB loads, a space-character load, a store
-through an indexed pointer, and two LDD/STD pairs moving sixteen-bit addresses
-around. That is the data movement layer of this program.
+## What This Chapter Covered
 
 Three of the 6809's four addressing modes appeared here: immediate, direct page,
 and indexed. The fourth — extended — is already present but unannounced: `JSR
-CLRSCR` uses a full two-byte address. The complete picture of addressing modes,
-including the full depth of indexed, has its own section later.
+CLRSCR` uses a full two-byte address. It will be covered in its own section.
 
-Here is the program as it stands after this chapter. Newly revealed lines are
-marked:
+Compare this with the program outline from Chapter 1. The gaps are still there
+— but the framework is real code now.
 
 ```asm
 POLCAT  EQU     $A000           ; *
@@ -292,16 +275,8 @@ Start
 
 WriteHello
         ; read next character from string  (indexed addressing)
-        ; is it a space?                   (conditionals)
-        ; if so, skip the conversion       (conditionals)
         ; map ASCII to VDG character set   (logic and bit manipulation)
         ; select normal video              (logic and bit manipulation)
-        ; go store the character           (conditionals)
-
-WriteSpace
-        LDA     #$20            ; *
-
-StoreChar
         STA     ,X+             ; *
         ; one fewer character to write     (arithmetic)
         ; loop back if not done            (conditionals)
@@ -320,8 +295,6 @@ WaitKey
 
         ; return to BASIC                  (subroutines)
 ```
-
-Gaps remain. They will be filled, one section at a time.
 
 ---
 
