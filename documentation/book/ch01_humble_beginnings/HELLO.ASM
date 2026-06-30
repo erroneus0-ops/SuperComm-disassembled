@@ -67,7 +67,9 @@ EXIT_Y    EQU  13
 ; Without ORA #$40 the character stays in the first set and appears
 ; inverted (green on black). Color BASIC uses the first set deliberately
 ; for its lowercase display -- since the VDG has no real lowercase glyphs,
-; BASIC uses first-set characters as inverted stand-ins.
+; BASIC uses first-set characters as inverted stand-ins for them.
+; This program uses the second set (ORA #$40) to match BASIC's established
+; convention for uppercase: normal video, black on green.
 ;
 ; Space: $20 AND $3F = $20, OR $40 = $60 -- the transformation works
 ;        uniformly for all characters including space.
