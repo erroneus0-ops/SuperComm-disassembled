@@ -197,5 +197,4 @@ directly into screen memory, one byte at a time. `WORLD!` is handed to a ROM
 routine that handles the details. Both produce the same result — so why write
 the code yourself when the ROM will do it for you?
 
-The answer has to do with control, and with how the CoCo's screen actually works.
-That is where chapter 2 begins.
+The answer is in chapter 2.
