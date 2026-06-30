@@ -95,12 +95,15 @@ CoCo BASIC uses the second set for uppercase and the first for lowercase — sin
 the original VDG has no actual lowercase glyphs, BASIC uses the first set as a
 stand-in. Lowercase `a` appears on screen as an inverted `A`: light on dark.
 
-That is why `HELLO` needs special handling. The program reads text from its own
-memory, transforms it to match Color BASIC's display scheme, and writes to screen
-memory directly at a specific location, bypassing the ROM entirely. `WORLD!` goes
-through `CHROUT`, which handles the conversion internally. Both end up looking the
-same on screen — the difference here is for demonstration. In practice you may
-choose one approach, the other, or invent your own. There is more than one way.
+That is why this program writes `HELLO ` directly to screen memory rather than
+passing it through the ROM. When you write directly, you decide what goes where
+and what it looks like. The program reads text from its own memory, converts it
+to match Color BASIC's display scheme, and places each byte at a specific screen
+address. `WORLD!` takes the other path — it goes through `CHROUT`, which handles
+the conversion and placement internally. Both end up looking the same on screen,
+which is the point: the ROM produces acceptable results with less effort, but
+direct writes give you control the ROM does not. You choose based on what you
+need.
 
 ---
 
