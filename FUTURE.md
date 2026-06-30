@@ -140,6 +140,22 @@ rather than storing them in a FCB table.
 
 ---
 
+## Cartridge ROM / XRoar WASM (open questions)
+- Confirm whether -cart-autorun no works for any cart form in this XRoar
+  WASM build, or only for named hardware profiles (rsdos, dragondos, etc.)
+- Consider writing up findings for Ciaran -- concrete repro steps for the
+  -cart-autorun no + bare-filename combination not suppressing FIRQ
+- Build a "dual-entry-safe" cartridge routine that detects FIRQ vs JSR
+  entry and exits correctly either way (PSHS CC normalization trick or
+  similar), as a teaching example for the cartridge chapter
+- STRTEST_CART.ROM (RTI, FIRQ-autostart) and STRTEST_CART_PASSIVE.ROM
+  (RTS, manual EXEC) both exist and work correctly for their respective
+  entry paths -- see CLAUDE_MANIFESTO.md "Cartridge ROM Entry Mechanisms"
+- Cartridge chapter material: tape-over-pin-8 history, FIRQ vs JSR entry,
+  disk11.rom as a real-world example of a "passive" cart that patches
+  hooks and returns rather than taking over (contrast with a game cart
+  like Dungeons of Daggorath, which never returns)
+
 ## Housekeeping
 - Clean up old/stale project files and folders in the repo (supercomm21, supercomm22-restored, etc.)
 - Reconcile analyst_json_tutorial.md and analyst_markup_reference.md into one authoritative document

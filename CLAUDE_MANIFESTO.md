@@ -1,6 +1,8 @@
-# CLAUDE_CONTEXT.md
+# CLAUDE_MANIFESTO.md
 # Project continuity file — paste this at the start of a new conversation
-# Last updated: end of session (June 23 2026)
+# Last updated: end of session (June 30 2026)
+# Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
+# philosophy document, not just context.
 
 ## Project Overview
 
@@ -471,3 +473,61 @@ the disassembler cannot either.
 General principle: if completeness matters, find or create an independent
 verification requirement that enforces it. Don't rely on the implementation
 to self-declare complete.
+
+---
+
+## Cartridge ROM Entry Mechanisms (CoCo $C000, confirmed by direct testing)
+
+A cartridge ROM at $C000 can be entered two genuinely different ways, and
+the closing instruction MUST match the entry mechanism or the result is
+silent stack corruption that can look deceptively like success.
+
+**Path A -- FIRQ autostart (real hardware: pin 8 tied to pin 7, CART* signal)**
+CPU pushes only PC (2 bytes) then CC (1 byte), then JMPs (not JSRs) to
+$C000 via the FIRQ vector chain. There is no JSR-style return-address
+frame. The routine MUST end in RTI to correctly restore CC (unmasking
+IRQ/FIRQ) and PC. Confirmed working: clean return to BASIC's own
+cold-start sequence, full register restoration, keyboard and cursor
+remain live afterward.
+
+**Path B -- manual call (EXEC &HC000 from BASIC)**
+EXEC pushes a normal 2-byte return address, same as any JSR. The routine
+MUST end in RTS. Using RTI here pops a fabricated "CC" byte (actually
+the low byte of the real return address) and miscomputes PC from
+adjacent stack bytes -- an uncontrolled jump built from misaligned
+stack data. Confirmed: this can land somewhere that happens to look
+like a clean result (e.g. BASIC's cold-start banner reprinting) without
+actually being one. Don't trust a plausible-looking result from a
+known-mismatched entry/exit pairing.
+
+**Using RTS after FIRQ entry** (the inverse mistake): pops [CC][low byte
+of PC] as a bogus return address, leaves IRQ/FIRQ masked because RTS
+never restores CC. Confirmed: keyboard and cursor go dead, machine
+appears frozen, because the periodic VSYNC interrupt that drives system
+housekeeping never fires again.
+
+**XRoar WASM cart-loading notes (this build, confirmed via `strings xroar.wasm`):**
+- `-cart` and `-cart-type` only accept a fixed set of named hardware
+  profiles: cp450, delta, dragondos, gmc, ide, mcx128, mcx128a, mooh,
+  orch90, rsdos. There is no generic "rom" type.
+- A bare filename passed to `-cart` (e.g. `-cart STRTEST_CART.ROM`) is
+  accepted and treated as an ad-hoc ROM cart -- this is how
+  `daggorat.ccc` worked with a single argument.
+- `-cart-autorun no` did NOT suppress the FIRQ autostart for a
+  bare-filename `-cart` load in direct testing (twice). It may only
+  apply to the named hardware profiles. Software equivalent of "taping
+  over pin 8" is not yet confirmed working through this argument
+  combination -- worth raising with Ciaran directly, with this session's
+  test results as evidence.
+- Swapping the active cartridge via the Hardware tab dropdown WITHOUT a
+  reset reproduces the real documented hardware hazard of hot-swapping
+  a cartridge while powered on (CoCopedia FAQ: "it is extremely
+  dangerous to insert a ROM-Pack with the CoCo switched on"). Confirmed:
+  this can hang the emulated machine, including surviving a soft reset,
+  because RAM hooks patched by the previous cart's ROM still point into
+  memory now occupied by different code (or NOP padding). Always pair a
+  cart change with a hard reset.
+- cocotools.py `makerom` command pads a raw binary to the standard 8K
+  cartridge size (8192 bytes) with NOP ($12), not $FF (SWI) -- chosen
+  deliberately so that if the CPU ever wanders into the padding it
+  slides through harmlessly rather than trapping.
