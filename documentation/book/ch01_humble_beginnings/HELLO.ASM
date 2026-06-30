@@ -1,6 +1,3 @@
-;
-;  This needs to be updated and also syncronized with the Ch02
-;
 ; ================================================================
 ; HELLO.ASM -- Humble Beginnings
 ; Chapter 1: A 6809 Assembly Language Tutorial
@@ -18,7 +15,7 @@
 ;          Loaded via BASIC VARPTR string method
 ;
 ; Screen result:
-;   Row 7:  [HELLO ] WORLD!    (HELLO=inverted, WORLD!=normal)
+;   Row 7:  HELLO  WORLD!    (both in normal video -- black on green)
 ;   Row 13: cursor (BASIC "OK" appears here on return)
 ;
 ; Assemble: lwasm --decb -o HELLO.BIN HELLO.ASM
@@ -68,7 +65,7 @@ EXIT_Y    EQU  13
 ;               $08 | $40 = $48
 ;
 ; Without ORA #$40 the character stays in the first set and appears
-; inverted (green on black) -- which is what HELLO uses deliberately.
+; inverted (green on black).
 ;
 ; Space: $20 AND $3F = $20, OR $40 = $60 -- the transformation works
 ;        uniformly for all characters including space.
