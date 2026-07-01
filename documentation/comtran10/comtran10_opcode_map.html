@@ -62,17 +62,14 @@
     .legend-item.dimmed { opacity: 0.35; }
     .legend-swatch { width: 0.75rem; height: 0.75rem; border-radius: 2px; flex-shrink: 0; }
 
-    /* Dimmed rows */
-    .opcode-table tr.grp-dimmed td:not(.hdr-msd) { opacity: 0.15; }
+    /* Dimmed cells */
+    .opcode-table td.grp-dimmed { opacity: 0.12; }
   </style>
   <script>
     // --- Column width normalization ---
-    // After DOM loads, find the max natural width among data columns ($0-$F)
-    // and set all to that width so the grid is uniform.
     function normalizeColumnWidths() {
       const table = document.querySelector('.opcode-table');
       if (!table) return;
-      // Columns 1-16 are the data columns (0 is MSD label)
       const rows = Array.from(table.rows);
       let maxW = 0;
       rows.forEach(row => {
@@ -82,30 +79,25 @@
         }
       });
       if (maxW === 0) return;
-      // Apply as min-width to all colgroup cols, or directly to header cells
       for (let c = 1; c <= 16; c++) {
         const cell = rows[0].cells[c];
         if (cell) cell.style.minWidth = maxW + 'px';
       }
     }
 
-    // --- Group toggle filter ---
+    // --- Per-cell group toggle filter ---
     const activeGroups = new Set(['load','store','arithmetic','logical','branch','input_output','nonmem','invalid']);
 
     function applyFilter() {
       const table = document.querySelector('.opcode-table');
       if (!table) return;
-      Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
-        // Determine the dominant group of this row from its cells
-        const groups = new Set();
-        Array.from(row.cells).forEach(cell => {
-          const cls = Array.from(cell.classList).find(c => c.startsWith('grp-'));
-          if (cls) groups.add(cls.replace('grp-', ''));
-        });
-        // A row is visible if ANY of its groups are active
-        // (most rows are one group, but mixed rows like $0x/$1x have multiple)
-        const visible = [...groups].some(g => activeGroups.has(g));
-        row.classList.toggle('grp-dimmed', !visible);
+      // Operate on individual td cells, not rows
+      table.querySelectorAll('tbody td').forEach(cell => {
+        if (cell.classList.contains('hdr-msd')) return;
+        const grpCls = Array.from(cell.classList).find(c => c.startsWith('grp-'));
+        if (!grpCls) return;
+        const grp = grpCls.replace('grp-', '');
+        cell.classList.toggle('grp-dimmed', !activeGroups.has(grp));
       });
     }
 
@@ -122,7 +114,6 @@
 
     window.addEventListener('load', () => {
       normalizeColumnWidths();
-      // Wire up legend buttons
       document.querySelectorAll('.legend-item[data-group]').forEach(btn => {
         btn.addEventListener('click', () => toggleGroup(btn.dataset.group, btn));
       });
