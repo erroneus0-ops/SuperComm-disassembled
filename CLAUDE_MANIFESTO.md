@@ -1,6 +1,7 @@
 # CLAUDE_MANIFESTO.md
 # Project continuity file — paste this at the start of a new conversation
-# Last updated: end of session (June 30 2026)
+# Last updated: July 1 2026 (session: XRoar cart-autorun investigation,
+#   COMTRAN TEN reference, book Ch02/Ch03, GitHub Pages, screenshot workflow)
 # Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
 # philosophy document, not just context.
 
@@ -664,3 +665,185 @@ bar is a thin UI layer on top of that existing mechanism:
 See FUTURE.md for open items: vertical slider alternative (left-side
 column, knob-style), cartridge ROM chapter material, and the
 -cart-autorun investigation.
+
+---
+
+## XRoar WASM -- cart-autorun Investigation (July 2026)
+
+**Summary:** `-no-cart-autorun` does not suppress FIRQ autostart for
+bare-filename ad-hoc carts. Confirmed negative result by direct testing.
+Source traced through XRoar's cart.c and xroar.c.
+
+**Three separate code paths identified:**
+
+1. **Bare-filename `-cart` path** (e.g. `-cart STRTEST_CART.ROM`):
+   Goes through `cart_special[]` fingerprint table in cart.c. Unknown
+   ROMs fall through to generic `cc->autorun = 1` unconditionally in
+   the auto-detection logic, before `cart_config_complete()`'s
+   `ANY_AUTO` check runs. `-no-cart-autorun` may be set too late to
+   affect this path.
+
+2. **Named hardware profile path** (e.g. `-cart rsdos`):
+   Goes through `cart_config_complete()` which checks `ANY_AUTO`.
+   `-no-cart-autorun` should work here via the standard option mechanism.
+
+3. **`-load` path** (e.g. `-load STRTEST_CART.ROM`):
+   Routes through `xroar_load_file_by_type()` -> `FILETYPE_ROM` case.
+   Calls `cart_config_by_name()` then unconditionally sets
+   `cc->autorun = autorun` where `autorun` comes from `do_load_binaries()`
+   checking `autorun_media_slot == media_slot_binary`. The first/only
+   media file specified always claims the autorun slot -- no suppression
+   flag found for this path.
+
+**`-no-machine-cart`** (`-nodos`): suppresses the default disk-controller
+cart (RS-DOS). Confirmed working. Does not affect autorun of loaded ROMs.
+
+**`cart_special[]` table:** hardwired in cart.c. Fingerprints known DOS
+ROMs by CRC32 and sets `no_autorun=1` for them specifically. Custom/unknown
+ROMs get the generic `autorun=1` fallback. Table is compiled into xroar.wasm.
+
+**Ciaran's note:** "-i should add a note about boolean options - that's the
+general form: `-no-<option>`" -- confirmed in xconfig.c: the `no-` prefix
+is handled generically by stripping it and calling `unset_option()`.
+
+**Status:** Report sent to Ciaran with test results. He acknowledged
+"something screwy about how it auto-makes a rom cart." Open.
+
+---
+
+## XRoar WASM Page -- New Features (July 2026)
+
+### Log Panel (Help tab)
+`Module.print` and `Module.printErr` are now wired to a visible
+`#xroar-log` div in the Help tab. XRoar's own console output (ROM CRC
+results, cart loading, "unknown file type", etc.) appears there on demand.
+Toggle with the "..." button. Messages accumulate while hidden.
+
+### DECB .bin Header Parser
+`file_input_onload()` now parses `.bin` files client-side before handing
+them to `wasm_load_file()`. Reports: block count, bytes loaded, load
+address, entry point. Flags entry points that are zero or outside loaded
+data range as likely placeholders.
+
+**DECB binary format (corrected):**
+- Data block: `[0x00][len_hi][len_lo][addr_hi][addr_lo][data...]`
+- EOF block: `[0xFF][0x00][0x00][exec_hi][exec_lo]`
+- The EOF block has a 2-byte length field (always 0x0000) before the
+  exec address. A common mistake is reading the length bytes as the
+  exec address -- produces 0x0000 which looks like a missing exec addr.
+
+### index_new.html
+`wasm/index_new.html` is now the active development page (rebuilt clean
+from index.html). `index.html` is the stable reference. The transparent
+overlay scaffolding file was removed.
+
+---
+
+## GitHub Pages (July 2026)
+
+The repo is now published at:
+**https://erroneus0-ops.github.io/SuperComm-disassembled/**
+
+Root `index.html` links to:
+- COMTRAN TEN opcode map and instruction reference
+- 6809 instruction reference (all groups)
+- XRoar standard and development pages
+
+**Do not link from the index:** FUTURE.md, CLAUDE_MANIFESTO.md,
+source files, binaries, project JSON files, screenshots folder,
+book draft `.md` files (render as plain text on Pages).
+
+Book chapters get linked when converted to HTML and ready to publish.
+
+---
+
+## Screenshot Workflow (July 2026)
+
+Screenshots are pushed to `screenshots/` folder in the repo.
+`make_screenshot_index.py` (repo root) generates `screenshots/index.html`
+-- a browsable listing of all image files. Run automatically by
+`git_update.bat` before each commit.
+
+**For Claude:** check `screenshots/` via `git pull` when contextually
+relevant. The index at `screenshots/index.html` lists current files with
+timestamps. New files can be fetched via GitHub Pages URL:
+`https://erroneus0-ops.github.io/SuperComm-disassembled/screenshots/`
+
+---
+
+## COMTRAN TEN Reference (July 2026)
+
+Complete instruction reference built from KDA-3032 (USAF, June 1981).
+Public domain (U.S. Government work, 17 U.S.C. § 105).
+Source PDF: `screenshots/KDA-3032_Digiac_COM-TRAN_TEN_Training_Jun81.pdf`
+
+Files in `documentation/comtran10/`:
+- `comtran10_instructions.json` -- all 44 instructions with descriptions,
+  notes, and examples
+- `comtran10_instructions.html` -- full reference with How to Read guide,
+  opcode format section, inline notes, examples, quick-reference tables
+- `comtran10_opcode_map.html` -- interactive 16x16 decode map with:
+  - Color-coded by functional group
+  - Group toggle filter (per-cell)
+  - Builder mode: click column/row headers to select page/index and
+    instruction; address input box for 8-bit or 10-bit address;
+    outputs two-byte opcode pair
+  - Column width normalization
+
+**Key facts for future sessions:**
+- 44 instructions, 6 groups: load(7), store(3), arithmetic(7),
+  logical(7), branch(11), I/O(9)
+- Every instruction is exactly 2 bytes: opcode + operand
+- Memory instructions: bits 7-3 = instruction, bits 2-0 = address modifiers
+  (bit 2 = index, bits 1-0 = page 0-3)
+- Non-memory instructions: all 8 bits = instruction identity
+- `%000xxxxx` range ($00-$1F) is almost entirely non-memory instructions;
+  FLC ($28) and FLS ($F8) are also non-memory but live outside this range
+- The Countdown Register (C) is exclusively an I/O transfer counter --
+  NOT a general-purpose loop register. Set with LC1,k before WDB/RDB/etc.
+- 10-bit address space ($000-$3FF), 4 pages of 256 bytes each
+- Page encoding: adding 1/2/3 to the base opcode selects pages 1/2/3
+
+---
+
+## Book Status (July 2026)
+
+### Chapter 1 (ch01_draft.md) -- COMPLETE DRAFT
+Recent fixes: closing question reframed from "special handling" to
+choice-and-control framing. Typo fixed. Leads cleanly into Ch02.
+
+### Chapter 2 (ch02_draft.md) -- COMPLETE DRAFT
+Recent fixes:
+- VDG/ROM paragraph rewritten: "The Color BASIC ROM builds on that
+  foundation. Programs you write in BASIC build on those routines."
+- HELLO/WORLD! contrast reframed: direct writes give control the ROM
+  does not -- programmer's choice, not special handling
+- Stale WriteSpace/StoreChar code and explanation removed (special-case
+  was eliminated from actual HELLO.ASM in prior session)
+- Partial listing updated to match current program structure
+- AI pattern language cleaned throughout
+
+### Chapter 3 (ch03_draft.md) -- DRAFT STARTED
+Structure:
+1. Arithmetic section: HELLO_POS/WORLD_POS/EXIT_POS EQU expressions,
+   assembler-as-calculator concept, ORG 0 introduced. Updated partial
+   listing with arithmetic lines filled in.
+2. COMTRAN TEN story as hinge ("Before Going Further")
+3. "A New Program" -- guessing game introduced (4-line description),
+   establishes it as vehicle for remaining chapters
+
+### HELLO.ASM -- CURRENT STATE
+- `ORA #$40` applied uniformly to ALL characters including space
+- No WriteSpace special case (removed)
+- Both HELLO and WORLD! display in normal video (black on green)
+- `ORG 0` for position-independent code
+- All stale comments removed and corrected
+
+### VDG Character Set (confirmed, corrected understanding)
+- First set ($00-$3F): green on black (light on dark) -- Color BASIC
+  uses this deliberately for lowercase display (inverted stand-ins)
+- Second set ($40-$7F): black on bright green (dark on light, "normal")
+  -- Color BASIC uses this for uppercase display
+- This program uses ORA #$40 (second set) to match BASIC's convention
+- Space: ASCII $20, through ANDA #$3F = $20, OR #$40 = $60. Works
+  uniformly with same logic as all other characters. No special case needed.
