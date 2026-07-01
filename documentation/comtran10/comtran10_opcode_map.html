@@ -8,52 +8,75 @@
   <style>
     body { max-width: 1200px; }
     h2 { margin-bottom: 0.5rem; }
-    .decode-note { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; line-height: 1.6; }
+    .decode-note { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.6; }
     .decode-note code { color: var(--accent); background: var(--code-bg); padding: 0.1rem 0.3rem; border-radius: 2px; }
 
-    .opcode-table-wrap { overflow-x: auto; margin-bottom: 2rem; }
+    .opcode-table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
     .opcode-table { border-collapse: collapse; font-family: "Courier New", monospace; font-size: 0.78rem; }
-
-    .opcode-table th, .opcode-table td { 
-      border: 1px solid #333; 
-      padding: 0.25rem 0.4rem; 
-      text-align: center; 
+    .opcode-table th, .opcode-table td {
+      border: 1px solid #333;
+      padding: 0.25rem 0.4rem;
+      text-align: center;
       white-space: nowrap;
     }
 
-    /* Row/col header cells */
-    .opcode-table .hdr-msd { 
-      background: #1e1e1e; color: var(--mnemonic); 
+    /* Header cells */
+    .opcode-table .hdr-msd {
+      background: #1e1e1e; color: var(--mnemonic);
       font-weight: bold; font-size: 0.9rem;
       min-width: 2.5rem;
       position: sticky; left: 0; z-index: 2;
+      cursor: pointer; user-select: none;
     }
-    .opcode-table .hdr-lsd { 
+    .opcode-table .hdr-msd:hover { background: #2a2a2a; }
+    .opcode-table .hdr-lsd {
       background: #1e1e1e; color: var(--text-dim);
-      font-size: 0.75rem;
+      font-size: 0.75rem; cursor: pointer; user-select: none;
     }
+    .opcode-table .hdr-lsd:hover { background: #2a2a2a; }
     .opcode-table .hdr-top {
       background: #1e1e1e; color: var(--mnemonic);
-      font-weight: bold;
+      font-weight: bold; cursor: default;
     }
     .opcode-table .col-decode {
       background: #222; color: #888;
-      font-size: 0.7rem;
+      font-size: 0.7rem; cursor: default;
     }
 
-    /* Instruction group colors */
+    /* Group colors */
     .grp-load        { background: #0d2018; color: #7ec8a4; }
     .grp-store       { background: #0d1820; color: #5b9bd5; }
     .grp-arithmetic  { background: #201808; color: #f0c060; }
     .grp-logical     { background: #180d20; color: #c090e0; }
     .grp-branch      { background: #200d0d; color: #e07070; }
     .grp-input_output { background: #0d2020; color: #70c0c0; }
-    .grp-invalid     { background: #111; color: #333; font-style: italic; font-size: 0.7rem; }
+    .grp-invalid     { background: #111; color: #333; font-style: italic; font-size: 0.7rem; cursor: default; }
     .grp-nonmem      { background: #1a1a10; color: #aaa; }
 
+    /* Selection states */
+    .opcode-table td.sel-dim    { opacity: 0.08; }
+    .opcode-table td.grp-dimmed { opacity: 0.12; }
+    .opcode-table th.sel-col    { background: #2a3a2a !important; color: #fff !important; outline: 2px solid #7ec8a4; outline-offset: -2px; }
+    .opcode-table td.sel-col    { outline: 1px solid #3a5a3a; }
+    .opcode-table .hdr-msd.sel-row { background: #2a2a3a !important; color: #fff !important; outline: 2px solid #5b9bd5; outline-offset: -2px; }
+    .opcode-table td.sel-row    { outline: 1px solid #2a2a5a; }
+    .opcode-table td.sel-intersect {
+      outline: 2px solid #fff !important;
+      outline-offset: -2px;
+      opacity: 1 !important;
+      filter: brightness(1.8);
+      cursor: pointer;
+    }
+    .opcode-table td.sel-single {
+      outline: 2px solid #fff !important;
+      outline-offset: -2px;
+      opacity: 1 !important;
+      filter: brightness(1.8);
+    }
+
     /* Legend / filter buttons */
-    .legend { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
-    .legend-item { 
+    .legend { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .legend-item {
       display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;
       padding: 0.3rem 0.6rem; border-radius: 3px; cursor: pointer;
       border: 1px solid #444; user-select: none; transition: opacity 0.15s;
@@ -62,84 +85,614 @@
     .legend-item.dimmed { opacity: 0.35; }
     .legend-swatch { width: 0.75rem; height: 0.75rem; border-radius: 2px; flex-shrink: 0; }
 
-    /* Dimmed cells */
-    .opcode-table td.grp-dimmed { opacity: 0.12; }
+    /* Builder output */
+    .builder {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start;
+      margin-bottom: 1.5rem; padding: 0.75rem 1rem;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+      font-family: "Courier New", monospace; font-size: 0.9rem;
+    }
+    .builder-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .builder-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .builder-status {
+      font-size: 0.85rem; color: var(--text-dim); font-style: italic;
+      align-self: center; flex: 1; min-width: 200px;
+    }
+    .builder input[type=text] {
+      background: var(--code-bg); border: 1px solid var(--border);
+      color: var(--accent); font-family: "Courier New", monospace;
+      font-size: 0.9rem; padding: 0.25rem 0.5rem; border-radius: 3px;
+      width: 6rem; text-transform: uppercase;
+    }
+    .builder input[type=text]:disabled {
+      opacity: 0.4; cursor: not-allowed;
+    }
+    .builder-output {
+      background: var(--code-bg); border: 1px solid var(--border);
+      color: var(--mnemonic); font-family: "Courier New", monospace;
+      font-size: 1rem; padding: 0.25rem 0.75rem; border-radius: 3px;
+      min-width: 12rem; cursor: pointer; user-select: all;
+    }
+    .builder-output:empty::before { content: "--  --"; color: #444; }
+    .builder-reset {
+      background: #2a1a1a; border: 1px solid #5a2a2a; color: #e07070;
+      font-size: 0.8rem; padding: 0.3rem 0.75rem; border-radius: 3px;
+      cursor: pointer; font-family: inherit; align-self: center;
+    }
+    .builder-reset:hover { background: #3a1a1a; }
   </style>
+
   <script>
-    // --- Column width normalization ---
-    function normalizeColumnWidths() {
-      const table = document.querySelector('.opcode-table');
-      if (!table) return;
-      const rows = Array.from(table.rows);
-      let maxW = 0;
-      rows.forEach(row => {
-        for (let c = 1; c <= 16; c++) {
-          const cell = row.cells[c];
-          if (cell) maxW = Math.max(maxW, cell.offsetWidth);
+  // ============================================================
+  // State
+  // ============================================================
+  let mode = 'filter';   // 'filter' | 'builder'
+  let selCol = -1;       // selected LSD column index (1-16, or -1)
+  let selRow = -1;       // selected MSD row index (0-15, or -1)
+  let selCell = null;    // {msd, lsd, opcode, mnemonic, fullName} or null
+  const activeGroups = new Set(['load','store','arithmetic','logical','branch','input_output','nonmem','invalid']);
+
+  // Opcode data embedded from JSON
+  const OPCODES = {
+    0x00: {msd:0, lsd:0, mnem:"SST", full:"Sense Status", grp:"input_output", page:0, indexed:0},
+    0x01: {msd:0, lsd:1, mnem:"LC1", full:"Load Countdown Immediate", grp:"load", page:1, indexed:0},
+    0x02: {msd:0, lsd:2, mnem:"LA1", full:"Load Accumulator Immediate", grp:"load", page:2, indexed:0},
+    0x03: {msd:0, lsd:3, mnem:"INX", full:"Increase Index", grp:"arithmetic", page:3, indexed:0},
+    0x04: {msd:0, lsd:4, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:0, indexed:1},
+    0x05: {msd:0, lsd:5, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:1, indexed:1},
+    0x06: {msd:0, lsd:6, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:2, indexed:1},
+    0x07: {msd:0, lsd:7, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:3, indexed:1},
+    0x08: {msd:0, lsd:8, mnem:"SKI", full:"Skip on Interrupt", grp:"branch", page:0, indexed:0},
+    0x09: {msd:0, lsd:9, mnem:"SKS", full:"Skip on Sense Switch", grp:"branch", page:1, indexed:0},
+    0x0A: {msd:0, lsd:10, mnem:"SKF", full:"Skip on Flag", grp:"branch", page:2, indexed:0},
+    0x0B: {msd:0, lsd:11, mnem:"SLA", full:"Shift Left Arithmetic", grp:"logical", page:3, indexed:0},
+    0x0C: {msd:0, lsd:12, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:0, indexed:1},
+    0x0D: {msd:0, lsd:13, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:1, indexed:1},
+    0x0E: {msd:0, lsd:14, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:2, indexed:1},
+    0x0F: {msd:0, lsd:15, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:3, indexed:1},
+    0x10: {msd:1, lsd:0, mnem:"SRA", full:"Shift Right Arithmetic", grp:"logical", page:0, indexed:0},
+    0x11: {msd:1, lsd:1, mnem:"OCD", full:"Output Command", grp:"input_output", page:1, indexed:0},
+    0x12: {msd:1, lsd:2, mnem:"LX1", full:"Load Index Immediate", grp:"load", page:2, indexed:0},
+    0x13: {msd:1, lsd:3, mnem:"SLL", full:"Shift Left Logical", grp:"logical", page:3, indexed:0},
+    0x14: {msd:1, lsd:4, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:0, indexed:1},
+    0x15: {msd:1, lsd:5, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:1, indexed:1},
+    0x16: {msd:1, lsd:6, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:2, indexed:1},
+    0x17: {msd:1, lsd:7, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:3, indexed:1},
+    0x18: {msd:1, lsd:8, mnem:"SRL", full:"Shift Right Logical", grp:"logical", page:0, indexed:0},
+    0x19: {msd:1, lsd:9, mnem:"AND", full:"And", grp:"logical", page:1, indexed:0},
+    0x1A: {msd:1, lsd:10, mnem:"IOR", full:"Inclusive Or", grp:"logical", page:2, indexed:0},
+    0x1B: {msd:1, lsd:11, mnem:"XOR", full:"Exclusive Or", grp:"logical", page:3, indexed:0},
+    0x1C: {msd:1, lsd:12, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:0, indexed:1},
+    0x1D: {msd:1, lsd:13, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:1, indexed:1},
+    0x1E: {msd:1, lsd:14, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:2, indexed:1},
+    0x1F: {msd:1, lsd:15, mnem:"INVALID", full:"Invalid instruction", grp:"invalid", page:3, indexed:1},
+    0x20: {msd:2, lsd:0, mnem:"LDA", full:"Load Accumulator", grp:"load", page:0, indexed:0},
+    0x21: {msd:2, lsd:1, mnem:"LDA", full:"Load Accumulator", grp:"load", page:1, indexed:0},
+    0x22: {msd:2, lsd:2, mnem:"LDA", full:"Load Accumulator", grp:"load", page:2, indexed:0},
+    0x23: {msd:2, lsd:3, mnem:"LDA", full:"Load Accumulator", grp:"load", page:3, indexed:0},
+    0x24: {msd:2, lsd:4, mnem:"LDA", full:"Load Accumulator", grp:"load", page:0, indexed:1},
+    0x25: {msd:2, lsd:5, mnem:"LDA", full:"Load Accumulator", grp:"load", page:1, indexed:1},
+    0x26: {msd:2, lsd:6, mnem:"LDA", full:"Load Accumulator", grp:"load", page:2, indexed:1},
+    0x27: {msd:2, lsd:7, mnem:"LDA", full:"Load Accumulator", grp:"load", page:3, indexed:1},
+    0x28: {msd:2, lsd:8, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:0, indexed:0},
+    0x29: {msd:2, lsd:9, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:1, indexed:0},
+    0x2A: {msd:2, lsd:10, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:2, indexed:0},
+    0x2B: {msd:2, lsd:11, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:3, indexed:0},
+    0x2C: {msd:2, lsd:12, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:0, indexed:1},
+    0x2D: {msd:2, lsd:13, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:1, indexed:1},
+    0x2E: {msd:2, lsd:14, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:2, indexed:1},
+    0x2F: {msd:2, lsd:15, mnem:"FLC", full:"Flag Clear", grp:"input_output", page:3, indexed:1},
+    0x30: {msd:3, lsd:0, mnem:"LCC", full:"Load Consecutive", grp:"load", page:0, indexed:0},
+    0x31: {msd:3, lsd:1, mnem:"LCC", full:"Load Consecutive", grp:"load", page:1, indexed:0},
+    0x32: {msd:3, lsd:2, mnem:"LCC", full:"Load Consecutive", grp:"load", page:2, indexed:0},
+    0x33: {msd:3, lsd:3, mnem:"LCC", full:"Load Consecutive", grp:"load", page:3, indexed:0},
+    0x34: {msd:3, lsd:4, mnem:"LCC", full:"Load Consecutive", grp:"load", page:0, indexed:1},
+    0x35: {msd:3, lsd:5, mnem:"LCC", full:"Load Consecutive", grp:"load", page:1, indexed:1},
+    0x36: {msd:3, lsd:6, mnem:"LCC", full:"Load Consecutive", grp:"load", page:2, indexed:1},
+    0x37: {msd:3, lsd:7, mnem:"LCC", full:"Load Consecutive", grp:"load", page:3, indexed:1},
+    0x38: {msd:3, lsd:8, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:0, indexed:0},
+    0x39: {msd:3, lsd:9, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:1, indexed:0},
+    0x3A: {msd:3, lsd:10, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:2, indexed:0},
+    0x3B: {msd:3, lsd:11, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:3, indexed:0},
+    0x3C: {msd:3, lsd:12, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:0, indexed:1},
+    0x3D: {msd:3, lsd:13, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:1, indexed:1},
+    0x3E: {msd:3, lsd:14, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:2, indexed:1},
+    0x3F: {msd:3, lsd:15, mnem:"LAN", full:"Load Accumulator Negative", grp:"load", page:3, indexed:1},
+    0x40: {msd:4, lsd:0, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:0, indexed:0},
+    0x41: {msd:4, lsd:1, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:1, indexed:0},
+    0x42: {msd:4, lsd:2, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:2, indexed:0},
+    0x43: {msd:4, lsd:3, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:3, indexed:0},
+    0x44: {msd:4, lsd:4, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:0, indexed:1},
+    0x45: {msd:4, lsd:5, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:1, indexed:1},
+    0x46: {msd:4, lsd:6, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:2, indexed:1},
+    0x47: {msd:4, lsd:7, mnem:"LDQ", full:"Load Quotient Register", grp:"load", page:3, indexed:1},
+    0x48: {msd:4, lsd:8, mnem:"STA", full:"Store Accumulator", grp:"store", page:0, indexed:0},
+    0x49: {msd:4, lsd:9, mnem:"STA", full:"Store Accumulator", grp:"store", page:1, indexed:0},
+    0x4A: {msd:4, lsd:10, mnem:"STA", full:"Store Accumulator", grp:"store", page:2, indexed:0},
+    0x4B: {msd:4, lsd:11, mnem:"STA", full:"Store Accumulator", grp:"store", page:3, indexed:0},
+    0x4C: {msd:4, lsd:12, mnem:"STA", full:"Store Accumulator", grp:"store", page:0, indexed:1},
+    0x4D: {msd:4, lsd:13, mnem:"STA", full:"Store Accumulator", grp:"store", page:1, indexed:1},
+    0x4E: {msd:4, lsd:14, mnem:"STA", full:"Store Accumulator", grp:"store", page:2, indexed:1},
+    0x4F: {msd:4, lsd:15, mnem:"STA", full:"Store Accumulator", grp:"store", page:3, indexed:1},
+    0x50: {msd:5, lsd:0, mnem:"STX", full:"Store Index", grp:"store", page:0, indexed:0},
+    0x51: {msd:5, lsd:1, mnem:"STX", full:"Store Index", grp:"store", page:1, indexed:0},
+    0x52: {msd:5, lsd:2, mnem:"STX", full:"Store Index", grp:"store", page:2, indexed:0},
+    0x53: {msd:5, lsd:3, mnem:"STX", full:"Store Index", grp:"store", page:3, indexed:0},
+    0x54: {msd:5, lsd:4, mnem:"STX", full:"Store Index", grp:"store", page:0, indexed:1},
+    0x55: {msd:5, lsd:5, mnem:"STX", full:"Store Index", grp:"store", page:1, indexed:1},
+    0x56: {msd:5, lsd:6, mnem:"STX", full:"Store Index", grp:"store", page:2, indexed:1},
+    0x57: {msd:5, lsd:7, mnem:"STX", full:"Store Index", grp:"store", page:3, indexed:1},
+    0x58: {msd:5, lsd:8, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:0, indexed:0},
+    0x59: {msd:5, lsd:9, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:1, indexed:0},
+    0x5A: {msd:5, lsd:10, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:2, indexed:0},
+    0x5B: {msd:5, lsd:11, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:3, indexed:0},
+    0x5C: {msd:5, lsd:12, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:0, indexed:1},
+    0x5D: {msd:5, lsd:13, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:1, indexed:1},
+    0x5E: {msd:5, lsd:14, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:2, indexed:1},
+    0x5F: {msd:5, lsd:15, mnem:"STQ", full:"Store Quotient Register", grp:"store", page:3, indexed:1},
+    0x60: {msd:6, lsd:0, mnem:"ADD", full:"Add", grp:"arithmetic", page:0, indexed:0},
+    0x61: {msd:6, lsd:1, mnem:"ADD", full:"Add", grp:"arithmetic", page:1, indexed:0},
+    0x62: {msd:6, lsd:2, mnem:"ADD", full:"Add", grp:"arithmetic", page:2, indexed:0},
+    0x63: {msd:6, lsd:3, mnem:"ADD", full:"Add", grp:"arithmetic", page:3, indexed:0},
+    0x64: {msd:6, lsd:4, mnem:"ADD", full:"Add", grp:"arithmetic", page:0, indexed:1},
+    0x65: {msd:6, lsd:5, mnem:"ADD", full:"Add", grp:"arithmetic", page:1, indexed:1},
+    0x66: {msd:6, lsd:6, mnem:"ADD", full:"Add", grp:"arithmetic", page:2, indexed:1},
+    0x67: {msd:6, lsd:7, mnem:"ADD", full:"Add", grp:"arithmetic", page:3, indexed:1},
+    0x68: {msd:6, lsd:8, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:0, indexed:0},
+    0x69: {msd:6, lsd:9, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:1, indexed:0},
+    0x6A: {msd:6, lsd:10, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:2, indexed:0},
+    0x6B: {msd:6, lsd:11, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:3, indexed:0},
+    0x6C: {msd:6, lsd:12, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:0, indexed:1},
+    0x6D: {msd:6, lsd:13, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:1, indexed:1},
+    0x6E: {msd:6, lsd:14, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:2, indexed:1},
+    0x6F: {msd:6, lsd:15, mnem:"SUB", full:"Subtract", grp:"arithmetic", page:3, indexed:1},
+    0x70: {msd:7, lsd:0, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:0, indexed:0},
+    0x71: {msd:7, lsd:1, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:1, indexed:0},
+    0x72: {msd:7, lsd:2, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:2, indexed:0},
+    0x73: {msd:7, lsd:3, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:3, indexed:0},
+    0x74: {msd:7, lsd:4, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:0, indexed:1},
+    0x75: {msd:7, lsd:5, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:1, indexed:1},
+    0x76: {msd:7, lsd:6, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:2, indexed:1},
+    0x77: {msd:7, lsd:7, mnem:"MPY", full:"Multiply", grp:"arithmetic", page:3, indexed:1},
+    0x78: {msd:7, lsd:8, mnem:"DIV", full:"Divide", grp:"arithmetic", page:0, indexed:0},
+    0x79: {msd:7, lsd:9, mnem:"DIV", full:"Divide", grp:"arithmetic", page:1, indexed:0},
+    0x7A: {msd:7, lsd:10, mnem:"DIV", full:"Divide", grp:"arithmetic", page:2, indexed:0},
+    0x7B: {msd:7, lsd:11, mnem:"DIV", full:"Divide", grp:"arithmetic", page:3, indexed:0},
+    0x7C: {msd:7, lsd:12, mnem:"DIV", full:"Divide", grp:"arithmetic", page:0, indexed:1},
+    0x7D: {msd:7, lsd:13, mnem:"DIV", full:"Divide", grp:"arithmetic", page:1, indexed:1},
+    0x7E: {msd:7, lsd:14, mnem:"DIV", full:"Divide", grp:"arithmetic", page:2, indexed:1},
+    0x7F: {msd:7, lsd:15, mnem:"DIV", full:"Divide", grp:"arithmetic", page:3, indexed:1},
+    0x80: {msd:8, lsd:0, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:0, indexed:0},
+    0x81: {msd:8, lsd:1, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:1, indexed:0},
+    0x82: {msd:8, lsd:2, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:2, indexed:0},
+    0x83: {msd:8, lsd:3, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:3, indexed:0},
+    0x84: {msd:8, lsd:4, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:0, indexed:1},
+    0x85: {msd:8, lsd:5, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:1, indexed:1},
+    0x86: {msd:8, lsd:6, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:2, indexed:1},
+    0x87: {msd:8, lsd:7, mnem:"RAO", full:"Replace Add One", grp:"arithmetic", page:3, indexed:1},
+    0x88: {msd:8, lsd:8, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:0, indexed:0},
+    0x89: {msd:8, lsd:9, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:1, indexed:0},
+    0x8A: {msd:8, lsd:10, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:2, indexed:0},
+    0x8B: {msd:8, lsd:11, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:3, indexed:0},
+    0x8C: {msd:8, lsd:12, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:0, indexed:1},
+    0x8D: {msd:8, lsd:13, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:1, indexed:1},
+    0x8E: {msd:8, lsd:14, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:2, indexed:1},
+    0x8F: {msd:8, lsd:15, mnem:"RSO", full:"Replace Subtract One", grp:"arithmetic", page:3, indexed:1},
+    0x90: {msd:9, lsd:0, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:0, indexed:0},
+    0x91: {msd:9, lsd:1, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:1, indexed:0},
+    0x92: {msd:9, lsd:2, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:2, indexed:0},
+    0x93: {msd:9, lsd:3, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:3, indexed:0},
+    0x94: {msd:9, lsd:4, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:0, indexed:1},
+    0x95: {msd:9, lsd:5, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:1, indexed:1},
+    0x96: {msd:9, lsd:6, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:2, indexed:1},
+    0x97: {msd:9, lsd:7, mnem:"BUN", full:"Branch Unconditional", grp:"branch", page:3, indexed:1},
+    0x98: {msd:9, lsd:8, mnem:"BST", full:"Branch and Stop", grp:"branch", page:0, indexed:0},
+    0x99: {msd:9, lsd:9, mnem:"BST", full:"Branch and Stop", grp:"branch", page:1, indexed:0},
+    0x9A: {msd:9, lsd:10, mnem:"BST", full:"Branch and Stop", grp:"branch", page:2, indexed:0},
+    0x9B: {msd:9, lsd:11, mnem:"BST", full:"Branch and Stop", grp:"branch", page:3, indexed:0},
+    0x9C: {msd:9, lsd:12, mnem:"BST", full:"Branch and Stop", grp:"branch", page:0, indexed:1},
+    0x9D: {msd:9, lsd:13, mnem:"BST", full:"Branch and Stop", grp:"branch", page:1, indexed:1},
+    0x9E: {msd:9, lsd:14, mnem:"BST", full:"Branch and Stop", grp:"branch", page:2, indexed:1},
+    0x9F: {msd:9, lsd:15, mnem:"BST", full:"Branch and Stop", grp:"branch", page:3, indexed:1},
+    0xA0: {msd:10, lsd:0, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:0, indexed:0},
+    0xA1: {msd:10, lsd:1, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:1, indexed:0},
+    0xA2: {msd:10, lsd:2, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:2, indexed:0},
+    0xA3: {msd:10, lsd:3, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:3, indexed:0},
+    0xA4: {msd:10, lsd:4, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:0, indexed:1},
+    0xA5: {msd:10, lsd:5, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:1, indexed:1},
+    0xA6: {msd:10, lsd:6, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:2, indexed:1},
+    0xA7: {msd:10, lsd:7, mnem:"BSB", full:"Branch to Subroutine", grp:"branch", page:3, indexed:1},
+    0xA8: {msd:10, lsd:8, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:0, indexed:0},
+    0xA9: {msd:10, lsd:9, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:1, indexed:0},
+    0xAA: {msd:10, lsd:10, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:2, indexed:0},
+    0xAB: {msd:10, lsd:11, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:3, indexed:0},
+    0xAC: {msd:10, lsd:12, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:0, indexed:1},
+    0xAD: {msd:10, lsd:13, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:1, indexed:1},
+    0xAE: {msd:10, lsd:14, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:2, indexed:1},
+    0xAF: {msd:10, lsd:15, mnem:"BPS", full:"Branch on Positive", grp:"branch", page:3, indexed:1},
+    0xB0: {msd:11, lsd:0, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:0, indexed:0},
+    0xB1: {msd:11, lsd:1, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:1, indexed:0},
+    0xB2: {msd:11, lsd:2, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:2, indexed:0},
+    0xB3: {msd:11, lsd:3, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:3, indexed:0},
+    0xB4: {msd:11, lsd:4, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:0, indexed:1},
+    0xB5: {msd:11, lsd:5, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:1, indexed:1},
+    0xB6: {msd:11, lsd:6, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:2, indexed:1},
+    0xB7: {msd:11, lsd:7, mnem:"BZE", full:"Branch on Zero", grp:"branch", page:3, indexed:1},
+    0xB8: {msd:11, lsd:8, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:0, indexed:0},
+    0xB9: {msd:11, lsd:9, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:1, indexed:0},
+    0xBA: {msd:11, lsd:10, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:2, indexed:0},
+    0xBB: {msd:11, lsd:11, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:3, indexed:0},
+    0xBC: {msd:11, lsd:12, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:0, indexed:1},
+    0xBD: {msd:11, lsd:13, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:1, indexed:1},
+    0xBE: {msd:11, lsd:14, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:2, indexed:1},
+    0xBF: {msd:11, lsd:15, mnem:"BNG", full:"Branch on Negative", grp:"branch", page:3, indexed:1},
+    0xC0: {msd:12, lsd:0, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:0, indexed:0},
+    0xC1: {msd:12, lsd:1, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:1, indexed:0},
+    0xC2: {msd:12, lsd:2, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:2, indexed:0},
+    0xC3: {msd:12, lsd:3, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:3, indexed:0},
+    0xC4: {msd:12, lsd:4, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:0, indexed:1},
+    0xC5: {msd:12, lsd:5, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:1, indexed:1},
+    0xC6: {msd:12, lsd:6, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:2, indexed:1},
+    0xC7: {msd:12, lsd:7, mnem:"BNC", full:"Branch on No Carry", grp:"branch", page:3, indexed:1},
+    0xC8: {msd:12, lsd:8, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:0, indexed:0},
+    0xC9: {msd:12, lsd:9, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:1, indexed:0},
+    0xCA: {msd:12, lsd:10, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:2, indexed:0},
+    0xCB: {msd:12, lsd:11, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:3, indexed:0},
+    0xCC: {msd:12, lsd:12, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:0, indexed:1},
+    0xCD: {msd:12, lsd:13, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:1, indexed:1},
+    0xCE: {msd:12, lsd:14, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:2, indexed:1},
+    0xCF: {msd:12, lsd:15, mnem:"BXZ", full:"Branch on Index Zero", grp:"branch", page:3, indexed:1},
+    0xD0: {msd:13, lsd:0, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:0, indexed:0},
+    0xD1: {msd:13, lsd:1, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:1, indexed:0},
+    0xD2: {msd:13, lsd:2, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:2, indexed:0},
+    0xD3: {msd:13, lsd:3, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:3, indexed:0},
+    0xD4: {msd:13, lsd:4, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:0, indexed:1},
+    0xD5: {msd:13, lsd:5, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:1, indexed:1},
+    0xD6: {msd:13, lsd:6, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:2, indexed:1},
+    0xD7: {msd:13, lsd:7, mnem:"WDB", full:"Write Data Block", grp:"input_output", page:3, indexed:1},
+    0xD8: {msd:13, lsd:8, mnem:"MNO", full:"Manual Output", grp:"input_output", page:0, indexed:0},
+    0xD9: {msd:13, lsd:9, mnem:"MNO", full:"Manual Output", grp:"input_output", page:1, indexed:0},
+    0xDA: {msd:13, lsd:10, mnem:"MNO", full:"Manual Output", grp:"input_output", page:2, indexed:0},
+    0xDB: {msd:13, lsd:11, mnem:"MNO", full:"Manual Output", grp:"input_output", page:3, indexed:0},
+    0xDC: {msd:13, lsd:12, mnem:"MNO", full:"Manual Output", grp:"input_output", page:0, indexed:1},
+    0xDD: {msd:13, lsd:13, mnem:"MNO", full:"Manual Output", grp:"input_output", page:1, indexed:1},
+    0xDE: {msd:13, lsd:14, mnem:"MNO", full:"Manual Output", grp:"input_output", page:2, indexed:1},
+    0xDF: {msd:13, lsd:15, mnem:"MNO", full:"Manual Output", grp:"input_output", page:3, indexed:1},
+    0xE0: {msd:14, lsd:0, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:0, indexed:0},
+    0xE1: {msd:14, lsd:1, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:1, indexed:0},
+    0xE2: {msd:14, lsd:2, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:2, indexed:0},
+    0xE3: {msd:14, lsd:3, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:3, indexed:0},
+    0xE4: {msd:14, lsd:4, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:0, indexed:1},
+    0xE5: {msd:14, lsd:5, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:1, indexed:1},
+    0xE6: {msd:14, lsd:6, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:2, indexed:1},
+    0xE7: {msd:14, lsd:7, mnem:"RDB", full:"Read Data Block", grp:"input_output", page:3, indexed:1},
+    0xE8: {msd:14, lsd:8, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:0, indexed:0},
+    0xE9: {msd:14, lsd:9, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:1, indexed:0},
+    0xEA: {msd:14, lsd:10, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:2, indexed:0},
+    0xEB: {msd:14, lsd:11, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:3, indexed:0},
+    0xEC: {msd:14, lsd:12, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:0, indexed:1},
+    0xED: {msd:14, lsd:13, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:1, indexed:1},
+    0xEE: {msd:14, lsd:14, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:2, indexed:1},
+    0xEF: {msd:14, lsd:15, mnem:"RDI", full:"Read Until Interrupt", grp:"input_output", page:3, indexed:1},
+    0xF0: {msd:15, lsd:0, mnem:"MNI", full:"Manual Input", grp:"input_output", page:0, indexed:0},
+    0xF1: {msd:15, lsd:1, mnem:"MNI", full:"Manual Input", grp:"input_output", page:1, indexed:0},
+    0xF2: {msd:15, lsd:2, mnem:"MNI", full:"Manual Input", grp:"input_output", page:2, indexed:0},
+    0xF3: {msd:15, lsd:3, mnem:"MNI", full:"Manual Input", grp:"input_output", page:3, indexed:0},
+    0xF4: {msd:15, lsd:4, mnem:"MNI", full:"Manual Input", grp:"input_output", page:0, indexed:1},
+    0xF5: {msd:15, lsd:5, mnem:"MNI", full:"Manual Input", grp:"input_output", page:1, indexed:1},
+    0xF6: {msd:15, lsd:6, mnem:"MNI", full:"Manual Input", grp:"input_output", page:2, indexed:1},
+    0xF7: {msd:15, lsd:7, mnem:"MNI", full:"Manual Input", grp:"input_output", page:3, indexed:1},
+    0xF8: {msd:15, lsd:8, mnem:"FLS", full:"Flag Set", grp:"input_output", page:0, indexed:0},
+    0xF9: {msd:15, lsd:9, mnem:"FLS", full:"Flag Set", grp:"input_output", page:1, indexed:0},
+    0xFA: {msd:15, lsd:10, mnem:"FLS", full:"Flag Set", grp:"input_output", page:2, indexed:0},
+    0xFB: {msd:15, lsd:11, mnem:"FLS", full:"Flag Set", grp:"input_output", page:3, indexed:0},
+    0xFC: {msd:15, lsd:12, mnem:"FLS", full:"Flag Set", grp:"input_output", page:0, indexed:1},
+    0xFD: {msd:15, lsd:13, mnem:"FLS", full:"Flag Set", grp:"input_output", page:1, indexed:1},
+    0xFE: {msd:15, lsd:14, mnem:"FLS", full:"Flag Set", grp:"input_output", page:2, indexed:1},
+    0xFF: {msd:15, lsd:15, mnem:"FLS", full:"Flag Set", grp:"input_output", page:3, indexed:1},
+  };
+
+  // ============================================================
+  // Filter mode
+  // ============================================================
+  function enterFilterMode() {
+    mode = 'filter';
+    selCol = -1; selRow = -1; selCell = null;
+    clearBuilderHighlights();
+    applyFilter();
+    updateBuilder();
+  }
+
+  function applyFilter() {
+    document.querySelector('.opcode-table').querySelectorAll('tbody td').forEach(cell => {
+      if (cell.classList.contains('hdr-msd')) return;
+      const grp = cell.dataset.grp;
+      if (!grp) return;
+      cell.classList.toggle('grp-dimmed', !activeGroups.has(grp));
+      cell.classList.remove('sel-dim');
+    });
+  }
+
+  function toggleGroup(group, btn) {
+    enterFilterMode();
+    if (activeGroups.has(group)) {
+      activeGroups.delete(group);
+      btn.classList.add('dimmed');
+    } else {
+      activeGroups.add(group);
+      btn.classList.remove('dimmed');
+    }
+    applyFilter();
+  }
+
+  // ============================================================
+  // Builder mode
+  // ============================================================
+  function clearBuilderHighlights() {
+    document.querySelectorAll('.opcode-table td, .opcode-table th').forEach(el => {
+      el.classList.remove('sel-col','sel-row','sel-intersect','sel-single','sel-dim','grp-dimmed');
+    });
+    document.querySelectorAll('.hdr-msd').forEach(el => el.classList.remove('sel-row'));
+    document.querySelectorAll('.hdr-lsd').forEach(el => el.classList.remove('sel-col'));
+  }
+
+  function resetLegendButtons() {
+    document.querySelectorAll('.legend-item[data-group]').forEach(btn => {
+      btn.classList.remove('dimmed');
+      activeGroups.add(btn.dataset.group);
+    });
+  }
+
+  function enterBuilderMode() {
+    mode = 'builder';
+    resetLegendButtons();
+    // Remove filter dimming
+    document.querySelectorAll('.opcode-table td').forEach(cell => {
+      cell.classList.remove('grp-dimmed');
+    });
+  }
+
+  function applyBuilderHighlights() {
+    const table = document.querySelector('.opcode-table');
+    const rows = Array.from(table.tBodies[0].rows);
+
+    // Clear all builder states first
+    table.querySelectorAll('td, th').forEach(el => {
+      el.classList.remove('sel-col','sel-row','sel-intersect','sel-single','sel-dim');
+    });
+    table.querySelectorAll('.hdr-msd').forEach(el => el.classList.remove('sel-row'));
+    table.querySelectorAll('thead .hdr-lsd').forEach(el => el.classList.remove('sel-col'));
+
+    if (selCell !== null) {
+      // Single cell selected -- dim everything else
+      rows.forEach((row, ri) => {
+        Array.from(row.cells).forEach((cell, ci) => {
+          if (ci === 0) return; // skip MSD header
+          if (ri === selCell.msd && ci === selCell.lsd + 1) {
+            cell.classList.add('sel-single');
+          } else {
+            cell.classList.add('sel-dim');
+          }
+        });
+      });
+      return;
+    }
+
+    if (selCol === -1 && selRow === -1) return;
+
+    // Highlight selected column header(s)
+    if (selCol !== -1) {
+      const hdrRow = table.tHead.rows[0];
+      if (hdrRow.cells[selCol]) hdrRow.cells[selCol].classList.add('sel-col');
+    }
+
+    // Highlight selected row header and mark cells
+    rows.forEach((row, ri) => {
+      Array.from(row.cells).forEach((cell, ci) => {
+        if (ci === 0) {
+          // MSD header cell
+          if (selRow !== -1 && ri === selRow) cell.classList.add('sel-row');
+          return;
+        }
+        const colMatch = selCol !== -1 && ci === selCol;
+        const rowMatch = selRow !== -1 && ri === selRow;
+
+        if (selCol !== -1 && selRow !== -1) {
+          // Both selected: highlight intersection, dim rest
+          if (colMatch && rowMatch) {
+            cell.classList.add('sel-intersect');
+          } else {
+            cell.classList.add('sel-dim');
+          }
+        } else if (selCol !== -1) {
+          // Column only: highlight col, dim others
+          if (colMatch) cell.classList.add('sel-col');
+          else cell.classList.add('sel-dim');
+        } else if (selRow !== -1) {
+          // Row only: highlight row, dim others
+          if (rowMatch) cell.classList.add('sel-row');
+          else cell.classList.add('sel-dim');
         }
       });
-      if (maxW === 0) return;
-      for (let c = 1; c <= 16; c++) {
-        const cell = rows[0].cells[c];
-        if (cell) cell.style.minWidth = maxW + 'px';
-      }
-    }
-
-    // --- Per-cell group toggle filter ---
-    const activeGroups = new Set(['load','store','arithmetic','logical','branch','input_output','nonmem','invalid']);
-
-    function applyFilter() {
-      const table = document.querySelector('.opcode-table');
-      if (!table) return;
-      // Operate on individual td cells, not rows
-      table.querySelectorAll('tbody td').forEach(cell => {
-        if (cell.classList.contains('hdr-msd')) return;
-        const grpCls = Array.from(cell.classList).find(c => c.startsWith('grp-'));
-        if (!grpCls) return;
-        const grp = grpCls.replace('grp-', '');
-        cell.classList.toggle('grp-dimmed', !activeGroups.has(grp));
-      });
-    }
-
-    function toggleGroup(group, btn) {
-      if (activeGroups.has(group)) {
-        activeGroups.delete(group);
-        btn.classList.add('dimmed');
-      } else {
-        activeGroups.add(group);
-        btn.classList.remove('dimmed');
-      }
-      applyFilter();
-    }
-
-    window.addEventListener('load', () => {
-      normalizeColumnWidths();
-      document.querySelectorAll('.legend-item[data-group]').forEach(btn => {
-        btn.addEventListener('click', () => toggleGroup(btn.dataset.group, btn));
-      });
     });
+  }
+
+  // ============================================================
+  // Builder output
+  // ============================================================
+  function updateBuilder() {
+    const statusEl = document.getElementById('builder-status');
+    const outputEl = document.getElementById('builder-output');
+    const addrEl   = document.getElementById('builder-addr');
+    const byteEl   = document.getElementById('builder-bytes');
+
+    if (mode === 'filter' || (selCol === -1 && selRow === -1 && selCell === null)) {
+      statusEl.textContent = 'Select a row or column to build an opcode pair.';
+      outputEl.textContent = '';
+      addrEl.disabled = true;
+      byteEl.textContent = '';
+      return;
+    }
+
+    if (selCell === null && selCol !== -1 && selRow === -1) {
+      statusEl.textContent = 'Column selected. Now select a row.';
+      outputEl.textContent = '';
+      addrEl.disabled = true;
+      byteEl.textContent = '';
+      return;
+    }
+
+    if (selCell === null && selRow !== -1 && selCol === -1) {
+      statusEl.textContent = 'Row selected. Now select a column.';
+      outputEl.textContent = '';
+      addrEl.disabled = true;
+      byteEl.textContent = '';
+      return;
+    }
+
+    // We have a complete selection
+    let opcode, info;
+    if (selCell !== null) {
+      opcode = (selCell.msd << 4) | selCell.lsd;
+      info = OPCODES[opcode];
+    } else {
+      opcode = ((selRow) << 4) | (selCol - 1);
+      info = OPCODES[opcode];
+    }
+
+    if (!info || info.grp === 'invalid') {
+      statusEl.textContent = 'INVALID instruction -- not defined.';
+      outputEl.textContent = '';
+      addrEl.disabled = true;
+      byteEl.textContent = '';
+      return;
+    }
+
+    addrEl.disabled = false;
+
+    // Parse address input
+    const rawAddr = addrEl.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+    let operand = 0;
+    let addrOverride = false;
+    let effectiveOpcode = opcode;
+
+    if (rawAddr.length >= 3) {
+      // 10-bit address: extract page and low byte
+      const fullAddr = parseInt(rawAddr.slice(-3), 16) & 0x3FF;
+      const page = (fullAddr >> 8) & 0x3;
+      operand = fullAddr & 0xFF;
+      // Override page bits in opcode (bits 1-0)
+      effectiveOpcode = (opcode & 0xF8) | (page & 0x3) | (opcode & 0x4);
+      addrOverride = true;
+    } else if (rawAddr.length > 0) {
+      operand = parseInt(rawAddr, 16) & 0xFF;
+    }
+
+    const modeStr = info.indexed ? ', indexed' : '';
+    const pageStr = addrOverride ? ` (page from address${modeStr})` : `page ${info.page}${modeStr}`;
+    statusEl.textContent = `${info.mnem}  --  ${info.full}`;
+    outputEl.textContent = `$${effectiveOpcode.toString(16).toUpperCase().padStart(2,'0')}  $${operand.toString(16).toUpperCase().padStart(2,'0')}`;
+    byteEl.textContent = pageStr + (addrOverride ? '  [address overrides column]' : '');
+  }
+
+  // ============================================================
+  // Event handlers
+  // ============================================================
+  function onColHeader(lsdIdx) {
+    // lsdIdx = 1-16 (column index in table)
+    enterBuilderMode();
+    selCell = null;
+    if (selCol === lsdIdx) {
+      selCol = -1; // toggle off
+    } else {
+      selCol = lsdIdx;
+    }
+    applyBuilderHighlights();
+    updateBuilder();
+  }
+
+  function onRowHeader(msdIdx) {
+    // msdIdx = 0-15
+    enterBuilderMode();
+    selCell = null;
+    if (selRow === msdIdx) {
+      selRow = -1; // toggle off
+    } else {
+      selRow = msdIdx;
+    }
+    applyBuilderHighlights();
+    updateBuilder();
+  }
+
+  function onCellClick(msd, lsd) {
+    const opcode = (msd << 4) | lsd;
+    const info = OPCODES[opcode];
+    if (!info || info.grp === 'invalid') return;
+    enterBuilderMode();
+    selRow = msd;
+    selCol = lsd + 1;
+    selCell = {msd, lsd, opcode};
+    applyBuilderHighlights();
+    updateBuilder();
+  }
+
+  function onReset() {
+    mode = 'filter';
+    selCol = -1; selRow = -1; selCell = null;
+    clearBuilderHighlights();
+    resetLegendButtons();
+    applyFilter();
+    updateBuilder();
+  }
+
+  // ============================================================
+  // Init
+  // ============================================================
+  function normalizeColumnWidths() {
+    const table = document.querySelector('.opcode-table');
+    if (!table) return;
+    const rows = Array.from(table.rows);
+    let maxW = 0;
+    rows.forEach(row => {
+      for (let c = 1; c <= 16; c++) {
+        const cell = row.cells[c];
+        if (cell) maxW = Math.max(maxW, cell.offsetWidth);
+      }
+    });
+    if (maxW === 0) return;
+    for (let c = 1; c <= 16; c++) {
+      const cell = rows[0].cells[c];
+      if (cell) cell.style.minWidth = maxW + 'px';
+    }
+  }
+
+  window.addEventListener('load', () => {
+    normalizeColumnWidths();
+    document.querySelectorAll('.legend-item[data-group]').forEach(btn => {
+      btn.addEventListener('click', () => toggleGroup(btn.dataset.group, btn));
+    });
+    document.getElementById('builder-addr').addEventListener('input', updateBuilder);
+    updateBuilder();
+  });
   </script>
 </head>
 <body>
   <nav class="topnav">
     <a href="comtran10_instructions.html">Instruction Reference</a>
-    <span class="group-title">COMTRAN TEN -- Opcode Map</span>
+    <span class="group-title">COMTRAN TEN -- Opcode Map &amp; Builder</span>
   </nav>
   <header>
     <h1>COMTRAN TEN</h1>
-    <h2>Opcode Decode Map</h2>
+    <h2>Opcode Decode Map &amp; Builder</h2>
   </header>
   <main>
 
   <p class="decode-note">
-    <strong>How to read:</strong> find the upper hex digit of the opcode in the MSD column (left),
-    then find the lower hex digit in the LSD row (top). The cell shows the instruction.<br>
-    <strong>Rows 0-1:</strong> non-memory instructions -- all 8 bits identify the instruction.
-    Cells marked INVALID are explicitly undefined.<br>
-    <strong>Rows 2-F:</strong> memory instructions -- upper 5 bits identify the instruction,
-    lower 3 bits are address modifiers.
-    The sub-header row shows: <code>p0</code>=page 0, <code>p1</code>=page 1,
-    <code>p2</code>=page 2, <code>p3</code>=page 3, <code>·x</code>=indexed.
+    <strong>Explore:</strong> click group buttons to highlight instruction categories.<br>
+    <strong>Build:</strong> click a column header (LSD) to select page/index, click a row header (MSD) to select instruction.
+    The intersection cell lights up and the opcode pair appears below.
+    Click any cell directly to select it immediately.
+    Either action clears the group filter.
   </p>
 
   <div class="legend">
@@ -153,27 +706,45 @@
     <div class="legend-item" data-group="invalid"><div class="legend-swatch grp-invalid"></div><span>Invalid</span></div>
   </div>
 
+  <!-- Builder output panel -->
+  <div class="builder">
+    <div class="builder-field">
+      <span class="builder-label">Address / Data (hex)</span>
+      <input type="text" id="builder-addr" maxlength="3" placeholder="000" disabled>
+    </div>
+    <div class="builder-field">
+      <span class="builder-label">Opcode Pair</span>
+      <div class="builder-output" id="builder-output" title="Click to select all"></div>
+    </div>
+    <div class="builder-field" style="flex:1">
+      <span class="builder-label">Instruction</span>
+      <span class="builder-status" id="builder-status">Select a row or column to build an opcode pair.</span>
+      <span style="font-size:0.75rem; color:#555; margin-top:0.2rem;" id="builder-bytes"></span>
+    </div>
+    <button class="builder-reset" onclick="onReset()">Reset</button>
+  </div>
+
   <div class="opcode-table-wrap">
   <table class="opcode-table">
     <thead>
       <tr>
         <th class="hdr-top">MSD \ LSD</th>
-        <th class="hdr-lsd">$0</th>
-        <th class="hdr-lsd">$1</th>
-        <th class="hdr-lsd">$2</th>
-        <th class="hdr-lsd">$3</th>
-        <th class="hdr-lsd">$4</th>
-        <th class="hdr-lsd">$5</th>
-        <th class="hdr-lsd">$6</th>
-        <th class="hdr-lsd">$7</th>
-        <th class="hdr-lsd">$8</th>
-        <th class="hdr-lsd">$9</th>
-        <th class="hdr-lsd">$A</th>
-        <th class="hdr-lsd">$B</th>
-        <th class="hdr-lsd">$C</th>
-        <th class="hdr-lsd">$D</th>
-        <th class="hdr-lsd">$E</th>
-        <th class="hdr-lsd">$F</th>
+        <th class="hdr-lsd" onclick="onColHeader(1)" title="LSD=$0">$0</th>
+        <th class="hdr-lsd" onclick="onColHeader(2)" title="LSD=$1">$1</th>
+        <th class="hdr-lsd" onclick="onColHeader(3)" title="LSD=$2">$2</th>
+        <th class="hdr-lsd" onclick="onColHeader(4)" title="LSD=$3">$3</th>
+        <th class="hdr-lsd" onclick="onColHeader(5)" title="LSD=$4">$4</th>
+        <th class="hdr-lsd" onclick="onColHeader(6)" title="LSD=$5">$5</th>
+        <th class="hdr-lsd" onclick="onColHeader(7)" title="LSD=$6">$6</th>
+        <th class="hdr-lsd" onclick="onColHeader(8)" title="LSD=$7">$7</th>
+        <th class="hdr-lsd" onclick="onColHeader(9)" title="LSD=$8">$8</th>
+        <th class="hdr-lsd" onclick="onColHeader(10)" title="LSD=$9">$9</th>
+        <th class="hdr-lsd" onclick="onColHeader(11)" title="LSD=$A">$A</th>
+        <th class="hdr-lsd" onclick="onColHeader(12)" title="LSD=$B">$B</th>
+        <th class="hdr-lsd" onclick="onColHeader(13)" title="LSD=$C">$C</th>
+        <th class="hdr-lsd" onclick="onColHeader(14)" title="LSD=$D">$D</th>
+        <th class="hdr-lsd" onclick="onColHeader(15)" title="LSD=$E">$E</th>
+        <th class="hdr-lsd" onclick="onColHeader(16)" title="LSD=$F">$F</th>
       </tr>
       <tr>
         <th class="col-decode">bits 7-4 \ 2-0</th>
@@ -197,329 +768,329 @@
     </thead>
     <tbody>
       <tr>
-        <td class="hdr-msd">$0x</td>
-        <td class="grp-nonmem" title="$00">SST</td>
-        <td class="grp-nonmem" title="$01">LC1</td>
-        <td class="grp-nonmem" title="$02">LA1</td>
-        <td class="grp-nonmem" title="$03">INX</td>
-        <td class="grp-invalid" title="$04">INVALID</td>
-        <td class="grp-invalid" title="$05">INVALID</td>
-        <td class="grp-invalid" title="$06">INVALID</td>
-        <td class="grp-invalid" title="$07">INVALID</td>
-        <td class="grp-nonmem" title="$08">SKI</td>
-        <td class="grp-nonmem" title="$09">SKS</td>
-        <td class="grp-nonmem" title="$0A">SKF</td>
-        <td class="grp-nonmem" title="$0B">SLA</td>
-        <td class="grp-invalid" title="$0C">INVALID</td>
-        <td class="grp-invalid" title="$0D">INVALID</td>
-        <td class="grp-invalid" title="$0E">INVALID</td>
-        <td class="grp-invalid" title="$0F">INVALID</td>
+        <td class="hdr-msd" onclick="onRowHeader(0)" title="MSD=$0x">$0x</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="0" onclick="onCellClick(0,0)" style="cursor:pointer" title="$00 -- Sense Status">SST</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="1" onclick="onCellClick(0,1)" style="cursor:pointer" title="$01 -- Load Countdown Immediate">LC1</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="2" onclick="onCellClick(0,2)" style="cursor:pointer" title="$02 -- Load Accumulator Immediate">LA1</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="3" onclick="onCellClick(0,3)" style="cursor:pointer" title="$03 -- Increase Index">INX</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="4" title="$04 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="5" title="$05 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="6" title="$06 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="7" title="$07 -- Invalid instruction">INVALID</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="8" onclick="onCellClick(0,8)" style="cursor:pointer" title="$08 -- Skip on Interrupt">SKI</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="9" onclick="onCellClick(0,9)" style="cursor:pointer" title="$09 -- Skip on Sense Switch">SKS</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="10" onclick="onCellClick(0,10)" style="cursor:pointer" title="$0A -- Skip on Flag">SKF</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="0" data-lsd="11" onclick="onCellClick(0,11)" style="cursor:pointer" title="$0B -- Shift Left Arithmetic">SLA</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="12" title="$0C -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="13" title="$0D -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="14" title="$0E -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="0" data-lsd="15" title="$0F -- Invalid instruction">INVALID</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$1x</td>
-        <td class="grp-nonmem" title="$10">SRA</td>
-        <td class="grp-nonmem" title="$11">OCD</td>
-        <td class="grp-nonmem" title="$12">LX1</td>
-        <td class="grp-nonmem" title="$13">SLL</td>
-        <td class="grp-invalid" title="$14">INVALID</td>
-        <td class="grp-invalid" title="$15">INVALID</td>
-        <td class="grp-invalid" title="$16">INVALID</td>
-        <td class="grp-invalid" title="$17">INVALID</td>
-        <td class="grp-nonmem" title="$18">SRL</td>
-        <td class="grp-nonmem" title="$19">AND</td>
-        <td class="grp-nonmem" title="$1A">IOR</td>
-        <td class="grp-nonmem" title="$1B">XOR</td>
-        <td class="grp-invalid" title="$1C">INVALID</td>
-        <td class="grp-invalid" title="$1D">INVALID</td>
-        <td class="grp-invalid" title="$1E">INVALID</td>
-        <td class="grp-invalid" title="$1F">INVALID</td>
+        <td class="hdr-msd" onclick="onRowHeader(1)" title="MSD=$1x">$1x</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="0" onclick="onCellClick(1,0)" style="cursor:pointer" title="$10 -- Shift Right Arithmetic">SRA</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="1" onclick="onCellClick(1,1)" style="cursor:pointer" title="$11 -- Output Command">OCD</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="2" onclick="onCellClick(1,2)" style="cursor:pointer" title="$12 -- Load Index Immediate">LX1</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="3" onclick="onCellClick(1,3)" style="cursor:pointer" title="$13 -- Shift Left Logical">SLL</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="4" title="$14 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="5" title="$15 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="6" title="$16 -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="7" title="$17 -- Invalid instruction">INVALID</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="8" onclick="onCellClick(1,8)" style="cursor:pointer" title="$18 -- Shift Right Logical">SRL</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="9" onclick="onCellClick(1,9)" style="cursor:pointer" title="$19 -- And">AND</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="10" onclick="onCellClick(1,10)" style="cursor:pointer" title="$1A -- Inclusive Or">IOR</td>
+        <td class="grp-nonmem" data-grp="nonmem" data-msd="1" data-lsd="11" onclick="onCellClick(1,11)" style="cursor:pointer" title="$1B -- Exclusive Or">XOR</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="12" title="$1C -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="13" title="$1D -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="14" title="$1E -- Invalid instruction">INVALID</td>
+        <td class="grp-invalid" data-grp="invalid" data-msd="1" data-lsd="15" title="$1F -- Invalid instruction">INVALID</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$2x</td>
-        <td class="grp-load" title="$20">LDA</td>
-        <td class="grp-load" title="$21">LDA</td>
-        <td class="grp-load" title="$22">LDA</td>
-        <td class="grp-load" title="$23">LDA</td>
-        <td class="grp-load" title="$24">LDA</td>
-        <td class="grp-load" title="$25">LDA</td>
-        <td class="grp-load" title="$26">LDA</td>
-        <td class="grp-load" title="$27">LDA</td>
-        <td class="grp-input_output" title="$28">FLC</td>
-        <td class="grp-input_output" title="$29">FLC</td>
-        <td class="grp-input_output" title="$2A">FLC</td>
-        <td class="grp-input_output" title="$2B">FLC</td>
-        <td class="grp-input_output" title="$2C">FLC</td>
-        <td class="grp-input_output" title="$2D">FLC</td>
-        <td class="grp-input_output" title="$2E">FLC</td>
-        <td class="grp-input_output" title="$2F">FLC</td>
+        <td class="hdr-msd" onclick="onRowHeader(2)" title="MSD=$2x">$2x</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="0" onclick="onCellClick(2,0)" style="cursor:pointer" title="$20 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="1" onclick="onCellClick(2,1)" style="cursor:pointer" title="$21 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="2" onclick="onCellClick(2,2)" style="cursor:pointer" title="$22 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="3" onclick="onCellClick(2,3)" style="cursor:pointer" title="$23 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="4" onclick="onCellClick(2,4)" style="cursor:pointer" title="$24 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="5" onclick="onCellClick(2,5)" style="cursor:pointer" title="$25 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="6" onclick="onCellClick(2,6)" style="cursor:pointer" title="$26 -- Load Accumulator">LDA</td>
+        <td class="grp-load" data-grp="load" data-msd="2" data-lsd="7" onclick="onCellClick(2,7)" style="cursor:pointer" title="$27 -- Load Accumulator">LDA</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="8" onclick="onCellClick(2,8)" style="cursor:pointer" title="$28 -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="9" onclick="onCellClick(2,9)" style="cursor:pointer" title="$29 -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="10" onclick="onCellClick(2,10)" style="cursor:pointer" title="$2A -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="11" onclick="onCellClick(2,11)" style="cursor:pointer" title="$2B -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="12" onclick="onCellClick(2,12)" style="cursor:pointer" title="$2C -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="13" onclick="onCellClick(2,13)" style="cursor:pointer" title="$2D -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="14" onclick="onCellClick(2,14)" style="cursor:pointer" title="$2E -- Flag Clear">FLC</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="2" data-lsd="15" onclick="onCellClick(2,15)" style="cursor:pointer" title="$2F -- Flag Clear">FLC</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$3x</td>
-        <td class="grp-load" title="$30">LCC</td>
-        <td class="grp-load" title="$31">LCC</td>
-        <td class="grp-load" title="$32">LCC</td>
-        <td class="grp-load" title="$33">LCC</td>
-        <td class="grp-load" title="$34">LCC</td>
-        <td class="grp-load" title="$35">LCC</td>
-        <td class="grp-load" title="$36">LCC</td>
-        <td class="grp-load" title="$37">LCC</td>
-        <td class="grp-load" title="$38">LAN</td>
-        <td class="grp-load" title="$39">LAN</td>
-        <td class="grp-load" title="$3A">LAN</td>
-        <td class="grp-load" title="$3B">LAN</td>
-        <td class="grp-load" title="$3C">LAN</td>
-        <td class="grp-load" title="$3D">LAN</td>
-        <td class="grp-load" title="$3E">LAN</td>
-        <td class="grp-load" title="$3F">LAN</td>
+        <td class="hdr-msd" onclick="onRowHeader(3)" title="MSD=$3x">$3x</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="0" onclick="onCellClick(3,0)" style="cursor:pointer" title="$30 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="1" onclick="onCellClick(3,1)" style="cursor:pointer" title="$31 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="2" onclick="onCellClick(3,2)" style="cursor:pointer" title="$32 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="3" onclick="onCellClick(3,3)" style="cursor:pointer" title="$33 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="4" onclick="onCellClick(3,4)" style="cursor:pointer" title="$34 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="5" onclick="onCellClick(3,5)" style="cursor:pointer" title="$35 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="6" onclick="onCellClick(3,6)" style="cursor:pointer" title="$36 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="7" onclick="onCellClick(3,7)" style="cursor:pointer" title="$37 -- Load Consecutive">LCC</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="8" onclick="onCellClick(3,8)" style="cursor:pointer" title="$38 -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="9" onclick="onCellClick(3,9)" style="cursor:pointer" title="$39 -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="10" onclick="onCellClick(3,10)" style="cursor:pointer" title="$3A -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="11" onclick="onCellClick(3,11)" style="cursor:pointer" title="$3B -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="12" onclick="onCellClick(3,12)" style="cursor:pointer" title="$3C -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="13" onclick="onCellClick(3,13)" style="cursor:pointer" title="$3D -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="14" onclick="onCellClick(3,14)" style="cursor:pointer" title="$3E -- Load Accumulator Negative">LAN</td>
+        <td class="grp-load" data-grp="load" data-msd="3" data-lsd="15" onclick="onCellClick(3,15)" style="cursor:pointer" title="$3F -- Load Accumulator Negative">LAN</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$4x</td>
-        <td class="grp-load" title="$40">LDQ</td>
-        <td class="grp-load" title="$41">LDQ</td>
-        <td class="grp-load" title="$42">LDQ</td>
-        <td class="grp-load" title="$43">LDQ</td>
-        <td class="grp-load" title="$44">LDQ</td>
-        <td class="grp-load" title="$45">LDQ</td>
-        <td class="grp-load" title="$46">LDQ</td>
-        <td class="grp-load" title="$47">LDQ</td>
-        <td class="grp-store" title="$48">STA</td>
-        <td class="grp-store" title="$49">STA</td>
-        <td class="grp-store" title="$4A">STA</td>
-        <td class="grp-store" title="$4B">STA</td>
-        <td class="grp-store" title="$4C">STA</td>
-        <td class="grp-store" title="$4D">STA</td>
-        <td class="grp-store" title="$4E">STA</td>
-        <td class="grp-store" title="$4F">STA</td>
+        <td class="hdr-msd" onclick="onRowHeader(4)" title="MSD=$4x">$4x</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="0" onclick="onCellClick(4,0)" style="cursor:pointer" title="$40 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="1" onclick="onCellClick(4,1)" style="cursor:pointer" title="$41 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="2" onclick="onCellClick(4,2)" style="cursor:pointer" title="$42 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="3" onclick="onCellClick(4,3)" style="cursor:pointer" title="$43 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="4" onclick="onCellClick(4,4)" style="cursor:pointer" title="$44 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="5" onclick="onCellClick(4,5)" style="cursor:pointer" title="$45 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="6" onclick="onCellClick(4,6)" style="cursor:pointer" title="$46 -- Load Quotient Register">LDQ</td>
+        <td class="grp-load" data-grp="load" data-msd="4" data-lsd="7" onclick="onCellClick(4,7)" style="cursor:pointer" title="$47 -- Load Quotient Register">LDQ</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="8" onclick="onCellClick(4,8)" style="cursor:pointer" title="$48 -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="9" onclick="onCellClick(4,9)" style="cursor:pointer" title="$49 -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="10" onclick="onCellClick(4,10)" style="cursor:pointer" title="$4A -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="11" onclick="onCellClick(4,11)" style="cursor:pointer" title="$4B -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="12" onclick="onCellClick(4,12)" style="cursor:pointer" title="$4C -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="13" onclick="onCellClick(4,13)" style="cursor:pointer" title="$4D -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="14" onclick="onCellClick(4,14)" style="cursor:pointer" title="$4E -- Store Accumulator">STA</td>
+        <td class="grp-store" data-grp="store" data-msd="4" data-lsd="15" onclick="onCellClick(4,15)" style="cursor:pointer" title="$4F -- Store Accumulator">STA</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$5x</td>
-        <td class="grp-store" title="$50">STX</td>
-        <td class="grp-store" title="$51">STX</td>
-        <td class="grp-store" title="$52">STX</td>
-        <td class="grp-store" title="$53">STX</td>
-        <td class="grp-store" title="$54">STX</td>
-        <td class="grp-store" title="$55">STX</td>
-        <td class="grp-store" title="$56">STX</td>
-        <td class="grp-store" title="$57">STX</td>
-        <td class="grp-store" title="$58">STQ</td>
-        <td class="grp-store" title="$59">STQ</td>
-        <td class="grp-store" title="$5A">STQ</td>
-        <td class="grp-store" title="$5B">STQ</td>
-        <td class="grp-store" title="$5C">STQ</td>
-        <td class="grp-store" title="$5D">STQ</td>
-        <td class="grp-store" title="$5E">STQ</td>
-        <td class="grp-store" title="$5F">STQ</td>
+        <td class="hdr-msd" onclick="onRowHeader(5)" title="MSD=$5x">$5x</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="0" onclick="onCellClick(5,0)" style="cursor:pointer" title="$50 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="1" onclick="onCellClick(5,1)" style="cursor:pointer" title="$51 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="2" onclick="onCellClick(5,2)" style="cursor:pointer" title="$52 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="3" onclick="onCellClick(5,3)" style="cursor:pointer" title="$53 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="4" onclick="onCellClick(5,4)" style="cursor:pointer" title="$54 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="5" onclick="onCellClick(5,5)" style="cursor:pointer" title="$55 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="6" onclick="onCellClick(5,6)" style="cursor:pointer" title="$56 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="7" onclick="onCellClick(5,7)" style="cursor:pointer" title="$57 -- Store Index">STX</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="8" onclick="onCellClick(5,8)" style="cursor:pointer" title="$58 -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="9" onclick="onCellClick(5,9)" style="cursor:pointer" title="$59 -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="10" onclick="onCellClick(5,10)" style="cursor:pointer" title="$5A -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="11" onclick="onCellClick(5,11)" style="cursor:pointer" title="$5B -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="12" onclick="onCellClick(5,12)" style="cursor:pointer" title="$5C -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="13" onclick="onCellClick(5,13)" style="cursor:pointer" title="$5D -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="14" onclick="onCellClick(5,14)" style="cursor:pointer" title="$5E -- Store Quotient Register">STQ</td>
+        <td class="grp-store" data-grp="store" data-msd="5" data-lsd="15" onclick="onCellClick(5,15)" style="cursor:pointer" title="$5F -- Store Quotient Register">STQ</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$6x</td>
-        <td class="grp-arithmetic" title="$60">ADD</td>
-        <td class="grp-arithmetic" title="$61">ADD</td>
-        <td class="grp-arithmetic" title="$62">ADD</td>
-        <td class="grp-arithmetic" title="$63">ADD</td>
-        <td class="grp-arithmetic" title="$64">ADD</td>
-        <td class="grp-arithmetic" title="$65">ADD</td>
-        <td class="grp-arithmetic" title="$66">ADD</td>
-        <td class="grp-arithmetic" title="$67">ADD</td>
-        <td class="grp-arithmetic" title="$68">SUB</td>
-        <td class="grp-arithmetic" title="$69">SUB</td>
-        <td class="grp-arithmetic" title="$6A">SUB</td>
-        <td class="grp-arithmetic" title="$6B">SUB</td>
-        <td class="grp-arithmetic" title="$6C">SUB</td>
-        <td class="grp-arithmetic" title="$6D">SUB</td>
-        <td class="grp-arithmetic" title="$6E">SUB</td>
-        <td class="grp-arithmetic" title="$6F">SUB</td>
+        <td class="hdr-msd" onclick="onRowHeader(6)" title="MSD=$6x">$6x</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="0" onclick="onCellClick(6,0)" style="cursor:pointer" title="$60 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="1" onclick="onCellClick(6,1)" style="cursor:pointer" title="$61 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="2" onclick="onCellClick(6,2)" style="cursor:pointer" title="$62 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="3" onclick="onCellClick(6,3)" style="cursor:pointer" title="$63 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="4" onclick="onCellClick(6,4)" style="cursor:pointer" title="$64 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="5" onclick="onCellClick(6,5)" style="cursor:pointer" title="$65 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="6" onclick="onCellClick(6,6)" style="cursor:pointer" title="$66 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="7" onclick="onCellClick(6,7)" style="cursor:pointer" title="$67 -- Add">ADD</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="8" onclick="onCellClick(6,8)" style="cursor:pointer" title="$68 -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="9" onclick="onCellClick(6,9)" style="cursor:pointer" title="$69 -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="10" onclick="onCellClick(6,10)" style="cursor:pointer" title="$6A -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="11" onclick="onCellClick(6,11)" style="cursor:pointer" title="$6B -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="12" onclick="onCellClick(6,12)" style="cursor:pointer" title="$6C -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="13" onclick="onCellClick(6,13)" style="cursor:pointer" title="$6D -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="14" onclick="onCellClick(6,14)" style="cursor:pointer" title="$6E -- Subtract">SUB</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="6" data-lsd="15" onclick="onCellClick(6,15)" style="cursor:pointer" title="$6F -- Subtract">SUB</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$7x</td>
-        <td class="grp-arithmetic" title="$70">MPY</td>
-        <td class="grp-arithmetic" title="$71">MPY</td>
-        <td class="grp-arithmetic" title="$72">MPY</td>
-        <td class="grp-arithmetic" title="$73">MPY</td>
-        <td class="grp-arithmetic" title="$74">MPY</td>
-        <td class="grp-arithmetic" title="$75">MPY</td>
-        <td class="grp-arithmetic" title="$76">MPY</td>
-        <td class="grp-arithmetic" title="$77">MPY</td>
-        <td class="grp-arithmetic" title="$78">DIV</td>
-        <td class="grp-arithmetic" title="$79">DIV</td>
-        <td class="grp-arithmetic" title="$7A">DIV</td>
-        <td class="grp-arithmetic" title="$7B">DIV</td>
-        <td class="grp-arithmetic" title="$7C">DIV</td>
-        <td class="grp-arithmetic" title="$7D">DIV</td>
-        <td class="grp-arithmetic" title="$7E">DIV</td>
-        <td class="grp-arithmetic" title="$7F">DIV</td>
+        <td class="hdr-msd" onclick="onRowHeader(7)" title="MSD=$7x">$7x</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="0" onclick="onCellClick(7,0)" style="cursor:pointer" title="$70 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="1" onclick="onCellClick(7,1)" style="cursor:pointer" title="$71 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="2" onclick="onCellClick(7,2)" style="cursor:pointer" title="$72 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="3" onclick="onCellClick(7,3)" style="cursor:pointer" title="$73 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="4" onclick="onCellClick(7,4)" style="cursor:pointer" title="$74 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="5" onclick="onCellClick(7,5)" style="cursor:pointer" title="$75 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="6" onclick="onCellClick(7,6)" style="cursor:pointer" title="$76 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="7" onclick="onCellClick(7,7)" style="cursor:pointer" title="$77 -- Multiply">MPY</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="8" onclick="onCellClick(7,8)" style="cursor:pointer" title="$78 -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="9" onclick="onCellClick(7,9)" style="cursor:pointer" title="$79 -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="10" onclick="onCellClick(7,10)" style="cursor:pointer" title="$7A -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="11" onclick="onCellClick(7,11)" style="cursor:pointer" title="$7B -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="12" onclick="onCellClick(7,12)" style="cursor:pointer" title="$7C -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="13" onclick="onCellClick(7,13)" style="cursor:pointer" title="$7D -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="14" onclick="onCellClick(7,14)" style="cursor:pointer" title="$7E -- Divide">DIV</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="7" data-lsd="15" onclick="onCellClick(7,15)" style="cursor:pointer" title="$7F -- Divide">DIV</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$8x</td>
-        <td class="grp-arithmetic" title="$80">RAO</td>
-        <td class="grp-arithmetic" title="$81">RAO</td>
-        <td class="grp-arithmetic" title="$82">RAO</td>
-        <td class="grp-arithmetic" title="$83">RAO</td>
-        <td class="grp-arithmetic" title="$84">RAO</td>
-        <td class="grp-arithmetic" title="$85">RAO</td>
-        <td class="grp-arithmetic" title="$86">RAO</td>
-        <td class="grp-arithmetic" title="$87">RAO</td>
-        <td class="grp-arithmetic" title="$88">RSO</td>
-        <td class="grp-arithmetic" title="$89">RSO</td>
-        <td class="grp-arithmetic" title="$8A">RSO</td>
-        <td class="grp-arithmetic" title="$8B">RSO</td>
-        <td class="grp-arithmetic" title="$8C">RSO</td>
-        <td class="grp-arithmetic" title="$8D">RSO</td>
-        <td class="grp-arithmetic" title="$8E">RSO</td>
-        <td class="grp-arithmetic" title="$8F">RSO</td>
+        <td class="hdr-msd" onclick="onRowHeader(8)" title="MSD=$8x">$8x</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="0" onclick="onCellClick(8,0)" style="cursor:pointer" title="$80 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="1" onclick="onCellClick(8,1)" style="cursor:pointer" title="$81 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="2" onclick="onCellClick(8,2)" style="cursor:pointer" title="$82 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="3" onclick="onCellClick(8,3)" style="cursor:pointer" title="$83 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="4" onclick="onCellClick(8,4)" style="cursor:pointer" title="$84 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="5" onclick="onCellClick(8,5)" style="cursor:pointer" title="$85 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="6" onclick="onCellClick(8,6)" style="cursor:pointer" title="$86 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="7" onclick="onCellClick(8,7)" style="cursor:pointer" title="$87 -- Replace Add One">RAO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="8" onclick="onCellClick(8,8)" style="cursor:pointer" title="$88 -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="9" onclick="onCellClick(8,9)" style="cursor:pointer" title="$89 -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="10" onclick="onCellClick(8,10)" style="cursor:pointer" title="$8A -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="11" onclick="onCellClick(8,11)" style="cursor:pointer" title="$8B -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="12" onclick="onCellClick(8,12)" style="cursor:pointer" title="$8C -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="13" onclick="onCellClick(8,13)" style="cursor:pointer" title="$8D -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="14" onclick="onCellClick(8,14)" style="cursor:pointer" title="$8E -- Replace Subtract One">RSO</td>
+        <td class="grp-arithmetic" data-grp="arithmetic" data-msd="8" data-lsd="15" onclick="onCellClick(8,15)" style="cursor:pointer" title="$8F -- Replace Subtract One">RSO</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$9x</td>
-        <td class="grp-branch" title="$90">BUN</td>
-        <td class="grp-branch" title="$91">BUN</td>
-        <td class="grp-branch" title="$92">BUN</td>
-        <td class="grp-branch" title="$93">BUN</td>
-        <td class="grp-branch" title="$94">BUN</td>
-        <td class="grp-branch" title="$95">BUN</td>
-        <td class="grp-branch" title="$96">BUN</td>
-        <td class="grp-branch" title="$97">BUN</td>
-        <td class="grp-branch" title="$98">BST</td>
-        <td class="grp-branch" title="$99">BST</td>
-        <td class="grp-branch" title="$9A">BST</td>
-        <td class="grp-branch" title="$9B">BST</td>
-        <td class="grp-branch" title="$9C">BST</td>
-        <td class="grp-branch" title="$9D">BST</td>
-        <td class="grp-branch" title="$9E">BST</td>
-        <td class="grp-branch" title="$9F">BST</td>
+        <td class="hdr-msd" onclick="onRowHeader(9)" title="MSD=$9x">$9x</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="0" onclick="onCellClick(9,0)" style="cursor:pointer" title="$90 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="1" onclick="onCellClick(9,1)" style="cursor:pointer" title="$91 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="2" onclick="onCellClick(9,2)" style="cursor:pointer" title="$92 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="3" onclick="onCellClick(9,3)" style="cursor:pointer" title="$93 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="4" onclick="onCellClick(9,4)" style="cursor:pointer" title="$94 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="5" onclick="onCellClick(9,5)" style="cursor:pointer" title="$95 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="6" onclick="onCellClick(9,6)" style="cursor:pointer" title="$96 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="7" onclick="onCellClick(9,7)" style="cursor:pointer" title="$97 -- Branch Unconditional">BUN</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="8" onclick="onCellClick(9,8)" style="cursor:pointer" title="$98 -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="9" onclick="onCellClick(9,9)" style="cursor:pointer" title="$99 -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="10" onclick="onCellClick(9,10)" style="cursor:pointer" title="$9A -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="11" onclick="onCellClick(9,11)" style="cursor:pointer" title="$9B -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="12" onclick="onCellClick(9,12)" style="cursor:pointer" title="$9C -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="13" onclick="onCellClick(9,13)" style="cursor:pointer" title="$9D -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="14" onclick="onCellClick(9,14)" style="cursor:pointer" title="$9E -- Branch and Stop">BST</td>
+        <td class="grp-branch" data-grp="branch" data-msd="9" data-lsd="15" onclick="onCellClick(9,15)" style="cursor:pointer" title="$9F -- Branch and Stop">BST</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Ax</td>
-        <td class="grp-branch" title="$A0">BSB</td>
-        <td class="grp-branch" title="$A1">BSB</td>
-        <td class="grp-branch" title="$A2">BSB</td>
-        <td class="grp-branch" title="$A3">BSB</td>
-        <td class="grp-branch" title="$A4">BSB</td>
-        <td class="grp-branch" title="$A5">BSB</td>
-        <td class="grp-branch" title="$A6">BSB</td>
-        <td class="grp-branch" title="$A7">BSB</td>
-        <td class="grp-branch" title="$A8">BPS</td>
-        <td class="grp-branch" title="$A9">BPS</td>
-        <td class="grp-branch" title="$AA">BPS</td>
-        <td class="grp-branch" title="$AB">BPS</td>
-        <td class="grp-branch" title="$AC">BPS</td>
-        <td class="grp-branch" title="$AD">BPS</td>
-        <td class="grp-branch" title="$AE">BPS</td>
-        <td class="grp-branch" title="$AF">BPS</td>
+        <td class="hdr-msd" onclick="onRowHeader(10)" title="MSD=$Ax">$Ax</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="0" onclick="onCellClick(10,0)" style="cursor:pointer" title="$A0 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="1" onclick="onCellClick(10,1)" style="cursor:pointer" title="$A1 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="2" onclick="onCellClick(10,2)" style="cursor:pointer" title="$A2 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="3" onclick="onCellClick(10,3)" style="cursor:pointer" title="$A3 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="4" onclick="onCellClick(10,4)" style="cursor:pointer" title="$A4 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="5" onclick="onCellClick(10,5)" style="cursor:pointer" title="$A5 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="6" onclick="onCellClick(10,6)" style="cursor:pointer" title="$A6 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="7" onclick="onCellClick(10,7)" style="cursor:pointer" title="$A7 -- Branch to Subroutine">BSB</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="8" onclick="onCellClick(10,8)" style="cursor:pointer" title="$A8 -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="9" onclick="onCellClick(10,9)" style="cursor:pointer" title="$A9 -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="10" onclick="onCellClick(10,10)" style="cursor:pointer" title="$AA -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="11" onclick="onCellClick(10,11)" style="cursor:pointer" title="$AB -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="12" onclick="onCellClick(10,12)" style="cursor:pointer" title="$AC -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="13" onclick="onCellClick(10,13)" style="cursor:pointer" title="$AD -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="14" onclick="onCellClick(10,14)" style="cursor:pointer" title="$AE -- Branch on Positive">BPS</td>
+        <td class="grp-branch" data-grp="branch" data-msd="10" data-lsd="15" onclick="onCellClick(10,15)" style="cursor:pointer" title="$AF -- Branch on Positive">BPS</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Bx</td>
-        <td class="grp-branch" title="$B0">BZE</td>
-        <td class="grp-branch" title="$B1">BZE</td>
-        <td class="grp-branch" title="$B2">BZE</td>
-        <td class="grp-branch" title="$B3">BZE</td>
-        <td class="grp-branch" title="$B4">BZE</td>
-        <td class="grp-branch" title="$B5">BZE</td>
-        <td class="grp-branch" title="$B6">BZE</td>
-        <td class="grp-branch" title="$B7">BZE</td>
-        <td class="grp-branch" title="$B8">BNG</td>
-        <td class="grp-branch" title="$B9">BNG</td>
-        <td class="grp-branch" title="$BA">BNG</td>
-        <td class="grp-branch" title="$BB">BNG</td>
-        <td class="grp-branch" title="$BC">BNG</td>
-        <td class="grp-branch" title="$BD">BNG</td>
-        <td class="grp-branch" title="$BE">BNG</td>
-        <td class="grp-branch" title="$BF">BNG</td>
+        <td class="hdr-msd" onclick="onRowHeader(11)" title="MSD=$Bx">$Bx</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="0" onclick="onCellClick(11,0)" style="cursor:pointer" title="$B0 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="1" onclick="onCellClick(11,1)" style="cursor:pointer" title="$B1 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="2" onclick="onCellClick(11,2)" style="cursor:pointer" title="$B2 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="3" onclick="onCellClick(11,3)" style="cursor:pointer" title="$B3 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="4" onclick="onCellClick(11,4)" style="cursor:pointer" title="$B4 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="5" onclick="onCellClick(11,5)" style="cursor:pointer" title="$B5 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="6" onclick="onCellClick(11,6)" style="cursor:pointer" title="$B6 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="7" onclick="onCellClick(11,7)" style="cursor:pointer" title="$B7 -- Branch on Zero">BZE</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="8" onclick="onCellClick(11,8)" style="cursor:pointer" title="$B8 -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="9" onclick="onCellClick(11,9)" style="cursor:pointer" title="$B9 -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="10" onclick="onCellClick(11,10)" style="cursor:pointer" title="$BA -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="11" onclick="onCellClick(11,11)" style="cursor:pointer" title="$BB -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="12" onclick="onCellClick(11,12)" style="cursor:pointer" title="$BC -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="13" onclick="onCellClick(11,13)" style="cursor:pointer" title="$BD -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="14" onclick="onCellClick(11,14)" style="cursor:pointer" title="$BE -- Branch on Negative">BNG</td>
+        <td class="grp-branch" data-grp="branch" data-msd="11" data-lsd="15" onclick="onCellClick(11,15)" style="cursor:pointer" title="$BF -- Branch on Negative">BNG</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Cx</td>
-        <td class="grp-branch" title="$C0">BNC</td>
-        <td class="grp-branch" title="$C1">BNC</td>
-        <td class="grp-branch" title="$C2">BNC</td>
-        <td class="grp-branch" title="$C3">BNC</td>
-        <td class="grp-branch" title="$C4">BNC</td>
-        <td class="grp-branch" title="$C5">BNC</td>
-        <td class="grp-branch" title="$C6">BNC</td>
-        <td class="grp-branch" title="$C7">BNC</td>
-        <td class="grp-branch" title="$C8">BXZ</td>
-        <td class="grp-branch" title="$C9">BXZ</td>
-        <td class="grp-branch" title="$CA">BXZ</td>
-        <td class="grp-branch" title="$CB">BXZ</td>
-        <td class="grp-branch" title="$CC">BXZ</td>
-        <td class="grp-branch" title="$CD">BXZ</td>
-        <td class="grp-branch" title="$CE">BXZ</td>
-        <td class="grp-branch" title="$CF">BXZ</td>
+        <td class="hdr-msd" onclick="onRowHeader(12)" title="MSD=$Cx">$Cx</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="0" onclick="onCellClick(12,0)" style="cursor:pointer" title="$C0 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="1" onclick="onCellClick(12,1)" style="cursor:pointer" title="$C1 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="2" onclick="onCellClick(12,2)" style="cursor:pointer" title="$C2 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="3" onclick="onCellClick(12,3)" style="cursor:pointer" title="$C3 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="4" onclick="onCellClick(12,4)" style="cursor:pointer" title="$C4 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="5" onclick="onCellClick(12,5)" style="cursor:pointer" title="$C5 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="6" onclick="onCellClick(12,6)" style="cursor:pointer" title="$C6 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="7" onclick="onCellClick(12,7)" style="cursor:pointer" title="$C7 -- Branch on No Carry">BNC</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="8" onclick="onCellClick(12,8)" style="cursor:pointer" title="$C8 -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="9" onclick="onCellClick(12,9)" style="cursor:pointer" title="$C9 -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="10" onclick="onCellClick(12,10)" style="cursor:pointer" title="$CA -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="11" onclick="onCellClick(12,11)" style="cursor:pointer" title="$CB -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="12" onclick="onCellClick(12,12)" style="cursor:pointer" title="$CC -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="13" onclick="onCellClick(12,13)" style="cursor:pointer" title="$CD -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="14" onclick="onCellClick(12,14)" style="cursor:pointer" title="$CE -- Branch on Index Zero">BXZ</td>
+        <td class="grp-branch" data-grp="branch" data-msd="12" data-lsd="15" onclick="onCellClick(12,15)" style="cursor:pointer" title="$CF -- Branch on Index Zero">BXZ</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Dx</td>
-        <td class="grp-input_output" title="$D0">WDB</td>
-        <td class="grp-input_output" title="$D1">WDB</td>
-        <td class="grp-input_output" title="$D2">WDB</td>
-        <td class="grp-input_output" title="$D3">WDB</td>
-        <td class="grp-input_output" title="$D4">WDB</td>
-        <td class="grp-input_output" title="$D5">WDB</td>
-        <td class="grp-input_output" title="$D6">WDB</td>
-        <td class="grp-input_output" title="$D7">WDB</td>
-        <td class="grp-input_output" title="$D8">MNO</td>
-        <td class="grp-input_output" title="$D9">MNO</td>
-        <td class="grp-input_output" title="$DA">MNO</td>
-        <td class="grp-input_output" title="$DB">MNO</td>
-        <td class="grp-input_output" title="$DC">MNO</td>
-        <td class="grp-input_output" title="$DD">MNO</td>
-        <td class="grp-input_output" title="$DE">MNO</td>
-        <td class="grp-input_output" title="$DF">MNO</td>
+        <td class="hdr-msd" onclick="onRowHeader(13)" title="MSD=$Dx">$Dx</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="0" onclick="onCellClick(13,0)" style="cursor:pointer" title="$D0 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="1" onclick="onCellClick(13,1)" style="cursor:pointer" title="$D1 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="2" onclick="onCellClick(13,2)" style="cursor:pointer" title="$D2 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="3" onclick="onCellClick(13,3)" style="cursor:pointer" title="$D3 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="4" onclick="onCellClick(13,4)" style="cursor:pointer" title="$D4 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="5" onclick="onCellClick(13,5)" style="cursor:pointer" title="$D5 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="6" onclick="onCellClick(13,6)" style="cursor:pointer" title="$D6 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="7" onclick="onCellClick(13,7)" style="cursor:pointer" title="$D7 -- Write Data Block">WDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="8" onclick="onCellClick(13,8)" style="cursor:pointer" title="$D8 -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="9" onclick="onCellClick(13,9)" style="cursor:pointer" title="$D9 -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="10" onclick="onCellClick(13,10)" style="cursor:pointer" title="$DA -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="11" onclick="onCellClick(13,11)" style="cursor:pointer" title="$DB -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="12" onclick="onCellClick(13,12)" style="cursor:pointer" title="$DC -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="13" onclick="onCellClick(13,13)" style="cursor:pointer" title="$DD -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="14" onclick="onCellClick(13,14)" style="cursor:pointer" title="$DE -- Manual Output">MNO</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="13" data-lsd="15" onclick="onCellClick(13,15)" style="cursor:pointer" title="$DF -- Manual Output">MNO</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Ex</td>
-        <td class="grp-input_output" title="$E0">RDB</td>
-        <td class="grp-input_output" title="$E1">RDB</td>
-        <td class="grp-input_output" title="$E2">RDB</td>
-        <td class="grp-input_output" title="$E3">RDB</td>
-        <td class="grp-input_output" title="$E4">RDB</td>
-        <td class="grp-input_output" title="$E5">RDB</td>
-        <td class="grp-input_output" title="$E6">RDB</td>
-        <td class="grp-input_output" title="$E7">RDB</td>
-        <td class="grp-input_output" title="$E8">RDI</td>
-        <td class="grp-input_output" title="$E9">RDI</td>
-        <td class="grp-input_output" title="$EA">RDI</td>
-        <td class="grp-input_output" title="$EB">RDI</td>
-        <td class="grp-input_output" title="$EC">RDI</td>
-        <td class="grp-input_output" title="$ED">RDI</td>
-        <td class="grp-input_output" title="$EE">RDI</td>
-        <td class="grp-input_output" title="$EF">RDI</td>
+        <td class="hdr-msd" onclick="onRowHeader(14)" title="MSD=$Ex">$Ex</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="0" onclick="onCellClick(14,0)" style="cursor:pointer" title="$E0 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="1" onclick="onCellClick(14,1)" style="cursor:pointer" title="$E1 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="2" onclick="onCellClick(14,2)" style="cursor:pointer" title="$E2 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="3" onclick="onCellClick(14,3)" style="cursor:pointer" title="$E3 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="4" onclick="onCellClick(14,4)" style="cursor:pointer" title="$E4 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="5" onclick="onCellClick(14,5)" style="cursor:pointer" title="$E5 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="6" onclick="onCellClick(14,6)" style="cursor:pointer" title="$E6 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="7" onclick="onCellClick(14,7)" style="cursor:pointer" title="$E7 -- Read Data Block">RDB</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="8" onclick="onCellClick(14,8)" style="cursor:pointer" title="$E8 -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="9" onclick="onCellClick(14,9)" style="cursor:pointer" title="$E9 -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="10" onclick="onCellClick(14,10)" style="cursor:pointer" title="$EA -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="11" onclick="onCellClick(14,11)" style="cursor:pointer" title="$EB -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="12" onclick="onCellClick(14,12)" style="cursor:pointer" title="$EC -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="13" onclick="onCellClick(14,13)" style="cursor:pointer" title="$ED -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="14" onclick="onCellClick(14,14)" style="cursor:pointer" title="$EE -- Read Until Interrupt">RDI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="14" data-lsd="15" onclick="onCellClick(14,15)" style="cursor:pointer" title="$EF -- Read Until Interrupt">RDI</td>
       </tr>
       <tr>
-        <td class="hdr-msd">$Fx</td>
-        <td class="grp-input_output" title="$F0">MNI</td>
-        <td class="grp-input_output" title="$F1">MNI</td>
-        <td class="grp-input_output" title="$F2">MNI</td>
-        <td class="grp-input_output" title="$F3">MNI</td>
-        <td class="grp-input_output" title="$F4">MNI</td>
-        <td class="grp-input_output" title="$F5">MNI</td>
-        <td class="grp-input_output" title="$F6">MNI</td>
-        <td class="grp-input_output" title="$F7">MNI</td>
-        <td class="grp-input_output" title="$F8">FLS</td>
-        <td class="grp-input_output" title="$F9">FLS</td>
-        <td class="grp-input_output" title="$FA">FLS</td>
-        <td class="grp-input_output" title="$FB">FLS</td>
-        <td class="grp-input_output" title="$FC">FLS</td>
-        <td class="grp-input_output" title="$FD">FLS</td>
-        <td class="grp-input_output" title="$FE">FLS</td>
-        <td class="grp-input_output" title="$FF">FLS</td>
+        <td class="hdr-msd" onclick="onRowHeader(15)" title="MSD=$Fx">$Fx</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="0" onclick="onCellClick(15,0)" style="cursor:pointer" title="$F0 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="1" onclick="onCellClick(15,1)" style="cursor:pointer" title="$F1 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="2" onclick="onCellClick(15,2)" style="cursor:pointer" title="$F2 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="3" onclick="onCellClick(15,3)" style="cursor:pointer" title="$F3 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="4" onclick="onCellClick(15,4)" style="cursor:pointer" title="$F4 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="5" onclick="onCellClick(15,5)" style="cursor:pointer" title="$F5 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="6" onclick="onCellClick(15,6)" style="cursor:pointer" title="$F6 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="7" onclick="onCellClick(15,7)" style="cursor:pointer" title="$F7 -- Manual Input">MNI</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="8" onclick="onCellClick(15,8)" style="cursor:pointer" title="$F8 -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="9" onclick="onCellClick(15,9)" style="cursor:pointer" title="$F9 -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="10" onclick="onCellClick(15,10)" style="cursor:pointer" title="$FA -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="11" onclick="onCellClick(15,11)" style="cursor:pointer" title="$FB -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="12" onclick="onCellClick(15,12)" style="cursor:pointer" title="$FC -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="13" onclick="onCellClick(15,13)" style="cursor:pointer" title="$FD -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="14" onclick="onCellClick(15,14)" style="cursor:pointer" title="$FE -- Flag Set">FLS</td>
+        <td class="grp-input_output" data-grp="input_output" data-msd="15" data-lsd="15" onclick="onCellClick(15,15)" style="cursor:pointer" title="$FF -- Flag Set">FLS</td>
       </tr>
     </tbody>
     <tfoot>
       <tr>
         <th class="hdr-top"></th>
-        <th class="hdr-lsd">$x0</th>
-        <th class="hdr-lsd">$x1</th>
-        <th class="hdr-lsd">$x2</th>
-        <th class="hdr-lsd">$x3</th>
-        <th class="hdr-lsd">$x4</th>
-        <th class="hdr-lsd">$x5</th>
-        <th class="hdr-lsd">$x6</th>
-        <th class="hdr-lsd">$x7</th>
-        <th class="hdr-lsd">$x8</th>
-        <th class="hdr-lsd">$x9</th>
-        <th class="hdr-lsd">$xA</th>
-        <th class="hdr-lsd">$xB</th>
-        <th class="hdr-lsd">$xC</th>
-        <th class="hdr-lsd">$xD</th>
-        <th class="hdr-lsd">$xE</th>
-        <th class="hdr-lsd">$xF</th>
+        <th class="hdr-lsd" onclick="onColHeader(1)">$x0</th>
+        <th class="hdr-lsd" onclick="onColHeader(2)">$x1</th>
+        <th class="hdr-lsd" onclick="onColHeader(3)">$x2</th>
+        <th class="hdr-lsd" onclick="onColHeader(4)">$x3</th>
+        <th class="hdr-lsd" onclick="onColHeader(5)">$x4</th>
+        <th class="hdr-lsd" onclick="onColHeader(6)">$x5</th>
+        <th class="hdr-lsd" onclick="onColHeader(7)">$x6</th>
+        <th class="hdr-lsd" onclick="onColHeader(8)">$x7</th>
+        <th class="hdr-lsd" onclick="onColHeader(9)">$x8</th>
+        <th class="hdr-lsd" onclick="onColHeader(10)">$x9</th>
+        <th class="hdr-lsd" onclick="onColHeader(11)">$xA</th>
+        <th class="hdr-lsd" onclick="onColHeader(12)">$xB</th>
+        <th class="hdr-lsd" onclick="onColHeader(13)">$xC</th>
+        <th class="hdr-lsd" onclick="onColHeader(14)">$xD</th>
+        <th class="hdr-lsd" onclick="onColHeader(15)">$xE</th>
+        <th class="hdr-lsd" onclick="onColHeader(16)">$xF</th>
       </tr>
     </tfoot>
   </table>
