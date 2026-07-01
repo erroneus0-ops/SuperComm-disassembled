@@ -43,9 +43,12 @@
     of a memory address.</p>
 
     <p><strong>Addressing modes</strong> are indicated by suffix in the mnemonic:</p>
-    <p><code>,k</code> -- immediate: operand is a constant value (0 to $FF).<br>
-    <code>,m</code> -- memory: operand is the low byte of a memory address.<br>
-    <code>,x</code> -- indexed: X Register is added to the memory address at execution time.</p>
+    <p><code>,k</code> -- immediate: operand is a constant value ($00 to $FF).<br>
+    <code>,m</code> -- memory: operand is the low 8 bits of the target address; the high 2 bits
+    are encoded in the op code itself (see page encoding below).<br>
+    <code>,x</code> -- indexed: the X Register is added to the operand byte at execution time
+    to produce the effective address. The operand is the fixed base; X is the moving offset.
+    The addition is unsigned and can carry into the page bits, giving a full 10-bit result.</p>
 
     <p><strong>Memory map:</strong> The COMTRAN TEN has 1024 ($400) locations, addressed $000 to $3FF.
     These are divided into four pages of 256 bytes each:</p>
