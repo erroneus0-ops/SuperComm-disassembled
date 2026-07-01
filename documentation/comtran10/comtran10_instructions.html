@@ -166,27 +166,8 @@ Addr  Hex   Hex   Mnemonic
 <div class="instruction" id="LC1_k">
   <h3 class="mnemonic"><code>LC1,k</code> <span class="full-name">-- Load Countdown Immediate</span></h3>
   <div class="hex-code">Hex: <code>$01</code> <span class="note-refs">[3]</span></div>
-  <p class="description">Load COUNTDOWN Register with a count of k.</p>
-  <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
-  <p class="covered-by">Example pattern: see <code>LX1</code> above.</p>
-  
-</div>
-
-<div class="instruction" id="LA1_k">
-  <h3 class="mnemonic"><code>LA1,k</code> <span class="full-name">-- Load Accumulator Immediate</span></h3>
-  <div class="hex-code">Hex: <code>$02</code> <span class="note-refs">[3, 14]</span></div>
-  <p class="description">Load ACCUMULATOR with the value k.</p>
-  <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
-  <p class="covered-by">Example pattern: see <code>LX1</code> above.</p>
-  
-</div>
-
-<div class="instruction" id="LDA_m_x">
-  <h3 class="mnemonic"><code>LDA,m,x</code> <span class="full-name">-- Load Accumulator</span></h3>
-  <div class="hex-code">Hex: <code>$20</code> <span class="note-refs">[1, 2, 14]</span></div>
-  <p class="description">Load ACCUMULATOR with contents of memory address m.</p>
-  <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
-  
+  <p class="description">Load COUNTDOWN Register with a count of k. The Countdown Register is a dedicated hardware counter used exclusively by the block I/O instructions (WDB, RDB, RDI, MNI, MNO). It is not a general-purpose loop counter. Load it with the number of words to transfer minus one -- the I/O instruction will transfer count + 1 words, decrementing C after each transfer and stopping when C reaches zero. For general loop control, use the Index Register with BXZ, or a memory location with RSO/RAO.</p>
+  <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div><div class="note-item"><span class="note-num">16.</span><span>The Countdown Register (C) is a dedicated I/O transfer counter, not a general-purpose loop register. It is automatically decremented by WDB, RDB, MNI, MNO during block transfers. It has no effect on RDI (which reads until interrupt). For fixed-length string output: set LC1 to length-1, fire WDB -- the hardware loop is built into the instruction. No explicit branch needed.</span></div></div>
   <div class="example">
   <div class="example-title">Load accumulator from memory -- page 0 and upper pages</div>
   <pre class="example-listing">; Data
@@ -1034,7 +1015,7 @@ Addr  Hex   Hex   Mnemonic
     </div>
   </div>
 
-  <div class="notes-section">
+    <div class="notes-section">
     <h2>Notes</h2>
     <div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div>
     <div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div>
@@ -1051,7 +1032,8 @@ Addr  Hex   Hex   Mnemonic
     <div class="note-item"><span class="note-num">13.</span><span>DIVIDE overflow: quotient exceeds largest signed 8-bit number.</span></div>
     <div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div>
     <div class="note-item"><span class="note-num">15.</span><span>MANUAL OUTPUT: contents of indicated memory location also displayed on Buffer Register. Computer stops with WAIT light on after each word. Press START to continue.</span></div>
-  </div>
+    <div class="note-item"><span class="note-num">16.</span><span>The Countdown Register (C) is a dedicated I/O transfer counter, not a general-purpose loop register. It is automatically decremented by WDB, RDB, MNI, MNO during block transfers. It has no effect on RDI (which reads until interrupt). For fixed-length string output: set LC1 to length-1, fire WDB -- the hardware loop is built into the instruction. No explicit branch needed.</span></div>
+  </div>  </div>
 
   </main>
   <footer>COMTRAN TEN Instruction Repertoire -- transcribed from KDA-3032, June 1981 -- public domain (U.S. Government work)</footer>
