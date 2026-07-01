@@ -1,0 +1,417 @@
+{
+  "machine": "COMTRAN TEN",
+  "manufacturer": "Digiac (subsidiary of Fabri-Tek)",
+  "manual": "KDA-3032, USAF Technical Training, June 1981",
+  "notes": {
+    "1": "To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.",
+    "2": "Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.",
+    "3": "Value k is limited to FF hex.",
+    "4": "Arithmetic in RAO and RSO handles an 8-bit unsigned number.",
+    "5": "Operand is not used in FLAG CLEAR or FLAG SET instructions.",
+    "6": "OCD instruction operand bits: bits 2,1,0 select peripheral unit; bit 3 selects HEX mode; bit 4 selects APH mode.",
+    "7": "RDB and RDI automatically generate and transmit XON to the teletype.",
+    "8": "Tape must end with XOFF followed by CONTROL 1.",
+    "9": "Teletype keyboard: CONTROL H sets HEX mode; CONTROL A sets ALPHA mode.",
+    "10": "In HEX mode, output colons (:) are inserted automatically with line feeds and carriage returns.",
+    "11": "CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.",
+    "12": "ADD overflow: result exceeds largest signed 8-bit number. Numbers handled as signed two's complement.",
+    "13": "DIVIDE overflow: quotient exceeds largest signed 8-bit number.",
+    "14": "CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.",
+    "15": "MANUAL OUTPUT: contents of indicated memory location also displayed on Buffer Register. Computer stops with WAIT light on after each word. Press START to continue."
+  },
+  "addressing_modes": {
+    "m": "Memory — operand is a memory address",
+    "k": "Immediate — operand is a constant value (max FF hex)",
+    "x": "Indexed — X Register added to memory address"
+  },
+  "groups": [
+    {
+      "group": "load",
+      "description": "Load registers from memory or immediate value",
+      "instructions": [
+        {
+          "mnemonic": "LX1,k",
+          "symbolic": "LX1,k",
+          "hex_code": "12",
+          "full_name": "Load Index Immediate",
+          "description": "Load INDEX Register with a count of k.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "LC1,k",
+          "symbolic": "LC1,k",
+          "hex_code": "01",
+          "full_name": "Load Countdown Immediate",
+          "description": "Load COUNTDOWN Register with a count of k.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "LA1,k",
+          "symbolic": "LA1,k",
+          "hex_code": "02",
+          "full_name": "Load Accumulator Immediate",
+          "description": "Load ACCUMULATOR with the value k.",
+          "notes": [3, 14]
+        },
+        {
+          "mnemonic": "LDA,m,x",
+          "symbolic": "LDA,m,x",
+          "hex_code": "20",
+          "full_name": "Load Accumulator",
+          "description": "Load ACCUMULATOR with contents of memory address m.",
+          "notes": [1, 2, 14]
+        },
+        {
+          "mnemonic": "LCC,m,x",
+          "symbolic": "LCC,m,x",
+          "hex_code": "30",
+          "full_name": "Load Consecutive",
+          "description": "Transfer the contents of memory address m to memory address m + 1.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "LAN,m,x",
+          "symbolic": "LAN,m,x",
+          "hex_code": "38",
+          "full_name": "Load Accumulator Negative",
+          "description": "Load ACCUMULATOR with the two's complement of the contents of m.",
+          "notes": [1, 2, 14]
+        },
+        {
+          "mnemonic": "LDQ,m,x",
+          "symbolic": "LDQ,m,x",
+          "hex_code": "40",
+          "full_name": "Load Quotient Register",
+          "description": "Load QUOTIENT Register with the contents of memory address m.",
+          "notes": [1, 2]
+        }
+      ]
+    },
+    {
+      "group": "store",
+      "description": "Store register contents to memory",
+      "instructions": [
+        {
+          "mnemonic": "STA,m,x",
+          "symbolic": "STA,m,x",
+          "hex_code": "48",
+          "full_name": "Store Accumulator",
+          "description": "Store contents of the ACCUMULATOR at memory address m.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "STX,m,x",
+          "symbolic": "STX,m,x",
+          "hex_code": "50",
+          "full_name": "Store Index",
+          "description": "Store contents of the INDEX Register at memory address m.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "STQ,m,x",
+          "symbolic": "STQ,m,x",
+          "hex_code": "58",
+          "full_name": "Store Quotient Register",
+          "description": "Store the contents of the QUOTIENT Register at memory address m.",
+          "notes": [1, 2]
+        }
+      ]
+    },
+    {
+      "group": "arithmetic",
+      "description": "Arithmetic operations",
+      "instructions": [
+        {
+          "mnemonic": "ADD,m,x",
+          "symbolic": "ADD,m,x",
+          "hex_code": "60",
+          "full_name": "Add",
+          "description": "Add the contents of memory address m to the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.",
+          "notes": [1, 2, 11, 12, 14]
+        },
+        {
+          "mnemonic": "SUB,m,x",
+          "symbolic": "SUB,m,x",
+          "hex_code": "68",
+          "full_name": "Subtract",
+          "description": "Subtract the contents of memory address m from the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.",
+          "notes": [1, 2, 11, 12, 14]
+        },
+        {
+          "mnemonic": "MPY,m,x",
+          "symbolic": "MPY,m,x",
+          "hex_code": "70",
+          "full_name": "Multiply",
+          "description": "Multiply the contents of the ACCUMULATOR by the contents of memory address m, leaving a double length product in the AQ Register.",
+          "notes": [1, 2, 14]
+        },
+        {
+          "mnemonic": "DIV,m,x",
+          "symbolic": "DIV,m,x",
+          "hex_code": "78",
+          "full_name": "Divide",
+          "description": "Divide the double length number in the AQ Register by the contents of memory address m, leaving the quotient in the Q Register and the remainder in the ACCUMULATOR. Set condition code to sign of quotient. Sign of remainder equals sign of dividend. Conditionally set divide overflow.",
+          "notes": [1, 2, 13, 14]
+        },
+        {
+          "mnemonic": "RAO,m,x",
+          "symbolic": "RAO,m,x",
+          "hex_code": "80",
+          "full_name": "Replace Add One",
+          "description": "Add 1 to the contents of memory address m. If contents of m are FF, sets m to zero and sets carry bit. ACCUMULATOR contains the result.",
+          "notes": [1, 2, 4, 11, 14]
+        },
+        {
+          "mnemonic": "RSO,m,x",
+          "symbolic": "RSO,m,x",
+          "hex_code": "88",
+          "full_name": "Replace Subtract One",
+          "description": "Subtract 1 from the contents of memory address m. If contents of m are zero, sets m to FF and sets carry bit. ACCUMULATOR contains the result.",
+          "notes": [1, 2, 4, 11, 14]
+        },
+        {
+          "mnemonic": "INX,k",
+          "symbolic": "INX,k",
+          "hex_code": "03",
+          "full_name": "Increase Index",
+          "description": "Increase the contents of the INDEX Register by k.",
+          "notes": [3]
+        }
+      ]
+    },
+    {
+      "group": "logical",
+      "description": "Logical and shift operations",
+      "instructions": [
+        {
+          "mnemonic": "SLA,k",
+          "symbolic": "SLA,k",
+          "hex_code": "0B",
+          "full_name": "Shift Left Arithmetic",
+          "description": "Shift the AQ Register left k places, filling in zeros on the right.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "SRA,k",
+          "symbolic": "SRA,k",
+          "hex_code": "10",
+          "full_name": "Shift Right Arithmetic",
+          "description": "Shift the AQ Register right k places, propagating sign bits on the left.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "SLL,k",
+          "symbolic": "SLL,k",
+          "hex_code": "13",
+          "full_name": "Shift Left Logical",
+          "description": "Shift the ACCUMULATOR left k places, filling in zeros on the right.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "SRL,k",
+          "symbolic": "SRL,k",
+          "hex_code": "18",
+          "full_name": "Shift Right Logical",
+          "description": "Shift the ACCUMULATOR right k places, filling in zeros on the left.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "AND,k",
+          "symbolic": "AND,k",
+          "hex_code": "19",
+          "full_name": "And",
+          "description": "Form the bit-by-bit logical product of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "IOR,k",
+          "symbolic": "IOR,k",
+          "hex_code": "1A",
+          "full_name": "Inclusive Or",
+          "description": "Form the bit-by-bit Inclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "XOR,k",
+          "symbolic": "XOR,k",
+          "hex_code": "1B",
+          "full_name": "Exclusive Or",
+          "description": "Form the bit-by-bit Exclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.",
+          "notes": [3]
+        }
+      ]
+    },
+    {
+      "group": "branch",
+      "description": "Branch and control flow",
+      "instructions": [
+        {
+          "mnemonic": "BUN,m,x",
+          "symbolic": "BUN,m,x",
+          "hex_code": "90",
+          "full_name": "Branch Unconditional",
+          "description": "Branch to memory address m.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BST,m,x",
+          "symbolic": "BST,m,x",
+          "hex_code": "98",
+          "full_name": "Branch and Stop",
+          "description": "Branch to memory address m and stop.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BSB,m,x",
+          "symbolic": "BSB,m,x",
+          "hex_code": "A0",
+          "full_name": "Branch to Subroutine",
+          "description": "Store BUN op code in location m. Store the contents of the P Register (next instruction address) in location m+1. Branch to location m+2.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BPS,m,x",
+          "symbolic": "BPS,m,x",
+          "hex_code": "A8",
+          "full_name": "Branch on Positive",
+          "description": "Branch to memory address m if the condition code is greater than zero.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BZE,m,x",
+          "symbolic": "BZE,m,x",
+          "hex_code": "B0",
+          "full_name": "Branch on Zero",
+          "description": "Branch to memory address m if the condition code is equal to zero.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BNG,m,x",
+          "symbolic": "BNG,m,x",
+          "hex_code": "B8",
+          "full_name": "Branch on Negative",
+          "description": "Branch to memory address m if the condition code is less than zero.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BNC,m,x",
+          "symbolic": "BNC,m,x",
+          "hex_code": "C0",
+          "full_name": "Branch on No Carry",
+          "description": "Branch to memory address m if the condition code is not carry.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "BXZ,m,x",
+          "symbolic": "BXZ,m,x",
+          "hex_code": "C8",
+          "full_name": "Branch on Index Zero",
+          "description": "Branch to memory address m if the INDEX Register is zero.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "SKI,k",
+          "symbolic": "SKI,k",
+          "hex_code": "08",
+          "full_name": "Skip on Interrupt",
+          "description": "Skip k instructions or 2k words if interrupt is set.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "SKS,k",
+          "symbolic": "SKS,k",
+          "hex_code": "09",
+          "full_name": "Skip on Sense Switch",
+          "description": "Skip k instructions or 2k words if the sense switch is on.",
+          "notes": [3]
+        },
+        {
+          "mnemonic": "SKF,k",
+          "symbolic": "SKF,k",
+          "hex_code": "0A",
+          "full_name": "Skip on Flag",
+          "description": "Skip k instructions or 2k words if flag is set.",
+          "notes": [3]
+        }
+      ]
+    },
+    {
+      "group": "input_output",
+      "description": "Input/Output and peripheral control",
+      "instructions": [
+        {
+          "mnemonic": "WDB,m,x",
+          "symbolic": "WDB,m,x",
+          "hex_code": "D0",
+          "full_name": "Write Data Block",
+          "description": "Transfer the contents of consecutive memory locations starting at address m to the selected external device. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.",
+          "notes": [1, 2, 10]
+        },
+        {
+          "mnemonic": "MNO,m,x",
+          "symbolic": "MNO,m,x",
+          "hex_code": "D8",
+          "full_name": "Manual Output",
+          "description": "Transfer the contents of consecutive memory locations to the Input Register. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.",
+          "notes": [1, 2, 15]
+        },
+        {
+          "mnemonic": "RDB,m,x",
+          "symbolic": "RDB,m,x",
+          "hex_code": "E0",
+          "full_name": "Read Data Block",
+          "description": "Store data from the selected external device in consecutive memory locations starting at address m. Continue until C Register is zero. Number of words stored is one more than initial count in C Register.",
+          "notes": [1, 2, 7, 9]
+        },
+        {
+          "mnemonic": "RDI,m,x",
+          "symbolic": "RDI,m,x",
+          "hex_code": "E8",
+          "full_name": "Read Until Interrupt",
+          "description": "Store data from the selected external device in consecutive memory locations starting at address m. Continue until interrupt is set.",
+          "notes": [1, 2, 7, 8, 9]
+        },
+        {
+          "mnemonic": "MNI,m,x",
+          "symbolic": "MNI,m,x",
+          "hex_code": "F0",
+          "full_name": "Manual Input",
+          "description": "Transfer the contents of the Input Register to consecutive memory locations starting at address m. Continue until the C Register is zero. Number of words stored is one more than initial count in C Register.",
+          "notes": [1, 2]
+        },
+        {
+          "mnemonic": "OCD,k",
+          "symbolic": "OCD,k",
+          "hex_code": "11",
+          "full_name": "Output Command",
+          "description": "Transmit the operand k to the external device addressed by the three low order bits in k.",
+          "notes": [3, 6, 9]
+        },
+        {
+          "mnemonic": "SST,k",
+          "symbolic": "SST,k",
+          "hex_code": "00",
+          "full_name": "Sense Status",
+          "description": "The previously addressed device sends an 8-bit status word which is transferred to the ACCUMULATOR.",
+          "notes": []
+        },
+        {
+          "mnemonic": "FLC,k",
+          "symbolic": "FLC,k",
+          "hex_code": "28",
+          "full_name": "Flag Clear",
+          "description": "Clear flag to zero.",
+          "notes": [5]
+        },
+        {
+          "mnemonic": "FLS,k",
+          "symbolic": "FLS,k",
+          "hex_code": "F8",
+          "full_name": "Flag Set",
+          "description": "Set flag to one.",
+          "notes": [5]
+        }
+      ]
+    }
+  ]
+}

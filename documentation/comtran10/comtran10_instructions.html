@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COMTRAN TEN — Instruction Repertoire</title>
+  <link rel="stylesheet" href="../html/style.css">
+  <style>
+    .hex-code { font-family: "Courier New", monospace; color: var(--accent2); font-size: 1rem; margin-bottom: 0.4rem; }
+    .note-refs { font-size: 0.8rem; color: var(--text-dim); }
+    .addressing { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem; padding: 0.5rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 3px; }
+    .addressing code { color: var(--accent); }
+    .notes-section { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--border); }
+    .notes-section h2 { margin-bottom: 1rem; }
+    .note-item { display: flex; gap: 1rem; margin-bottom: 0.6rem; font-size: 0.9rem; color: var(--text-dim); }
+    .note-num { font-family: "Courier New", monospace; color: var(--accent); min-width: 1.5rem; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <span class="group-title">COMTRAN TEN — Instruction Repertoire</span>
+  </nav>
+  <header>
+    <h1>COMTRAN TEN</h1>
+    <h2>Instruction Repertoire &mdash; 44 Instructions &mdash; Digiac / Fabri-Tek, 1972</h2>
+    <h2>Source: KDA-3032, USAF Technical Training, June 1981</h2>
+  </header>
+  <main>
+
+  <div class="addressing">
+    <strong>Addressing modes:</strong>
+    <code>,m</code> memory address &nbsp;&nbsp;
+    <code>,k</code> immediate constant (max $FF) &nbsp;&nbsp;
+    <code>,x</code> indexed (X Register added to address)
+  </div>
+
+    <h2>Load <span class="count">— Load registers from memory or immediate value</span></h2>
+
+<div class="instruction" id="LX1_k">
+  <h3 class="mnemonic"><code>LX1,k</code> <span class="full-name">— Load Index Immediate</span></h3>
+  <div class="hex-code">Hex: <code>$12</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Load INDEX Register with a count of k.</p>
+</div>
+
+<div class="instruction" id="LC1_k">
+  <h3 class="mnemonic"><code>LC1,k</code> <span class="full-name">— Load Countdown Immediate</span></h3>
+  <div class="hex-code">Hex: <code>$01</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Load COUNTDOWN Register with a count of k.</p>
+</div>
+
+<div class="instruction" id="LA1_k">
+  <h3 class="mnemonic"><code>LA1,k</code> <span class="full-name">— Load Accumulator Immediate</span></h3>
+  <div class="hex-code">Hex: <code>$02</code> <span class="note-refs">[3, 14]</span></div>
+  <p class="description">Load ACCUMULATOR with the value k.</p>
+</div>
+
+<div class="instruction" id="LDA_m_x">
+  <h3 class="mnemonic"><code>LDA,m,x</code> <span class="full-name">— Load Accumulator</span></h3>
+  <div class="hex-code">Hex: <code>$20</code> <span class="note-refs">[1, 2, 14]</span></div>
+  <p class="description">Load ACCUMULATOR with contents of memory address m.</p>
+</div>
+
+<div class="instruction" id="LCC_m_x">
+  <h3 class="mnemonic"><code>LCC,m,x</code> <span class="full-name">— Load Consecutive</span></h3>
+  <div class="hex-code">Hex: <code>$30</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Transfer the contents of memory address m to memory address m + 1.</p>
+</div>
+
+<div class="instruction" id="LAN_m_x">
+  <h3 class="mnemonic"><code>LAN,m,x</code> <span class="full-name">— Load Accumulator Negative</span></h3>
+  <div class="hex-code">Hex: <code>$38</code> <span class="note-refs">[1, 2, 14]</span></div>
+  <p class="description">Load ACCUMULATOR with the two's complement of the contents of m.</p>
+</div>
+
+<div class="instruction" id="LDQ_m_x">
+  <h3 class="mnemonic"><code>LDQ,m,x</code> <span class="full-name">— Load Quotient Register</span></h3>
+  <div class="hex-code">Hex: <code>$40</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Load QUOTIENT Register with the contents of memory address m.</p>
+</div>
+    <h2>Store <span class="count">— Store register contents to memory</span></h2>
+
+<div class="instruction" id="STA_m_x">
+  <h3 class="mnemonic"><code>STA,m,x</code> <span class="full-name">— Store Accumulator</span></h3>
+  <div class="hex-code">Hex: <code>$48</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Store contents of the ACCUMULATOR at memory address m.</p>
+</div>
+
+<div class="instruction" id="STX_m_x">
+  <h3 class="mnemonic"><code>STX,m,x</code> <span class="full-name">— Store Index</span></h3>
+  <div class="hex-code">Hex: <code>$50</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Store contents of the INDEX Register at memory address m.</p>
+</div>
+
+<div class="instruction" id="STQ_m_x">
+  <h3 class="mnemonic"><code>STQ,m,x</code> <span class="full-name">— Store Quotient Register</span></h3>
+  <div class="hex-code">Hex: <code>$58</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Store the contents of the QUOTIENT Register at memory address m.</p>
+</div>
+    <h2>Arithmetic <span class="count">— Arithmetic operations</span></h2>
+
+<div class="instruction" id="ADD_m_x">
+  <h3 class="mnemonic"><code>ADD,m,x</code> <span class="full-name">— Add</span></h3>
+  <div class="hex-code">Hex: <code>$60</code> <span class="note-refs">[1, 2, 11, 12, 14]</span></div>
+  <p class="description">Add the contents of memory address m to the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.</p>
+</div>
+
+<div class="instruction" id="SUB_m_x">
+  <h3 class="mnemonic"><code>SUB,m,x</code> <span class="full-name">— Subtract</span></h3>
+  <div class="hex-code">Hex: <code>$68</code> <span class="note-refs">[1, 2, 11, 12, 14]</span></div>
+  <p class="description">Subtract the contents of memory address m from the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.</p>
+</div>
+
+<div class="instruction" id="MPY_m_x">
+  <h3 class="mnemonic"><code>MPY,m,x</code> <span class="full-name">— Multiply</span></h3>
+  <div class="hex-code">Hex: <code>$70</code> <span class="note-refs">[1, 2, 14]</span></div>
+  <p class="description">Multiply the contents of the ACCUMULATOR by the contents of memory address m, leaving a double length product in the AQ Register.</p>
+</div>
+
+<div class="instruction" id="DIV_m_x">
+  <h3 class="mnemonic"><code>DIV,m,x</code> <span class="full-name">— Divide</span></h3>
+  <div class="hex-code">Hex: <code>$78</code> <span class="note-refs">[1, 2, 13, 14]</span></div>
+  <p class="description">Divide the double length number in the AQ Register by the contents of memory address m, leaving the quotient in the Q Register and the remainder in the ACCUMULATOR. Set condition code to sign of quotient. Sign of remainder equals sign of dividend. Conditionally set divide overflow.</p>
+</div>
+
+<div class="instruction" id="RAO_m_x">
+  <h3 class="mnemonic"><code>RAO,m,x</code> <span class="full-name">— Replace Add One</span></h3>
+  <div class="hex-code">Hex: <code>$80</code> <span class="note-refs">[1, 2, 4, 11, 14]</span></div>
+  <p class="description">Add 1 to the contents of memory address m. If contents of m are FF, sets m to zero and sets carry bit. ACCUMULATOR contains the result.</p>
+</div>
+
+<div class="instruction" id="RSO_m_x">
+  <h3 class="mnemonic"><code>RSO,m,x</code> <span class="full-name">— Replace Subtract One</span></h3>
+  <div class="hex-code">Hex: <code>$88</code> <span class="note-refs">[1, 2, 4, 11, 14]</span></div>
+  <p class="description">Subtract 1 from the contents of memory address m. If contents of m are zero, sets m to FF and sets carry bit. ACCUMULATOR contains the result.</p>
+</div>
+
+<div class="instruction" id="INX_k">
+  <h3 class="mnemonic"><code>INX,k</code> <span class="full-name">— Increase Index</span></h3>
+  <div class="hex-code">Hex: <code>$03</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Increase the contents of the INDEX Register by k.</p>
+</div>
+    <h2>Logical <span class="count">— Logical and shift operations</span></h2>
+
+<div class="instruction" id="SLA_k">
+  <h3 class="mnemonic"><code>SLA,k</code> <span class="full-name">— Shift Left Arithmetic</span></h3>
+  <div class="hex-code">Hex: <code>$0B</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Shift the AQ Register left k places, filling in zeros on the right.</p>
+</div>
+
+<div class="instruction" id="SRA_k">
+  <h3 class="mnemonic"><code>SRA,k</code> <span class="full-name">— Shift Right Arithmetic</span></h3>
+  <div class="hex-code">Hex: <code>$10</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Shift the AQ Register right k places, propagating sign bits on the left.</p>
+</div>
+
+<div class="instruction" id="SLL_k">
+  <h3 class="mnemonic"><code>SLL,k</code> <span class="full-name">— Shift Left Logical</span></h3>
+  <div class="hex-code">Hex: <code>$13</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Shift the ACCUMULATOR left k places, filling in zeros on the right.</p>
+</div>
+
+<div class="instruction" id="SRL_k">
+  <h3 class="mnemonic"><code>SRL,k</code> <span class="full-name">— Shift Right Logical</span></h3>
+  <div class="hex-code">Hex: <code>$18</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Shift the ACCUMULATOR right k places, filling in zeros on the left.</p>
+</div>
+
+<div class="instruction" id="AND_k">
+  <h3 class="mnemonic"><code>AND,k</code> <span class="full-name">— And</span></h3>
+  <div class="hex-code">Hex: <code>$19</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Form the bit-by-bit logical product of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
+</div>
+
+<div class="instruction" id="IOR_k">
+  <h3 class="mnemonic"><code>IOR,k</code> <span class="full-name">— Inclusive Or</span></h3>
+  <div class="hex-code">Hex: <code>$1A</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Form the bit-by-bit Inclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
+</div>
+
+<div class="instruction" id="XOR_k">
+  <h3 class="mnemonic"><code>XOR,k</code> <span class="full-name">— Exclusive Or</span></h3>
+  <div class="hex-code">Hex: <code>$1B</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Form the bit-by-bit Exclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
+</div>
+    <h2>Branch <span class="count">— Branch and control flow</span></h2>
+
+<div class="instruction" id="BUN_m_x">
+  <h3 class="mnemonic"><code>BUN,m,x</code> <span class="full-name">— Branch Unconditional</span></h3>
+  <div class="hex-code">Hex: <code>$90</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m.</p>
+</div>
+
+<div class="instruction" id="BST_m_x">
+  <h3 class="mnemonic"><code>BST,m,x</code> <span class="full-name">— Branch and Stop</span></h3>
+  <div class="hex-code">Hex: <code>$98</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m and stop.</p>
+</div>
+
+<div class="instruction" id="BSB_m_x">
+  <h3 class="mnemonic"><code>BSB,m,x</code> <span class="full-name">— Branch to Subroutine</span></h3>
+  <div class="hex-code">Hex: <code>$A0</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Store BUN op code in location m. Store the contents of the P Register (next instruction address) in location m+1. Branch to location m+2.</p>
+</div>
+
+<div class="instruction" id="BPS_m_x">
+  <h3 class="mnemonic"><code>BPS,m,x</code> <span class="full-name">— Branch on Positive</span></h3>
+  <div class="hex-code">Hex: <code>$A8</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m if the condition code is greater than zero.</p>
+</div>
+
+<div class="instruction" id="BZE_m_x">
+  <h3 class="mnemonic"><code>BZE,m,x</code> <span class="full-name">— Branch on Zero</span></h3>
+  <div class="hex-code">Hex: <code>$B0</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m if the condition code is equal to zero.</p>
+</div>
+
+<div class="instruction" id="BNG_m_x">
+  <h3 class="mnemonic"><code>BNG,m,x</code> <span class="full-name">— Branch on Negative</span></h3>
+  <div class="hex-code">Hex: <code>$B8</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m if the condition code is less than zero.</p>
+</div>
+
+<div class="instruction" id="BNC_m_x">
+  <h3 class="mnemonic"><code>BNC,m,x</code> <span class="full-name">— Branch on No Carry</span></h3>
+  <div class="hex-code">Hex: <code>$C0</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m if the condition code is not carry.</p>
+</div>
+
+<div class="instruction" id="BXZ_m_x">
+  <h3 class="mnemonic"><code>BXZ,m,x</code> <span class="full-name">— Branch on Index Zero</span></h3>
+  <div class="hex-code">Hex: <code>$C8</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Branch to memory address m if the INDEX Register is zero.</p>
+</div>
+
+<div class="instruction" id="SKI_k">
+  <h3 class="mnemonic"><code>SKI,k</code> <span class="full-name">— Skip on Interrupt</span></h3>
+  <div class="hex-code">Hex: <code>$08</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Skip k instructions or 2k words if interrupt is set.</p>
+</div>
+
+<div class="instruction" id="SKS_k">
+  <h3 class="mnemonic"><code>SKS,k</code> <span class="full-name">— Skip on Sense Switch</span></h3>
+  <div class="hex-code">Hex: <code>$09</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Skip k instructions or 2k words if the sense switch is on.</p>
+</div>
+
+<div class="instruction" id="SKF_k">
+  <h3 class="mnemonic"><code>SKF,k</code> <span class="full-name">— Skip on Flag</span></h3>
+  <div class="hex-code">Hex: <code>$0A</code> <span class="note-refs">[3]</span></div>
+  <p class="description">Skip k instructions or 2k words if flag is set.</p>
+</div>
+    <h2>Input/Output <span class="count">— Input/Output and peripheral control</span></h2>
+
+<div class="instruction" id="WDB_m_x">
+  <h3 class="mnemonic"><code>WDB,m,x</code> <span class="full-name">— Write Data Block</span></h3>
+  <div class="hex-code">Hex: <code>$D0</code> <span class="note-refs">[1, 2, 10]</span></div>
+  <p class="description">Transfer the contents of consecutive memory locations starting at address m to the selected external device. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.</p>
+</div>
+
+<div class="instruction" id="MNO_m_x">
+  <h3 class="mnemonic"><code>MNO,m,x</code> <span class="full-name">— Manual Output</span></h3>
+  <div class="hex-code">Hex: <code>$D8</code> <span class="note-refs">[1, 2, 15]</span></div>
+  <p class="description">Transfer the contents of consecutive memory locations to the Input Register. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.</p>
+</div>
+
+<div class="instruction" id="RDB_m_x">
+  <h3 class="mnemonic"><code>RDB,m,x</code> <span class="full-name">— Read Data Block</span></h3>
+  <div class="hex-code">Hex: <code>$E0</code> <span class="note-refs">[1, 2, 7, 9]</span></div>
+  <p class="description">Store data from the selected external device in consecutive memory locations starting at address m. Continue until C Register is zero. Number of words stored is one more than initial count in C Register.</p>
+</div>
+
+<div class="instruction" id="RDI_m_x">
+  <h3 class="mnemonic"><code>RDI,m,x</code> <span class="full-name">— Read Until Interrupt</span></h3>
+  <div class="hex-code">Hex: <code>$E8</code> <span class="note-refs">[1, 2, 7, 8, 9]</span></div>
+  <p class="description">Store data from the selected external device in consecutive memory locations starting at address m. Continue until interrupt is set.</p>
+</div>
+
+<div class="instruction" id="MNI_m_x">
+  <h3 class="mnemonic"><code>MNI,m,x</code> <span class="full-name">— Manual Input</span></h3>
+  <div class="hex-code">Hex: <code>$F0</code> <span class="note-refs">[1, 2]</span></div>
+  <p class="description">Transfer the contents of the Input Register to consecutive memory locations starting at address m. Continue until the C Register is zero. Number of words stored is one more than initial count in C Register.</p>
+</div>
+
+<div class="instruction" id="OCD_k">
+  <h3 class="mnemonic"><code>OCD,k</code> <span class="full-name">— Output Command</span></h3>
+  <div class="hex-code">Hex: <code>$11</code> <span class="note-refs">[3, 6, 9]</span></div>
+  <p class="description">Transmit the operand k to the external device addressed by the three low order bits in k.</p>
+</div>
+
+<div class="instruction" id="SST_k">
+  <h3 class="mnemonic"><code>SST,k</code> <span class="full-name">— Sense Status</span></h3>
+  <div class="hex-code">Hex: <code>$00</code></div>
+  <p class="description">The previously addressed device sends an 8-bit status word which is transferred to the ACCUMULATOR.</p>
+</div>
+
+<div class="instruction" id="FLC_k">
+  <h3 class="mnemonic"><code>FLC,k</code> <span class="full-name">— Flag Clear</span></h3>
+  <div class="hex-code">Hex: <code>$28</code> <span class="note-refs">[5]</span></div>
+  <p class="description">Clear flag to zero.</p>
+</div>
+
+<div class="instruction" id="FLS_k">
+  <h3 class="mnemonic"><code>FLS,k</code> <span class="full-name">— Flag Set</span></h3>
+  <div class="hex-code">Hex: <code>$F8</code> <span class="note-refs">[5]</span></div>
+  <p class="description">Set flag to one.</p>
+</div>
+
+  <div class="notes-section">
+    <h2>Notes</h2>
+    <div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div>
+    <div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div>
+    <div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div>
+    <div class="note-item"><span class="note-num">4.</span><span>Arithmetic in RAO and RSO handles an 8-bit unsigned number.</span></div>
+    <div class="note-item"><span class="note-num">5.</span><span>Operand is not used in FLAG CLEAR or FLAG SET instructions.</span></div>
+    <div class="note-item"><span class="note-num">6.</span><span>OCD instruction operand bits: bits 2,1,0 select peripheral unit; bit 3 selects HEX mode; bit 4 selects APH mode.</span></div>
+    <div class="note-item"><span class="note-num">7.</span><span>RDB and RDI automatically generate and transmit XON to the teletype.</span></div>
+    <div class="note-item"><span class="note-num">8.</span><span>Tape must end with XOFF followed by CONTROL 1.</span></div>
+    <div class="note-item"><span class="note-num">9.</span><span>Teletype keyboard: CONTROL H sets HEX mode; CONTROL A sets ALPHA mode.</span></div>
+    <div class="note-item"><span class="note-num">10.</span><span>In HEX mode, output colons (:) are inserted automatically with line feeds and carriage returns.</span></div>
+    <div class="note-item"><span class="note-num">11.</span><span>CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.</span></div>
+    <div class="note-item"><span class="note-num">12.</span><span>ADD overflow: result exceeds largest signed 8-bit number. Numbers handled as signed two's complement.</span></div>
+    <div class="note-item"><span class="note-num">13.</span><span>DIVIDE overflow: quotient exceeds largest signed 8-bit number.</span></div>
+    <div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div>
+    <div class="note-item"><span class="note-num">15.</span><span>MANUAL OUTPUT: contents of indicated memory location also displayed on Buffer Register. Computer stops with WAIT light on after each word. Press START to continue.</span></div>
+  </div>
+
+  </main>
+  <footer>COMTRAN TEN Instruction Repertoire &mdash; transcribed from KDA-3032, June 1981 &mdash; public domain (U.S. Government work)</footer>
+</body>
+</html>
