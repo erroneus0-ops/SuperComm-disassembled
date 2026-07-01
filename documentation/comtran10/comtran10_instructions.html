@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>COMTRAN TEN — Instruction Repertoire</title>
+  <title>COMTRAN TEN -- Instruction Repertoire</title>
   <link rel="stylesheet" href="../html/style.css">
   <style>
     .hex-code { font-family: "Courier New", monospace; color: var(--accent2); font-size: 1rem; margin-bottom: 0.4rem; }
     .note-refs { font-size: 0.8rem; color: var(--text-dim); }
-    .addressing { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; padding: 0.5rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 3px; }
-    .addressing code { color: var(--accent); }
+    .how-to-read { margin-bottom: 2rem; padding: 1rem 1.25rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; line-height: 1.7; }
+    .how-to-read h3 { color: var(--mnemonic); font-size: 1rem; margin-bottom: 0.75rem; font-family: "Courier New", monospace; }
+    .how-to-read code { color: var(--accent); background: var(--code-bg); padding: 0.1rem 0.3rem; border-radius: 2px; }
+    .how-to-read pre { font-family: "Courier New", monospace; font-size: 0.82rem; background: var(--code-bg); color: var(--accent); padding: 0.75rem 1rem; border-radius: 3px; border: 1px solid var(--border); margin: 0.75rem 0; line-height: 1.5; overflow-x: auto; }
+    .how-to-read p { margin-bottom: 0.6rem; color: var(--text-dim); }
     .inline-notes { margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: var(--bg2); border-left: 3px solid var(--border); font-size: 0.85rem; }
     .note-item { display: flex; gap: 0.75rem; margin-bottom: 0.3rem; color: var(--text-dim); }
     .note-num { font-family: "Courier New", monospace; color: var(--accent); min-width: 1.5rem; flex-shrink: 0; }
@@ -18,460 +21,835 @@
     .example { margin-top: 0.75rem; }
     .example-title { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem; font-style: italic; }
     .example-listing { font-family: "Courier New", monospace; font-size: 0.82rem; background: var(--code-bg); color: var(--accent); padding: 0.75rem 1rem; border-radius: 3px; border: 1px solid var(--border); overflow-x: auto; line-height: 1.5; white-space: pre; }
+    .covered-by { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
   <nav class="topnav">
-    <span class="group-title">COMTRAN TEN &mdash; Instruction Repertoire</span>
+    <span class="group-title">COMTRAN TEN -- Instruction Repertoire</span>
   </nav>
   <header>
     <h1>COMTRAN TEN</h1>
-    <h2>Instruction Repertoire &mdash; 44 Instructions &mdash; Digiac / Fabri-Tek, 1972</h2>
+    <h2>Instruction Repertoire -- 44 Instructions -- Digiac / Fabri-Tek, 1972</h2>
     <h2>Source: KDA-3032, USAF Technical Training, June 1981</h2>
   </header>
   <main>
 
-  <div class="addressing">
-    <strong>Instruction format:</strong> two consecutive 8-bit words. First word: op code (bits 7&ndash;3) + index bit (bit 2) + page bits (bits 1&ndash;0 via note 1). Second word: operand (address low byte or immediate value k).<br>
-    <strong>Addressing modes:</strong>
-    <code>,m</code> memory address &nbsp;
-    <code>,k</code> immediate constant (max $FF) &nbsp;
-    <code>,x</code> indexed (X Register added to address)<br>
-    <strong>Memory:</strong> $000&ndash;$3FF (4 pages of 256 bytes). Page encoded in op code high bits per note 1.
+  <div class="how-to-read">
+    <h3>How to Read This Reference</h3>
+
+    <p>Every instruction is exactly <strong>two consecutive 8-bit bytes</strong>. The first byte is
+    the op code. The second byte is the operand -- either an immediate value or the low byte
+    of a memory address.</p>
+
+    <p><strong>Addressing modes</strong> are indicated by suffix in the mnemonic:</p>
+    <p><code>,k</code> -- immediate: operand is a constant value (0 to $FF).<br>
+    <code>,m</code> -- memory: operand is the low byte of a memory address.<br>
+    <code>,x</code> -- indexed: X Register is added to the memory address at execution time.</p>
+
+    <p><strong>Memory map:</strong> The COMTRAN TEN has 1024 ($400) locations, addressed $000 to $3FF.
+    These are divided into four pages of 256 bytes each:</p>
+    <pre>Page 0:  $000 - $0FF
+Page 1:  $100 - $1FF
+Page 2:  $200 - $2FF
+Page 3:  $300 - $3FF</pre>
+
+    <p><strong>The page number is encoded in the op code byte itself.</strong> This is the most
+    important thing to understand when reading or writing hex by hand. The mnemonic is the same
+    regardless of which page you address, but the hex op code changes:</p>
+    <pre>LDA $0050  ->  20 50    (op $20 = LDA, page 0)
+LDA $0150  ->  21 50    (op $21 = LDA, page 1)
+LDA $0250  ->  22 50    (op $22 = LDA, page 2)
+LDA $0350  ->  23 50    (op $23 = LDA, page 3)</pre>
+    <p>The assembler computes the correct op code from the address you write. Hand-assembling
+    means choosing it yourself. The base op code (page 0) is what the Hex Code column shows.
+    Add 1, 2, or 3 for pages 1, 2, or 3 respectively (see note 1).</p>
+
+    <p><strong>Indexed addressing</strong> sets bit 2 of the op code (adds $04 to the base).
+    Page and index bits combine: <code>LDA $0050,x</code> on page 0 = op $24; on page 1 = op $25 (see note 2).</p>
+
+    <p><strong>Examples</strong> show a data block at a low address, a vertical ellipsis (...),
+    then the code block. Each instruction line shows: address, first hex byte, second hex byte,
+    mnemonic, and a comment using <code>&lt;-</code> for assignment. Where instructions share
+    the same pattern, one example covers the group.</p>
   </div>
 
 
-    <h2>Load <span class="count">— Load registers from memory or immediate value</span></h2>
+    <h2>Load <span class="count">-- Load registers from memory or immediate value</span></h2>
 
 <div class="instruction" id="LX1_k">
-  <h3 class="mnemonic"><code>LX1,k</code> <span class="full-name">— Load Index Immediate</span></h3>
+  <h3 class="mnemonic"><code>LX1,k</code> <span class="full-name">-- Load Index Immediate</span></h3>
   <div class="hex-code">Hex: <code>$12</code> <span class="note-refs">[3]</span></div>
   <p class="description">Load INDEX Register with a count of k.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Load a register with an immediate value (pattern applies to LA1, LC1)</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  12    05    LX1,k       ; X &lt;- $05  (load INDEX with immediate value 5)
+0102  01    0A    LC1,k       ; C &lt;- $0A  (load COUNTDOWN with 10)
+0104  02    FF    LA1,k       ; A &lt;- $FF  (load ACCUMULATOR with 255)
+;
+; k is always the second byte. Max value $FF. No memory access.</pre>
+</div>
 </div>
 
 <div class="instruction" id="LC1_k">
-  <h3 class="mnemonic"><code>LC1,k</code> <span class="full-name">— Load Countdown Immediate</span></h3>
+  <h3 class="mnemonic"><code>LC1,k</code> <span class="full-name">-- Load Countdown Immediate</span></h3>
   <div class="hex-code">Hex: <code>$01</code> <span class="note-refs">[3]</span></div>
   <p class="description">Load COUNTDOWN Register with a count of k.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>LX1</code> above.</p>
   
 </div>
 
 <div class="instruction" id="LA1_k">
-  <h3 class="mnemonic"><code>LA1,k</code> <span class="full-name">— Load Accumulator Immediate</span></h3>
+  <h3 class="mnemonic"><code>LA1,k</code> <span class="full-name">-- Load Accumulator Immediate</span></h3>
   <div class="hex-code">Hex: <code>$02</code> <span class="note-refs">[3, 14]</span></div>
   <p class="description">Load ACCUMULATOR with the value k.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>LX1</code> above.</p>
   
 </div>
 
 <div class="instruction" id="LDA_m_x">
-  <h3 class="mnemonic"><code>LDA,m,x</code> <span class="full-name">— Load Accumulator</span></h3>
+  <h3 class="mnemonic"><code>LDA,m,x</code> <span class="full-name">-- Load Accumulator</span></h3>
   <div class="hex-code">Hex: <code>$20</code> <span class="note-refs">[1, 2, 14]</span></div>
   <p class="description">Load ACCUMULATOR with contents of memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Load a value from memory</div>
+  <div class="example-title">Load accumulator from memory -- page 0 and upper pages</div>
   <pre class="example-listing">; Data
-Addr  Hex   
-0010  2F          ; source byte ($2F)
+Addr  Hex
+0050  2F          ; value to load ($2F)
+0150  7C          ; same offset, page 1
 
-      ⋮
+      ...
 
 ; Code
 Addr  Hex   Hex   Mnemonic
-0100  20    10    LDA,m       ; A &lt;- [$0010]  (A = $2F)</pre>
+0100  20    50    LDA,m       ; A &lt;- [$0050]  op=$20 = LDA page 0
+0102  21    50    LDA,m       ; A &lt;- [$0150]  op=$21 = LDA page 1 (page in op code!)
+0104  22    50    LDA,m       ; A &lt;- [$0250]  op=$22 = LDA page 2
+0106  23    50    LDA,m       ; A &lt;- [$0350]  op=$23 = LDA page 3
+;
+; Same mnemonic, different hex op code. Page number is baked into
+; the upper bits of the first byte. The assembler writes the right
+; op code based on the address you give it. By hand, you choose it.</pre>
 </div>
 </div>
 
 <div class="instruction" id="LCC_m_x">
-  <h3 class="mnemonic"><code>LCC,m,x</code> <span class="full-name">— Load Consecutive</span></h3>
+  <h3 class="mnemonic"><code>LCC,m,x</code> <span class="full-name">-- Load Consecutive</span></h3>
   <div class="hex-code">Hex: <code>$30</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Transfer the contents of memory address m to memory address m + 1.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Copy one memory location to the next (memory-to-memory transfer)</div>
+  <pre class="example-listing">; Data (before)
+Addr  Hex
+0010  A5          ; source
+0011  00          ; destination (will be overwritten)
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  30    10    LCC,m       ; [$0011] &lt;- [$0010]  ($0011 = $A5)
+;
+; LCC transfers m to m+1. Accumulator is not involved.</pre>
+</div>
 </div>
 
 <div class="instruction" id="LAN_m_x">
-  <h3 class="mnemonic"><code>LAN,m,x</code> <span class="full-name">— Load Accumulator Negative</span></h3>
+  <h3 class="mnemonic"><code>LAN,m,x</code> <span class="full-name">-- Load Accumulator Negative</span></h3>
   <div class="hex-code">Hex: <code>$38</code> <span class="note-refs">[1, 2, 14]</span></div>
   <p class="description">Load ACCUMULATOR with the two's complement of the contents of m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Load accumulator with the two's complement (negate) of a memory value</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  05          ; source value ($05)
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  38    10    LAN,m       ; A &lt;- -[$0010]  (A = $FB = -5 in two's complement)
+;
+; Equivalent to loading then negating. Useful for setting up subtraction.</pre>
+</div>
 </div>
 
 <div class="instruction" id="LDQ_m_x">
-  <h3 class="mnemonic"><code>LDQ,m,x</code> <span class="full-name">— Load Quotient Register</span></h3>
+  <h3 class="mnemonic"><code>LDQ,m,x</code> <span class="full-name">-- Load Quotient Register</span></h3>
   <div class="hex-code">Hex: <code>$40</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Load QUOTIENT Register with the contents of memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Load the Quotient Register from memory</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  00          ; high byte of dividend
+0011  3C          ; low byte of dividend ($003C = 60)
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  02    3C    LA1,k       ; A &lt;- $3C  (low byte of dividend)
+0102  40    10    LDQ,m       ; Q &lt;- [$0010]  (high byte into Q)
+; AQ now holds the double-length value $003C, ready for DIV</pre>
+</div>
 </div>
 
-    <h2>Store <span class="count">— Store register contents to memory</span></h2>
+    <h2>Store <span class="count">-- Store register contents to memory</span></h2>
 
 <div class="instruction" id="STA_m_x">
-  <h3 class="mnemonic"><code>STA,m,x</code> <span class="full-name">— Store Accumulator</span></h3>
+  <h3 class="mnemonic"><code>STA,m,x</code> <span class="full-name">-- Store Accumulator</span></h3>
   <div class="hex-code">Hex: <code>$48</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Store contents of the ACCUMULATOR at memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Store accumulator to memory</div>
-  <pre class="example-listing">; Data (before)
-Addr  Hex
-0020  00          ; destination (will be written)
-
-      ⋮
-
-; Code  (assume A = $2F from prior LDA)
+  <div class="example-title">Store a register to memory (pattern applies to STX, STQ)</div>
+  <pre class="example-listing">; Code  (assume A = $2F, X = $0080, Q = $00)
 Addr  Hex   Hex   Mnemonic
-0100  48    20    STA,m       ; [$0020] &lt;- A  ([$0020] = $2F)</pre>
+0100  48    20    STA,m       ; [$0020] &lt;- A   ($0020 = $2F)
+0102  50    21    STX,m       ; [$0021] &lt;- X   ($0021 = $80, low byte)
+0104  58    22    STQ,m       ; [$0022] &lt;- Q   ($0022 = $00)
+;
+; All store instructions write one byte to the specified address.
+; STX stores the low byte of the 10-bit INDEX Register.</pre>
 </div>
 </div>
 
 <div class="instruction" id="STX_m_x">
-  <h3 class="mnemonic"><code>STX,m,x</code> <span class="full-name">— Store Index</span></h3>
+  <h3 class="mnemonic"><code>STX,m,x</code> <span class="full-name">-- Store Index</span></h3>
   <div class="hex-code">Hex: <code>$50</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Store contents of the INDEX Register at memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>STA</code> above.</p>
   
 </div>
 
 <div class="instruction" id="STQ_m_x">
-  <h3 class="mnemonic"><code>STQ,m,x</code> <span class="full-name">— Store Quotient Register</span></h3>
+  <h3 class="mnemonic"><code>STQ,m,x</code> <span class="full-name">-- Store Quotient Register</span></h3>
   <div class="hex-code">Hex: <code>$58</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Store the contents of the QUOTIENT Register at memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>STA</code> above.</p>
   
 </div>
 
-    <h2>Arithmetic <span class="count">— Arithmetic operations</span></h2>
+    <h2>Arithmetic <span class="count">-- Arithmetic operations</span></h2>
 
 <div class="instruction" id="ADD_m_x">
-  <h3 class="mnemonic"><code>ADD,m,x</code> <span class="full-name">— Add</span></h3>
+  <h3 class="mnemonic"><code>ADD,m,x</code> <span class="full-name">-- Add</span></h3>
   <div class="hex-code">Hex: <code>$60</code> <span class="note-refs">[1, 2, 11, 12, 14]</span></div>
   <p class="description">Add the contents of memory address m to the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">11.</span><span>CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.</span></div><div class="note-item"><span class="note-num">12.</span><span>ADD overflow: result exceeds largest signed 8-bit number. Numbers handled as signed two's complement.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Add memory contents to accumulator</div>
+  <div class="example-title">Add memory to accumulator; subtract is the same pattern</div>
   <pre class="example-listing">; Data
 Addr  Hex
-0010  07          ; addend ($07)
+0010  07          ; addend
+0011  03          ; subtrahend
 
-      ⋮
+      ...
 
-; Code  (assume A = $05)
+; Code
 Addr  Hex   Hex   Mnemonic
-0100  02    05    LA1,k       ; A &lt;- $05 (immediate)
-0102  60    10    ADD,m       ; A &lt;- A + [$0010]  (A = $0C)</pre>
+0100  02    05    LA1,k       ; A &lt;- $05
+0102  60    10    ADD,m       ; A &lt;- A + [$0010]  (A = $0C)
+0104  68    11    SUB,m       ; A &lt;- A - [$0011]  (A = $09)
+; Carry set if borrow (SUB) or overflow (ADD) occurred</pre>
 </div>
 </div>
 
 <div class="instruction" id="SUB_m_x">
-  <h3 class="mnemonic"><code>SUB,m,x</code> <span class="full-name">— Subtract</span></h3>
+  <h3 class="mnemonic"><code>SUB,m,x</code> <span class="full-name">-- Subtract</span></h3>
   <div class="hex-code">Hex: <code>$68</code> <span class="note-refs">[1, 2, 11, 12, 14]</span></div>
   <p class="description">Subtract the contents of memory address m from the ACCUMULATOR, leaving the result in the ACCUMULATOR. Conditionally set carry and add overflow.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">11.</span><span>CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.</span></div><div class="note-item"><span class="note-num">12.</span><span>ADD overflow: result exceeds largest signed 8-bit number. Numbers handled as signed two's complement.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>ADD</code> above.</p>
   
 </div>
 
 <div class="instruction" id="MPY_m_x">
-  <h3 class="mnemonic"><code>MPY,m,x</code> <span class="full-name">— Multiply</span></h3>
+  <h3 class="mnemonic"><code>MPY,m,x</code> <span class="full-name">-- Multiply</span></h3>
   <div class="hex-code">Hex: <code>$70</code> <span class="note-refs">[1, 2, 14]</span></div>
   <p class="description">Multiply the contents of the ACCUMULATOR by the contents of memory address m, leaving a double length product in the AQ Register.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Multiply — result in AQ Register</div>
+  <div class="example-title">Multiply -- double-length result in AQ Register</div>
   <pre class="example-listing">; Data
 Addr  Hex
 0010  0A          ; multiplier ($0A = 10)
 
-      ⋮
+      ...
 
-; Code  (assume A = $06)
+; Code
 Addr  Hex   Hex   Mnemonic
-0100  02    06    LA1,k       ; A &lt;- $06 (immediate)
+0100  02    06    LA1,k       ; A &lt;- $06  (multiplicand = 6)
 0102  70    10    MPY,m       ; AQ &lt;- A * [$0010]  (AQ = $003C = 60)
-; Q Register holds high byte, A holds low byte of double-length product</pre>
+;
+; Q holds the high byte of the 16-bit product.
+; A holds the low byte.
+; Result $003C: Q = $00, A = $3C</pre>
 </div>
 </div>
 
 <div class="instruction" id="DIV_m_x">
-  <h3 class="mnemonic"><code>DIV,m,x</code> <span class="full-name">— Divide</span></h3>
+  <h3 class="mnemonic"><code>DIV,m,x</code> <span class="full-name">-- Divide</span></h3>
   <div class="hex-code">Hex: <code>$78</code> <span class="note-refs">[1, 2, 13, 14]</span></div>
   <p class="description">Divide the double length number in the AQ Register by the contents of memory address m, leaving the quotient in the Q Register and the remainder in the ACCUMULATOR. Set condition code to sign of quotient. Sign of remainder equals sign of dividend. Conditionally set divide overflow.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">13.</span><span>DIVIDE overflow: quotient exceeds largest signed 8-bit number.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Divide -- quotient in Q Register, remainder in Accumulator</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  07          ; divisor ($07 = 7)
+
+      ...
+
+; Code  (AQ = $003C = 60 from prior MPY, or set up manually)
+Addr  Hex   Hex   Mnemonic
+0100  78    10    DIV,m       ; AQ / [$0010]:  60 / 7
+                              ; Q &lt;- $08  (quotient = 8)
+                              ; A &lt;- $04  (remainder = 4)
+;
+; Condition code reflects sign of quotient (Q Register), not A.
+; Divide overflow set if quotient exceeds signed 8-bit range.</pre>
+</div>
 </div>
 
 <div class="instruction" id="RAO_m_x">
-  <h3 class="mnemonic"><code>RAO,m,x</code> <span class="full-name">— Replace Add One</span></h3>
+  <h3 class="mnemonic"><code>RAO,m,x</code> <span class="full-name">-- Replace Add One</span></h3>
   <div class="hex-code">Hex: <code>$80</code> <span class="note-refs">[1, 2, 4, 11, 14]</span></div>
   <p class="description">Add 1 to the contents of memory address m. If contents of m are FF, sets m to zero and sets carry bit. ACCUMULATOR contains the result.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">4.</span><span>Arithmetic in RAO and RSO handles an 8-bit unsigned number.</span></div><div class="note-item"><span class="note-num">11.</span><span>CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Increment and decrement memory in place (RAO / RSO)</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  04          ; counter
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  80    10    RAO,m       ; [$0010] &lt;- [$0010] + 1  (= $05); A = $05
+0102  88    10    RSO,m       ; [$0010] &lt;- [$0010] - 1  (= $04); A = $04
+;
+; Both instructions modify memory AND load the result into A.
+; RAO wraps $FF -&gt; $00 and sets carry. RSO wraps $00 -&gt; $FF and sets carry.</pre>
+</div>
 </div>
 
 <div class="instruction" id="RSO_m_x">
-  <h3 class="mnemonic"><code>RSO,m,x</code> <span class="full-name">— Replace Subtract One</span></h3>
+  <h3 class="mnemonic"><code>RSO,m,x</code> <span class="full-name">-- Replace Subtract One</span></h3>
   <div class="hex-code">Hex: <code>$88</code> <span class="note-refs">[1, 2, 4, 11, 14]</span></div>
   <p class="description">Subtract 1 from the contents of memory address m. If contents of m are zero, sets m to FF and sets carry bit. ACCUMULATOR contains the result.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">4.</span><span>Arithmetic in RAO and RSO handles an 8-bit unsigned number.</span></div><div class="note-item"><span class="note-num">11.</span><span>CARRY condition code set by ADD, SUB, RAO, or RSO — indicates carry or borrow from bit 7.</span></div><div class="note-item"><span class="note-num">14.</span><span>CONDITION CODE reflects ACCUMULATOR status at end of instruction. Exceptions: (a) DIV — reflects Quotient Register; (b) MPY, SRA, SLA — reflects AQ Register.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>RAO</code> above.</p>
   
 </div>
 
 <div class="instruction" id="INX_k">
-  <h3 class="mnemonic"><code>INX,k</code> <span class="full-name">— Increase Index</span></h3>
+  <h3 class="mnemonic"><code>INX,k</code> <span class="full-name">-- Increase Index</span></h3>
   <div class="hex-code">Hex: <code>$03</code> <span class="note-refs">[3]</span></div>
   <p class="description">Increase the contents of the INDEX Register by k.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Increment the INDEX Register by an immediate value</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  12    00    LX1,k       ; X &lt;- $00  (start at zero)
+0102  03    01    INX,k       ; X &lt;- X + $01  (X = $01)
+0104  03    01    INX,k       ; X &lt;- X + $01  (X = $02)
+;
+; INX adds k to X. To step through memory one byte at a time, use INX,1
+; before or after an indexed LDA or STA.</pre>
+</div>
 </div>
 
-    <h2>Logical <span class="count">— Logical and shift operations</span></h2>
+    <h2>Logical <span class="count">-- Logical and shift operations</span></h2>
 
 <div class="instruction" id="SLA_k">
-  <h3 class="mnemonic"><code>SLA,k</code> <span class="full-name">— Shift Left Arithmetic</span></h3>
+  <h3 class="mnemonic"><code>SLA,k</code> <span class="full-name">-- Shift Left Arithmetic</span></h3>
   <div class="hex-code">Hex: <code>$0B</code> <span class="note-refs">[3]</span></div>
   <p class="description">Shift the AQ Register left k places, filling in zeros on the right.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Arithmetic shifts operate on the AQ Register (double-length)</div>
+  <pre class="example-listing">; Code  (assume AQ = $0018 = 0000 0000 0001 1000)
+Addr  Hex   Hex   Mnemonic
+0100  0B    02    SLA,k       ; AQ &lt;- AQ &lt;&lt; 2  (AQ = $0060 = 96)
+                              ; shift left 2 = multiply by 4
+0102  10    01    SRA,k       ; AQ &lt;- AQ &gt;&gt; 1  (AQ = $0030 = 48, sign extended)
+                              ; shift right 1 = divide by 2
+;
+; SLA/SRA work on the full 16-bit AQ pair.
+; SRA propagates the sign bit (arithmetic shift).</pre>
+</div>
 </div>
 
 <div class="instruction" id="SRA_k">
-  <h3 class="mnemonic"><code>SRA,k</code> <span class="full-name">— Shift Right Arithmetic</span></h3>
+  <h3 class="mnemonic"><code>SRA,k</code> <span class="full-name">-- Shift Right Arithmetic</span></h3>
   <div class="hex-code">Hex: <code>$10</code> <span class="note-refs">[3]</span></div>
   <p class="description">Shift the AQ Register right k places, propagating sign bits on the left.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>SLA</code> above.</p>
   
 </div>
 
 <div class="instruction" id="SLL_k">
-  <h3 class="mnemonic"><code>SLL,k</code> <span class="full-name">— Shift Left Logical</span></h3>
+  <h3 class="mnemonic"><code>SLL,k</code> <span class="full-name">-- Shift Left Logical</span></h3>
   <div class="hex-code">Hex: <code>$13</code> <span class="note-refs">[3]</span></div>
   <p class="description">Shift the ACCUMULATOR left k places, filling in zeros on the right.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Logical shifts operate on the Accumulator only</div>
+  <pre class="example-listing">; Code  (assume A = $18 = 0001 1000)
+Addr  Hex   Hex   Mnemonic
+0100  13    02    SLL,k       ; A &lt;- A &lt;&lt; 2  (A = $60 = 0110 0000)
+0102  18    01    SRL,k       ; A &lt;- A &gt;&gt; 1  (A = $30 = 0011 0000, zero filled)
+;
+; SLL/SRL work on A only, not AQ.
+; SRL fills with zeros on the left (logical, not arithmetic).</pre>
+</div>
 </div>
 
 <div class="instruction" id="SRL_k">
-  <h3 class="mnemonic"><code>SRL,k</code> <span class="full-name">— Shift Right Logical</span></h3>
+  <h3 class="mnemonic"><code>SRL,k</code> <span class="full-name">-- Shift Right Logical</span></h3>
   <div class="hex-code">Hex: <code>$18</code> <span class="note-refs">[3]</span></div>
   <p class="description">Shift the ACCUMULATOR right k places, filling in zeros on the left.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>SLL</code> above.</p>
   
 </div>
 
 <div class="instruction" id="AND_k">
-  <h3 class="mnemonic"><code>AND,k</code> <span class="full-name">— And</span></h3>
+  <h3 class="mnemonic"><code>AND,k</code> <span class="full-name">-- And</span></h3>
   <div class="hex-code">Hex: <code>$19</code> <span class="note-refs">[3]</span></div>
   <p class="description">Form the bit-by-bit logical product of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Mask the accumulator (immediate)</div>
+  <div class="example-title">Bitwise AND, OR, XOR with immediate value</div>
   <pre class="example-listing">; Code  (assume A = $AF = 1010 1111)
 Addr  Hex   Hex   Mnemonic
-0100  02    AF    LA1,k       ; A &lt;- $AF (immediate)
-0102  19    0F    AND,k       ; A &lt;- A AND $0F  (A = $0F = 0000 1111)
-; Masks upper nibble, preserves lower nibble</pre>
+0100  02    AF    LA1,k       ; A &lt;- $AF
+0102  19    0F    AND,k       ; A &lt;- A AND $0F  (A = $0F)  mask upper nibble
+0104  02    AF    LA1,k       ; A &lt;- $AF (restore)
+0106  1A    50    IOR,k       ; A &lt;- A OR $50   (A = $FF)  set bits
+0108  02    AF    LA1,k       ; A &lt;- $AF (restore)
+010A  1B    FF    XOR,k       ; A &lt;- A XOR $FF  (A = $50)  flip all bits</pre>
 </div>
 </div>
 
 <div class="instruction" id="IOR_k">
-  <h3 class="mnemonic"><code>IOR,k</code> <span class="full-name">— Inclusive Or</span></h3>
+  <h3 class="mnemonic"><code>IOR,k</code> <span class="full-name">-- Inclusive Or</span></h3>
   <div class="hex-code">Hex: <code>$1A</code> <span class="note-refs">[3]</span></div>
   <p class="description">Form the bit-by-bit Inclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>AND</code> above.</p>
   
 </div>
 
 <div class="instruction" id="XOR_k">
-  <h3 class="mnemonic"><code>XOR,k</code> <span class="full-name">— Exclusive Or</span></h3>
+  <h3 class="mnemonic"><code>XOR,k</code> <span class="full-name">-- Exclusive Or</span></h3>
   <div class="hex-code">Hex: <code>$1B</code> <span class="note-refs">[3]</span></div>
   <p class="description">Form the bit-by-bit Exclusive OR of k and the contents of the ACCUMULATOR, leaving the result in the ACCUMULATOR.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>AND</code> above.</p>
   
 </div>
 
-    <h2>Branch <span class="count">— Branch and control flow</span></h2>
+    <h2>Branch <span class="count">-- Branch and control flow</span></h2>
 
 <div class="instruction" id="BUN_m_x">
-  <h3 class="mnemonic"><code>BUN,m,x</code> <span class="full-name">— Branch Unconditional</span></h3>
+  <h3 class="mnemonic"><code>BUN,m,x</code> <span class="full-name">-- Branch Unconditional</span></h3>
   <div class="hex-code">Hex: <code>$90</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Unconditional branch</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  90    10    BUN,m       ; PC &lt;- $0010  (jump to $0010 unconditionally)
+;
+; BUN is the fundamental jump. BSB uses BUN internally for its return mechanism.</pre>
+</div>
 </div>
 
 <div class="instruction" id="BST_m_x">
-  <h3 class="mnemonic"><code>BST,m,x</code> <span class="full-name">— Branch and Stop</span></h3>
+  <h3 class="mnemonic"><code>BST,m,x</code> <span class="full-name">-- Branch and Stop</span></h3>
   <div class="hex-code">Hex: <code>$98</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m and stop.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Branch and stop -- used to pause execution at a known address</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  98    50    BST,m       ; jump to $0050 and halt
+                              ; computer stops with WAIT light on
+                              ; press START to continue from $0050
+;
+; Useful in diagnostics: stop here, inspect registers, resume.</pre>
+</div>
 </div>
 
 <div class="instruction" id="BSB_m_x">
-  <h3 class="mnemonic"><code>BSB,m,x</code> <span class="full-name">— Branch to Subroutine</span></h3>
+  <h3 class="mnemonic"><code>BSB,m,x</code> <span class="full-name">-- Branch to Subroutine</span></h3>
   <div class="hex-code">Hex: <code>$A0</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Store BUN op code in location m. Store the contents of the P Register (next instruction address) in location m+1. Branch to location m+2.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  
   <div class="example">
-  <div class="example-title">Branch to subroutine (and return)</div>
+  <div class="example-title">Branch to subroutine -- return address stored at call site</div>
   <pre class="example-listing">; Code
 Addr  Hex   Hex   Mnemonic
-0100  A0    20    BSB,m       ; store BUN at $0020, P+1 at $0021, branch to $0022
-                              ; $0020 &lt;- $90 (BUN opcode)
-                              ; $0021 &lt;- $02 (return address low byte: $0102)
-                              ; PC -&gt; $0022  (subroutine entry)
-0102  ...         (continues here on return)
+0100  A0    20    BSB,m       ; call subroutine via $0020:
+                              ;   [$0020] &lt;- $90  (BUN opcode)
+                              ;   [$0021] &lt;- $02  (return addr low: $0102)
+                              ;   PC     &lt;- $0022 (subroutine entry)
+0102  ...         (execution returns here)
 
-      ⋮
+      ...
 
-; Subroutine at $0020 (note: $0020/$0021 used as linkage, code starts $0022)
-0022  02    FF    LA1,k       ; subroutine body -- example
-0024  90    20    BUN,m       ; return: branch to [$0020] which holds BUN $0102
-; The BSB mechanism stores its own return jump at the call site</pre>
+; Subroutine entry at $0022 (linkage occupies $0020-$0021)
+0022  02    FF    LA1,k       ; subroutine body
+0024  90    20    BUN,m       ; return: branch to $0020 which holds BUN $0102
+;
+; BSB writes its own return jump into the two bytes at the call address.
+; $0020/$0021 are linkage, not code. Subroutine starts at $0022.
+; Note: this mechanism means BSB is NOT re-entrant.</pre>
 </div>
 </div>
 
 <div class="instruction" id="BPS_m_x">
-  <h3 class="mnemonic"><code>BPS,m,x</code> <span class="full-name">— Branch on Positive</span></h3>
+  <h3 class="mnemonic"><code>BPS,m,x</code> <span class="full-name">-- Branch on Positive</span></h3>
   <div class="hex-code">Hex: <code>$A8</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m if the condition code is greater than zero.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Conditional branches on accumulator condition code</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  00          ; target A value
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  20    10    LDA,m       ; A &lt;- [$0010]
+0102  A8    20    BPS,m       ; if A &gt; 0, branch to $0020  (positive)
+0104  B0    30    BZE,m       ; if A = 0, branch to $0030  (zero)
+0106  B8    40    BNG,m       ; if A &lt; 0, branch to $0040  (negative)
+;
+; Condition code set by the preceding instruction.
+; Only one of the three branches will be taken.</pre>
+</div>
 </div>
 
 <div class="instruction" id="BZE_m_x">
-  <h3 class="mnemonic"><code>BZE,m,x</code> <span class="full-name">— Branch on Zero</span></h3>
+  <h3 class="mnemonic"><code>BZE,m,x</code> <span class="full-name">-- Branch on Zero</span></h3>
   <div class="hex-code">Hex: <code>$B0</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m if the condition code is equal to zero.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>BPS</code> above.</p>
   
 </div>
 
 <div class="instruction" id="BNG_m_x">
-  <h3 class="mnemonic"><code>BNG,m,x</code> <span class="full-name">— Branch on Negative</span></h3>
+  <h3 class="mnemonic"><code>BNG,m,x</code> <span class="full-name">-- Branch on Negative</span></h3>
   <div class="hex-code">Hex: <code>$B8</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m if the condition code is less than zero.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>BPS</code> above.</p>
   
 </div>
 
 <div class="instruction" id="BNC_m_x">
-  <h3 class="mnemonic"><code>BNC,m,x</code> <span class="full-name">— Branch on No Carry</span></h3>
+  <h3 class="mnemonic"><code>BNC,m,x</code> <span class="full-name">-- Branch on No Carry</span></h3>
   <div class="hex-code">Hex: <code>$C0</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m if the condition code is not carry.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Branch on no carry -- test carry flag after arithmetic</div>
+  <pre class="example-listing">; Code  (assume prior ADD or SUB set carry)
+Addr  Hex   Hex   Mnemonic
+0100  60    10    ADD,m       ; A &lt;- A + [$0010]; carry set if overflow
+0102  C0    20    BNC,m       ; if no carry, branch to $0020
+                              ; if carry set, fall through to $0104
+;
+; Used after ADD, SUB, RAO, RSO to detect overflow or borrow.</pre>
+</div>
 </div>
 
 <div class="instruction" id="BXZ_m_x">
-  <h3 class="mnemonic"><code>BXZ,m,x</code> <span class="full-name">— Branch on Index Zero</span></h3>
+  <h3 class="mnemonic"><code>BXZ,m,x</code> <span class="full-name">-- Branch on Index Zero</span></h3>
   <div class="hex-code">Hex: <code>$C8</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Branch to memory address m if the INDEX Register is zero.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Count-down loop using INDEX Register and RSO</div>
+  <pre class="example-listing">; Data
+Addr  Hex
+0010  05          ; loop counter (will be decremented in memory)
+0020  00          ; data being processed (example)
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  12    05    LX1,k       ; X &lt;- $05  (index for indexed addressing)
+0102  20    20    LDA,m       ; A &lt;- [$0020]  (loop body -- process data)
+0104  88    10    RSO,m       ; [$0010] &lt;- [$0010] - 1; A = decremented count
+0106  B0    02    BZE,m       ; if counter = 0, branch to $0002 (done)
+0108  90    02    BUN,m       ; else loop back to $0102
+;
+; RSO decrements the counter in memory and loads result into A.
+; BZE tests A (= counter) for zero. Loop runs 5 times then exits.
+; INX steps the index through a data array each iteration.</pre>
+</div>
 </div>
 
 <div class="instruction" id="SKI_k">
-  <h3 class="mnemonic"><code>SKI,k</code> <span class="full-name">— Skip on Interrupt</span></h3>
+  <h3 class="mnemonic"><code>SKI,k</code> <span class="full-name">-- Skip on Interrupt</span></h3>
   <div class="hex-code">Hex: <code>$08</code> <span class="note-refs">[3]</span></div>
   <p class="description">Skip k instructions or 2k words if interrupt is set.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Skip instructions based on hardware state (SKI / SKS / SKF)</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  08    01    SKI,k       ; if interrupt set: skip 1 instruction (-&gt; $0104)
+0102  90    10    BUN,m       ; not skipped: jump to $0010 (interrupt not set)
+0104  ...         (skipped to here: interrupt was set, handle it)
+
+0200  09    01    SKS,k       ; if sense switch ON: skip 1 instruction
+0202  90    30    BUN,m       ; switch off: jump to $0030
+0204  ...         (switch was on)
+
+0300  0A    01    SKF,k       ; if flag set: skip 1 instruction
+0302  90    50    BUN,m       ; flag clear: jump to $0050
+0304  ...         (flag was set)
+;
+; k=1 skips 1 instruction (2 bytes). k=2 skips 2 instructions, etc.</pre>
+</div>
 </div>
 
 <div class="instruction" id="SKS_k">
-  <h3 class="mnemonic"><code>SKS,k</code> <span class="full-name">— Skip on Sense Switch</span></h3>
+  <h3 class="mnemonic"><code>SKS,k</code> <span class="full-name">-- Skip on Sense Switch</span></h3>
   <div class="hex-code">Hex: <code>$09</code> <span class="note-refs">[3]</span></div>
   <p class="description">Skip k instructions or 2k words if the sense switch is on.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>SKI</code> above.</p>
   
 </div>
 
 <div class="instruction" id="SKF_k">
-  <h3 class="mnemonic"><code>SKF,k</code> <span class="full-name">— Skip on Flag</span></h3>
+  <h3 class="mnemonic"><code>SKF,k</code> <span class="full-name">-- Skip on Flag</span></h3>
   <div class="hex-code">Hex: <code>$0A</code> <span class="note-refs">[3]</span></div>
   <p class="description">Skip k instructions or 2k words if flag is set.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>SKI</code> above.</p>
   
 </div>
 
-    <h2>Input/Output <span class="count">— Input/Output and peripheral control</span></h2>
+    <h2>Input/Output <span class="count">-- Input/Output and peripheral control</span></h2>
 
 <div class="instruction" id="WDB_m_x">
-  <h3 class="mnemonic"><code>WDB,m,x</code> <span class="full-name">— Write Data Block</span></h3>
+  <h3 class="mnemonic"><code>WDB,m,x</code> <span class="full-name">-- Write Data Block</span></h3>
   <div class="hex-code">Hex: <code>$D0</code> <span class="note-refs">[1, 2, 10]</span></div>
   <p class="description">Transfer the contents of consecutive memory locations starting at address m to the selected external device. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">10.</span><span>In HEX mode, output colons (:) are inserted automatically with line feeds and carriage returns.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Select a device then write a block of memory to it</div>
+  <pre class="example-listing">; Data to send
+Addr  Hex
+0010  48          ; H
+0011  45          ; E
+0012  4C          ; L
+0013  4C          ; L
+0014  4F          ; O
+
+      ...
+
+; Code
+Addr  Hex   Hex   Mnemonic
+0100  01    04    LC1,k       ; C &lt;- $04  (5 words: count = n - 1)
+0102  11    01    OCD,k       ; select device 1 (bits 0-2 of operand byte)
+0104  D0    10    WDB,m       ; write C+1 words from $0010 to device 1
+;
+; OCD must precede WDB/RDB to select the target device.
+; C Register holds count - 1. WDB transfers count + 1 words.</pre>
+</div>
 </div>
 
 <div class="instruction" id="MNO_m_x">
-  <h3 class="mnemonic"><code>MNO,m,x</code> <span class="full-name">— Manual Output</span></h3>
+  <h3 class="mnemonic"><code>MNO,m,x</code> <span class="full-name">-- Manual Output</span></h3>
   <div class="hex-code">Hex: <code>$D8</code> <span class="note-refs">[1, 2, 15]</span></div>
   <p class="description">Transfer the contents of consecutive memory locations to the Input Register. Continue until the C Register is zero. Number of words transferred is one more than the initial count in the C Register.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">15.</span><span>MANUAL OUTPUT: contents of indicated memory location also displayed on Buffer Register. Computer stops with WAIT light on after each word. Press START to continue.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Manual output -- display each word and wait for START</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  01    02    LC1,k       ; C &lt;- $02  (3 words)
+0102  D8    10    MNO,m       ; display [$0010], [$0011], [$0012] one at a time
+                              ; computer halts after each word (WAIT light on)
+                              ; press START to advance to next word
+;
+; Used in diagnostics: step through memory contents manually.
+; Each word also appears on the Buffer Register display.</pre>
+</div>
 </div>
 
 <div class="instruction" id="RDB_m_x">
-  <h3 class="mnemonic"><code>RDB,m,x</code> <span class="full-name">— Read Data Block</span></h3>
+  <h3 class="mnemonic"><code>RDB,m,x</code> <span class="full-name">-- Read Data Block</span></h3>
   <div class="hex-code">Hex: <code>$E0</code> <span class="note-refs">[1, 2, 7, 9]</span></div>
   <p class="description">Store data from the selected external device in consecutive memory locations starting at address m. Continue until C Register is zero. Number of words stored is one more than initial count in C Register.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">7.</span><span>RDB and RDI automatically generate and transmit XON to the teletype.</span></div><div class="note-item"><span class="note-num">9.</span><span>Teletype keyboard: CONTROL H sets HEX mode; CONTROL A sets ALPHA mode.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Read a block of data from a device into memory</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  01    09    LC1,k       ; C &lt;- $09  (10 words)
+0102  11    01    OCD,k       ; select device 1
+0104  E0    20    RDB,m       ; read C+1 words from device 1 into $0020-$0029
+;
+; Automatically sends XON to start the tape reader (note 7).
+; Stores words at $0020, $0021 ... $0029.</pre>
+</div>
 </div>
 
 <div class="instruction" id="RDI_m_x">
-  <h3 class="mnemonic"><code>RDI,m,x</code> <span class="full-name">— Read Until Interrupt</span></h3>
+  <h3 class="mnemonic"><code>RDI,m,x</code> <span class="full-name">-- Read Until Interrupt</span></h3>
   <div class="hex-code">Hex: <code>$E8</code> <span class="note-refs">[1, 2, 7, 8, 9]</span></div>
   <p class="description">Store data from the selected external device in consecutive memory locations starting at address m. Continue until interrupt is set.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div><div class="note-item"><span class="note-num">7.</span><span>RDB and RDI automatically generate and transmit XON to the teletype.</span></div><div class="note-item"><span class="note-num">8.</span><span>Tape must end with XOFF followed by CONTROL 1.</span></div><div class="note-item"><span class="note-num">9.</span><span>Teletype keyboard: CONTROL H sets HEX mode; CONTROL A sets ALPHA mode.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Read from device until hardware interrupt is set</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  11    01    OCD,k       ; select device 1
+0102  E8    20    RDI,m       ; read from device into $0020 onward until interrupt
+;
+; No count required -- reads until the device signals done via interrupt.
+; Tape must end with XOFF then CONTROL 1 to set the interrupt (note 8).</pre>
+</div>
 </div>
 
 <div class="instruction" id="MNI_m_x">
-  <h3 class="mnemonic"><code>MNI,m,x</code> <span class="full-name">— Manual Input</span></h3>
+  <h3 class="mnemonic"><code>MNI,m,x</code> <span class="full-name">-- Manual Input</span></h3>
   <div class="hex-code">Hex: <code>$F0</code> <span class="note-refs">[1, 2]</span></div>
   <p class="description">Transfer the contents of the Input Register to consecutive memory locations starting at address m. Continue until the C Register is zero. Number of words stored is one more than initial count in C Register.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">1.</span><span>To address memory locations above FF hex; 1, 2, or 3 is added to the instruction code.</span></div><div class="note-item"><span class="note-num">2.</span><span>Setting the index bit in the instruction OP CODE causes the X Register to be added to the memory address.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Manual input -- load Input Register contents into memory</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  01    02    LC1,k       ; C &lt;- $02  (3 words)
+0102  F0    20    MNI,m       ; store Input Register -&gt; $0020, $0021, $0022
+;
+; Operator loads each value via the hex keypad into the Input Register.
+; MNI stores the sequence. Used for entering test data manually.</pre>
+</div>
 </div>
 
 <div class="instruction" id="OCD_k">
-  <h3 class="mnemonic"><code>OCD,k</code> <span class="full-name">— Output Command</span></h3>
+  <h3 class="mnemonic"><code>OCD,k</code> <span class="full-name">-- Output Command</span></h3>
   <div class="hex-code">Hex: <code>$11</code> <span class="note-refs">[3, 6, 9]</span></div>
   <p class="description">Transmit the operand k to the external device addressed by the three low order bits in k.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">3.</span><span>Value k is limited to FF hex.</span></div><div class="note-item"><span class="note-num">6.</span><span>OCD instruction operand bits: bits 2,1,0 select peripheral unit; bit 3 selects HEX mode; bit 4 selects APH mode.</span></div><div class="note-item"><span class="note-num">9.</span><span>Teletype keyboard: CONTROL H sets HEX mode; CONTROL A sets ALPHA mode.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Output command -- select a peripheral device</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  11    01    OCD,k       ; select device 1 (bits 0-2 = 001)
+0102  11    04    OCD,k       ; select device 4 (bits 0-2 = 100)
+0104  11    08    OCD,k       ; select device with HEX mode (bit 3 = 1)
+0106  11    10    OCD,k       ; select device with APH mode (bit 4 = 1)
+;
+; Bits 0-2 select one of 8 peripheral units.
+; Bit 3 selects HEX output mode.
+; Bit 4 selects APH (alphanumeric) output mode.</pre>
+</div>
 </div>
 
 <div class="instruction" id="SST_k">
-  <h3 class="mnemonic"><code>SST,k</code> <span class="full-name">— Sense Status</span></h3>
+  <h3 class="mnemonic"><code>SST,k</code> <span class="full-name">-- Sense Status</span></h3>
   <div class="hex-code">Hex: <code>$00</code></div>
   <p class="description">The previously addressed device sends an 8-bit status word which is transferred to the ACCUMULATOR.</p>
   
   
+  <div class="example">
+  <div class="example-title">Sense status -- read device status into accumulator</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  11    01    OCD,k       ; select device 1
+0102  00    00    SST,k       ; A &lt;- 8-bit status word from device 1
+;
+; Operand byte is not used (note 5) but must be present (two-byte format).
+; Examine A after SST to determine device ready/busy/error state.</pre>
+</div>
 </div>
 
 <div class="instruction" id="FLC_k">
-  <h3 class="mnemonic"><code>FLC,k</code> <span class="full-name">— Flag Clear</span></h3>
+  <h3 class="mnemonic"><code>FLC,k</code> <span class="full-name">-- Flag Clear</span></h3>
   <div class="hex-code">Hex: <code>$28</code> <span class="note-refs">[5]</span></div>
   <p class="description">Clear flag to zero.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">5.</span><span>Operand is not used in FLAG CLEAR or FLAG SET instructions.</span></div></div>
   
+  <div class="example">
+  <div class="example-title">Set and clear the flag register</div>
+  <pre class="example-listing">; Code
+Addr  Hex   Hex   Mnemonic
+0100  F8    00    FLS,k       ; flag &lt;- 1  (set)
+0102  0A    01    SKF,k       ; skip 1 if flag set (will skip)
+0104  90    20    BUN,m       ; not reached
+0106  28    00    FLC,k       ; flag &lt;- 0  (clear)
+;
+; Operand byte not used (note 5) but required by two-byte format.
+; Flag is a single programmable flip-flop, independent of condition code.</pre>
+</div>
 </div>
 
 <div class="instruction" id="FLS_k">
-  <h3 class="mnemonic"><code>FLS,k</code> <span class="full-name">— Flag Set</span></h3>
+  <h3 class="mnemonic"><code>FLS,k</code> <span class="full-name">-- Flag Set</span></h3>
   <div class="hex-code">Hex: <code>$F8</code> <span class="note-refs">[5]</span></div>
   <p class="description">Set flag to one.</p>
   <div class="inline-notes"><div class="note-item"><span class="note-num">5.</span><span>Operand is not used in FLAG CLEAR or FLAG SET instructions.</span></div></div>
+  <p class="covered-by">Example pattern: see <code>FLC</code> above.</p>
   
 </div>
 
@@ -495,6 +873,6 @@ Addr  Hex   Hex   Mnemonic
   </div>
 
   </main>
-  <footer>COMTRAN TEN Instruction Repertoire &mdash; transcribed from KDA-3032, June 1981 &mdash; public domain (U.S. Government work)</footer>
+  <footer>COMTRAN TEN Instruction Repertoire -- transcribed from KDA-3032, June 1981 -- public domain (U.S. Government work)</footer>
 </body>
 </html>
