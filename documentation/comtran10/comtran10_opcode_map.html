@@ -51,11 +51,83 @@
     .grp-invalid     { background: #111; color: #333; font-style: italic; font-size: 0.7rem; }
     .grp-nonmem      { background: #1a1a10; color: #aaa; }
 
-    /* Legend */
-    .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
-    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
-    .legend-swatch { width: 1rem; height: 1rem; border: 1px solid #444; border-radius: 2px; }
+    /* Legend / filter buttons */
+    .legend { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .legend-item { 
+      display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;
+      padding: 0.3rem 0.6rem; border-radius: 3px; cursor: pointer;
+      border: 1px solid #444; user-select: none; transition: opacity 0.15s;
+    }
+    .legend-item:hover { border-color: #888; }
+    .legend-item.dimmed { opacity: 0.35; }
+    .legend-swatch { width: 0.75rem; height: 0.75rem; border-radius: 2px; flex-shrink: 0; }
+
+    /* Dimmed rows */
+    .opcode-table tr.grp-dimmed td:not(.hdr-msd) { opacity: 0.15; }
   </style>
+  <script>
+    // --- Column width normalization ---
+    // After DOM loads, find the max natural width among data columns ($0-$F)
+    // and set all to that width so the grid is uniform.
+    function normalizeColumnWidths() {
+      const table = document.querySelector('.opcode-table');
+      if (!table) return;
+      // Columns 1-16 are the data columns (0 is MSD label)
+      const rows = Array.from(table.rows);
+      let maxW = 0;
+      rows.forEach(row => {
+        for (let c = 1; c <= 16; c++) {
+          const cell = row.cells[c];
+          if (cell) maxW = Math.max(maxW, cell.offsetWidth);
+        }
+      });
+      if (maxW === 0) return;
+      // Apply as min-width to all colgroup cols, or directly to header cells
+      for (let c = 1; c <= 16; c++) {
+        const cell = rows[0].cells[c];
+        if (cell) cell.style.minWidth = maxW + 'px';
+      }
+    }
+
+    // --- Group toggle filter ---
+    const activeGroups = new Set(['load','store','arithmetic','logical','branch','input_output','nonmem','invalid']);
+
+    function applyFilter() {
+      const table = document.querySelector('.opcode-table');
+      if (!table) return;
+      Array.from(table.querySelectorAll('tbody tr')).forEach(row => {
+        // Determine the dominant group of this row from its cells
+        const groups = new Set();
+        Array.from(row.cells).forEach(cell => {
+          const cls = Array.from(cell.classList).find(c => c.startsWith('grp-'));
+          if (cls) groups.add(cls.replace('grp-', ''));
+        });
+        // A row is visible if ANY of its groups are active
+        // (most rows are one group, but mixed rows like $0x/$1x have multiple)
+        const visible = [...groups].some(g => activeGroups.has(g));
+        row.classList.toggle('grp-dimmed', !visible);
+      });
+    }
+
+    function toggleGroup(group, btn) {
+      if (activeGroups.has(group)) {
+        activeGroups.delete(group);
+        btn.classList.add('dimmed');
+      } else {
+        activeGroups.add(group);
+        btn.classList.remove('dimmed');
+      }
+      applyFilter();
+    }
+
+    window.addEventListener('load', () => {
+      normalizeColumnWidths();
+      // Wire up legend buttons
+      document.querySelectorAll('.legend-item[data-group]').forEach(btn => {
+        btn.addEventListener('click', () => toggleGroup(btn.dataset.group, btn));
+      });
+    });
+  </script>
 </head>
 <body>
   <nav class="topnav">
@@ -80,14 +152,14 @@
   </p>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-swatch grp-load"></div><span>Load</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-store"></div><span>Store</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-arithmetic"></div><span>Arithmetic</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-logical"></div><span>Logical</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-branch"></div><span>Branch</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-input_output"></div><span>I/O</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-nonmem"></div><span>Non-memory (rows 0-1)</span></div>
-    <div class="legend-item"><div class="legend-swatch grp-invalid"></div><span>Invalid</span></div>
+    <div class="legend-item" data-group="load"><div class="legend-swatch grp-load"></div><span>Load</span></div>
+    <div class="legend-item" data-group="store"><div class="legend-swatch grp-store"></div><span>Store</span></div>
+    <div class="legend-item" data-group="arithmetic"><div class="legend-swatch grp-arithmetic"></div><span>Arithmetic</span></div>
+    <div class="legend-item" data-group="logical"><div class="legend-swatch grp-logical"></div><span>Logical</span></div>
+    <div class="legend-item" data-group="branch"><div class="legend-swatch grp-branch"></div><span>Branch</span></div>
+    <div class="legend-item" data-group="input_output"><div class="legend-swatch grp-input_output"></div><span>I/O</span></div>
+    <div class="legend-item" data-group="nonmem"><div class="legend-swatch grp-nonmem"></div><span>Non-memory (rows 0-1)</span></div>
+    <div class="legend-item" data-group="invalid"><div class="legend-swatch grp-invalid"></div><span>Invalid</span></div>
   </div>
 
   <div class="opcode-table-wrap">
