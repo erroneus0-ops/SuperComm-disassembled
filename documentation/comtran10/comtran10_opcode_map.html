@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COMTRAN TEN -- Opcode Map</title>
+  <link rel="stylesheet" href="../html/style.css">
+  <style>
+    body { max-width: 1200px; }
+    h2 { margin-bottom: 0.5rem; }
+    .decode-note { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; line-height: 1.6; }
+    .decode-note code { color: var(--accent); background: var(--code-bg); padding: 0.1rem 0.3rem; border-radius: 2px; }
+
+    .opcode-table-wrap { overflow-x: auto; margin-bottom: 2rem; }
+    .opcode-table { border-collapse: collapse; font-family: "Courier New", monospace; font-size: 0.78rem; }
+
+    .opcode-table th, .opcode-table td { 
+      border: 1px solid #333; 
+      padding: 0.25rem 0.4rem; 
+      text-align: center; 
+      white-space: nowrap;
+    }
+
+    /* Row/col header cells */
+    .opcode-table .hdr-msd { 
+      background: #1e1e1e; color: var(--mnemonic); 
+      font-weight: bold; font-size: 0.9rem;
+      min-width: 2.5rem;
+      position: sticky; left: 0; z-index: 2;
+    }
+    .opcode-table .hdr-lsd { 
+      background: #1e1e1e; color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+    .opcode-table .hdr-top {
+      background: #1e1e1e; color: var(--mnemonic);
+      font-weight: bold;
+    }
+    .opcode-table .col-decode {
+      background: #181818; color: #555;
+      font-size: 0.7rem;
+    }
+
+    /* Instruction group colors */
+    .grp-load        { background: #0d2018; color: #7ec8a4; }
+    .grp-store       { background: #0d1820; color: #5b9bd5; }
+    .grp-arithmetic  { background: #201808; color: #f0c060; }
+    .grp-logical     { background: #180d20; color: #c090e0; }
+    .grp-branch      { background: #200d0d; color: #e07070; }
+    .grp-input_output { background: #0d2020; color: #70c0c0; }
+    .grp-invalid     { background: #111; color: #333; font-style: italic; font-size: 0.7rem; }
+    .grp-nonmem      { background: #1a1a10; color: #aaa; }
+
+    /* Legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
+    .legend-swatch { width: 1rem; height: 1rem; border: 1px solid #444; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="comtran10_instructions.html">Instruction Reference</a>
+    <span class="group-title">COMTRAN TEN -- Opcode Map</span>
+  </nav>
+  <header>
+    <h1>COMTRAN TEN</h1>
+    <h2>Opcode Decode Map</h2>
+  </header>
+  <main>
+
+  <p class="decode-note">
+    <strong>How to read:</strong> find the upper hex digit of the opcode in the MSD column (left),
+    then find the lower hex digit in the LSD row (top). The cell shows the instruction.<br>
+    <strong>Rows 0-1:</strong> non-memory instructions -- all 8 bits identify the instruction.
+    Cells marked INVALID are explicitly undefined.<br>
+    <strong>Rows 2-F:</strong> memory instructions -- upper 5 bits identify the instruction,
+    lower 3 bits are address modifiers.
+    The sub-header row shows: <code>p0</code>=page 0, <code>p1</code>=page 1,
+    <code>p2</code>=page 2, <code>p3</code>=page 3, <code>·x</code>=indexed.
+  </p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch grp-load"></div><span>Load</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-store"></div><span>Store</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-arithmetic"></div><span>Arithmetic</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-logical"></div><span>Logical</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-branch"></div><span>Branch</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-input_output"></div><span>I/O</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-nonmem"></div><span>Non-memory (rows 0-1)</span></div>
+    <div class="legend-item"><div class="legend-swatch grp-invalid"></div><span>Invalid</span></div>
+  </div>
+
+  <div class="opcode-table-wrap">
+  <table class="opcode-table">
+    <thead>
+      <tr>
+        <th class="hdr-top">MSD \ LSD</th>
+        <th class="hdr-lsd">$0</th>
+        <th class="hdr-lsd">$1</th>
+        <th class="hdr-lsd">$2</th>
+        <th class="hdr-lsd">$3</th>
+        <th class="hdr-lsd">$4</th>
+        <th class="hdr-lsd">$5</th>
+        <th class="hdr-lsd">$6</th>
+        <th class="hdr-lsd">$7</th>
+        <th class="hdr-lsd">$8</th>
+        <th class="hdr-lsd">$9</th>
+        <th class="hdr-lsd">$A</th>
+        <th class="hdr-lsd">$B</th>
+        <th class="hdr-lsd">$C</th>
+        <th class="hdr-lsd">$D</th>
+        <th class="hdr-lsd">$E</th>
+        <th class="hdr-lsd">$F</th>
+      </tr>
+      <tr>
+        <th class="col-decode">bits 7-4 \ 2-0</th>
+        <th class="col-decode">p0</th>
+        <th class="col-decode">p1</th>
+        <th class="col-decode">p2</th>
+        <th class="col-decode">p3</th>
+        <th class="col-decode">p0·x</th>
+        <th class="col-decode">p1·x</th>
+        <th class="col-decode">p2·x</th>
+        <th class="col-decode">p3·x</th>
+        <th class="col-decode">p0</th>
+        <th class="col-decode">p1</th>
+        <th class="col-decode">p2</th>
+        <th class="col-decode">p3</th>
+        <th class="col-decode">p0·x</th>
+        <th class="col-decode">p1·x</th>
+        <th class="col-decode">p2·x</th>
+        <th class="col-decode">p3·x</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="hdr-msd">$0x</td>
+        <td class="grp-nonmem" title="$00">SST</td>
+        <td class="grp-nonmem" title="$01">LC1</td>
+        <td class="grp-nonmem" title="$02">LA1</td>
+        <td class="grp-nonmem" title="$03">INX</td>
+        <td class="grp-invalid" title="$04">INVALID</td>
+        <td class="grp-invalid" title="$05">INVALID</td>
+        <td class="grp-invalid" title="$06">INVALID</td>
+        <td class="grp-invalid" title="$07">INVALID</td>
+        <td class="grp-nonmem" title="$08">SKI</td>
+        <td class="grp-nonmem" title="$09">SKS</td>
+        <td class="grp-nonmem" title="$0A">SKF</td>
+        <td class="grp-nonmem" title="$0B">SLA</td>
+        <td class="grp-invalid" title="$0C">INVALID</td>
+        <td class="grp-invalid" title="$0D">INVALID</td>
+        <td class="grp-invalid" title="$0E">INVALID</td>
+        <td class="grp-invalid" title="$0F">INVALID</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$1x</td>
+        <td class="grp-nonmem" title="$10">SRA</td>
+        <td class="grp-nonmem" title="$11">OCD</td>
+        <td class="grp-nonmem" title="$12">LX1</td>
+        <td class="grp-nonmem" title="$13">SLL</td>
+        <td class="grp-invalid" title="$14">INVALID</td>
+        <td class="grp-invalid" title="$15">INVALID</td>
+        <td class="grp-invalid" title="$16">INVALID</td>
+        <td class="grp-invalid" title="$17">INVALID</td>
+        <td class="grp-nonmem" title="$18">SRL</td>
+        <td class="grp-nonmem" title="$19">AND</td>
+        <td class="grp-nonmem" title="$1A">IOR</td>
+        <td class="grp-nonmem" title="$1B">XOR</td>
+        <td class="grp-invalid" title="$1C">INVALID</td>
+        <td class="grp-invalid" title="$1D">INVALID</td>
+        <td class="grp-invalid" title="$1E">INVALID</td>
+        <td class="grp-invalid" title="$1F">INVALID</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$2x</td>
+        <td class="grp-load" title="$20">LDA</td>
+        <td class="grp-load" title="$21">LDA</td>
+        <td class="grp-load" title="$22">LDA</td>
+        <td class="grp-load" title="$23">LDA</td>
+        <td class="grp-load" title="$24">LDA</td>
+        <td class="grp-load" title="$25">LDA</td>
+        <td class="grp-load" title="$26">LDA</td>
+        <td class="grp-load" title="$27">LDA</td>
+        <td class="grp-input_output" title="$28">FLC</td>
+        <td class="grp-input_output" title="$29">FLC</td>
+        <td class="grp-input_output" title="$2A">FLC</td>
+        <td class="grp-input_output" title="$2B">FLC</td>
+        <td class="grp-input_output" title="$2C">FLC</td>
+        <td class="grp-input_output" title="$2D">FLC</td>
+        <td class="grp-input_output" title="$2E">FLC</td>
+        <td class="grp-input_output" title="$2F">FLC</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$3x</td>
+        <td class="grp-load" title="$30">LCC</td>
+        <td class="grp-load" title="$31">LCC</td>
+        <td class="grp-load" title="$32">LCC</td>
+        <td class="grp-load" title="$33">LCC</td>
+        <td class="grp-load" title="$34">LCC</td>
+        <td class="grp-load" title="$35">LCC</td>
+        <td class="grp-load" title="$36">LCC</td>
+        <td class="grp-load" title="$37">LCC</td>
+        <td class="grp-load" title="$38">LAN</td>
+        <td class="grp-load" title="$39">LAN</td>
+        <td class="grp-load" title="$3A">LAN</td>
+        <td class="grp-load" title="$3B">LAN</td>
+        <td class="grp-load" title="$3C">LAN</td>
+        <td class="grp-load" title="$3D">LAN</td>
+        <td class="grp-load" title="$3E">LAN</td>
+        <td class="grp-load" title="$3F">LAN</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$4x</td>
+        <td class="grp-load" title="$40">LDQ</td>
+        <td class="grp-load" title="$41">LDQ</td>
+        <td class="grp-load" title="$42">LDQ</td>
+        <td class="grp-load" title="$43">LDQ</td>
+        <td class="grp-load" title="$44">LDQ</td>
+        <td class="grp-load" title="$45">LDQ</td>
+        <td class="grp-load" title="$46">LDQ</td>
+        <td class="grp-load" title="$47">LDQ</td>
+        <td class="grp-store" title="$48">STA</td>
+        <td class="grp-store" title="$49">STA</td>
+        <td class="grp-store" title="$4A">STA</td>
+        <td class="grp-store" title="$4B">STA</td>
+        <td class="grp-store" title="$4C">STA</td>
+        <td class="grp-store" title="$4D">STA</td>
+        <td class="grp-store" title="$4E">STA</td>
+        <td class="grp-store" title="$4F">STA</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$5x</td>
+        <td class="grp-store" title="$50">STX</td>
+        <td class="grp-store" title="$51">STX</td>
+        <td class="grp-store" title="$52">STX</td>
+        <td class="grp-store" title="$53">STX</td>
+        <td class="grp-store" title="$54">STX</td>
+        <td class="grp-store" title="$55">STX</td>
+        <td class="grp-store" title="$56">STX</td>
+        <td class="grp-store" title="$57">STX</td>
+        <td class="grp-store" title="$58">STQ</td>
+        <td class="grp-store" title="$59">STQ</td>
+        <td class="grp-store" title="$5A">STQ</td>
+        <td class="grp-store" title="$5B">STQ</td>
+        <td class="grp-store" title="$5C">STQ</td>
+        <td class="grp-store" title="$5D">STQ</td>
+        <td class="grp-store" title="$5E">STQ</td>
+        <td class="grp-store" title="$5F">STQ</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$6x</td>
+        <td class="grp-arithmetic" title="$60">ADD</td>
+        <td class="grp-arithmetic" title="$61">ADD</td>
+        <td class="grp-arithmetic" title="$62">ADD</td>
+        <td class="grp-arithmetic" title="$63">ADD</td>
+        <td class="grp-arithmetic" title="$64">ADD</td>
+        <td class="grp-arithmetic" title="$65">ADD</td>
+        <td class="grp-arithmetic" title="$66">ADD</td>
+        <td class="grp-arithmetic" title="$67">ADD</td>
+        <td class="grp-arithmetic" title="$68">SUB</td>
+        <td class="grp-arithmetic" title="$69">SUB</td>
+        <td class="grp-arithmetic" title="$6A">SUB</td>
+        <td class="grp-arithmetic" title="$6B">SUB</td>
+        <td class="grp-arithmetic" title="$6C">SUB</td>
+        <td class="grp-arithmetic" title="$6D">SUB</td>
+        <td class="grp-arithmetic" title="$6E">SUB</td>
+        <td class="grp-arithmetic" title="$6F">SUB</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$7x</td>
+        <td class="grp-arithmetic" title="$70">MPY</td>
+        <td class="grp-arithmetic" title="$71">MPY</td>
+        <td class="grp-arithmetic" title="$72">MPY</td>
+        <td class="grp-arithmetic" title="$73">MPY</td>
+        <td class="grp-arithmetic" title="$74">MPY</td>
+        <td class="grp-arithmetic" title="$75">MPY</td>
+        <td class="grp-arithmetic" title="$76">MPY</td>
+        <td class="grp-arithmetic" title="$77">MPY</td>
+        <td class="grp-arithmetic" title="$78">DIV</td>
+        <td class="grp-arithmetic" title="$79">DIV</td>
+        <td class="grp-arithmetic" title="$7A">DIV</td>
+        <td class="grp-arithmetic" title="$7B">DIV</td>
+        <td class="grp-arithmetic" title="$7C">DIV</td>
+        <td class="grp-arithmetic" title="$7D">DIV</td>
+        <td class="grp-arithmetic" title="$7E">DIV</td>
+        <td class="grp-arithmetic" title="$7F">DIV</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$8x</td>
+        <td class="grp-arithmetic" title="$80">RAO</td>
+        <td class="grp-arithmetic" title="$81">RAO</td>
+        <td class="grp-arithmetic" title="$82">RAO</td>
+        <td class="grp-arithmetic" title="$83">RAO</td>
+        <td class="grp-arithmetic" title="$84">RAO</td>
+        <td class="grp-arithmetic" title="$85">RAO</td>
+        <td class="grp-arithmetic" title="$86">RAO</td>
+        <td class="grp-arithmetic" title="$87">RAO</td>
+        <td class="grp-arithmetic" title="$88">RSO</td>
+        <td class="grp-arithmetic" title="$89">RSO</td>
+        <td class="grp-arithmetic" title="$8A">RSO</td>
+        <td class="grp-arithmetic" title="$8B">RSO</td>
+        <td class="grp-arithmetic" title="$8C">RSO</td>
+        <td class="grp-arithmetic" title="$8D">RSO</td>
+        <td class="grp-arithmetic" title="$8E">RSO</td>
+        <td class="grp-arithmetic" title="$8F">RSO</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$9x</td>
+        <td class="grp-branch" title="$90">BUN</td>
+        <td class="grp-branch" title="$91">BUN</td>
+        <td class="grp-branch" title="$92">BUN</td>
+        <td class="grp-branch" title="$93">BUN</td>
+        <td class="grp-branch" title="$94">BUN</td>
+        <td class="grp-branch" title="$95">BUN</td>
+        <td class="grp-branch" title="$96">BUN</td>
+        <td class="grp-branch" title="$97">BUN</td>
+        <td class="grp-branch" title="$98">BST</td>
+        <td class="grp-branch" title="$99">BST</td>
+        <td class="grp-branch" title="$9A">BST</td>
+        <td class="grp-branch" title="$9B">BST</td>
+        <td class="grp-branch" title="$9C">BST</td>
+        <td class="grp-branch" title="$9D">BST</td>
+        <td class="grp-branch" title="$9E">BST</td>
+        <td class="grp-branch" title="$9F">BST</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Ax</td>
+        <td class="grp-branch" title="$A0">BSB</td>
+        <td class="grp-branch" title="$A1">BSB</td>
+        <td class="grp-branch" title="$A2">BSB</td>
+        <td class="grp-branch" title="$A3">BSB</td>
+        <td class="grp-branch" title="$A4">BSB</td>
+        <td class="grp-branch" title="$A5">BSB</td>
+        <td class="grp-branch" title="$A6">BSB</td>
+        <td class="grp-branch" title="$A7">BSB</td>
+        <td class="grp-branch" title="$A8">BPS</td>
+        <td class="grp-branch" title="$A9">BPS</td>
+        <td class="grp-branch" title="$AA">BPS</td>
+        <td class="grp-branch" title="$AB">BPS</td>
+        <td class="grp-branch" title="$AC">BPS</td>
+        <td class="grp-branch" title="$AD">BPS</td>
+        <td class="grp-branch" title="$AE">BPS</td>
+        <td class="grp-branch" title="$AF">BPS</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Bx</td>
+        <td class="grp-branch" title="$B0">BZE</td>
+        <td class="grp-branch" title="$B1">BZE</td>
+        <td class="grp-branch" title="$B2">BZE</td>
+        <td class="grp-branch" title="$B3">BZE</td>
+        <td class="grp-branch" title="$B4">BZE</td>
+        <td class="grp-branch" title="$B5">BZE</td>
+        <td class="grp-branch" title="$B6">BZE</td>
+        <td class="grp-branch" title="$B7">BZE</td>
+        <td class="grp-branch" title="$B8">BNG</td>
+        <td class="grp-branch" title="$B9">BNG</td>
+        <td class="grp-branch" title="$BA">BNG</td>
+        <td class="grp-branch" title="$BB">BNG</td>
+        <td class="grp-branch" title="$BC">BNG</td>
+        <td class="grp-branch" title="$BD">BNG</td>
+        <td class="grp-branch" title="$BE">BNG</td>
+        <td class="grp-branch" title="$BF">BNG</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Cx</td>
+        <td class="grp-branch" title="$C0">BNC</td>
+        <td class="grp-branch" title="$C1">BNC</td>
+        <td class="grp-branch" title="$C2">BNC</td>
+        <td class="grp-branch" title="$C3">BNC</td>
+        <td class="grp-branch" title="$C4">BNC</td>
+        <td class="grp-branch" title="$C5">BNC</td>
+        <td class="grp-branch" title="$C6">BNC</td>
+        <td class="grp-branch" title="$C7">BNC</td>
+        <td class="grp-branch" title="$C8">BXZ</td>
+        <td class="grp-branch" title="$C9">BXZ</td>
+        <td class="grp-branch" title="$CA">BXZ</td>
+        <td class="grp-branch" title="$CB">BXZ</td>
+        <td class="grp-branch" title="$CC">BXZ</td>
+        <td class="grp-branch" title="$CD">BXZ</td>
+        <td class="grp-branch" title="$CE">BXZ</td>
+        <td class="grp-branch" title="$CF">BXZ</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Dx</td>
+        <td class="grp-input_output" title="$D0">WDB</td>
+        <td class="grp-input_output" title="$D1">WDB</td>
+        <td class="grp-input_output" title="$D2">WDB</td>
+        <td class="grp-input_output" title="$D3">WDB</td>
+        <td class="grp-input_output" title="$D4">WDB</td>
+        <td class="grp-input_output" title="$D5">WDB</td>
+        <td class="grp-input_output" title="$D6">WDB</td>
+        <td class="grp-input_output" title="$D7">WDB</td>
+        <td class="grp-input_output" title="$D8">MNO</td>
+        <td class="grp-input_output" title="$D9">MNO</td>
+        <td class="grp-input_output" title="$DA">MNO</td>
+        <td class="grp-input_output" title="$DB">MNO</td>
+        <td class="grp-input_output" title="$DC">MNO</td>
+        <td class="grp-input_output" title="$DD">MNO</td>
+        <td class="grp-input_output" title="$DE">MNO</td>
+        <td class="grp-input_output" title="$DF">MNO</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Ex</td>
+        <td class="grp-input_output" title="$E0">RDB</td>
+        <td class="grp-input_output" title="$E1">RDB</td>
+        <td class="grp-input_output" title="$E2">RDB</td>
+        <td class="grp-input_output" title="$E3">RDB</td>
+        <td class="grp-input_output" title="$E4">RDB</td>
+        <td class="grp-input_output" title="$E5">RDB</td>
+        <td class="grp-input_output" title="$E6">RDB</td>
+        <td class="grp-input_output" title="$E7">RDB</td>
+        <td class="grp-input_output" title="$E8">RDI</td>
+        <td class="grp-input_output" title="$E9">RDI</td>
+        <td class="grp-input_output" title="$EA">RDI</td>
+        <td class="grp-input_output" title="$EB">RDI</td>
+        <td class="grp-input_output" title="$EC">RDI</td>
+        <td class="grp-input_output" title="$ED">RDI</td>
+        <td class="grp-input_output" title="$EE">RDI</td>
+        <td class="grp-input_output" title="$EF">RDI</td>
+      </tr>
+      <tr>
+        <td class="hdr-msd">$Fx</td>
+        <td class="grp-input_output" title="$F0">MNI</td>
+        <td class="grp-input_output" title="$F1">MNI</td>
+        <td class="grp-input_output" title="$F2">MNI</td>
+        <td class="grp-input_output" title="$F3">MNI</td>
+        <td class="grp-input_output" title="$F4">MNI</td>
+        <td class="grp-input_output" title="$F5">MNI</td>
+        <td class="grp-input_output" title="$F6">MNI</td>
+        <td class="grp-input_output" title="$F7">MNI</td>
+        <td class="grp-input_output" title="$F8">FLS</td>
+        <td class="grp-input_output" title="$F9">FLS</td>
+        <td class="grp-input_output" title="$FA">FLS</td>
+        <td class="grp-input_output" title="$FB">FLS</td>
+        <td class="grp-input_output" title="$FC">FLS</td>
+        <td class="grp-input_output" title="$FD">FLS</td>
+        <td class="grp-input_output" title="$FE">FLS</td>
+        <td class="grp-input_output" title="$FF">FLS</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th class="hdr-top"></th>
+        <th class="hdr-lsd">$0</th>
+        <th class="hdr-lsd">$1</th>
+        <th class="hdr-lsd">$2</th>
+        <th class="hdr-lsd">$3</th>
+        <th class="hdr-lsd">$4</th>
+        <th class="hdr-lsd">$5</th>
+        <th class="hdr-lsd">$6</th>
+        <th class="hdr-lsd">$7</th>
+        <th class="hdr-lsd">$8</th>
+        <th class="hdr-lsd">$9</th>
+        <th class="hdr-lsd">$A</th>
+        <th class="hdr-lsd">$B</th>
+        <th class="hdr-lsd">$C</th>
+        <th class="hdr-lsd">$D</th>
+        <th class="hdr-lsd">$E</th>
+        <th class="hdr-lsd">$F</th>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+
+  </main>
+  <footer>COMTRAN TEN Opcode Map -- derived from KDA-3032, June 1981 -- public domain (U.S. Government work)</footer>
+</body>
+</html>
