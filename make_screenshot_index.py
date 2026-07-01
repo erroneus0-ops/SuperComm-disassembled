@@ -49,4 +49,8 @@ out_path = os.path.join(SCREENSHOTS_DIR, 'index.html')
 with open(out_path, 'w') as f:
     f.write(html)
 
-print(f'  screenshots/index.html updated -- {len(files)} file(s) indexed.')
+print(f'screenshots/index.html updated -- {len(files)} file(s):', flush=True)
+for f in files:
+    print(f'  {f}', flush=True)
+if not files:
+    print('  (no image files found)', flush=True)
