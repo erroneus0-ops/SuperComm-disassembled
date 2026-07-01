@@ -77,6 +77,70 @@ LDA $0350  ->  23 50    (op $23 = LDA, page 3)</pre>
     the same pattern, one example covers the group.</p>
   </div>
 
+  <div class="how-to-read" id="opcode-format">
+    <h3>Opcode Format -- The Mental Assembler Tell</h3>
+
+    <p>Every opcode byte encodes two things at once: <em>which operation</em> and
+    <em>how to find the data</em>. The upper three bits tell you which category you
+    are in, and that determines what the lower three bits mean.</p>
+
+    <p><strong>If bits 7-5 are %000 -- immediate instruction.</strong><br>
+    All 8 bits together identify the instruction. Bits 2-0 are part of the opcode,
+    not an address. No memory access for the operand. The second byte is a constant
+    value k ($00 to $FF).</p>
+
+    <p><strong>If bits 7-5 are anything else -- memory instruction.</strong><br>
+    Bits 7-3 identify the instruction (5 bits, 32 possible operations).
+    Bits 2-0 are address modifiers, routed to the address hardware:</p>
+
+    <pre>  Bit 2 -- index bit: if set, X Register is added to the operand address
+  Bit 1 -- page high bit  \
+  Bit 0 -- page low bit    } together select which 256-byte page (0-3)
+  </pre>
+
+    <p>The base opcode (page 0, no indexing) always has bits 2-0 = %000.
+    To address page 1, set bit 0 (%001). Page 2, set bit 1 (%010).
+    Page 3, set both (%011). To index, set bit 2 (%100). These combine:
+    page 1 indexed = %101, page 2 indexed = %110, page 3 indexed = %111.</p>
+
+    <pre>  Base opcode (page 0, no index):  %XXXXX000
+  Page 1:                           %XXXXX001
+  Page 2:                           %XXXXX010
+  Page 3:                           %XXXXX011
+  Page 0, indexed:                  %XXXXX100
+  Page 1, indexed:                  %XXXXX101
+  Page 2, indexed:                  %XXXXX110
+  Page 3, indexed:                  %XXXXX111</pre>
+
+    <p>Reading a hex dump, the tell is immediate: if the high nibble is $0 or $1
+    (bits 7-5 = %000), you are looking at an immediate instruction and the opcode
+    is the whole byte. If the high nibble is $2 or above, you are looking at a
+    memory instruction and the low 3 bits are address modifiers, not opcode.</p>
+
+    <p><strong>Exceptions: FLC ($28) and FLS ($F8).</strong><br>
+    These two flag instructions sit outside the %000 immediate block but do not
+    use the address bits (note 5: operand is unused). Their low 3 bits happen to
+    be %000 -- indistinguishable from a memory base opcode by bit pattern alone.
+    The decode gate network knows them by their full 8-bit value. They are the
+    two rows in the truth table that break the pattern.</p>
+
+    <p><strong>The immediate instruction block ($00-$1F) has internal structure:</strong></p>
+    <pre>  %000 00 xxx  $00-$03  SST, LC1, LA1, INX   status + register loads
+  %000 01 xxx  $08-$0B  SKI, SKS, SKF, SLA   skip conditions + shift
+  %000 10 xxx  $10-$13  SRA, OCD, LX1, SLL   shift + I/O + index load
+  %000 11 xxx  $18-$1B  SRL, AND, IOR, XOR   logical operations</pre>
+    <p>Bits 4-3 group the instructions into quads of four. Within each quad,
+    bits 2-0 select the specific instruction. This is not a rule the hardware
+    enforces -- it is a regularity the designer built into the encoding to make
+    hand-assembly systematic. Knowing it, you can derive most immediate opcodes
+    without looking them up.</p>
+
+    <p>Note the gap: $04-$07 and $0C-$0F are unused in each quad. The skip
+    instructions (SKI, SKS, SKF) only fill three of the four slots in their
+    quad -- the fourth slot ($0B) belongs to SLA. There is no fourth skip
+    condition, and no hidden instruction at those unused values.</p>
+  </div>
+
 
     <h2>Load <span class="count">-- Load registers from memory or immediate value</span></h2>
 
