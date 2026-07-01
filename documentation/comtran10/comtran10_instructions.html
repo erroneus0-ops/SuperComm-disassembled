@@ -20,6 +20,22 @@
     .notes-section h2 { margin-bottom: 1rem; }
     .example { margin-top: 0.75rem; }
     .example-title { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.25rem; font-style: italic; }
+
+    .summary-section { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--border); }
+    .summary-section h2 { margin-bottom: 0.5rem; }
+    .summary-note { font-size: 0.875rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+    .summary-tables { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .summary-table-wrap { flex: 1; min-width: 300px; }
+    .summary-table-wrap h3 { color: var(--mnemonic); font-family: "Courier New", monospace; font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .summary-table th { background: var(--bg3); color: var(--text-dim); padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: left; font-weight: normal; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+    .summary-table td { padding: 0.25rem 0.5rem; border: 1px solid var(--border); background: var(--bg2); vertical-align: top; }
+    .summary-table tr:hover td { background: var(--bg3); }
+    .sr-hex { font-family: "Courier New", monospace; color: var(--accent2); white-space: nowrap; }
+    .sr-mnem code { color: var(--accent); font-size: 0.8rem; }
+    .sr-name { color: var(--text); }
+    .sr-desc { color: var(--text-dim); font-size: 0.75rem; }
+
     .example-listing { font-family: "Courier New", monospace; font-size: 0.82rem; background: var(--code-bg); color: var(--accent); padding: 0.75rem 1rem; border-radius: 3px; border: 1px solid var(--border); overflow-x: auto; line-height: 1.5; white-space: pre; }
     .covered-by { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin-top: 0.5rem; }
   </style>
@@ -904,6 +920,119 @@ Addr  Hex   Hex   Mnemonic
   <p class="covered-by">Example pattern: see <code>FLC</code> above.</p>
   
 </div>
+
+  <div class="summary-section">
+    <h2>Quick Reference</h2>
+    <p class="summary-note">Two-way lookup: find the hex code from the mnemonic, or decode a hex value back to its mnemonic. These are the reference cards you would have had in front of you when hand-assembling.</p>
+
+    <div class="summary-tables">
+      <div class="summary-table-wrap">
+        <h3>Alphabetical</h3>
+        <table class="summary-table">
+          <thead><tr><th>Hex</th><th>Mnemonic</th><th>Name</th><th>Operation</th></tr></thead>
+          <tbody>
+<tr><td class="sr-hex">$60</td><td class="sr-mnem"><code>ADD,m,x</code></td><td class="sr-name">Add</td><td class="sr-desc">Add the contents of memory address m to the ACCUMULATOR, leaving the result in t...</td></tr>
+<tr><td class="sr-hex">$19</td><td class="sr-mnem"><code>AND,k</code></td><td class="sr-name">And</td><td class="sr-desc">Form the bit-by-bit logical product of k and the contents of the ACCUMULATOR, le...</td></tr>
+<tr><td class="sr-hex">$C0</td><td class="sr-mnem"><code>BNC,m,x</code></td><td class="sr-name">Branch on No Carry</td><td class="sr-desc">Branch to memory address m if the condition code is not carry.</td></tr>
+<tr><td class="sr-hex">$B8</td><td class="sr-mnem"><code>BNG,m,x</code></td><td class="sr-name">Branch on Negative</td><td class="sr-desc">Branch to memory address m if the condition code is less than zero.</td></tr>
+<tr><td class="sr-hex">$A8</td><td class="sr-mnem"><code>BPS,m,x</code></td><td class="sr-name">Branch on Positive</td><td class="sr-desc">Branch to memory address m if the condition code is greater than zero.</td></tr>
+<tr><td class="sr-hex">$A0</td><td class="sr-mnem"><code>BSB,m,x</code></td><td class="sr-name">Branch to Subroutine</td><td class="sr-desc">Store BUN op code in location m. Store the contents of the P Register (next inst...</td></tr>
+<tr><td class="sr-hex">$98</td><td class="sr-mnem"><code>BST,m,x</code></td><td class="sr-name">Branch and Stop</td><td class="sr-desc">Branch to memory address m and stop.</td></tr>
+<tr><td class="sr-hex">$90</td><td class="sr-mnem"><code>BUN,m,x</code></td><td class="sr-name">Branch Unconditional</td><td class="sr-desc">Branch to memory address m.</td></tr>
+<tr><td class="sr-hex">$C8</td><td class="sr-mnem"><code>BXZ,m,x</code></td><td class="sr-name">Branch on Index Zero</td><td class="sr-desc">Branch to memory address m if the INDEX Register is zero.</td></tr>
+<tr><td class="sr-hex">$B0</td><td class="sr-mnem"><code>BZE,m,x</code></td><td class="sr-name">Branch on Zero</td><td class="sr-desc">Branch to memory address m if the condition code is equal to zero.</td></tr>
+<tr><td class="sr-hex">$78</td><td class="sr-mnem"><code>DIV,m,x</code></td><td class="sr-name">Divide</td><td class="sr-desc">Divide the double length number in the AQ Register by the contents of memory add...</td></tr>
+<tr><td class="sr-hex">$28</td><td class="sr-mnem"><code>FLC,k</code></td><td class="sr-name">Flag Clear</td><td class="sr-desc">Clear flag to zero.</td></tr>
+<tr><td class="sr-hex">$F8</td><td class="sr-mnem"><code>FLS,k</code></td><td class="sr-name">Flag Set</td><td class="sr-desc">Set flag to one.</td></tr>
+<tr><td class="sr-hex">$03</td><td class="sr-mnem"><code>INX,k</code></td><td class="sr-name">Increase Index</td><td class="sr-desc">Increase the contents of the INDEX Register by k.</td></tr>
+<tr><td class="sr-hex">$1A</td><td class="sr-mnem"><code>IOR,k</code></td><td class="sr-name">Inclusive Or</td><td class="sr-desc">Form the bit-by-bit Inclusive OR of k and the contents of the ACCUMULATOR, leavi...</td></tr>
+<tr><td class="sr-hex">$02</td><td class="sr-mnem"><code>LA1,k</code></td><td class="sr-name">Load Accumulator Immediate</td><td class="sr-desc">Load ACCUMULATOR with the value k.</td></tr>
+<tr><td class="sr-hex">$38</td><td class="sr-mnem"><code>LAN,m,x</code></td><td class="sr-name">Load Accumulator Negative</td><td class="sr-desc">Load ACCUMULATOR with the two's complement of the contents of m.</td></tr>
+<tr><td class="sr-hex">$01</td><td class="sr-mnem"><code>LC1,k</code></td><td class="sr-name">Load Countdown Immediate</td><td class="sr-desc">Load COUNTDOWN Register with a count of k.</td></tr>
+<tr><td class="sr-hex">$30</td><td class="sr-mnem"><code>LCC,m,x</code></td><td class="sr-name">Load Consecutive</td><td class="sr-desc">Transfer the contents of memory address m to memory address m + 1.</td></tr>
+<tr><td class="sr-hex">$20</td><td class="sr-mnem"><code>LDA,m,x</code></td><td class="sr-name">Load Accumulator</td><td class="sr-desc">Load ACCUMULATOR with contents of memory address m.</td></tr>
+<tr><td class="sr-hex">$40</td><td class="sr-mnem"><code>LDQ,m,x</code></td><td class="sr-name">Load Quotient Register</td><td class="sr-desc">Load QUOTIENT Register with the contents of memory address m.</td></tr>
+<tr><td class="sr-hex">$12</td><td class="sr-mnem"><code>LX1,k</code></td><td class="sr-name">Load Index Immediate</td><td class="sr-desc">Load INDEX Register with a count of k.</td></tr>
+<tr><td class="sr-hex">$F0</td><td class="sr-mnem"><code>MNI,m,x</code></td><td class="sr-name">Manual Input</td><td class="sr-desc">Transfer the contents of the Input Register to consecutive memory locations star...</td></tr>
+<tr><td class="sr-hex">$D8</td><td class="sr-mnem"><code>MNO,m,x</code></td><td class="sr-name">Manual Output</td><td class="sr-desc">Transfer the contents of consecutive memory locations to the Input Register. Con...</td></tr>
+<tr><td class="sr-hex">$70</td><td class="sr-mnem"><code>MPY,m,x</code></td><td class="sr-name">Multiply</td><td class="sr-desc">Multiply the contents of the ACCUMULATOR by the contents of memory address m, le...</td></tr>
+<tr><td class="sr-hex">$11</td><td class="sr-mnem"><code>OCD,k</code></td><td class="sr-name">Output Command</td><td class="sr-desc">Transmit the operand k to the external device addressed by the three low order b...</td></tr>
+<tr><td class="sr-hex">$80</td><td class="sr-mnem"><code>RAO,m,x</code></td><td class="sr-name">Replace Add One</td><td class="sr-desc">Add 1 to the contents of memory address m. If contents of m are FF, sets m to ze...</td></tr>
+<tr><td class="sr-hex">$E0</td><td class="sr-mnem"><code>RDB,m,x</code></td><td class="sr-name">Read Data Block</td><td class="sr-desc">Store data from the selected external device in consecutive memory locations sta...</td></tr>
+<tr><td class="sr-hex">$E8</td><td class="sr-mnem"><code>RDI,m,x</code></td><td class="sr-name">Read Until Interrupt</td><td class="sr-desc">Store data from the selected external device in consecutive memory locations sta...</td></tr>
+<tr><td class="sr-hex">$88</td><td class="sr-mnem"><code>RSO,m,x</code></td><td class="sr-name">Replace Subtract One</td><td class="sr-desc">Subtract 1 from the contents of memory address m. If contents of m are zero, set...</td></tr>
+<tr><td class="sr-hex">$0A</td><td class="sr-mnem"><code>SKF,k</code></td><td class="sr-name">Skip on Flag</td><td class="sr-desc">Skip k instructions or 2k words if flag is set.</td></tr>
+<tr><td class="sr-hex">$08</td><td class="sr-mnem"><code>SKI,k</code></td><td class="sr-name">Skip on Interrupt</td><td class="sr-desc">Skip k instructions or 2k words if interrupt is set.</td></tr>
+<tr><td class="sr-hex">$09</td><td class="sr-mnem"><code>SKS,k</code></td><td class="sr-name">Skip on Sense Switch</td><td class="sr-desc">Skip k instructions or 2k words if the sense switch is on.</td></tr>
+<tr><td class="sr-hex">$0B</td><td class="sr-mnem"><code>SLA,k</code></td><td class="sr-name">Shift Left Arithmetic</td><td class="sr-desc">Shift the AQ Register left k places, filling in zeros on the right.</td></tr>
+<tr><td class="sr-hex">$13</td><td class="sr-mnem"><code>SLL,k</code></td><td class="sr-name">Shift Left Logical</td><td class="sr-desc">Shift the ACCUMULATOR left k places, filling in zeros on the right.</td></tr>
+<tr><td class="sr-hex">$10</td><td class="sr-mnem"><code>SRA,k</code></td><td class="sr-name">Shift Right Arithmetic</td><td class="sr-desc">Shift the AQ Register right k places, propagating sign bits on the left.</td></tr>
+<tr><td class="sr-hex">$18</td><td class="sr-mnem"><code>SRL,k</code></td><td class="sr-name">Shift Right Logical</td><td class="sr-desc">Shift the ACCUMULATOR right k places, filling in zeros on the left.</td></tr>
+<tr><td class="sr-hex">$00</td><td class="sr-mnem"><code>SST,k</code></td><td class="sr-name">Sense Status</td><td class="sr-desc">The previously addressed device sends an 8-bit status word which is transferred ...</td></tr>
+<tr><td class="sr-hex">$48</td><td class="sr-mnem"><code>STA,m,x</code></td><td class="sr-name">Store Accumulator</td><td class="sr-desc">Store contents of the ACCUMULATOR at memory address m.</td></tr>
+<tr><td class="sr-hex">$58</td><td class="sr-mnem"><code>STQ,m,x</code></td><td class="sr-name">Store Quotient Register</td><td class="sr-desc">Store the contents of the QUOTIENT Register at memory address m.</td></tr>
+<tr><td class="sr-hex">$50</td><td class="sr-mnem"><code>STX,m,x</code></td><td class="sr-name">Store Index</td><td class="sr-desc">Store contents of the INDEX Register at memory address m.</td></tr>
+<tr><td class="sr-hex">$68</td><td class="sr-mnem"><code>SUB,m,x</code></td><td class="sr-name">Subtract</td><td class="sr-desc">Subtract the contents of memory address m from the ACCUMULATOR, leaving the resu...</td></tr>
+<tr><td class="sr-hex">$D0</td><td class="sr-mnem"><code>WDB,m,x</code></td><td class="sr-name">Write Data Block</td><td class="sr-desc">Transfer the contents of consecutive memory locations starting at address m to t...</td></tr>
+<tr><td class="sr-hex">$1B</td><td class="sr-mnem"><code>XOR,k</code></td><td class="sr-name">Exclusive Or</td><td class="sr-desc">Form the bit-by-bit Exclusive OR of k and the contents of the ACCUMULATOR, leavi...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="summary-table-wrap">
+        <h3>Numerical</h3>
+        <table class="summary-table">
+          <thead><tr><th>Hex</th><th>Mnemonic</th><th>Name</th><th>Operation</th></tr></thead>
+          <tbody>
+<tr><td class="sr-hex">$00</td><td class="sr-mnem"><code>SST,k</code></td><td class="sr-name">Sense Status</td><td class="sr-desc">The previously addressed device sends an 8-bit status word which is transferred ...</td></tr>
+<tr><td class="sr-hex">$01</td><td class="sr-mnem"><code>LC1,k</code></td><td class="sr-name">Load Countdown Immediate</td><td class="sr-desc">Load COUNTDOWN Register with a count of k.</td></tr>
+<tr><td class="sr-hex">$02</td><td class="sr-mnem"><code>LA1,k</code></td><td class="sr-name">Load Accumulator Immediate</td><td class="sr-desc">Load ACCUMULATOR with the value k.</td></tr>
+<tr><td class="sr-hex">$03</td><td class="sr-mnem"><code>INX,k</code></td><td class="sr-name">Increase Index</td><td class="sr-desc">Increase the contents of the INDEX Register by k.</td></tr>
+<tr><td class="sr-hex">$08</td><td class="sr-mnem"><code>SKI,k</code></td><td class="sr-name">Skip on Interrupt</td><td class="sr-desc">Skip k instructions or 2k words if interrupt is set.</td></tr>
+<tr><td class="sr-hex">$09</td><td class="sr-mnem"><code>SKS,k</code></td><td class="sr-name">Skip on Sense Switch</td><td class="sr-desc">Skip k instructions or 2k words if the sense switch is on.</td></tr>
+<tr><td class="sr-hex">$0A</td><td class="sr-mnem"><code>SKF,k</code></td><td class="sr-name">Skip on Flag</td><td class="sr-desc">Skip k instructions or 2k words if flag is set.</td></tr>
+<tr><td class="sr-hex">$0B</td><td class="sr-mnem"><code>SLA,k</code></td><td class="sr-name">Shift Left Arithmetic</td><td class="sr-desc">Shift the AQ Register left k places, filling in zeros on the right.</td></tr>
+<tr><td class="sr-hex">$10</td><td class="sr-mnem"><code>SRA,k</code></td><td class="sr-name">Shift Right Arithmetic</td><td class="sr-desc">Shift the AQ Register right k places, propagating sign bits on the left.</td></tr>
+<tr><td class="sr-hex">$11</td><td class="sr-mnem"><code>OCD,k</code></td><td class="sr-name">Output Command</td><td class="sr-desc">Transmit the operand k to the external device addressed by the three low order b...</td></tr>
+<tr><td class="sr-hex">$12</td><td class="sr-mnem"><code>LX1,k</code></td><td class="sr-name">Load Index Immediate</td><td class="sr-desc">Load INDEX Register with a count of k.</td></tr>
+<tr><td class="sr-hex">$13</td><td class="sr-mnem"><code>SLL,k</code></td><td class="sr-name">Shift Left Logical</td><td class="sr-desc">Shift the ACCUMULATOR left k places, filling in zeros on the right.</td></tr>
+<tr><td class="sr-hex">$18</td><td class="sr-mnem"><code>SRL,k</code></td><td class="sr-name">Shift Right Logical</td><td class="sr-desc">Shift the ACCUMULATOR right k places, filling in zeros on the left.</td></tr>
+<tr><td class="sr-hex">$19</td><td class="sr-mnem"><code>AND,k</code></td><td class="sr-name">And</td><td class="sr-desc">Form the bit-by-bit logical product of k and the contents of the ACCUMULATOR, le...</td></tr>
+<tr><td class="sr-hex">$1A</td><td class="sr-mnem"><code>IOR,k</code></td><td class="sr-name">Inclusive Or</td><td class="sr-desc">Form the bit-by-bit Inclusive OR of k and the contents of the ACCUMULATOR, leavi...</td></tr>
+<tr><td class="sr-hex">$1B</td><td class="sr-mnem"><code>XOR,k</code></td><td class="sr-name">Exclusive Or</td><td class="sr-desc">Form the bit-by-bit Exclusive OR of k and the contents of the ACCUMULATOR, leavi...</td></tr>
+<tr><td class="sr-hex">$20</td><td class="sr-mnem"><code>LDA,m,x</code></td><td class="sr-name">Load Accumulator</td><td class="sr-desc">Load ACCUMULATOR with contents of memory address m.</td></tr>
+<tr><td class="sr-hex">$28</td><td class="sr-mnem"><code>FLC,k</code></td><td class="sr-name">Flag Clear</td><td class="sr-desc">Clear flag to zero.</td></tr>
+<tr><td class="sr-hex">$30</td><td class="sr-mnem"><code>LCC,m,x</code></td><td class="sr-name">Load Consecutive</td><td class="sr-desc">Transfer the contents of memory address m to memory address m + 1.</td></tr>
+<tr><td class="sr-hex">$38</td><td class="sr-mnem"><code>LAN,m,x</code></td><td class="sr-name">Load Accumulator Negative</td><td class="sr-desc">Load ACCUMULATOR with the two's complement of the contents of m.</td></tr>
+<tr><td class="sr-hex">$40</td><td class="sr-mnem"><code>LDQ,m,x</code></td><td class="sr-name">Load Quotient Register</td><td class="sr-desc">Load QUOTIENT Register with the contents of memory address m.</td></tr>
+<tr><td class="sr-hex">$48</td><td class="sr-mnem"><code>STA,m,x</code></td><td class="sr-name">Store Accumulator</td><td class="sr-desc">Store contents of the ACCUMULATOR at memory address m.</td></tr>
+<tr><td class="sr-hex">$50</td><td class="sr-mnem"><code>STX,m,x</code></td><td class="sr-name">Store Index</td><td class="sr-desc">Store contents of the INDEX Register at memory address m.</td></tr>
+<tr><td class="sr-hex">$58</td><td class="sr-mnem"><code>STQ,m,x</code></td><td class="sr-name">Store Quotient Register</td><td class="sr-desc">Store the contents of the QUOTIENT Register at memory address m.</td></tr>
+<tr><td class="sr-hex">$60</td><td class="sr-mnem"><code>ADD,m,x</code></td><td class="sr-name">Add</td><td class="sr-desc">Add the contents of memory address m to the ACCUMULATOR, leaving the result in t...</td></tr>
+<tr><td class="sr-hex">$68</td><td class="sr-mnem"><code>SUB,m,x</code></td><td class="sr-name">Subtract</td><td class="sr-desc">Subtract the contents of memory address m from the ACCUMULATOR, leaving the resu...</td></tr>
+<tr><td class="sr-hex">$70</td><td class="sr-mnem"><code>MPY,m,x</code></td><td class="sr-name">Multiply</td><td class="sr-desc">Multiply the contents of the ACCUMULATOR by the contents of memory address m, le...</td></tr>
+<tr><td class="sr-hex">$78</td><td class="sr-mnem"><code>DIV,m,x</code></td><td class="sr-name">Divide</td><td class="sr-desc">Divide the double length number in the AQ Register by the contents of memory add...</td></tr>
+<tr><td class="sr-hex">$80</td><td class="sr-mnem"><code>RAO,m,x</code></td><td class="sr-name">Replace Add One</td><td class="sr-desc">Add 1 to the contents of memory address m. If contents of m are FF, sets m to ze...</td></tr>
+<tr><td class="sr-hex">$88</td><td class="sr-mnem"><code>RSO,m,x</code></td><td class="sr-name">Replace Subtract One</td><td class="sr-desc">Subtract 1 from the contents of memory address m. If contents of m are zero, set...</td></tr>
+<tr><td class="sr-hex">$90</td><td class="sr-mnem"><code>BUN,m,x</code></td><td class="sr-name">Branch Unconditional</td><td class="sr-desc">Branch to memory address m.</td></tr>
+<tr><td class="sr-hex">$98</td><td class="sr-mnem"><code>BST,m,x</code></td><td class="sr-name">Branch and Stop</td><td class="sr-desc">Branch to memory address m and stop.</td></tr>
+<tr><td class="sr-hex">$A0</td><td class="sr-mnem"><code>BSB,m,x</code></td><td class="sr-name">Branch to Subroutine</td><td class="sr-desc">Store BUN op code in location m. Store the contents of the P Register (next inst...</td></tr>
+<tr><td class="sr-hex">$A8</td><td class="sr-mnem"><code>BPS,m,x</code></td><td class="sr-name">Branch on Positive</td><td class="sr-desc">Branch to memory address m if the condition code is greater than zero.</td></tr>
+<tr><td class="sr-hex">$B0</td><td class="sr-mnem"><code>BZE,m,x</code></td><td class="sr-name">Branch on Zero</td><td class="sr-desc">Branch to memory address m if the condition code is equal to zero.</td></tr>
+<tr><td class="sr-hex">$B8</td><td class="sr-mnem"><code>BNG,m,x</code></td><td class="sr-name">Branch on Negative</td><td class="sr-desc">Branch to memory address m if the condition code is less than zero.</td></tr>
+<tr><td class="sr-hex">$C0</td><td class="sr-mnem"><code>BNC,m,x</code></td><td class="sr-name">Branch on No Carry</td><td class="sr-desc">Branch to memory address m if the condition code is not carry.</td></tr>
+<tr><td class="sr-hex">$C8</td><td class="sr-mnem"><code>BXZ,m,x</code></td><td class="sr-name">Branch on Index Zero</td><td class="sr-desc">Branch to memory address m if the INDEX Register is zero.</td></tr>
+<tr><td class="sr-hex">$D0</td><td class="sr-mnem"><code>WDB,m,x</code></td><td class="sr-name">Write Data Block</td><td class="sr-desc">Transfer the contents of consecutive memory locations starting at address m to t...</td></tr>
+<tr><td class="sr-hex">$D8</td><td class="sr-mnem"><code>MNO,m,x</code></td><td class="sr-name">Manual Output</td><td class="sr-desc">Transfer the contents of consecutive memory locations to the Input Register. Con...</td></tr>
+<tr><td class="sr-hex">$E0</td><td class="sr-mnem"><code>RDB,m,x</code></td><td class="sr-name">Read Data Block</td><td class="sr-desc">Store data from the selected external device in consecutive memory locations sta...</td></tr>
+<tr><td class="sr-hex">$E8</td><td class="sr-mnem"><code>RDI,m,x</code></td><td class="sr-name">Read Until Interrupt</td><td class="sr-desc">Store data from the selected external device in consecutive memory locations sta...</td></tr>
+<tr><td class="sr-hex">$F0</td><td class="sr-mnem"><code>MNI,m,x</code></td><td class="sr-name">Manual Input</td><td class="sr-desc">Transfer the contents of the Input Register to consecutive memory locations star...</td></tr>
+<tr><td class="sr-hex">$F8</td><td class="sr-mnem"><code>FLS,k</code></td><td class="sr-name">Flag Set</td><td class="sr-desc">Set flag to one.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div class="notes-section">
     <h2>Notes</h2>
