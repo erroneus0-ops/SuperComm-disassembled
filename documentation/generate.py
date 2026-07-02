@@ -675,6 +675,7 @@ def render_postbyte_page(data):
     .postbyte-table td, .postbyte-table th {{ text-align: center; }}
     .postbyte-table td:first-child, .postbyte-table th:first-child,
     .postbyte-table td:last-child, .postbyte-table th:last-child {{ text-align: left; }}
+    .postbyte-table td:first-child, .postbyte-table th:first-child {{ width: 7rem; white-space: nowrap; }}
     .postbyte-table tr.section-header td {{
       background: var(--bg3) !important;
       color: var(--mnemonic);
