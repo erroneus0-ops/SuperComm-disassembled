@@ -199,7 +199,7 @@
       "note": "Always indirect. No register involved."
     }
   ],
-  "hand_assembly_examples": [
+  "encoding_examples": [
     {
       "syntax": "STA ,X+",
       "opcode": "A7",
@@ -235,6 +235,14 @@
       "operand": "10",
       "total_bytes": 3,
       "description": "Load A from X+$10. 8-bit offset follows postbyte."
+    },
+    {
+      "syntax": "LDA $100,X",
+      "opcode": "A6",
+      "postbyte": "89",
+      "operand": "01 00",
+      "total_bytes": 4,
+      "description": "Load A from X+$0100. Offset $100 exceeds 8-bit range, uses 16-bit offset mode. Two offset bytes follow postbyte."
     },
     {
       "syntax": "LDA [,X++]",

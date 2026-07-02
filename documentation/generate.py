@@ -651,7 +651,7 @@ def render_postbyte_page(data):
 
     # Hand assembly examples
     ex_rows = []
-    for ex in data.get('hand_assembly_examples', []):
+    for ex in data.get('encoding_examples', []):
         op2 = f' <code>${ex["postbyte"]}</code>' if 'postbyte' in ex else ''
         op3 = f' <code>${ex.get("operand","")}</code>' if 'operand' in ex else ''
         ex_rows.append(f'''
@@ -709,7 +709,7 @@ def render_postbyte_page(data):
       <tbody>{"".join(mode_rows)}</tbody>
     </table>
 
-    <h3>Hand Assembly Examples</h3>
+    <h3>Encoding Examples</h3>
     <table class="modes-table" style="width:100%">
       <thead>
         <tr><th>Syntax</th><th>Bytes</th><th>Total bytes</th><th>Description</th></tr>
