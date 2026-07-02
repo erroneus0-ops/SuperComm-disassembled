@@ -672,6 +672,15 @@ def render_postbyte_page(data):
   <style>
     .postbyte-table td.center {{ text-align: center; }}
     .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
+    .postbyte-table td, .postbyte-table th {{ text-align: center; }}
+    .postbyte-table td:first-child, .postbyte-table th:first-child,
+    .postbyte-table td:last-child, .postbyte-table th:last-child {{ text-align: left; }}
+    .postbyte-table tr.section-header td {{
+      background: var(--bg3) !important;
+      color: var(--mnemonic);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+    }}
     .reg-table {{ width: auto; margin-bottom: 1.5rem; }}
     .reg-table td, .reg-table th {{ padding: 0.25rem 1rem; }}
   </style>
@@ -694,19 +703,57 @@ def render_postbyte_page(data):
       <tbody>{reg_rows}</tbody>
     </table>
 
-    <h3>Postbyte Modes</h3>
-    <table class="modes-table postbyte-table" style="width:100%">
+    <h3>Postbyte Bit Map</h3>
+    <p>All postbyte values shown for register X (bits 6-5 = 00). For Y add $20, U add $40, S add $60.</p>
+    <table class="modes-table postbyte-table" style="width:100%; font-family: monospace; font-size: 0.85rem;">
       <thead>
         <tr>
-          <th>Syntax</th>
-          <th>Description</th>
-          <th>Postbyte (per register)</th>
-          <th>Extra bytes</th>
-          <th>Extra cycles</th>
-          <th>Indirect postbyte</th>
+          <th style="text-align:left">Syntax</th>
+          <th>7</th><th>6</th><th>5</th><th>4</th>
+          <th>3</th><th>2</th><th>1</th><th>0</th>
+          <th style="text-align:left">Notes</th>
+        </tr>
+        <tr style="font-size:0.75rem; color:var(--text-dim)">
+          <th></th>
+          <th>r</th><th>R</th><th>R</th><th>i</th>
+          <th>m</th><th>m</th><th>m</th><th>m</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody>{"".join(mode_rows)}</tbody>
+      <tbody>
+        <tr class="section-header"><td colspan="10"><strong>Register select (bits 6-5 when bit 7=1)</strong></td></tr>
+        <tr><td>,X</td><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td></tr>
+        <tr><td>,Y</td><td>1</td><td>0</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td></tr>
+        <tr><td>,U</td><td>1</td><td>1</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td></tr>
+        <tr><td>,S</td><td>1</td><td>1</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td></tr>
+        <tr class="section-header"><td colspan="10"><strong>5-bit signed offset mode (bit 7=0, no indirect)</strong></td></tr>
+        <tr><td>n,R</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td>offset -16 to +15</td></tr>
+        <tr class="section-header"><td colspan="10"><strong>Standard indexed (bit 7=1, bit 4=0, no indirect)</strong></td></tr>
+        <tr><td>,R+</td>  <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>post-increment by 1</td></tr>
+        <tr><td>,R++</td> <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>post-increment by 2</td></tr>
+        <tr><td>,-R</td>  <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>pre-decrement by 1</td></tr>
+        <tr><td>,--R</td> <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>pre-decrement by 2</td></tr>
+        <tr><td>,R</td>   <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>zero offset</td></tr>
+        <tr><td>B,R</td>  <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>B accumulator offset</td></tr>
+        <tr><td>A,R</td>  <td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>A accumulator offset</td></tr>
+        <tr><td>n8,R</td> <td>1</td><td>R</td><td>R</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>8-bit signed offset follows</td></tr>
+        <tr><td>n16,R</td><td>1</td><td>R</td><td>R</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>16-bit signed offset follows (2 bytes)</td></tr>
+        <tr><td>D,R</td>  <td>1</td><td>R</td><td>R</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>D accumulator offset (16-bit)</td></tr>
+        <tr><td>n8,PCR</td> <td>1</td><td>R</td><td>R</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>8-bit PC-relative offset follows</td></tr>
+        <tr><td>n16,PCR</td><td>1</td><td>R</td><td>R</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>16-bit PC-relative offset follows</td></tr>
+        <tr class="section-header"><td colspan="10"><strong>Indirect variants (bit 4=1) — EA is address of address</strong></td></tr>
+        <tr><td>[,R++]</td>  <td>1</td><td>R</td><td>R</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td></td></tr>
+        <tr><td>[,--R]</td>  <td>1</td><td>R</td><td>R</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td></td></tr>
+        <tr><td>[,R]</td>    <td>1</td><td>R</td><td>R</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td></td></tr>
+        <tr><td>[B,R]</td>   <td>1</td><td>R</td><td>R</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td></td></tr>
+        <tr><td>[A,R]</td>   <td>1</td><td>R</td><td>R</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td></td></tr>
+        <tr><td>[n8,R]</td>  <td>1</td><td>R</td><td>R</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>8-bit offset follows</td></tr>
+        <tr><td>[n16,R]</td> <td>1</td><td>R</td><td>R</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>16-bit offset follows</td></tr>
+        <tr><td>[D,R]</td>   <td>1</td><td>R</td><td>R</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td></td></tr>
+        <tr><td>[n8,PCR]</td> <td>1</td><td>R</td><td>R</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>8-bit PC-relative offset follows</td></tr>
+        <tr><td>[n16,PCR]</td><td>1</td><td>R</td><td>R</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>16-bit PC-relative offset follows</td></tr>
+        <tr><td>[addr]</td>  <td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>extended indirect $9F — fixed, no register variant</td></tr>
+      </tbody>
     </table>
 
     <h3>Encoding Examples</h3>
