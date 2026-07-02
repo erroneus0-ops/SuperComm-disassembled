@@ -672,10 +672,19 @@ def render_postbyte_page(data):
   <style>
     .postbyte-table td.center {{ text-align: center; }}
     .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
-    .postbyte-table td, .postbyte-table th {{ text-align: center; }}
+    .postbyte-table td, .postbyte-table th {{ text-align: center; white-space: nowrap; }}
     .postbyte-table td:first-child, .postbyte-table th:first-child,
-    .postbyte-table td:last-child, .postbyte-table th:last-child {{ text-align: left; }}
-    .postbyte-table td:first-child, .postbyte-table th:first-child {{ width: 7rem; white-space: nowrap; }}
+    .postbyte-table td:last-child, .postbyte-table th:last-child {{ text-align: left; white-space: nowrap; }}
+    .postbyte-table td:first-child, .postbyte-table th:first-child {{ width: 5rem; }}
+    .postbyte-table td:nth-child(2), .postbyte-table th:nth-child(2),
+    .postbyte-table td:nth-child(3), .postbyte-table th:nth-child(3),
+    .postbyte-table td:nth-child(4), .postbyte-table th:nth-child(4),
+    .postbyte-table td:nth-child(5), .postbyte-table th:nth-child(5),
+    .postbyte-table td:nth-child(6), .postbyte-table th:nth-child(6),
+    .postbyte-table td:nth-child(7), .postbyte-table th:nth-child(7),
+    .postbyte-table td:nth-child(8), .postbyte-table th:nth-child(8),
+    .postbyte-table td:nth-child(9), .postbyte-table th:nth-child(9) {{ width: 1.8rem; padding: 0.2rem 0.1rem; }}
+    .postbyte-table td:last-child, .postbyte-table th:last-child {{ width: auto; }}
     .postbyte-table tr.section-header td {{
       background: var(--bg3) !important;
       color: var(--mnemonic);
