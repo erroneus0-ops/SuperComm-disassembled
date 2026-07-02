@@ -5,6 +5,75 @@ Reads opcodes/*.json and produces HTML reference pages.
 
 Usage:
     python generate.py [--output html]
+
+========================================================================
+JSON SCHEMA DOCUMENTATION
+========================================================================
+
+Each opcodes_<group>.json file has this top-level structure:
+{
+  "group":        string  -- matches GROUP_ORDER key (e.g. "load")
+  "description":  string  -- one-line group description
+  "instructions": [ ... ] -- list of instruction objects (see below)
+}
+
+Each instruction object:
+{
+  "mnemonic":        string  -- e.g. "LDA"
+  "full_name":       string  -- e.g. "Load Accumulator A"
+  "operation":       string  -- register-transfer notation e.g. "A <- M"
+  "description":     string  -- optional longer description (HTML ok)
+  "condition_codes": {       -- each value is one of: "↕" "-" "0" "1" "?"
+    "H": string,             -- Half carry
+    "N": string,             -- Negative
+    "Z": string,             -- Zero
+    "V": string,             -- Overflow
+    "C": string              -- Carry
+  },
+  "modes": [                 -- list of addressing mode entries
+    {
+      "mode":   string,      -- "immediate" "direct" "indexed" "extended"
+                             --  "inherent" "relative"
+      "syntax": string,      -- assembler syntax e.g. "LDA #n"
+      "opcode": string,      -- hex without $ e.g. "86" or "10A6" (prefixed)
+      "bytes":  int|string,  -- byte count; "2+" means 2 + postbyte for indexed
+      "cycles": int|string   -- cycle count; "4+" means 4 + postbyte cycles
+    },
+    ...
+  ],
+  "flow":  string,           -- "sequential" "branch" "call" "return"
+  "notes": string            -- optional footnote (HTML ok)
+}
+
+INDEXED ADDRESSING POSTBYTE
+----------------------------
+The "indexed" mode entry shows bytes as "2+" and cycles as "4+" (or
+similar) because the actual byte count and cycle count depend on the
+postbyte that follows the opcode. The postbyte encodes:
+  - which pointer register (X, Y, U, S)
+  - the type of indexing (constant offset, auto-increment/decrement,
+    accumulator offset, PC-relative, indirect)
+  - the size of any offset
+
+The postbyte encoding is documented separately in:
+  opcodes_indexed_postbyte.json   -- machine-readable postbyte table
+  html/groups/indexed_postbyte.html -- rendered reference page
+
+Every group page that contains instructions with indexed mode links to
+the postbyte reference page. The generator checks for the presence of
+any "indexed" mode entry and adds the link automatically.
+
+ADDING A NEW GROUP
+------------------
+1. Create opcodes_<group>.json following the schema above.
+2. Add ("group_key", "Display Title") to GROUP_ORDER below.
+3. Run generate.py to rebuild all HTML pages.
+
+REGENERATING HTML
+-----------------
+Run from the repo root:
+    python documentation/generate.py
+Output goes to documentation/html/groups/<group>.html
 """
 
 import json
@@ -104,8 +173,20 @@ def render_instruction(instr):
 </div>
 '''
 
+def has_indexed_mode(instructions):
+    """Return True if any instruction in the group has an indexed mode."""
+    return any(
+        any(m.get('mode') == 'indexed' for m in i.get('modes', []))
+        for i in instructions
+    )
+
 def render_group_page(group_key, group_title, instructions):
     instruction_html = '\n'.join(render_instruction(i) for i in instructions)
+    postbyte_link = (
+        '<a href="indexed_postbyte.html" class="postbyte-link">'
+        'Indexed Addressing Postbyte Reference</a>'
+        if has_indexed_mode(instructions) else ''
+    )
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,6 +199,7 @@ def render_group_page(group_key, group_title, instructions):
   <nav class="topnav">
     <a href="../index.html">Index</a>
     <span class="group-title">{group_title}</span>
+    {postbyte_link}
   </nav>
   <main>
     <h2>{group_title}</h2>
@@ -533,12 +615,124 @@ footer {
 }
 '''
 
+def render_postbyte_page(data):
+    """Render the indexed addressing postbyte reference page from JSON."""
+
+    notes_html = ''.join(f'<li>{n}</li>' for n in data.get('notes', []))
+
+    # Register bits table
+    reg_rows = ''.join(
+        f'<tr><td><code>%{r["bits"]}xxxxx</code></td><td>{r["register"]}</td></tr>'
+        for r in data['register_bits']['values']
+    )
+
+    # Main postbyte modes table
+    mode_rows = []
+    for m in data['modes']:
+        pb_vals = m.get('postbyte_values', {})
+        ipb_vals = m.get('indirect_postbyte_values', {})
+
+        # Format postbyte values as $XX per register
+        def fmt_vals(d):
+            return '  '.join(f'{r}=<code>${v}</code>' for r, v in d.items()) if d else '—'
+
+        indirect_cell = fmt_vals(ipb_vals) if m.get('indirect_available') else '—'
+        note = m.get('note', '')
+
+        mode_rows.append(f'''
+<tr>
+  <td><code>{m["syntax"]}</code></td>
+  <td class="description">{m["description"]}{(" " + note) if note else ""}</td>
+  <td>{fmt_vals(pb_vals)}</td>
+  <td class="center">{m.get("extra_bytes", 0)}</td>
+  <td class="center">+{m.get("extra_cycles", 0)}</td>
+  <td>{indirect_cell}</td>
+</tr>''')
+
+    # Hand assembly examples
+    ex_rows = []
+    for ex in data.get('hand_assembly_examples', []):
+        op2 = f' <code>${ex["postbyte"]}</code>' if 'postbyte' in ex else ''
+        op3 = f' <code>${ex.get("operand","")}</code>' if 'operand' in ex else ''
+        ex_rows.append(f'''
+<tr>
+  <td><code>{ex["syntax"]}</code></td>
+  <td><code>${ex["opcode"]}</code>{op2}{op3}</td>
+  <td class="center">{ex["total_bytes"]}</td>
+  <td>{ex["description"]}</td>
+</tr>''')
+
+    return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Indexed Addressing Postbyte</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .postbyte-table td.center {{ text-align: center; }}
+    .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
+    .reg-table {{ width: auto; margin-bottom: 1.5rem; }}
+    .reg-table td, .reg-table th {{ padding: 0.25rem 1rem; }}
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Indexed Addressing Postbyte</span>
+  </nav>
+  <main>
+    <h2>Indexed Addressing — Postbyte Encoding</h2>
+    <p>{data["description"]}</p>
+
+    <h3>Notes</h3>
+    <ul>{notes_html}</ul>
+
+    <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
+    <table class="modes-table reg-table">
+      <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
+      <tbody>{reg_rows}</tbody>
+    </table>
+
+    <h3>Postbyte Modes</h3>
+    <table class="modes-table postbyte-table" style="width:100%">
+      <thead>
+        <tr>
+          <th>Syntax</th>
+          <th>Description</th>
+          <th>Postbyte (per register)</th>
+          <th>Extra bytes</th>
+          <th>Extra cycles</th>
+          <th>Indirect postbyte</th>
+        </tr>
+      </thead>
+      <tbody>{"".join(mode_rows)}</tbody>
+    </table>
+
+    <h3>Hand Assembly Examples</h3>
+    <table class="modes-table" style="width:100%">
+      <thead>
+        <tr><th>Syntax</th><th>Bytes</th><th>Total bytes</th><th>Description</th></tr>
+      </thead>
+      <tbody>{"".join(ex_rows)}</tbody>
+    </table>
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>
+'''
+
+
 def main():
     os.makedirs(os.path.join(OUTPUT_DIR, 'groups'), exist_ok=True)
 
-    # Load all groups in order
+    # Load all groups in order (skip special files like indexed_postbyte)
     groups_data = {}
     for f in glob.glob(os.path.join(OPCODES_DIR, 'opcodes_*.json')):
+        if 'postbyte' in os.path.basename(f):
+            continue
         d = json.load(open(f))
         groups_data[d['group']] = d['instructions']
 
@@ -563,6 +757,15 @@ def main():
         with open(path, 'w') as f:
             f.write(render_group_page(key, title, instructions))
         print(f'Written: groups/{key}.html  ({len(instructions)} instructions)')
+
+    # Write indexed postbyte reference page
+    pb_path = os.path.join(OPCODES_DIR, 'opcodes_indexed_postbyte.json')
+    if os.path.exists(pb_path):
+        pb_data = json.load(open(pb_path))
+        path = os.path.join(OUTPUT_DIR, 'groups', 'indexed_postbyte.html')
+        with open(path, 'w') as f:
+            f.write(render_postbyte_page(pb_data))
+        print('Written: groups/indexed_postbyte.html')
 
     total = sum(len(i) for _, _, i in ordered_groups)
     print(f'\nDone. {total} instructions across {len(ordered_groups)} groups.')

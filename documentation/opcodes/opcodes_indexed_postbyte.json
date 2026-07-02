@@ -1,0 +1,247 @@
+{
+  "title": "6809 Indexed Addressing Postbyte Encoding",
+  "description": "Every instruction using indexed addressing requires a postbyte immediately after the opcode. The postbyte encodes the pointer register, indexing type, offset size, and whether indirect addressing is used. This table is shared by all instructions that show 'indexed' mode.",
+  "notes": [
+    "Bits 6-5 of the postbyte select the pointer register: 00=X  01=Y  10=U  11=S",
+    "Bit 4 selects indirect mode (EA is address of address). Not available for auto-increment/decrement by 1.",
+    "For 5-bit offset (postbyte < $80): bits 4-0 are the signed offset, bits 6-5 are the register. No indirect.",
+    "Cycles shown are additional cycles added to the instruction's base indexed cycle count.",
+    "PC-relative modes use R=PC (bits 6-5 = 11 would mean S; PC-relative is a special encoding -- see below).",
+    "Postbyte $9F = extended indirect [addr] -- 16-bit address in the two bytes following the postbyte."
+  ],
+  "register_bits": {
+    "description": "Bits 6-5 of postbyte (when bit 7 = 1)",
+    "values": [
+      { "bits": "00", "register": "X" },
+      { "bits": "01", "register": "Y" },
+      { "bits": "10", "register": "U" },
+      { "bits": "11", "register": "S" }
+    ]
+  },
+  "modes": [
+    {
+      "type": "5-bit signed constant offset",
+      "condition": "postbyte bit 7 = 0",
+      "syntax": "n,R",
+      "description": "Bits 4-0 are a 5-bit signed offset (-16 to +15). Bits 6-5 select register. Bit 4 is part of the offset, NOT indirect. No additional bytes.",
+      "postbyte_pattern": "0 RR nnnnn",
+      "extra_bytes": 0,
+      "extra_cycles": 1,
+      "indirect_available": false,
+      "examples": [
+        { "syntax": "0,X",   "postbyte": "84", "note": "zero offset from X" },
+        { "syntax": "5,Y",   "postbyte": "29", "note": "5 from Y (bits 6-5=01 Y, bits 4-0=00101)" },
+        { "syntax": "-1,X",  "postbyte": "9F", "note": "wait -- $9F is extended indirect; -1,X = $1F" }
+      ]
+    },
+    {
+      "type": "No offset (zero offset)",
+      "syntax": ",R",
+      "description": "Effective address is the register value. Same as 0,R but encoded with bit 7=1.",
+      "postbyte_values": {
+        "X": "84", "Y": "A4", "U": "C4", "S": "E4"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 0,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "94", "Y": "B4", "U": "D4", "S": "F4"
+      }
+    },
+    {
+      "type": "Post-increment by 1",
+      "syntax": ",R+",
+      "description": "Use register as EA, then increment register by 1.",
+      "postbyte_values": {
+        "X": "80", "Y": "A0", "U": "C0", "S": "E0"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 2,
+      "indirect_available": false
+    },
+    {
+      "type": "Post-increment by 2",
+      "syntax": ",R++",
+      "description": "Use register as EA, then increment register by 2.",
+      "postbyte_values": {
+        "X": "81", "Y": "A1", "U": "C1", "S": "E1"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 3,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "91", "Y": "B1", "U": "D1", "S": "F1"
+      }
+    },
+    {
+      "type": "Pre-decrement by 1",
+      "syntax": ",-R",
+      "description": "Decrement register by 1, then use as EA.",
+      "postbyte_values": {
+        "X": "82", "Y": "A2", "U": "C2", "S": "E2"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 2,
+      "indirect_available": false
+    },
+    {
+      "type": "Pre-decrement by 2",
+      "syntax": ",--R",
+      "description": "Decrement register by 2, then use as EA.",
+      "postbyte_values": {
+        "X": "83", "Y": "A3", "U": "C3", "S": "E3"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 3,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "93", "Y": "B3", "U": "D3", "S": "F3"
+      }
+    },
+    {
+      "type": "8-bit signed constant offset",
+      "syntax": "n,R",
+      "description": "8-bit signed offset (-128 to +127) in the byte following the postbyte.",
+      "postbyte_values": {
+        "X": "88", "Y": "A8", "U": "C8", "S": "E8"
+      },
+      "extra_bytes": 1,
+      "extra_cycles": 1,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "98", "Y": "B8", "U": "D8", "S": "F8"
+      }
+    },
+    {
+      "type": "16-bit signed constant offset",
+      "syntax": "n,R",
+      "description": "16-bit signed offset in the two bytes following the postbyte (big-endian).",
+      "postbyte_values": {
+        "X": "89", "Y": "A9", "U": "C9", "S": "E9"
+      },
+      "extra_bytes": 2,
+      "extra_cycles": 4,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "99", "Y": "B9", "U": "D9", "S": "F9"
+      }
+    },
+    {
+      "type": "Accumulator A offset",
+      "syntax": "A,R",
+      "description": "A register (8-bit signed) added to pointer register.",
+      "postbyte_values": {
+        "X": "86", "Y": "A6", "U": "C6", "S": "E6"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 1,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "96", "Y": "B6", "U": "D6", "S": "F6"
+      }
+    },
+    {
+      "type": "Accumulator B offset",
+      "syntax": "B,R",
+      "description": "B register (8-bit signed) added to pointer register.",
+      "postbyte_values": {
+        "X": "85", "Y": "A5", "U": "C5", "S": "E5"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 1,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "95", "Y": "B5", "U": "D5", "S": "F5"
+      }
+    },
+    {
+      "type": "Accumulator D offset",
+      "syntax": "D,R",
+      "description": "D register (16-bit signed) added to pointer register.",
+      "postbyte_values": {
+        "X": "8B", "Y": "AB", "U": "CB", "S": "EB"
+      },
+      "extra_bytes": 0,
+      "extra_cycles": 4,
+      "indirect_available": true,
+      "indirect_postbyte_values": {
+        "X": "9B", "Y": "BB", "U": "DB", "S": "FB"
+      }
+    },
+    {
+      "type": "8-bit PC-relative offset",
+      "syntax": "n,PCR",
+      "description": "8-bit signed offset from Program Counter. Used for position-independent data references.",
+      "postbyte_values": { "PC": "8C" },
+      "extra_bytes": 1,
+      "extra_cycles": 1,
+      "indirect_available": true,
+      "indirect_postbyte_values": { "PC": "9C" }
+    },
+    {
+      "type": "16-bit PC-relative offset",
+      "syntax": "n,PCR",
+      "description": "16-bit signed offset from Program Counter.",
+      "postbyte_values": { "PC": "8D" },
+      "extra_bytes": 2,
+      "extra_cycles": 5,
+      "indirect_available": true,
+      "indirect_postbyte_values": { "PC": "9D" }
+    },
+    {
+      "type": "Extended indirect",
+      "syntax": "[addr]",
+      "description": "16-bit absolute address in the two bytes following the postbyte. EA is the contents of that address (indirect).",
+      "postbyte_values": { "": "9F" },
+      "extra_bytes": 2,
+      "extra_cycles": 5,
+      "indirect_available": false,
+      "note": "Always indirect. No register involved."
+    }
+  ],
+  "hand_assembly_examples": [
+    {
+      "syntax": "STA ,X+",
+      "opcode": "A7",
+      "postbyte": "80",
+      "total_bytes": 2,
+      "description": "Store A to address in X, then X = X + 1"
+    },
+    {
+      "syntax": "STA ,-X",
+      "opcode": "A7",
+      "postbyte": "82",
+      "total_bytes": 2,
+      "description": "X = X - 1, then store A to new address in X"
+    },
+    {
+      "syntax": "LDA ,X",
+      "opcode": "A6",
+      "postbyte": "84",
+      "total_bytes": 2,
+      "description": "Load A from address in X, X unchanged"
+    },
+    {
+      "syntax": "LDA 5,Y",
+      "opcode": "A6",
+      "postbyte": "29",
+      "total_bytes": 2,
+      "description": "Load A from Y+5. 5-bit offset: bits 6-5=01 (Y), bits 4-0=00101"
+    },
+    {
+      "syntax": "LDA $10,X",
+      "opcode": "A6",
+      "postbyte": "88",
+      "operand": "10",
+      "total_bytes": 3,
+      "description": "Load A from X+$10. 8-bit offset follows postbyte."
+    },
+    {
+      "syntax": "LDA [,X++]",
+      "opcode": "A6",
+      "postbyte": "91",
+      "total_bytes": 2,
+      "description": "Indirect: load A from address stored at X, then X = X + 2"
+    }
+  ]
+}
