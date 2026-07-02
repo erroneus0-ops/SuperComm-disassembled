@@ -769,6 +769,31 @@ def render_postbyte_page(data):
       </tbody>
     </table>
 
+    <div style="margin: 1rem 0;">
+      <button onclick="collectNotes()" style="font-family:monospace; padding:0.4rem 1rem; background:var(--bg3); color:var(--accent); border:1px solid var(--border); border-radius:3px; cursor:pointer;">Collect Notes as CSV</button>
+      <textarea id="notes-csv" rows="6" style="display:none; width:100%; margin-top:0.5rem; font-family:monospace; font-size:0.8rem; background:var(--code-bg); color:var(--accent2); border:1px solid var(--border); border-radius:3px; padding:0.5rem;" readonly></textarea>
+    </div>
+    <script>
+    function collectNotes() {{
+      var rows = document.querySelectorAll('.postbyte-table tbody tr:not(.section-header)');
+      var lines = ['syntax,notes'];
+      rows.forEach(function(row) {{
+        var cells = row.querySelectorAll('td');
+        if (cells.length < 10) return;
+        var syntax = cells[0].textContent.trim();
+        var notes  = cells[9].textContent.trim();
+        if (!syntax) return;
+        // CSV-escape: wrap in quotes, double any internal quotes
+        function esc(s) {{ return '"' + s.replace(/"/g, '""') + '"'; }}
+        lines.push(esc(syntax) + ',' + esc(notes));
+      }});
+      var ta = document.getElementById('notes-csv');
+      ta.value = lines.join('\\n');
+      ta.style.display = 'block';
+      ta.select();
+    }}
+    </script>
+
     <h3>Encoding Examples</h3>
     <table class="modes-table" style="width:100%">
       <thead>
