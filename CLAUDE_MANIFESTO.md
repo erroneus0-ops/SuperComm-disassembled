@@ -847,3 +847,171 @@ Structure:
 - This program uses ORA #$40 (second set) to match BASIC's convention
 - Space: ASCII $20, through ANDA #$3F = $20, OR #$40 = $60. Works
   uniformly with same logic as all other characters. No special case needed.
+
+---
+
+## XRoar WASM Mobile Improvements (July 3 2026)
+
+### Hamburger Menu Icon
+- `wasm/hamburger.svg` -- custom SVG burger icon (actual hamburger design)
+  Top bun as arc path, lettuce with ruffled edge, cheese with corner
+  overhangs, thick patty, flat bottom bun. Designed collaboratively,
+  geometry specified by Daniel before building.
+- Appears in title bar to left of "XRoar Online" text
+- Single tap: toggles controls panel show/hide (300ms delay to distinguish
+  from double-tap)
+- Double-tap (< 300ms): resets overlay to default position without toggling
+- `oncontextmenu="return false"` and `-webkit-touch-callout:none` suppress
+  browser long-press image menu
+- Title bar has `z-index: 101` -- burger always above overlay (z-index 100)
+
+### Mobile Controls Overlay
+On mobile (detected by preponderance scoring -- see below):
+- Controls panel hidden by default on load
+- Shown as `position:fixed` overlay when burger tapped
+- Wrapper div contains: drag handle title bar + controls-region (scrollable)
+- Drag handle stays fixed above scrollable content -- title bar doesn't
+  scroll away when Help tab log is open
+- Drag constrained: cannot go above title bar (burger always accessible)
+- Width matches monitorWidth, max 95vw
+- Max-height 70vh, controls-region scrollable within wrapper
+- `ui_set_fullscreen()` updated to use wrapper on mobile
+
+### Mobile Detection (preponderance-of-evidence)
+`isMobileDevice()` scores multiple signals, threshold 4/8:
+- `ontouchstart` in window: 2pts
+- `pointer: coarse` media query: 2pts
+- `hover: none` media query: 1pt
+- `window.innerWidth < 700`: 1pt
+- UA string contains Mobile/Android/iPhone/iPad: 1pt
+- `screen.width < 768`: 1pt
+
+Result stored as `window._isMobile` (global, accessible outside IIFE).
+Fixes landscape refresh glitch -- phone in landscape scores 6-7 regardless
+of viewport width being > 700px.
+
+### Mobile Keyboard Observations (OPEN)
+- Soft keyboard appears for the size label input field (numeric keyboard)
+- Only `-`, `.`, and tab pass through to the input -- SDL2 captures everything else
+- Canvas element does not trigger soft keyboard on tap
+- Same issue as Type Text dialog -- SDL2 keyboard capture at document level
+- Fix path: hidden `<input type="text">` focused on canvas tap, keystrokes
+  forwarded to XRoar. Requires asking Ciaran if WASM build exposes an input path.
+- Worth asking Ciaran: is the built-in GDB debugger/monitor accessible in WASM?
+  If so, execution trace could appear in the Help tab log panel.
+
+### IIFE Scope Trap (recurring)
+Functions defined inside the outer IIFE are invisible to inline event
+handlers (`onclick=`) and to code outside the IIFE (like `ui_set_fullscreen`).
+Pattern: always use `addEventListener` from inside the IIFE, and expose
+values that need global access via `window._name`. This has bitten us
+multiple times -- check scope before wondering why something doesn't fire.
+
+---
+
+## zip_backup.py Rewrite (July 3 2026)
+
+Complete rewrite with config file, module system, explicit flags.
+
+### Location
+- Office: `C:\Users\dhauck\AppData\Local\scripts\zip_backup.py`
+- Home: `C:\Users\Daniel\AppData\Local\scripts\zip_backup.py`
+- Config: `zip_backup.json` next to script (not tracked in git, machine-specific)
+- Modules: `zip_backup_modules\` folder next to script
+
+### Flags
+- No flags → shows help (no accidental runs)
+- `--run` → incremental backup
+- `--full` → full backup
+- `--dry-run` → preview, no zip created
+- `--config` → interactive reconfiguration only, no backup
+- `--help` / `-h` → help
+
+### Config: zip_backup.json
+```json
+{
+    "source_dir":       "D:\\git",
+    "backup_dir":       "D:\\git_backups",
+    "log_file":         "D:\\git_backups\\zip_backup_log.log",
+    "max_backups":      20,
+    "prefix":           "git_",
+    "excluded_folders": ["screenshots"],
+    "modules":          ["git_bundle"]
+}
+```
+Optional keys: `suffix_incremental` (default `_daily`), `suffix_full` (default `_full`)
+
+### Key behaviors
+- Dot-folders (.git, .svn, etc.) always excluded from incremental at runtime
+- Not stored in JSON -- handled by code
+- Log: weekly rotating (TimedRotatingFileHandler, W0, 4 weeks)
+- Config prompts: short labels when value exists, descriptive with platform
+  hints when empty. Windows hints `C:\DATA\...`, Unix hints `/home/user/...`
+- `X to clear` for folder exclusions
+- Scheduled task: exits with error code 2 if no config and no terminal
+- `--config` requires interactive terminal, exits with error if not
+
+### Module System
+Modules in `zip_backup_modules\` folder. Each is a `.py` file exposing:
+- `NAME` -- string, matches config "modules" list entry
+- `DESCRIPTION` -- string
+- `run(cfg, backup_dir, dry_run)` -- returns list of Path objects to include
+
+Bundled module: `git_bundle.py` -- creates `git bundle --all` snapshot of
+each repo found directly under source_dir. Bundle written to backup_dir,
+included in zip. Self-contained restore: `git clone repo.bundle restored_repo`
+
+Optional git_bundle config in zip_backup.json:
+```json
+"git_bundle": { "git_exe": "C:\\Program Files\\Git\\cmd\\git.exe" }
+```
+If omitted, assumes `git` is in PATH.
+
+README in `zip_backup_modules\README.md` documents module contract.
+
+---
+
+## 6809 Opcode Reference -- Indexed Postbyte Page (July 3 2026)
+
+`documentation/html/groups/indexed_postbyte.html` -- new reference page:
+- Bit-map table showing every postbyte mode as explicit bit fields
+  (r/R/R/i/m/m/m/m header row)
+- Section dividers: register select, 5-bit offset, standard indexed,
+  indirect variants
+- Worked example: `STA ,-X` → `$A7 $82` shown as OR of register field
+  ($80) and mode field ($02)
+- Encoding examples table (renamed from "hand assembly examples")
+- `LDA $100,X` example showing 16-bit offset mode ($A6 $89 $01 $00)
+- Contenteditable notes cells with "Collect Notes as CSV" button
+- Linked from nav bar of every group page that has indexed mode instructions
+- Generator skips postbyte JSON in group loader (different schema)
+
+Key insight for the book: postbyte = bitwise OR of register field and mode
+field. Non-overlapping bit positions, mechanical derivation, no lookup needed
+once the table is understood. This is what makes hand-assembly possible but
+also illustrates exactly why you use an assembler for anything real.
+
+### Pending: postbyte hint in opcode group pages
+Inject a compact bit-field line + link to postbyte page for any instruction
+that has an indexed mode entry. The note shows the bit pattern and links
+to the full postbyte reference. Generator should do this automatically.
+
+---
+
+## Hand Assembly Document (PENDING)
+
+Fill-screen routine as teaching exercise:
+- Forward version (STA ,X+): fills $0400-$05FF forward
+- Backward version (STA ,-X): fills $05FF-$0400 backward
+- Both are PIC (no self-references) but operate on fixed hardware addresses
+- Hand-assembly exercise: derive hex bytes from postbyte table + opcode reference
+- "Chaos experiment": load code at $0400 (screen memory start) and EXEC it
+  -- code overwrites itself as it fills, spectacular undefined behavior
+  Backward version is more interesting: fills toward $0400, overwrites
+  itself last, might survive long enough to complete
+
+Purpose of exercise: NOT to teach hand assembly as practice, but to show
+exactly what the assembler does on your behalf. Done once, understood forever.
+BASIC trick to hold screen: `?@32` positions cursor off-screen so BASIC's
+"OK" prompt doesn't overwrite the result (simpler than `20 GOTO 20` loop).
+
