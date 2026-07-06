@@ -110,8 +110,7 @@ Start:
 
     WriteHello:
         Load the next character from the string, advance Y
-        If it is a space, handle specially
-        Otherwise convert from ASCII to VDG screen code
+        Convert from ASCII to VDG screen code
         Write the character to screen memory, advance X
         Decrement the counter
         Loop back if not done
@@ -175,7 +174,7 @@ The six concepts, in order:
    and control the display mode. The result is visible on screen.
 
 4. **Compare and Branch** — the only way a sequential machine makes decisions.
-   The loop, the special case, the keyboard wait.
+   The loop and the keyboard wait.
 
 5. **Stack and Subroutines** — how the CPU remembers where it came from, and
    how subroutines use that mechanism.
