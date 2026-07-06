@@ -146,20 +146,69 @@ BNE takes a single signed byte offset. The offset is calculated from the
 address of the instruction immediately following the branch — the byte
 after the offset byte.
 
-Work out the addresses:
+**Where is the PC when the offset is applied?**
+
+The CPU fetches bytes one at a time. Each fetch advances the program
+counter by one before the byte is used. BNE is a two-byte instruction:
+the opcode byte and the offset byte. By the time the CPU has fetched
+both, the PC has advanced twice — past the opcode, past the offset,
+landing on the first byte of the next instruction.
 
 ```
-$3F00   8E 06 00    LDX  #$0600       (3 bytes)
-$3F03   86 60       LDA  #$60         (2 bytes)
-$3F05   A7 82       STA  ,-X          (2 bytes)  <- Loop
-$3F07   8C 04 00    CMPX #$0400       (3 bytes)
-$3F0A   26 ??       BNE  Loop         (2 bytes)
-$3F0C   39          RTS               (1 byte)
+$3F0A   26          BNE opcode     <- PC advances to $3F0B after this fetch
+$3F0B   F9          offset byte    <- PC advances to $3F0C after this fetch
+$3F0C   39          RTS            <- PC is here when the offset is applied
 ```
 
-PC after the BNE instruction points to `$3F0C`.
-Loop is at `$3F05`.
-Offset = `$3F05 - $3F0C` = `-7` = `$F9` (two's complement).
+The offset is added to `$3F0C`. Not to `$3F0A` where BNE begins. Not to
+`$3F0B` where the offset byte lives. To `$3F0C` — the instruction after.
+
+**Deriving the offset**
+
+The branch target is `Loop` at `$3F05`. That is before `$3F0C`, so the
+offset is negative. How far back?
+
+```
+$3F0C - $3F05 = 7 bytes
+```
+
+The offset must be -7.
+
+**Two's complement: expressing a negative number as a byte**
+
+A signed byte can hold values from -128 to +127. Negative numbers are
+stored in two's complement form. To find the two's complement of 7:
+
+Step 1. Write 7 in binary:
+
+```
+%0000 0111
+```
+
+Step 2. Invert every bit:
+
+```
+%1111 1000
+```
+
+Step 3. Add 1:
+
+```
+%1111 1001
+```
+
+Step 4. Convert to hex — group the bits four at a time:
+
+```
+%1111 = $F
+%1001 = $9
+Result: $F9
+```
+
+The last step uses what you already know: hex is shorthand for groups of
+four binary digits.
+
+**Verify:** `$3F0C + (-7)` = `$3F0C - 7` = `$3F05`. That is `Loop`. Correct.
 
 Look up `BNE` in the reference.
 
