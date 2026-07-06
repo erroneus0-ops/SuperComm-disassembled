@@ -338,6 +338,14 @@ Change line 10 of your BASIC program:
 
 Everything else stays the same — the POKE and EXEC both use `A`.
 
+This experiment is only possible because the routine is
+position-independent. It contains no references to its own location
+in memory — only references to the fixed hardware address `$0400`,
+which is always `$0400` regardless of where the code lives. The same
+thirteen bytes run identically at `$3F00` or `$0400` or anywhere else.
+
+More on position-independent code later.
+
 Type `RUN`.
 
 The routine begins filling the screen from `$05FF` toward `$0400`. As it
