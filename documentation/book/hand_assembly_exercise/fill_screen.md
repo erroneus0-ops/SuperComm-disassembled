@@ -564,10 +564,11 @@ The fields occupy non-overlapping bit positions.
 
 **Bit map:**
 
-```
 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+|---|---|---|---|---|---|---|---|
 | r | R | R | i | m | m | m | m |
 
+```
 r    = 1 for standard indexed mode
 RR   = register select (00=X  01=Y  10=U  11=S)
 i    = 1 for indirect mode
