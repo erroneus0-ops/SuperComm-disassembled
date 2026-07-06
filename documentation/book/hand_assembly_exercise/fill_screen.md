@@ -265,34 +265,32 @@ Count your bytes. If you have nine, proceed.
 ## Step 3: Load and Run
 
 Type the following BASIC program. The DATA statement contains your nine
-bytes in decimal. The program pokes them into memory starting at `$3F00`
-and runs them.
+bytes as hex strings — the same values you wrote in your margin. The
+program reads each string, converts it to a number, and pokes it into
+memory starting at `$3F00`.
 
 ```basic
-10 FOR I=0 TO 8
-20 READ B
-30 POKE &H3F00+I,B
+10 FOR I=0 TO 12
+20 READ H$
+30 POKE &H3F00+I,VAL("&H"+H$)
 40 NEXT I
 50 EXEC &H3F00
-60 DATA 142,6,0,134,96,167,130,140,4,0,38,249,57
+60 DATA 8E,06,00,86,60,A7,82,8C,04,00,26,F9,39
 ```
 
-Type `RUN` and press Enter.
+The values in the DATA statement are your hand-assembled bytes. Compare
+them directly against what you wrote in your margin — they should match
+exactly.
 
-The screen will fill with spaces in normal video, working from the bottom
-right to the top left. BASIC will print `OK` when the program returns.
+To verify any byte on the BASIC command line:
 
-If nothing happens or BASIC crashes, check your DATA values against the
-decimal equivalents below:
-
+```basic
+? VAL("&H8E")
+ 142
 ```
-$8E = 142    $06 = 6      $00 = 0
-$86 = 134    $60 = 96
-$A7 = 167    $82 = 130
-$8C = 140    $04 = 4      $00 = 0
-$26 = 38     $F9 = 249
-$39 = 57
-```
+
+BASIC returns the decimal equivalent. Useful for checking your work
+but not required — the loader handles the conversion automatically.
 
 ---
 
