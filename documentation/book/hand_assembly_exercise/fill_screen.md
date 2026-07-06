@@ -396,8 +396,34 @@ table. You loaded those bytes into memory. You executed them. The machine
 did what you told it, exactly as you told it.
 
 This is what the assembler does on your behalf for every instruction in
-every program. For nine bytes it is a reasonable exercise. For nine hundred
-it is not. For nine thousand it is not possible.
+every program. For thirteen bytes it is a reasonable exercise. For nine
+hundred it is not. For nine thousand it is not possible.
 
 The assembler is not magic. It is arithmetic, applied consistently, without
 mistakes, faster than you can.
+
+---
+
+## References
+
+The following reference pages were used in this exercise. When this document
+is placed in the book, these references become internal. For now they are
+available online.
+
+**6809 Instruction Reference — Load group** (LDX, LDA)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/load.html
+
+**6809 Instruction Reference — Store group** (STA)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/store.html
+
+**6809 Instruction Reference — Compare group** (CMPX)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/compare.html
+
+**6809 Instruction Reference — Branch group** (BNE)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/branch.html
+
+**6809 Instruction Reference — Miscellaneous group** (RTS)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/misc.html
+
+**Indexed Addressing Postbyte Reference** (STA ,-X postbyte derivation)
+https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/indexed_postbyte.html
