@@ -274,7 +274,7 @@ margin, with the fill character on its own line.
 30 NEXT I
 40 EXEC &H3F00
 70 DATA "8E","06","00","86"
-80 DATA 60
+80 DATA "60"
 90 DATA "A7","82","8C","04","00"
 100 DATA "26","F9","39"
 ```
@@ -304,11 +304,11 @@ fill happens faster than you can see it.
 
 ## Step 4: Change the Fill Character
 
-Change line 80 to use a different fill character value. Try `134` — that
+Change line 80 to use a different fill character value. Try `"86"` — that
 is `$86`, a graphics block character:
 
 ```basic
-80 DATA 134
+80 DATA "86"
 ```
 
 Type `RUN`. The screen fills with a checkerboard pattern of alternating
