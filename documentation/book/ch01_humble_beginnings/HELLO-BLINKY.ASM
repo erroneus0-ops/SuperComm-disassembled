@@ -1,6 +1,13 @@
 ; ================================================================
-; HELLO.ASM -- Humble Beginnings
+; HELLO-BLINKY.ASM -- Humble Beginnings (enhanced version)
 ; Chapter 1: A 6809 Assembly Language Tutorial
+;
+; Same as HELLO.ASM but replaces the POLCAT polling loop with
+; BLINKKY -- a ROM routine that blinks the cursor and waits for
+; a keypress in a single call. Simpler to write, but hides the
+; polling mechanism that HELLO.ASM makes explicit.
+;
+; Compare with HELLO.ASM to see what BLINKKY does on your behalf.
 ;
 ; Demonstrates the six foundational concepts:
 ;   1. Data Movement    -- loading and storing values
@@ -139,17 +146,16 @@ WriteHello
         STD     <CURPOS         ; position cursor for BASIC return
 
 ; -----------------------------------------------------------------
-; STEP 6: Wait for keypress
+; STEP 6: Wait for keypress with blinking cursor
 ; Concept: Compare and branch (polling loop)
 ;          JSR [indirect]: calls via ROM jump vector
 ;
-; POLCAT ($A000) polls the keyboard once. It returns the ASCII
-; code of the key in A, or zero if no key is pressed.
-; We loop until a non-zero result -- the classic poll loop.
+; BLINKKY ($A1B1) blinks the cursor at the current CURPOS and
+; waits for a keypress, returning the key in A.
+; NOTE: address is ROM-version dependent -- verify before shipping.
 ; -----------------------------------------------------------------
 WaitKey
-        JSR     [POLCAT]        ; poll keyboard -- returns char in A, 0=none
-        BEQ     WaitKey         ; zero = no key pressed, loop back
+        JSR     BLINKKY         ; blink cursor, wait for key -- returns char in A
 
 ; -----------------------------------------------------------------
 ; STEP 7: Return to BASIC
