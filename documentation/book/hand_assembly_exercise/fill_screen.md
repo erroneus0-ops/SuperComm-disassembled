@@ -269,14 +269,17 @@ hand-assembled bytes — hex strings matching what you wrote in your
 margin, with the fill character on its own line.
 
 ```basic
-10 FOR I=0 TO 12:READ H$
-20 POKE &H3F00+I,VAL("&H"+H$)
-30 NEXT I
-40 EXEC &H3F00
-70 DATA "8E","06","00","86"
-80 DATA "60"
-90 DATA "A7","82","8C","04","00"
-100 DATA "26","F9","39"
+10 A=&H3F00
+20 FOR I=0 TO 12:READ H$
+30 POKE A+I,VAL("&H"+H$)
+40 NEXT I
+50 EXEC A
+60 PRINT @0,;
+70 A$=INKEY$:IF A$="" THEN 70
+80 DATA "8E","06","00","86"
+90 DATA "60"
+100 DATA "A7","82","8C","04","00"
+110 DATA "26","F9","39"
 ```
 
 Type `RUN` and press Enter. The screen fills from bottom-right to
@@ -284,10 +287,10 @@ top-left. BASIC prints `OK` when the routine returns.
 
 The DATA statements map directly to your hand-assembled bytes:
 
-- Line 70: `LDX #$0600` opcode and operand, then `LDA` opcode
-- Line 80: `LDA` operand — the fill character, isolated for easy editing
-- Line 90: `STA ,-X` opcode and postbyte, then `CMPX #$0400` opcode and operand
-- Line 100: `BNE` opcode and offset, then `RTS`
+- Line 80: `LDX #$0600` opcode and operand, then `LDA` opcode
+- Line 90: `LDA` operand — the fill character, isolated for easy editing
+- Line 100: `STA ,-X` opcode and postbyte, then `CMPX #$0400` opcode and operand
+- Line 110: `BNE` opcode and offset, then `RTS`
 
 Once it works, try these additions:
 
@@ -304,11 +307,11 @@ fill happens faster than you can see it.
 
 ## Step 4: Change the Fill Character
 
-Change line 80 to use a different fill character value. Try `"86"` — that
+Change line 90 to use a different fill character value. Try `"86"` — that
 is `$86`, a graphics block character:
 
 ```basic
-80 DATA "86"
+90 DATA "86"
 ```
 
 Type `RUN`. The screen fills with a checkerboard pattern of alternating
@@ -327,17 +330,13 @@ the results.
 The routine works correctly when loaded at `$3F00`. Now load it at `$0400`
 — the start of screen memory — and see what happens.
 
-Change line 20 of your BASIC program:
+Change line 10 of your BASIC program:
 
 ```basic
-20 POKE &H0400+I,VAL("&H"+H$)
+10 A=&H400
 ```
 
-And change line 40:
-
-```basic
-40 EXEC &H400
-```
+Everything else stays the same — the POKE and EXEC both use `A`.
 
 Type `RUN`.
 
