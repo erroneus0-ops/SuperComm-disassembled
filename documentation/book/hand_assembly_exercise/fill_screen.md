@@ -456,15 +456,15 @@ Each instruction entry shows:
 
 **Operation:** X ← M:M+1
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Immediate | $8E | 3 | 3 | LDX #nn |
+| Mode      | Opcode | Bytes | Cycles | Syntax   |
+|-----------|--------|-------|--------|----------|
+| Immediate | $8E    | 3     | 3      | LDX #nn  |
 
 The operand is a 16-bit value — two bytes, high byte first.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | ↕ | ↕ | 0 | - |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  ↕  |  ↕  |  0  |  -  |
 
 ---
 
@@ -472,15 +472,15 @@ The operand is a 16-bit value — two bytes, high byte first.
 
 **Operation:** A ← M
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Immediate | $86 | 2 | 2 | LDA #n |
+| Mode      | Opcode | Bytes | Cycles | Syntax  |
+|-----------|--------|-------|--------|---------|
+| Immediate | $86    | 2     | 2      | LDA #n  |
 
 The operand is an 8-bit value — one byte.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | ↕ | ↕ | 0 | - |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  ↕  |  ↕  |  0  |  -  |
 
 ---
 
@@ -488,17 +488,17 @@ The operand is an 8-bit value — one byte.
 
 **Operation:** M ← A
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Indexed | $A7 | 2+ | 4+ | STA addr,R |
+| Mode    | Opcode | Bytes | Cycles | Syntax      |
+|---------|--------|-------|--------|-------------|
+| Indexed | $A7    | 2+    | 4+     | STA addr,R  |
 
 Indexed mode requires a postbyte after the opcode. See the postbyte
 table below. Bytes and cycles shown are minimums — the postbyte may
 add more.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | ↕ | ↕ | 0 | - |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  ↕  |  ↕  |  0  |  -  |
 
 ---
 
@@ -506,16 +506,16 @@ add more.
 
 **Operation:** X − M:M+1 (result discarded, condition codes set)
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Immediate | $8C | 3 | 4 | CMPX #nn |
+| Mode      | Opcode | Bytes | Cycles | Syntax    |
+|-----------|--------|-------|--------|-----------|
+| Immediate | $8C    | 3     | 4      | CMPX #nn  |
 
 The operand is a 16-bit value — two bytes, high byte first. X is not
 changed. Only the condition codes reflect the result.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | ↕ | ↕ | ↕ | ↕ |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  ↕  |  ↕  |  ↕  |  ↕  |
 
 ---
 
@@ -523,17 +523,17 @@ changed. Only the condition codes reflect the result.
 
 **Operation:** PC ← PC + offset if Z=0
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Relative | $26 | 2 | 3/3 | BNE label |
+| Mode     | Opcode | Bytes | Cycles | Syntax     |
+|----------|--------|-------|--------|------------|
+| Relative | $26    | 2     | 3/3    | BNE label  |
 
 The operand is a signed 8-bit offset. The offset is added to the PC
 after both bytes of the instruction have been fetched. See the branch
 offset derivation in Step 1.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | - | - | - | - |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  -  |  -  |  -  |  -  |
 
 ---
 
@@ -541,15 +541,15 @@ offset derivation in Step 1.
 
 **Operation:** PC ← M[SP]; SP ← SP+2
 
-| Mode | Opcode | Bytes | Cycles | Syntax |
-|------|--------|-------|--------|--------|
-| Inherent | $39 | 1 | 5 | RTS |
+| Mode     | Opcode | Bytes | Cycles | Syntax  |
+|----------|--------|-------|--------|---------|
+| Inherent | $39    | 1     | 5      | RTS     |
 
 No operand. Pulls the return address from the stack.
 
-| CC | H | N | Z | V | C |
-|----|---|---|---|---|---|
-|    | - | - | - | - | - |
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|----|-----|-----|-----|-----|-----|
+|    |  -  |  -  |  -  |  -  |  -  |
 
 ---
 
@@ -576,27 +576,27 @@ mmmm = mode select (see table below)
 
 **Register field (bits 6-5 when bit 7=1):**
 
-| Register | Bits 6-5 | Bit pattern | Hex |
-|----------|----------|-------------|-----|
-| X | 00 | 10000000 | $80 |
-| Y | 01 | 10100000 | $A0 |
-| U | 10 | 11000000 | $C0 |
-| S | 11 | 11100000 | $E0 |
+| Register | Bits 6-5 | Bit pattern | Hex  |
+|----------|----------|-------------|------|
+| X        | 00       | 1 0 0 0 0 0 0 0 | $80  |
+| Y        | 01       | 1 0 1 0 0 0 0 0 | $A0  |
+| U        | 10       | 1 1 0 0 0 0 0 0 | $C0  |
+| S        | 11       | 1 1 1 0 0 0 0 0 | $E0  |
 
 **Mode field (bits 3-0, bit 4=0 for non-indirect):**
 
-| Syntax | Mode bits | Hex | Extra bytes | Extra cycles |
-|--------|-----------|-----|-------------|--------------|
-| ,R+ | 0000 0000 | $00 | 0 | +2 |
-| ,R++ | 0000 0001 | $01 | 0 | +3 |
-| ,-R | 0000 0010 | $02 | 0 | +2 |
-| ,--R | 0000 0011 | $03 | 0 | +3 |
-| ,R | 0000 0100 | $04 | 0 | 0 |
-| B,R | 0000 0101 | $05 | 0 | +1 |
-| A,R | 0000 0110 | $06 | 0 | +1 |
-| n8,R | 0000 1000 | $08 | 1 | +1 |
-| n16,R | 0000 1001 | $09 | 2 | +4 |
-| D,R | 0000 1011 | $0B | 0 | +4 |
+| Syntax  | Bit pattern     | Hex  | Extra bytes | Extra cycles |
+|---------|-----------------|------|-------------|--------------|
+| ,R+     | 0 0 0 0 0 0 0 0 | $00  | 0           | +2           |
+| ,R++    | 0 0 0 0 0 0 0 1 | $01  | 0           | +3           |
+| ,-R     | 0 0 0 0 0 0 1 0 | $02  | 0           | +2           |
+| ,--R    | 0 0 0 0 0 0 1 1 | $03  | 0           | +3           |
+| ,R      | 0 0 0 0 0 1 0 0 | $04  | 0           |  0           |
+| B,R     | 0 0 0 0 0 1 0 1 | $05  | 0           | +1           |
+| A,R     | 0 0 0 0 0 1 1 0 | $06  | 0           | +1           |
+| n8,R    | 0 0 0 0 1 0 0 0 | $08  | 1           | +1           |
+| n16,R   | 0 0 0 0 1 0 0 1 | $09  | 2           | +4           |
+| D,R     | 0 0 0 0 1 0 1 1 | $0B  | 0           | +4           |
 
 **Worked example: STA ,-X**
 
