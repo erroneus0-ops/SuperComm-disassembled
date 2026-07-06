@@ -406,24 +406,25 @@ mistakes, faster than you can.
 
 ## References
 
-The following reference pages were used in this exercise. When this document
-is placed in the book, these references become internal. For now they are
-available online.
+The following references were used in this exercise. Specific page numbers
+and chapter locations will be filled in when this document is placed in the
+final book structure.
 
-**6809 Instruction Reference — Load group** (LDX, LDA)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/load.html
+**6809 Instruction Reference — Load group**
+LDX immediate, LDA immediate.
 
-**6809 Instruction Reference — Store group** (STA)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/store.html
+**6809 Instruction Reference — Store group**
+STA indexed.
 
-**6809 Instruction Reference — Compare group** (CMPX)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/compare.html
+**6809 Instruction Reference — Compare group**
+CMPX immediate.
 
-**6809 Instruction Reference — Branch group** (BNE)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/branch.html
+**6809 Instruction Reference — Branch group**
+BNE relative.
 
-**6809 Instruction Reference — Miscellaneous group** (RTS)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/misc.html
+**6809 Instruction Reference — Miscellaneous group**
+RTS inherent.
 
-**Indexed Addressing Postbyte Reference** (STA ,-X postbyte derivation)
-https://erroneus0-ops.github.io/SuperComm-disassembled/documentation/html/groups/indexed_postbyte.html
+**Indexed Addressing Postbyte Reference**
+Pre-decrement by 1 (`,-X`), postbyte derivation by OR of register
+and mode fields.
