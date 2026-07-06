@@ -265,30 +265,22 @@ Count your bytes. If you have nine, proceed.
 ## Step 3: Load and Run
 
 Type the following BASIC program. The DATA statements contain your
-hand-assembled bytes as hex strings — the same values you wrote in
-your margin. The fill character byte sits on its own DATA line so
-it is easy to find and change.
+hand-assembled bytes — hex strings matching what you wrote in your
+margin, with the fill character on its own line.
 
 ```basic
 10 FOR I=0 TO 12:READ H$
 20 POKE &H3F00+I,VAL("&H"+H$)
 30 NEXT I
 40 EXEC &H3F00
-50 PRINT @0,;
-60 A$=INKEY$:IF A$="" THEN 60
 70 DATA "8E","06","00","86"
 80 DATA 60
 90 DATA "A7","82","8C","04","00"
 100 DATA "26","F9","39"
 ```
 
-Line 80 contains the fill character as an unquoted decimal value.
-`60` is `$60` — a space in normal video, the same character Color BASIC
-uses for uppercase text.
-
-Line 50 positions the cursor without clearing the screen. Line 60
-waits for a keypress before returning to BASIC, giving you as long
-as you need to look at the result.
+Type `RUN` and press Enter. The screen fills from bottom-right to
+top-left. BASIC prints `OK` when the routine returns.
 
 The DATA statements map directly to your hand-assembled bytes:
 
@@ -297,15 +289,16 @@ The DATA statements map directly to your hand-assembled bytes:
 - Line 90: `STA ,-X` opcode and postbyte, then `CMPX #$0400` opcode and operand
 - Line 100: `BNE` opcode and offset, then `RTS`
 
-Type `RUN` and press Enter. The screen fills from bottom-right to
-top-left. Press any key to return to BASIC.
-
-To verify any byte on the BASIC command line:
+Once it works, try these additions:
 
 ```basic
-? VAL("&H8E")
- 142
+50 PRINT @0,;
+60 A$=INKEY$:IF A$="" THEN 60
 ```
+
+Line 50 positions the cursor without clearing the screen. Line 60
+waits for a keypress before returning to BASIC — useful when the
+fill happens faster than you can see it.
 
 ---
 
