@@ -428,3 +428,182 @@ RTS inherent.
 **Indexed Addressing Postbyte Reference**
 Pre-decrement by 1 (`,-X`), postbyte derivation by OR of register
 and mode fields.
+
+---
+
+## Appendix: Instruction Reference
+
+This appendix contains the reference data needed to complete this exercise.
+The condition code column uses these symbols: `↕` changes, `-` unchanged,
+`0` always cleared.
+
+---
+
+### How to Read an Entry
+
+Each instruction entry shows:
+
+- **Operation** — what the instruction does in register-transfer notation
+- **Mode** — the addressing mode used
+- **Opcode** — the hex byte that identifies this instruction
+- **Bytes** — total bytes including opcode and any operands
+- **Cycles** — clock cycles to execute
+- **CC** — effect on condition codes: H N Z V C
+
+---
+
+### LDX — Load Index Register X
+
+**Operation:** X ← M:M+1
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Immediate | $8E | 3 | 3 | LDX #nn |
+
+The operand is a 16-bit value — two bytes, high byte first.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | ↕ | ↕ | 0 | - |
+
+---
+
+### LDA — Load Accumulator A
+
+**Operation:** A ← M
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Immediate | $86 | 2 | 2 | LDA #n |
+
+The operand is an 8-bit value — one byte.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | ↕ | ↕ | 0 | - |
+
+---
+
+### STA — Store Accumulator A
+
+**Operation:** M ← A
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Indexed | $A7 | 2+ | 4+ | STA addr,R |
+
+Indexed mode requires a postbyte after the opcode. See the postbyte
+table below. Bytes and cycles shown are minimums — the postbyte may
+add more.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | ↕ | ↕ | 0 | - |
+
+---
+
+### CMPX — Compare Index Register X
+
+**Operation:** X − M:M+1 (result discarded, condition codes set)
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Immediate | $8C | 3 | 4 | CMPX #nn |
+
+The operand is a 16-bit value — two bytes, high byte first. X is not
+changed. Only the condition codes reflect the result.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | ↕ | ↕ | ↕ | ↕ |
+
+---
+
+### BNE — Branch if Not Equal (Z=0)
+
+**Operation:** PC ← PC + offset if Z=0
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Relative | $26 | 2 | 3/3 | BNE label |
+
+The operand is a signed 8-bit offset. The offset is added to the PC
+after both bytes of the instruction have been fetched. See the branch
+offset derivation in Step 1.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | - | - | - | - |
+
+---
+
+### RTS — Return from Subroutine
+
+**Operation:** PC ← M[SP]; SP ← SP+2
+
+| Mode | Opcode | Bytes | Cycles | Syntax |
+|------|--------|-------|--------|--------|
+| Inherent | $39 | 1 | 5 | RTS |
+
+No operand. Pulls the return address from the stack.
+
+| CC | H | N | Z | V | C |
+|----|---|---|---|---|---|
+|    | - | - | - | - | - |
+
+---
+
+## Appendix: Indexed Addressing Postbyte
+
+Every instruction using indexed addressing requires a postbyte immediately
+after the opcode. The postbyte encodes the pointer register and the
+addressing mode.
+
+The postbyte is derived by OR-ing the register field and the mode field.
+The fields occupy non-overlapping bit positions.
+
+**Bit map:**
+
+```
+| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+| r | R | R | i | m | m | m | m |
+
+r    = 1 for standard indexed mode
+RR   = register select (00=X  01=Y  10=U  11=S)
+i    = 1 for indirect mode
+mmmm = mode select (see table below)
+```
+
+**Register field (bits 6-5 when bit 7=1):**
+
+| Register | Bits 6-5 | Bit pattern | Hex |
+|----------|----------|-------------|-----|
+| X | 00 | 10000000 | $80 |
+| Y | 01 | 10100000 | $A0 |
+| U | 10 | 11000000 | $C0 |
+| S | 11 | 11100000 | $E0 |
+
+**Mode field (bits 3-0, bit 4=0 for non-indirect):**
+
+| Syntax | Mode bits | Hex | Extra bytes | Extra cycles |
+|--------|-----------|-----|-------------|--------------|
+| ,R+ | 0000 0000 | $00 | 0 | +2 |
+| ,R++ | 0000 0001 | $01 | 0 | +3 |
+| ,-R | 0000 0010 | $02 | 0 | +2 |
+| ,--R | 0000 0011 | $03 | 0 | +3 |
+| ,R | 0000 0100 | $04 | 0 | 0 |
+| B,R | 0000 0101 | $05 | 0 | +1 |
+| A,R | 0000 0110 | $06 | 0 | +1 |
+| n8,R | 0000 1000 | $08 | 1 | +1 |
+| n16,R | 0000 1001 | $09 | 2 | +4 |
+| D,R | 0000 1011 | $0B | 0 | +4 |
+
+**Worked example: STA ,-X**
+
+```
+Register X:    1 0 0 x x x x x  =  $80
+Mode ,-R:      x x x 0 0 0 1 0  =  $02
+OR result:     1 0 0 0 0 0 1 0  =  $82
+```
+
+Opcode `$A7`, postbyte `$82` — two bytes total.
