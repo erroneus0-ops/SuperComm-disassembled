@@ -1015,3 +1015,40 @@ exactly what the assembler does on your behalf. Done once, understood forever.
 BASIC trick to hold screen: `?@32` positions cursor off-screen so BASIC's
 "OK" prompt doesn't overwrite the result (simpler than `20 GOTO 20` loop).
 
+
+---
+
+## Visual Design Preferences for Markdown Tables (Daniel)
+
+Established through the hand assembly exercise document. Apply to all
+future markdown table work in this project.
+
+**Monospaced alignment** — pad columns so they line up vertically in
+the raw source. The rendered output is identical but the source reads
+cleanly in any monospaced editor.
+
+**`x` for don't-care bits** — not `0`, not blank. `x` is explicit and
+unambiguous. A `0` in a bit pattern means the bit is zero. An `x` means
+the bit is not constrained by this field.
+
+**Spaced bit patterns** — `1 0 0 x x x x x` not `100xxxxx`. One space
+between each bit. Groups of four may be spaced further for readability.
+
+**Split column headers** — when a column label is long, split across two
+header rows to keep column width narrow. Empty first-row cell above the
+label in the second row.
+
+```
+|         |                 |      | Extra | Extra  |
+| Syntax  | Bit pattern     | Hex  | bytes | Cycles |
+```
+
+**Signed extras** — `+2` not `2` for extra cycles/bytes. `0` not blank
+for zero. Makes the additive nature of the values explicit.
+
+**Hex values with `$`** — `$80` not `80` or `0x80`. Consistent with
+6809 assembly convention throughout the project.
+
+**CC table symbols** — `↕` changes, `-` unchanged, `0` always cleared.
+Single-width characters, consistent spacing.
+
