@@ -332,20 +332,18 @@ Or let the CoCo choose:
 Add that line and run the program repeatedly. `RND(256)-1` produces a
 random value from 0 to 255 — the full byte range. Every run is different.
 
-Save the program before proceeding.
-
-```basic
-SAVE "FILLSCR"
-```
-
-The chaos experiment will likely destroy the BASIC listing in memory.
-
 ---
 
 ## Part Two: The Chaos Experiment
 
 The routine works correctly when loaded at `$3F00`. Now load it at `$0400`
 — the start of screen memory — and see what happens.
+
+Saving before running is advised. Unpredictable results may follow.
+
+```basic
+SAVE "FILLSCR"
+```
 
 Change line 10 of your BASIC program:
 
