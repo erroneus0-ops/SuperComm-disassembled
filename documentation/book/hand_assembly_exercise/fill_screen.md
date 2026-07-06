@@ -375,12 +375,17 @@ byte will be interpreted as a 6809 opcode. Some may be harmless. Some may
 cause a jump to a random address. The CoCo may freeze, crash to BASIC, or
 produce unexpected screen patterns before stopping.
 
-This is not a bug in the program. It is the program doing exactly what it
-was told, in exactly the memory you told it to use. The processor has no
-concept of the difference between code and data. Memory is memory.
+By loading the code into screen memory we introduced a bug. As the
+routine fills backward toward `$0400`, it overwrites its own instructions
+with fill character bytes. The crash pattern depends on the fill character.
 
-This is why the assembler matters. Loading nine bytes at the right address
-and running them is the entire job — but the right address is everything.
+If the fill character happens to be `$39` — the RTS opcode — the routine
+runs normally until it replaces the BNE instruction's offset byte. At that
+point the branch goes somewhere unexpected and the crash follows.
+
+Any other fill character produces less predictable results. The processor
+executes whatever opcode the fill byte represents, with whatever follows
+in memory as its operand. Where it goes from there is anyone's guess.
 
 ---
 
