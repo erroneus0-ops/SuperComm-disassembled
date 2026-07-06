@@ -323,6 +323,15 @@ in normal video. Values between 128 (`$80`) and 191 (`$BF`) produce
 graphics block characters. Experiment with different values and observe
 the results.
 
+Or let the CoCo choose:
+
+```basic
+41 POKE A+4,RND(256)-1
+```
+
+Add that line and run the program repeatedly. `RND(256)-1` produces a
+random value from 0 to 255 — the full byte range. Every run is different.
+
 ---
 
 ## Part Two: The Chaos Experiment
