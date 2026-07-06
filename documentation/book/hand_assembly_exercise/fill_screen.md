@@ -264,23 +264,41 @@ Count your bytes. If you have nine, proceed.
 
 ## Step 3: Load and Run
 
-Type the following BASIC program. The DATA statement contains your nine
-bytes as hex strings — the same values you wrote in your margin. The
-program reads each string, converts it to a number, and pokes it into
-memory starting at `$3F00`.
+Type the following BASIC program. The DATA statements contain your
+hand-assembled bytes as hex strings — the same values you wrote in
+your margin. The fill character byte sits on its own DATA line so
+it is easy to find and change.
 
 ```basic
-10 FOR I=0 TO 12
-20 READ H$
-30 POKE &H3F00+I,VAL("&H"+H$)
-40 NEXT I
-50 EXEC &H3F00
-60 DATA 8E,06,00,86,60,A7,82,8C,04,00,26,F9,39
+10 FOR I=0 TO 12:READ H$
+20 POKE &H3F00+I,VAL("&H"+H$)
+30 NEXT I
+40 EXEC &H3F00
+50 PRINT @0,;
+60 A$=INKEY$:IF A$="" THEN 60
+70 DATA "8E","06","00","86"
+80 DATA 60
+90 DATA "A7","82","8C","04","00"
+100 DATA "26","F9","39"
 ```
 
-The values in the DATA statement are your hand-assembled bytes. Compare
-them directly against what you wrote in your margin — they should match
-exactly.
+Line 80 contains the fill character as an unquoted decimal value.
+`60` is `$60` — a space in normal video, the same character Color BASIC
+uses for uppercase text.
+
+Line 50 positions the cursor without clearing the screen. Line 60
+waits for a keypress before returning to BASIC, giving you as long
+as you need to look at the result.
+
+The DATA statements map directly to your hand-assembled bytes:
+
+- Line 70: `LDX #$0600` opcode and operand, then `LDA` opcode
+- Line 80: `LDA` operand — the fill character, isolated for easy editing
+- Line 90: `STA ,-X` opcode and postbyte, then `CMPX #$0400` opcode and operand
+- Line 100: `BNE` opcode and offset, then `RTS`
+
+Type `RUN` and press Enter. The screen fills from bottom-right to
+top-left. Press any key to return to BASIC.
 
 To verify any byte on the BASIC command line:
 
@@ -289,34 +307,25 @@ To verify any byte on the BASIC command line:
  142
 ```
 
-BASIC returns the decimal equivalent. Useful for checking your work
-but not required — the loader handles the conversion automatically.
-
 ---
 
 ## Step 4: Change the Fill Character
 
-The fill character is the value `$60` (decimal 96) poked at address `$3F04`
-— the second byte of the `LDA #$60` instruction. You can change it without
-retyping the whole program:
+Change line 80 to use a different fill character value. Try `134` — that
+is `$86`, a graphics block character:
 
 ```basic
-POKE &H3F04,42 : EXEC &H3F00
+80 DATA 134
 ```
 
-`42` is `*` in the VDG character set. Try other values and observe the
-results. Values between `$40` and `$7F` produce visible characters in
-normal video.
+Type `RUN`. The screen fills with a checkerboard pattern of alternating
+green and black blocks. The routine is unchanged — only the fill character
+is different.
 
-To hold the screen after the fill so you can see the result before BASIC
-prints `OK`, add this line to your BASIC program:
-
-```basic
-45 PRINT @32,""
-```
-
-`PRINT @32` positions the cursor at screen position 32 — the second line —
-so BASIC's `OK` appears there rather than overwriting the filled screen.
+Values between 64 (`$40`) and 127 (`$7F`) produce visible text characters
+in normal video. Values between 128 (`$80`) and 191 (`$BF`) produce
+graphics block characters. Experiment with different values and observe
+the results.
 
 ---
 
@@ -325,16 +334,16 @@ so BASIC's `OK` appears there rather than overwriting the filled screen.
 The routine works correctly when loaded at `$3F00`. Now load it at `$0400`
 — the start of screen memory — and see what happens.
 
-Change line 30 of your BASIC program:
+Change line 20 of your BASIC program:
 
 ```basic
-30 POKE &H0400+I,B
+20 POKE &H0400+I,VAL("&H"+H$)
 ```
 
-And change line 50:
+And change line 40:
 
 ```basic
-50 EXEC &H400
+40 EXEC &H400
 ```
 
 Type `RUN`.
