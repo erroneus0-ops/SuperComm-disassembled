@@ -201,7 +201,7 @@ distinction will be covered when those branches are introduced.
 Branch to `Loop` if X has not yet reached `$0400`.
 
 BNE takes a single signed byte offset. The offset is not the address of
-`Loop` — it is the distance from the instruction after BNE to `Loop`.
+`Loop` — it is the direction (-back/+forward) and the distance (in bytes) from the instruction after BNE to `Loop`.
 
 **Where is the PC when the offset is applied?**
 
@@ -299,8 +299,6 @@ margin, with the fill character on its own line.
 30 POKE A+I,VAL("&H"+H$)
 40 NEXT I
 50 EXEC A
-60 PRINT @0,;
-70 A$=INKEY$:IF A$="" THEN 70
 80 DATA "8E","06","00","86"
 90 DATA "60"
 100 DATA "A7","82","8C","04","00"
@@ -320,11 +318,11 @@ The DATA statements map directly to your hand-assembled bytes:
 Once it works, try these additions:
 
 ```basic
-50 PRINT @0,;
-60 A$=INKEY$:IF A$="" THEN 60
+60 PRINT @0,;
+70 A$=INKEY$:IF A$="" THEN 70
 ```
 
-Line 50 positions the cursor without clearing the screen. Line 60
+Line 60 positions the cursor without clearing the screen. Line 70
 waits for a keypress before returning to BASIC — useful when the
 fill happens faster than you can see it.
 
@@ -402,7 +400,7 @@ produce unexpected screen patterns before stopping.
 
 By loading the code into screen memory we introduced a bug. As the
 routine fills backward toward `$0400`, it overwrites its own instructions
-with fill character bytes. The crash pattern depends on the fill character.
+with fill character bytes. The crash pattern varies on the fill character.
 
 If the fill character happens to be `$39` — the RTS opcode — the routine
 runs normally until it replaces the BNE instruction's offset byte. At that
