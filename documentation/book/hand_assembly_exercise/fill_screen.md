@@ -162,6 +162,38 @@ Write in your margin:
 __ __ __            CMPX    #SCREEN
 ```
 
+**How CMPX communicates its result**
+
+CMPX subtracts the operand from X and discards the result. The only
+output is a set of bits written into the Condition Code register (CC).
+Each bit captures one aspect of what the subtraction produced:
+
+- **Z** (Zero) — set if the result was exactly zero; cleared otherwise
+- **N** (Negative) — set if the result was negative (bit 15 was 1)
+- **V** (Overflow) — set if signed overflow occurred
+- **C** (Carry) — set if unsigned borrow occurred
+
+X is not changed. The CC register is the communication channel between
+an instruction that tests a condition and the instruction that acts on it.
+
+The conditional branch that follows does not know what instruction set the
+CC bits. It only reads them. The programmer creates the relationship —
+CMPX followed by BNE is meaningful because the programmer placed them in
+that order, not because the CPU enforces any connection between them.
+
+**BNE and the Z bit**
+
+BNE — Branch if Not Equal — reads only the Z bit. If Z is clear (the
+subtraction result was not zero, meaning X ≠ `$0400`), it branches. If Z
+is set (the result was zero, meaning X = `$0400`), it falls through to the
+next instruction.
+
+BNE is one of the few conditional branches that means the same thing
+regardless of whether the values are treated as signed or unsigned. Not
+equal is not equal either way. Other branches — greater than, less than —
+behave differently depending on signed or unsigned interpretation. That
+distinction will be covered when those branches are introduced.
+
 ---
 
 ### BNE Loop
