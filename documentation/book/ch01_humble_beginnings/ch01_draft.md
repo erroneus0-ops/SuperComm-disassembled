@@ -176,6 +176,16 @@ The six concepts, in order:
 4. **Compare and Branch** — the only way a sequential machine makes decisions.
    The loop and the keyboard wait.
 
+   In Color BASIC you might write `IF X = &H0400 THEN GOTO Loop`. The test
+   and the branch are one statement — the relationship is visible in the syntax.
+   In assembly, a compare instruction and a branch instruction are two separate,
+   independent operations. The compare writes its result into the Condition Code
+   register (CC). The branch reads that register and decides. The CPU enforces
+   no connection between them — the programmer creates the relationship by
+   placing them in order and knowing what each does. This is the fundamental
+   cognitive shift assembly demands: relationships between instructions exist
+   only in the programmer's intention, not in the syntax.
+
 5. **Stack and Subroutines** — how the CPU remembers where it came from, and
    how subroutines use that mechanism.
 
