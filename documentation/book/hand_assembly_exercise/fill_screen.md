@@ -568,10 +568,12 @@ The fields occupy non-overlapping bit positions.
 |---|---|---|---|---|---|---|---|
 | r | R | R | i | m | m | m | m |
 
-- r    = 1 for standard indexed mode<br>
-- RR   = register select (00=X  01=Y  10=U  11=S)<br>
-- i    = 1 for indirect mode<br>
-- mmmm = mode select (see table below)<br>
+```
+r    = 1 for standard indexed mode
+RR   = register select (00=X  01=Y  10=U  11=S)
+i    = 1 for indirect mode
+mmmm = mode select (see table below)
+```
 
 
 **Register field (bits 6-5 when bit 7=1):**
