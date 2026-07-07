@@ -526,6 +526,7 @@ entry shows which bits are affected by that instruction.
 
 ```
 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+|---|---|---|---|---|---|---|---|
 | E | F | H | I | N | Z | V | C |
 ```
 
