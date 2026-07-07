@@ -57,7 +57,7 @@ Load index register X with the immediate value `$0600`.
 The assembler evaluates `SCREEN+512` = `$0400 + $0200` = `$0600`.
 You provide the result — the assembler is not here.
 
-Find **Load Index Register X (LDX)** in the instruction reference.
+Find **OpRef.LDX** in the instruction reference appendix.
 Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
 high byte first).
 
@@ -82,7 +82,7 @@ Load accumulator A with the immediate value `$60`.
 set used by Color BASIC for normal video. This is the fill character.
 You can change it later.
 
-Find **Load Accumulator A (LDA)** in the instruction reference.
+Find **OpRef.LDA** in the instruction reference appendix.
 Immediate mode. One opcode byte, followed by one data byte.
 
 ```
@@ -105,7 +105,7 @@ Store accumulator A to the address in X, after first decrementing X by one.
 This is indexed addressing with pre-decrement. The instruction has two
 bytes: the opcode and a postbyte that encodes the addressing mode.
 
-Find **Store Accumulator A (STA)** in the instruction reference.
+Find **OpRef.STA** in the instruction reference appendix.
 Indexed mode. One opcode byte, followed by one postbyte.
 
 ```
@@ -113,8 +113,8 @@ Opcode:   $XX
 Postbyte: $XX
 ```
 
-For the postbyte, open the postbyte reference. Find the row for
-pre-decrement by 1 (`,-R`) and the register X column.
+For the postbyte, find **OpRef.PB** in the postbyte reference appendix.
+Find the row for pre-decrement by 1 (`,-R`) and the register X column.
 
 The postbyte is derived by OR-ing two fields:
 
@@ -142,7 +142,7 @@ Compare X with the immediate value `$0400`.
 When X reaches `$0400` — the start of screen memory — the loop is done.
 CMPX sets the condition codes without changing X.
 
-Find **Compare Index Register X (CMPX)** in the instruction reference.
+Find **OpRef.CMPX** in the instruction reference appendix.
 Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
 high byte first).
 
@@ -198,7 +198,7 @@ Step 4. Group into hex:       %1111 = $F   %1001 = $9   Result: $XX
 
 Verify: `$3F0C + (-7)` = `$3F05`. That is `Loop`. Correct.
 
-Find **Branch if Not Equal (BNE)** in the instruction reference.
+Find **OpRef.BNE** in the instruction reference appendix.
 Relative mode. One opcode byte, followed by the signed offset byte
 you just derived.
 
@@ -219,7 +219,7 @@ XX XX               BNE     Loop
 
 Return to the caller (BASIC). No operand.
 
-Find **Return from Subroutine (RTS)** in the instruction reference.
+Find **OpRef.RTS** in the instruction reference appendix.
 Inherent mode. One opcode byte only.
 
 ```
@@ -480,7 +480,7 @@ Each instruction entry shows:
 
 ---
 
-### LDX — Load Index Register X
+### OpRef.LDX — LDX — Load Index Register X
 
 **Operation:** X ← M:M+1
 
@@ -496,7 +496,7 @@ The operand is a 16-bit value — two bytes, high byte first.
 
 ---
 
-### LDA — Load Accumulator A
+### OpRef.LDA — LDA — Load Accumulator A
 
 **Operation:** A ← M
 
@@ -512,7 +512,7 @@ The operand is an 8-bit value — one byte.
 
 ---
 
-### STA — Store Accumulator A
+### OpRef.STA — STA — Store Accumulator A
 
 **Operation:** M ← A
 
@@ -520,9 +520,8 @@ The operand is an 8-bit value — one byte.
 |---------|--------|-------|--------|-------------|
 | Indexed | $A7    | 2+    | 4+     | STA addr,R  |
 
-Indexed mode requires a postbyte after the opcode. See the postbyte
-table below. Bytes and cycles shown are minimums — the postbyte may
-add more.
+Indexed mode requires a postbyte after the opcode. See **OpRef.PB**
+below. Bytes and cycles shown are minimums — the postbyte may add more.
 
 | CC |  H  |  N  |  Z  |  V  |  C  |
 |----|-----|-----|-----|-----|-----|
@@ -530,7 +529,7 @@ add more.
 
 ---
 
-### CMPX — Compare Index Register X
+### OpRef.CMPX — CMPX — Compare Index Register X
 
 **Operation:** X − M:M+1 (result discarded, condition codes set)
 
@@ -547,7 +546,7 @@ changed. Only the condition codes reflect the result.
 
 ---
 
-### BNE — Branch if Not Equal (Z=0)
+### OpRef.BNE — BNE — Branch if Not Equal (Z=0)
 
 **Operation:** PC ← PC + offset if Z=0
 
@@ -565,7 +564,7 @@ offset derivation in Step 1.
 
 ---
 
-### RTS — Return from Subroutine
+### OpRef.RTS — RTS — Return from Subroutine
 
 **Operation:** PC ← M[SP]; SP ← SP+2
 
@@ -581,7 +580,7 @@ No operand. Pulls the return address from the stack.
 
 ---
 
-## Appendix: Indexed Addressing Postbyte
+## OpRef.PB — Appendix: Indexed Addressing Postbyte
 
 Every instruction using indexed addressing requires a postbyte immediately
 after the opcode. The postbyte encodes the pointer register and the
