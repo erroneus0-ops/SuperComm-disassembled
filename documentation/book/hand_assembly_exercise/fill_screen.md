@@ -114,6 +114,15 @@ Opcode:   $XX
 Postbyte: $XX
 ```
 
+The postbyte is not looked up directly — it is constructed. Two fields
+from the postbyte reference are combined using bitwise OR to produce the
+final byte. The fields occupy non-overlapping bit positions so the OR
+simply merges them without conflict.
+
+Find the register X row in the register field table and the `,-R` row
+in the mode field table. Fill in the OR derivation below and combine
+the results.
+
 OR derivation:
 
 ```
