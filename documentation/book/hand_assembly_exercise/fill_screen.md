@@ -537,7 +537,7 @@ H  Half carry -- carry out of bit 3 (used in BCD arithmetic)
 I  IRQ mask  -- masks the interrupt request when set
 N  Negative  -- set if the result had bit 7 (or bit 15) set
 Z  Zero      -- set if the result was exactly zero
-V  Overflow  -- set if signed arithmetic overflow occurred
+V  Overflow  -- set if   signed arithmetic overflow occurred
 C  Carry     -- set if unsigned carry or borrow occurred
 ```
 
