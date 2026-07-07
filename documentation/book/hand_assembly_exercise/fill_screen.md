@@ -57,9 +57,9 @@ Load index register X with the immediate value `$0600`.
 The assembler evaluates `SCREEN+512` = `$0400 + $0200` = `$0600`.
 You provide the result — the assembler is not here.
 
-Find **OpRef.LDX** in the instruction reference appendix.
-Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
-high byte first).
+Find **OpRef.LDX** in the instruction reference appendix. Identify the
+opcode byte and determine the following two operand bytes. Note them
+to complete the line below.
 
 ```
 Opcode:   $XX
@@ -82,8 +82,8 @@ Load accumulator A with the immediate value `$60`.
 set used by Color BASIC for normal video. This is the fill character.
 You can change it later.
 
-Find **OpRef.LDA** in the instruction reference appendix.
-Immediate mode. One opcode byte, followed by one data byte.
+Find **OpRef.LDA** in the instruction reference appendix. Identify the
+opcode byte and note it to complete the line below.
 
 ```
 Opcode:   $XX
@@ -105,18 +105,16 @@ Store accumulator A to the address in X, after first decrementing X by one.
 This is indexed addressing with pre-decrement. The instruction has two
 bytes: the opcode and a postbyte that encodes the addressing mode.
 
-Find **OpRef.STA** in the instruction reference appendix.
-Indexed mode. One opcode byte, followed by one postbyte.
+Find **OpRef.STA** in the instruction reference appendix, then
+**OpRef.PB** for the postbyte. Complete the OR derivation and note
+both bytes below.
 
 ```
 Opcode:   $XX
 Postbyte: $XX
 ```
 
-For the postbyte, find **OpRef.PB** in the postbyte reference appendix.
-Find the row for pre-decrement by 1 (`,-R`) and the register X column.
-
-The postbyte is derived by OR-ing two fields:
+OR derivation:
 
 ```
 Register X field:   1 0 0 x x x x x  =  $XX
@@ -142,9 +140,7 @@ Compare X with the immediate value `$0400`.
 When X reaches `$0400` — the start of screen memory — the loop is done.
 CMPX sets the condition codes without changing X.
 
-Find **OpRef.CMPX** in the instruction reference appendix.
-Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
-high byte first).
+Find **OpRef.CMPX**. Note the opcode and two operand bytes below.
 
 ```
 Opcode:   $XX
@@ -198,9 +194,7 @@ Step 4. Group into hex:       %1111 = $F   %1001 = $9   Result: $XX
 
 Verify: `$3F0C + (-7)` = `$3F05`. That is `Loop`. Correct.
 
-Find **OpRef.BNE** in the instruction reference appendix.
-Relative mode. One opcode byte, followed by the signed offset byte
-you just derived.
+Find **OpRef.BNE**. Derive the signed offset byte and note both bytes below.
 
 ```
 Opcode:   $XX
@@ -219,8 +213,7 @@ XX XX               BNE     Loop
 
 Return to the caller (BASIC). No operand.
 
-Find **OpRef.RTS** in the instruction reference appendix.
-Inherent mode. One opcode byte only.
+Find **OpRef.RTS**. Note the single opcode byte below.
 
 ```
 Opcode:   $XX
