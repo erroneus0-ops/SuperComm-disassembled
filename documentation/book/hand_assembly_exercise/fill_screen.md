@@ -377,7 +377,11 @@ Change line 10 of your BASIC program:
 10 A=&H400
 ```
 
-Everything else stays the same — the POKE and EXEC both use `A`.
+Both POKE and EXEC use `A` as a base address with an offset applied —
+`POKE A+I` adds the loop counter to `A` exactly as indexed addressing
+adds an offset to a register. Change the base on line 10 and everything
+that follows it moves with it. The concept is the same in both languages;
+only the vocabulary differs.
 
 This experiment is only possible because the routine is
 position-independent. It contains no references to its own location
