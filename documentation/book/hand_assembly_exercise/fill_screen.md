@@ -511,6 +511,10 @@ Each instruction entry shows:
 - **CC** — effect on condition codes: H N Z V C
 
 ---
+### Details on reading the Condition Code register notation
+
+(insert detailed description and defining symbols for the CC register notation used here)
+---
 
 ### OpRef.LDX — LDX — Load Index Register X
 
