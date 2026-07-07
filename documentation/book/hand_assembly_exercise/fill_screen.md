@@ -44,28 +44,35 @@ the end.
 ## Step 1: Encode Each Instruction
 
 Work through the routine one instruction at a time. For each instruction,
-look it up in the reference and write the bytes in the left margin next to
-the source line.
+find it in the reference appendix, fill in the blanks, then write the
+bytes in the left margin of your template. The answers are in the Answer
+Key at the end of this document — cover them until you are done.
+
+---
 
 ### LDX #SCREEN+512
 
 Load index register X with the immediate value `$0600`.
 
 The assembler evaluates `SCREEN+512` = `$0400 + $0200` = `$0600`.
-You provide the result.
+You provide the result — the assembler is not here.
 
-Look up `LDX` in the reference, immediate mode.
+Find **Load Index Register X (LDX)** in the instruction reference.
+Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
+high byte first).
 
 ```
-Opcode:   $8E
-Operand:  $06  $00     (high byte first, then low byte)
+Opcode:   $XX
+Operand:  $XX  $XX     (high byte = $06, low byte = $00)
 ```
 
 Write in your margin:
 
 ```
-8E 06 00            LDX     #SCREEN+512
+XX XX XX            LDX     #SCREEN+512
 ```
+
+---
 
 ### LDA #$60
 
@@ -75,47 +82,58 @@ Load accumulator A with the immediate value `$60`.
 set used by Color BASIC for normal video. This is the fill character.
 You can change it later.
 
-Look up `LDA` in the reference, immediate mode.
+Find **Load Accumulator A (LDA)** in the instruction reference.
+Immediate mode. One opcode byte, followed by one data byte.
 
 ```
-Opcode:   $86
+Opcode:   $XX
 Operand:  $60
 ```
 
 Write in your margin:
 
 ```
-86 60               LDA     #$60
+XX 60               LDA     #$60
 ```
+
+---
 
 ### STA ,-X
 
 Store accumulator A to the address in X, after first decrementing X by one.
 
-This is indexed addressing with pre-decrement. The instruction opcode is
-`$A7` (STA indexed). The addressing mode is encoded in a second byte called
-the postbyte.
+This is indexed addressing with pre-decrement. The instruction has two
+bytes: the opcode and a postbyte that encodes the addressing mode.
 
-Open the postbyte reference. Find the row for pre-decrement by 1 (`,-R`).
-Find the column for register X. The postbyte value is `$82`.
-
-Verify by OR: register X uses bits 6-5 = `00`, giving `%10000000` = `$80`.
-Pre-decrement by 1 uses mode bits `0 0 0 1 0`, giving `$02`.
-OR them together: `$80 | $02` = `$82`. Confirmed.
+Find **Store Accumulator A (STA)** in the instruction reference.
+Indexed mode. One opcode byte, followed by one postbyte.
 
 ```
-Opcode:   $A7
-Postbyte: $82
+Opcode:   $XX
+Postbyte: $XX
+```
+
+For the postbyte, open the postbyte reference. Find the row for
+pre-decrement by 1 (`,-R`) and the register X column.
+
+The postbyte is derived by OR-ing two fields:
+
+```
+Register X field:   1 0 0 x x x x x  =  $XX
+Pre-decrement mode: x x x 0 0 0 1 0  =  $XX
+OR result:          1 0 0 0 0 0 1 0  =  $XX
 ```
 
 Write in your margin:
 
 ```
-A7 82               STA     ,-X
+XX XX               STA     ,-X
 ```
 
 This is the `Loop` label. Note the address this instruction assembles at:
 `$3F05`. You will need it for the branch offset below.
+
+---
 
 ### CMPX #SCREEN
 
@@ -124,141 +142,114 @@ Compare X with the immediate value `$0400`.
 When X reaches `$0400` — the start of screen memory — the loop is done.
 CMPX sets the condition codes without changing X.
 
-Look up `CMPX` in the reference, immediate mode.
+Find **Compare Index Register X (CMPX)** in the instruction reference.
+Immediate mode. One opcode byte, followed by a 16-bit value (two bytes,
+high byte first).
 
 ```
-Opcode:   $8C
-Operand:  $04  $00
+Opcode:   $XX
+Operand:  $XX  $XX     (high byte = $04, low byte = $00)
 ```
 
 Write in your margin:
 
 ```
-8C 04 00            CMPX    #SCREEN
+XX XX XX            CMPX    #SCREEN
 ```
+
+---
 
 ### BNE Loop
 
-Branch to `Loop` if the result of the previous comparison was not equal
-(X has not yet reached `$0400`).
+Branch to `Loop` if X has not yet reached `$0400`.
 
-BNE takes a single signed byte offset. The offset is calculated from the
-address of the instruction immediately following the branch — the byte
-after the offset byte.
+BNE takes a single signed byte offset. The offset is not the address of
+`Loop` — it is the distance from the instruction after BNE to `Loop`.
 
 **Where is the PC when the offset is applied?**
 
-The CPU fetches bytes one at a time. Each fetch advances the program
-counter by one before the byte is used. BNE is a two-byte instruction:
-the opcode byte and the offset byte. By the time the CPU has fetched
-both, the PC has advanced twice — past the opcode, past the offset,
-landing on the first byte of the next instruction.
+The CPU fetches bytes one at a time, advancing the program counter after
+each fetch. BNE is two bytes: opcode and offset. By the time both are
+fetched, PC points at the instruction after BNE — not at BNE itself.
 
 ```
 $3F0A   26          BNE opcode     <- PC advances to $3F0B after this fetch
-$3F0B   F9          offset byte    <- PC advances to $3F0C after this fetch
+$3F0B   ??          offset byte    <- PC advances to $3F0C after this fetch
 $3F0C   39          RTS            <- PC is here when the offset is applied
 ```
 
-The offset is added to `$3F0C`. Not to `$3F0A` where BNE begins. Not to
-`$3F0B` where the offset byte lives. To `$3F0C` — the instruction after.
-
 **Deriving the offset**
 
-The branch target is `Loop` at `$3F05`. That is before `$3F0C`, so the
-offset is negative. How far back?
+`Loop` is at `$3F05`. PC is at `$3F0C`. The branch goes backward.
 
 ```
-$3F0C - $3F05 = 7 bytes
+Distance: $3F0C - $3F05 = 7 bytes back
+Offset:   -7
 ```
 
-The offset must be -7.
-
-**Two's complement: expressing a negative number as a byte**
-
-A signed byte can hold values from -128 to +127. Negative numbers are
-stored in two's complement form. To find the two's complement of 7:
-
-Step 1. Write 7 in binary:
+**Two's complement of 7:**
 
 ```
-%0000 0111
+Step 1. Write 7 in binary:    %0000 0111
+Step 2. Invert every bit:     %1111 1000
+Step 3. Add 1:                %1111 1001
+Step 4. Group into hex:       %1111 = $F   %1001 = $9   Result: $XX
 ```
 
-Step 2. Invert every bit:
+Verify: `$3F0C + (-7)` = `$3F05`. That is `Loop`. Correct.
+
+Find **Branch if Not Equal (BNE)** in the instruction reference.
+Relative mode. One opcode byte, followed by the signed offset byte
+you just derived.
 
 ```
-%1111 1000
-```
-
-Step 3. Add 1:
-
-```
-%1111 1001
-```
-
-Step 4. Convert to hex — group the bits four at a time:
-
-```
-%1111 = $F
-%1001 = $9
-Result: $F9
-```
-
-The last step uses what you already know: hex is shorthand for groups of
-four binary digits.
-
-**Verify:** `$3F0C + (-7)` = `$3F0C - 7` = `$3F05`. That is `Loop`. Correct.
-
-Look up `BNE` in the reference.
-
-```
-Opcode:   $26
-Operand:  $F9
+Opcode:   $XX
+Operand:  $XX
 ```
 
 Write in your margin:
 
 ```
-26 F9               BNE     Loop
+XX XX               BNE     Loop
 ```
+
+---
 
 ### RTS
 
-Return to the caller (BASIC).
+Return to the caller (BASIC). No operand.
+
+Find **Return from Subroutine (RTS)** in the instruction reference.
+Inherent mode. One opcode byte only.
 
 ```
-Opcode:   $39
+Opcode:   $XX
 ```
 
 Write in your margin:
 
 ```
-39                  RTS
+XX                  RTS
 ```
 
 ---
 
 ## Step 2: Verify Your Bytes
 
-Your completed margin should read:
+Your completed margin should show thirteen bytes. Count them before
+checking the answer key.
 
 ```
-8E 06 00            LDX     #SCREEN+512
-86 60               LDA     #$60
-A7 82               STA     ,-X
-8C 04 00            CMPX    #SCREEN
-26 F9               BNE     Loop
-39                  RTS
+XX XX XX            LDX     #SCREEN+512
+XX XX               LDA     #$60
+XX XX               STA     ,-X
+XX XX XX            CMPX    #SCREEN
+XX XX               BNE     Loop
+XX                  RTS
 ```
 
-Nine bytes total:
-
-```
-8E 06 00 86 60 A7 82 8C 04 00 26 F9 39
-```
-
-Count your bytes. If you have nine, proceed.
+If you have thirteen bytes, check your work against the Answer Key at
+the end of this document.
 
 ---
 
@@ -404,7 +395,44 @@ mistakes, faster than you can.
 
 ---
 
-## References
+## Answer Key
+
+Check your work here after completing Step 2.
+
+```
+8E 06 00            LDX     #SCREEN+512
+86 60               LDA     #$60
+A7 82               STA     ,-X
+8C 04 00            CMPX    #SCREEN
+26 F9               BNE     Loop
+39                  RTS
+```
+
+Thirteen bytes in sequence:
+
+```
+8E 06 00 86 60 A7 82 8C 04 00 26 F9 39
+```
+
+**STA postbyte derivation:**
+
+```
+Register X field:   1 0 0 x x x x x  =  $80
+Pre-decrement mode: x x x 0 0 0 1 0  =  $02
+OR result:          1 0 0 0 0 0 1 0  =  $82
+```
+
+**BNE offset derivation:**
+
+```
+PC after BNE fetch: $3F0C
+Loop address:       $3F05
+Distance:           7 bytes back
+Two's complement:   %0000 0111 -> %1111 1000 -> %1111 1001 = $F9
+```
+
+---
+
 
 The following references were used in this exercise. Specific page numbers
 and chapter locations will be filled in when this document is placed in the
