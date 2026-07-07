@@ -1082,3 +1082,28 @@ descriptions benefits from this treatment. Register-transfer notation,
 condition codes, addressing modes -- all have multiple valid ways of
 being described depending on what aspect is being emphasized.
 
+
+---
+
+## PENDING: CC Register Deep Dive (Chapter 4)
+
+The hand assembly exercise introduced the CC register at a functional level.
+A full treatment belongs in Chapter 4 (Compare and Branch) covering:
+
+- Full bit layout: E F H I N Z V C
+- Three update categories:
+  - **Passive observation** -- N, Z watching the data bus as a byproduct
+    of data movement (e.g. LDX updates N and Z without explicit comparison)
+  - **Active assertion** -- V cleared on load because the operation
+    semantics guarantee no overflow is possible
+  - **Explicit manipulation** -- I, F written by instructions whose
+    purpose is CC management (ANDCC, ORCC, etc.)
+- Signed vs unsigned interpretation and how it affects branch selection
+  (BNE is interpretation-independent; BGT vs BHI are not)
+- Using CC side effects to avoid explicit compares in tight code
+- The passive/active distinction as a hardware insight: CC logic watches
+  specific signal lines rather than executing a separate evaluate step
+
+Daniel's observation: CC updates on load instructions suggest the CC
+logic is observing bus traffic passively -- N and Z are byproducts of
+data movement, not results of a separate comparison operation.
