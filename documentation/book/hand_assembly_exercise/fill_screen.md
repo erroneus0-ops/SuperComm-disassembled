@@ -200,8 +200,11 @@ distinction will be covered when those branches are introduced.
 
 Branch to `Loop` if X has not yet reached `$0400`.
 
-BNE takes a single signed byte offset. The offset is not the address of
-`Loop` — it is the direction (-back/+forward) and the distance (in bytes) from the instruction after BNE to `Loop`.
+BNE takes a single signed byte offset. The offset encodes both direction
+(backward or forward) and distance (in bytes) from the instruction after
+BNE to the target. Direction plus distance — a vector. The relative offset
+byte is the branch vector, and it is not a fixed address but a value the
+CPU computes into one at runtime.
 
 **Where is the PC when the offset is applied?**
 

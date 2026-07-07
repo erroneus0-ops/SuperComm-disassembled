@@ -1052,3 +1052,33 @@ for zero. Makes the additive nature of the values explicit.
 **CC table symbols** — `↕` changes, `-` unchanged, `0` always cleared.
 Single-width characters, consistent spacing.
 
+
+---
+
+## Writing Style: Terminology Variety
+
+Established during the hand assembly exercise document. Apply to all
+future book writing.
+
+Avoid repeating the same term for the same concept throughout a passage.
+Use synonyms and varied phrasings that each highlight a different aspect
+of the concept. The variety keeps the prose alive and the reader engaged.
+
+**Example -- branch offset byte:**
+- "relative offset" -- when explaining the mechanics
+- "branch vector" -- when referring to it as a quantity with direction and distance
+- "dynamically computed address" -- when emphasizing what the CPU produces at runtime
+
+**Introducing a new term:**
+State the components first, then name the combination. The reader derives
+the term rather than having it handed to them, which makes it stick.
+Example: "direction plus distance -- a vector."
+
+After introduction, all three phrasings are available as vocabulary.
+Use whichever fits the sentence naturally, rotating for variety.
+
+This principle applies broadly -- any concept that has multiple valid
+descriptions benefits from this treatment. Register-transfer notation,
+condition codes, addressing modes -- all have multiple valid ways of
+being described depending on what aspect is being emphasized.
+
