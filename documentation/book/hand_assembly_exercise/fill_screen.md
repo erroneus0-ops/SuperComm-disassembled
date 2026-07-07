@@ -511,9 +511,66 @@ Each instruction entry shows:
 - **CC** — effect on condition codes: H N Z V C
 
 ---
-### Details on reading the Condition Code register notation
 
-(insert detailed description and defining symbols for the CC register notation used here)
+### Details on Reading the Condition Code Register Notation
+
+The Condition Code register (CC) is an 8-bit register. Each bit is a flag
+that records one aspect of the result of the most recent instruction that
+affects it. Not all instructions affect all bits — the CC column in each
+entry shows which bits are affected by that instruction.
+
+**Bit layout:**
+
+```
+| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+| E | F | H | I | N | Z | V | C |
+```
+
+```
+E  Entire    -- set when the entire CPU state was saved on the stack
+F  FIRQ mask -- masks the fast interrupt request when set
+H  Half carry -- carry out of bit 3 (used in BCD arithmetic)
+I  IRQ mask  -- masks the interrupt request when set
+N  Negative  -- set if the result had bit 7 (or bit 15) set
+Z  Zero      -- set if the result was exactly zero
+V  Overflow  -- set if signed arithmetic overflow occurred
+C  Carry     -- set if unsigned carry or borrow occurred
+```
+
+The bits used in everyday programming are N, Z, V, and C. E, F, and I
+are interrupt control bits. H appears in BCD arithmetic.
+
+**Table symbols:**
+
+The CC column in each instruction entry uses these symbols:
+
+```
+↕   the bit changes to reflect the result of the instruction
+-   the bit is not affected by this instruction
+0   the bit is always cleared by this instruction
+1   the bit is always set by this instruction
+```
+
+**Example — LDX immediate:**
+
+```
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|    |  -  |  ↕  |  ↕  |  0  |  -  |
+```
+
+H is unaffected. N and Z change to reflect whether the loaded value was
+negative or zero. V is always cleared. C is unaffected.
+
+**Example — CMPX immediate:**
+
+```
+| CC |  H  |  N  |  Z  |  V  |  C  |
+|    |  -  |  ↕  |  ↕  |  ↕  |  ↕  |
+```
+
+N, Z, V, and C all change to reflect the result of the comparison.
+BNE reads only Z. Other branches read N, V, C, or combinations of them.
+
 ---
 
 ### OpRef.LDX — LDX — Load Index Register X
