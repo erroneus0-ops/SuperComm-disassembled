@@ -69,7 +69,7 @@ Operand:  $XX  $XX     (high byte = $06, low byte = $00)
 Write in your margin:
 
 ```
-XX XX XX            LDX     #SCREEN+512
+__ __ __            LDX     #SCREEN+512
 ```
 
 ---
@@ -93,7 +93,7 @@ Operand:  $60
 Write in your margin:
 
 ```
-XX 60               LDA     #$60
+__ 60               LDA     #$60
 ```
 
 ---
@@ -125,7 +125,7 @@ OR result:          1 0 0 0 0 0 1 0  =  $XX
 Write in your margin:
 
 ```
-XX XX               STA     ,-X
+__ __               STA     ,-X
 ```
 
 This is the `Loop` label. Note the address this instruction assembles at:
@@ -150,7 +150,7 @@ Operand:  $XX  $XX     (high byte = $04, low byte = $00)
 Write in your margin:
 
 ```
-XX XX XX            CMPX    #SCREEN
+__ __ __            CMPX    #SCREEN
 ```
 
 ---
@@ -204,7 +204,7 @@ Operand:  $XX
 Write in your margin:
 
 ```
-XX XX               BNE     Loop
+__ __               BNE     Loop
 ```
 
 ---
@@ -222,7 +222,7 @@ Opcode:   $XX
 Write in your margin:
 
 ```
-XX                  RTS
+__                  RTS
 ```
 
 ---
@@ -233,12 +233,12 @@ Your completed margin should show thirteen bytes. Count them before
 checking the answer key.
 
 ```
-XX XX XX            LDX     #SCREEN+512
-XX XX               LDA     #$60
-XX XX               STA     ,-X
-XX XX XX            CMPX    #SCREEN
-XX XX               BNE     Loop
-XX                  RTS
+__ __ __            LDX     #SCREEN+512
+__ __               LDA     #$60
+__ __               STA     ,-X
+__ __ __            CMPX    #SCREEN
+__ __               BNE     Loop
+__                  RTS
 ```
 
 If you have thirteen bytes, check your work against the Answer Key at
