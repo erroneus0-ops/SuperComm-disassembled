@@ -2981,6 +2981,24 @@ MARKUP_QUICK_REF = """
 """
 
 
+
+def _get_markup_ref():
+    """Get markup language reference as comment lines by calling markup.py --ref --asm."""
+    import subprocess, os
+    markup_py = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'markup.py')
+    try:
+        result = subprocess.run(
+            [sys.executable, markup_py, '--ref', '--asm'],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout
+    except Exception:
+        pass
+    # Fallback to embedded copy if markup.py unavailable
+    return MARKUP_QUICK_REF
+
+
 def detect_format(data: bytes) -> str:
     """Auto-detect binary format. Returns 'os9', 'decb', or 'raw'."""
     if len(data) >= 2 and data[0] == 0x87 and data[1] == 0xCD:
@@ -3067,8 +3085,8 @@ Examples:
         help='Merge auto-generated labels into project JSON (preserves existing names)')
     parser.add_argument('--report', action='store_true',
         help='Print anomaly report: unreferenced labels, overlaps, mid-data xrefs')
-    parser.add_argument('--markup', action='store_true',
-        help='Append markup directive quick reference to the end of the listing')
+    parser.add_argument('--ref', action='store_true',
+        help='Append markup directive quick reference to end of .dasm output')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
         help='Non-interactive: skip confirmation prompts, use defaults')
     args = parser.parse_args()
@@ -3131,8 +3149,8 @@ Examples:
             eng.load(raw_data)
         eng.run()
         asm = eng.render()
-        if args.markup:
-            asm = asm + MARKUP_QUICK_REF
+        if args.ref:
+            asm = asm + _get_markup_ref()
         out_path = stem + '.dasm'
         with open(out_path, 'w', encoding='utf-8') as f:
             f.write(asm)
@@ -3328,8 +3346,8 @@ Examples:
 
     # ── Render and write ──────────────────────────────────────────────────
     asm = eng.render()
-    if args.markup:
-        asm = asm + MARKUP_QUICK_REF
+    if args.ref:
+        asm = asm + _get_markup_ref()
     out_path = proj.output or (stem + '_proj.dasm')
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(asm)
