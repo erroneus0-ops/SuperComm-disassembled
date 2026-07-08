@@ -1227,3 +1227,33 @@ Product stage:
   Use -n flag to skip prompts and accept defaults.
 - DECB project JSON workflow (--decb --proj) not yet implemented --
   currently DECB is one-shot only. Full DECB workflow is a pending item.
+
+---
+
+## dis6x09.py / markup.py -- Discoverability Design Notes
+
+The tool was redesigned after identifying that the original workflow
+punished natural first-contact behavior:
+
+**Problems identified:**
+- No args → hung indefinitely waiting for JSON name prompt
+- --help showed -h in usage line (unclear)
+- No path to useful output without knowing the full JSON workflow
+- MARKUP_QUICK_REF embedded in dis6x09.py (duplicate, drift risk)
+
+**Solutions applied:**
+- No args → clean usage line + "run with --help" hint, exits cleanly
+- --help shown explicitly in usage line
+- --quick / -q → first-contact mode: auto-detect format, no JSON,
+  no prompts, write .dasm and exit. Natural entry point for new binary.
+- Auto-detection: OS-9 ($87CD), DECB (block structure), raw (fallback)
+- --os9 / --decb / --raw override detection when needed
+- MARKUP_QUICK_REF moved to markup.py as single source of truth
+- markup.py --ref → terminal reference; --ref --asm → comment lines
+- dis6x09.py --ref calls markup.py --ref --asm via subprocess
+
+**Intended first contact with an unknown binary:**
+```bash
+python3 dis6x09.py --source unknown.bin --quick
+```
+Get output, get oriented, then start a full --proj workflow if warranted.
