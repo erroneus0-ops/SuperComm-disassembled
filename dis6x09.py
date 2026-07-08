@@ -629,8 +629,9 @@ class Engine:
             'high_water':high_water,
         }
 
-        # Tell output pass to skip OS-9 header emit
-        self.project.target = 'decb'
+        # Tell output pass to skip OS-9 header and equates
+        self.project.target       = 'decb'
+        self.project.emit_equates = False
 
     # ── Header ────────────────────────────────────────────────────────────
 
