@@ -2973,7 +2973,9 @@ Examples:
 """)
 
     parser.add_argument('--source', metavar='BINARY',
-        help='Path to the OS-9 binary to disassemble')
+        help='Path to the binary to disassemble')
+    parser.add_argument('--decb', action='store_true',
+        help='Load as CoCo DECB/RS-DOS BIN format instead of OS-9 module')
     parser.add_argument('--proj',   metavar='JSON',
         help='Path to the project JSON file')
     parser.add_argument('--stats',  action='store_true',
@@ -3104,6 +3106,12 @@ Examples:
                 print()
                 sys.exit(0)
 
+    elif args.decb:
+        # DECB mode -- no project JSON needed, create a fresh project
+        proj = Project()
+        proj.binary = source
+        stem = os.path.splitext(source)[0]
+
     else:
         # --proj not given
         # Check if an inferrable JSON exists — if so, tell the analyst
@@ -3155,7 +3163,11 @@ Examples:
 
     # ── Run engine ────────────────────────────────────────────────────────
     eng = Engine(proj)
-    eng.load(open(source, 'rb').read())
+    raw = open(source, 'rb').read()
+    if args.decb:
+        eng.load_decb(raw)
+    else:
+        eng.load(raw)
     eng.run()
 
     # ── --stats ───────────────────────────────────────────────────────────
