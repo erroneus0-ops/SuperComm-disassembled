@@ -686,6 +686,33 @@ class Engine:
 
     # ── Header ────────────────────────────────────────────────────────────
 
+    def load_raw(self, data: bytes, org: int = 0):
+        """Load a raw binary with no header at the given origin address.
+        Entry point is assumed to be the first byte (org).
+        """
+        mem = bytearray(0x10000)
+        end = min(org + len(data), 0x10000)
+        mem[org:end] = data[:end - org]
+        self.data     = mem
+        self.exec_off = (self.project.entry if self.project.entry is not None else org)
+        self.crc_off  = end
+        self.hdr = {
+            'mod_name':  self.project.binary or 'raw',
+            'exec_off':  org,
+            'crc_off':   end,
+            'mod_size':  end - org,
+            'bss_size':  0,
+            'mod_type':  0,
+            'lang':      0,
+            'attr':      0,
+            'name_off':  0,
+            'type_name': 'RAW',
+            'crc':       None,
+        }
+        self.project.target       = 'decb'  # reuse DECB output path
+        self.project.emit_equates = False
+
+
     def _parse_header(self):
         d = self.data
         if len(d) < 13 or d[0] != 0x87 or d[1] != 0xCD:
@@ -2953,47 +2980,105 @@ MARKUP_QUICK_REF = """
 ; ══════════════════════════════════════════════════════════════
 """
 
+
+def detect_format(data: bytes) -> str:
+    """Auto-detect binary format. Returns 'os9', 'decb', or 'raw'."""
+    if len(data) >= 2 and data[0] == 0x87 and data[1] == 0xCD:
+        return 'os9'
+    # Try DECB: walk block structure and see if it parses cleanly
+    try:
+        i = 0
+        blocks = 0
+        while i < len(data):
+            bt = data[i]; i += 1
+            if bt == 0xFF:
+                if i + 2 <= len(data):
+                    return 'decb'  # valid end block
+                break
+            elif bt == 0x00:
+                if i + 4 > len(data): break
+                length = (data[i] << 8) | data[i+1]; i += 2
+                load_addr = (data[i] << 8) | data[i+1]; i += 2
+                if i + length > len(data): break
+                i += length
+                blocks += 1
+                if blocks > 32: break  # sanity limit
+            else:
+                break  # not DECB
+    except Exception:
+        pass
+    return 'raw'
+
+
 def main():
     import argparse, sys, os
 
     parser = argparse.ArgumentParser(
         prog='dis6x09.py',
-        description='6809/6309 disassembler — supports OS-9 modules and DECB/Color BASIC BIN format',
+        description='6809/6309 disassembler. Auto-detects OS-9, DECB/Color BASIC BIN, or raw binary.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False,
         epilog="""
+Format detection (automatic unless overridden):
+  $87CD at offset 0  → OS-9 module
+  valid block structure  → DECB/Color BASIC BIN
+  anything else  → raw binary (use --org to set load address)
+
 Examples:
-  DECB/Color BASIC BIN (no project file needed):
-    python dis6x09.py --source flames.bin --decb
+  Quick first look (auto-detect, no JSON):
+    python dis6x09.py --source flames.bin --quick
 
-  OS-9 module, first run (creates project JSON):
+  Full workflow with project JSON (OS-9 or DECB):
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
 
-  OS-9 module, subsequent runs:
-    python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
+  Force a specific format:
+    python dis6x09.py --source file.bin --decb --quick
+    python dis6x09.py --source file.bin --os9 --proj file_proj.json
+    python dis6x09.py --source file.bin --raw --org C000 --quick
 
   Stats only:
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json --stats
 """)
 
+    parser.add_argument('--help', '-h', action='help',
+        help='Show this help message and exit')
     parser.add_argument('--source', metavar='BINARY',
         help='Path to the binary to disassemble')
-    parser.add_argument('--decb', action='store_true',
-        help='Load as CoCo DECB/RS-DOS BIN format instead of OS-9 module')
-    parser.add_argument('--proj',   metavar='JSON',
-        help='Path to the project JSON file')
-    parser.add_argument('--stats',  action='store_true',
-        help='Show pass-1 classification stats only, no output written')
+
+    # ── Format flags (override auto-detection) ────────────────────────────
+    fmt_group = parser.add_mutually_exclusive_group()
+    fmt_group.add_argument('--os9',  action='store_true',
+        help='Treat as OS-9 module (default if $87CD magic detected)')
+    fmt_group.add_argument('--decb', action='store_true',
+        help='Treat as DECB/Color BASIC BIN (default if block structure detected)')
+    fmt_group.add_argument('--raw',  action='store_true',
+        help='Treat as raw binary — no header, entry point = load address')
+    parser.add_argument('--org', metavar='HEX',
+        help='Load address for raw binary (hex, e.g. C000). Default: 0000')
+
+    # ── Workflow flags ────────────────────────────────────────────────────
+    parser.add_argument('--quick', '-q', action='store_true',
+        help='Quick mode: no JSON, no prompts, auto-detect format, write .dasm and exit')
+    parser.add_argument('--proj', metavar='JSON',
+        help='Project JSON file for full analyst workflow')
+    parser.add_argument('--stats', action='store_true',
+        help='Show pass-1 classification stats (code/data counts) — no .dasm written')
     parser.add_argument('--update-labels', action='store_true',
-        help='Merge auto-generated labels into the project JSON '
-             '(preserves existing names, adds only new ones)')
+        help='Merge auto-generated labels into project JSON (preserves existing names)')
     parser.add_argument('--report', action='store_true',
-        help='Print anomaly report: unreferenced labels, overlaps, '
-             'mid-data references')
+        help='Print anomaly report: unreferenced labels, overlaps, mid-data xrefs')
     parser.add_argument('--markup', action='store_true',
-        help='Append markup quick reference to the end of the output listing')
+        help='Append markup directive quick reference to the end of the listing')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
-        help='Non-interactive mode — skip confirmation prompts')
+        help='Non-interactive: skip confirmation prompts, use defaults')
     args = parser.parse_args()
+
+    # ── No args at all → print usage ──────────────────────────────────────
+    if not args.source and not args.proj:
+        parser.print_usage()
+        print()
+        print("  Run with --help for full option descriptions and examples.")
+        sys.exit(0)
 
     # ── --source: required unless proj.binary provides it ─────────────────
     if not args.source:
@@ -3016,6 +3101,43 @@ Examples:
         sys.exit(1)
 
     actual_crc = binary_crc(source)
+
+    # ── Auto-detect format unless overridden ───────────────────────────────
+    raw_data = open(source, 'rb').read()
+    if not (args.os9 or args.decb or args.raw):
+        detected = detect_format(raw_data)
+        if detected == 'os9':
+            args.os9 = True
+            print(f"; Detected: OS-9 module", file=sys.stderr)
+        elif detected == 'decb':
+            args.decb = True
+            print(f"; Detected: DECB/Color BASIC BIN", file=sys.stderr)
+        else:
+            args.raw = True
+            print(f"; Detected: raw binary", file=sys.stderr)
+
+    # ── Quick mode: no JSON, no prompts ───────────────────────────────────
+    if args.quick or args.decb and not args.proj:
+        proj = Project()
+        proj.binary = source
+        stem = os.path.splitext(source)[0]
+        eng = Engine(proj)
+        if args.decb:
+            eng.load_decb(raw_data)
+        elif args.raw:
+            org = int(args.org, 16) if args.org else 0
+            eng.load_raw(raw_data, org)
+        else:
+            eng.load(raw_data)
+        eng.run()
+        asm = eng.render()
+        if args.markup:
+            asm = asm + MARKUP_QUICK_REF
+        out_path = stem + '.dasm'
+        with open(out_path, 'w', encoding='utf-8') as f:
+            f.write(asm)
+        print(f"Written: {out_path}  ({len(asm.splitlines())} lines)", file=sys.stderr)
+        return
 
     # ── Resolve --proj ────────────────────────────────────────────────────
     if args.proj:
@@ -3109,12 +3231,6 @@ Examples:
                 print()
                 sys.exit(0)
 
-    elif args.decb:
-        # DECB mode -- no project JSON needed, create a fresh project
-        proj = Project()
-        proj.binary = source
-        stem = os.path.splitext(source)[0]
-
     else:
         # --proj not given
         # Check if an inferrable JSON exists — if so, tell the analyst
@@ -3166,11 +3282,13 @@ Examples:
 
     # ── Run engine ────────────────────────────────────────────────────────
     eng = Engine(proj)
-    raw = open(source, 'rb').read()
     if args.decb:
-        eng.load_decb(raw)
+        eng.load_decb(raw_data)
+    elif args.raw:
+        org = int(args.org, 16) if args.org else 0
+        eng.load_raw(raw_data, org)
     else:
-        eng.load(raw)
+        eng.load(raw_data)
     eng.run()
 
     # ── --stats ───────────────────────────────────────────────────────────
