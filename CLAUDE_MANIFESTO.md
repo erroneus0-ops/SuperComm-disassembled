@@ -1107,3 +1107,69 @@ A full treatment belongs in Chapter 4 (Compare and Branch) covering:
 Daniel's observation: CC updates on load instructions suggest the CC
 logic is observing bus traffic passively -- N and Z are byproducts of
 data movement, not results of a separate comparison operation.
+
+---
+
+## XRoar WASM Build from Source (July 7 2026)
+
+### Environment
+- Windows 10 LTSC 2021 (build 19044) -- upgraded from 1809 this session
+- WSL2 with Ubuntu 22.04.1 LTS
+- Emscripten 6.0.2 (installed via emsdk)
+- XRoar source: https://www.6809.org.uk/git/xroar.git
+
+### Setup commands
+```bash
+# Install emsdk
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source ./emsdk_env.sh   # must run each session or add to .bashrc
+
+# Clone XRoar
+mkdir -p ~/src
+cd ~/src
+git clone https://www.6809.org.uk/git/xroar.git
+cd xroar
+
+# Dependencies (most already present on Ubuntu 22.04)
+sudo apt install -y build-essential autoconf automake pkg-config \
+    libsdl2-dev libpng-dev zlib1g-dev python3 texinfo
+```
+
+### Build commands
+```bash
+autoreconf -fi
+
+emconfigure ./configure --enable-traps --host=wasm32-unknown-emscripten
+
+emmake make -j$(nproc) GL_LIBS=""
+```
+
+### Known quirks
+- `--host=wasm32-unknown-emscripten` required -- without it configure
+  detects Objective-C and sets OBJCLD incorrectly, causing link failure
+  with "none: No such file or directory"
+- `GL_LIBS=""` required at make time -- configure sets GL_LIBS to the
+  literal string "none required" (from the OpenGL check output) which
+  gets passed to emcc as an input file and fails
+- `texinfo` must be installed or doc build fails
+
+### Output
+- `src/xroar.wasm` -- 5.99MB (unoptimized, with debug symbols)
+- Ciaran's release build is 1.3MB -- size difference due to -g flag
+  and missing Emscripten-specific size optimizations
+- Committed to repo as `wasm/xroar-custom.wasm`
+
+### Next steps
+- Study Ciaran's build flags for size optimization
+- Add debug exports to wasm.c: wasm_set_trace, wasm_set_breakpoint,
+  wasm_clear_breakpoint, wasm_get_registers
+- Add to exported_functions
+- Rebuild and test in browser
+- Ciaran's note: build with --enable-traps for trap/breakpoint support
+
+### WSL2 path to Windows files
+D: drive is at /mnt/d/ in WSL2
+Copy built WASM to repo: cp ~/src/xroar/src/xroar.wasm /mnt/d/git/supercomm/wasm/
