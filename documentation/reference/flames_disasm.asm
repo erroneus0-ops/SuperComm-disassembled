@@ -2786,12 +2786,3 @@ $2474  E0 09                                      SUBB 9,X
 $2476  00 00                                      NEG <$00
 $2478  E0 09                                      SUBB 9,X
 $247A  00 00                                      NEG <$00
-
-; ==============================================================
-; ModEnd — CRC-24 appended by fixmod (not in source)
-; ==============================================================
-ModEnd
-; CRC-24 (3 bytes) appended here by fixmod
-         FCB    $00,$00,$00        ; CRC placeholder — overwritten by fixmod
-ModCRC
-ModSize  EQU    ModCRC-ModHeader   ; module size including 3 CRC bytes

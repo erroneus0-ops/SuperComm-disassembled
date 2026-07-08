@@ -2413,6 +2413,8 @@ class Engine:
                 "eom      equ   *",
                 "         end",
             ]
+        elif proj.target == 'decb':
+            pass  # no module footer for DECB binaries
         else:
             out += [
                 "",
