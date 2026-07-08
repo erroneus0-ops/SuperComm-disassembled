@@ -38,6 +38,58 @@ class _OverlapHandled(Exception):
 
 # ── OS-9 platform tables ──────────────────────────────────────────────────────
 
+
+# ── CoCo/Dragon hardware equates (DECB target) ────────────────────────────────
+# Emitted in place of OS-9 equates when target == 'decb'.
+# Organised by subsystem. Add entries as needed -- this is a starting point.
+
+COCO_EQUATES = """
+; ================================================================
+; TRS-80 Color Computer / Dragon Hardware Register Equates
+; ================================================================
+
+; ── PIA0  $FF00-$FF03  (keyboard, joystick, cassette) ──────────
+PIA0DA   EQU    $FF00    ; PIA0 Data Register A  (keyboard columns)
+PIA0CRA  EQU    $FF01    ; PIA0 Control Register A
+PIA0DB   EQU    $FF02    ; PIA0 Data Register B  (keyboard rows, joystick)
+PIA0CRB  EQU    $FF03    ; PIA0 Control Register B
+
+; ── PIA1  $FF20-$FF23  (VDG mode, sound, RS-232) ───────────────
+PIA1DA   EQU    $FF20    ; PIA1 Data Register A  (cassette, sound, RS-232)
+PIA1CRA  EQU    $FF21    ; PIA1 Control Register A
+PIA1DB   EQU    $FF22    ; PIA1 Data Register B  (VDG mode select bits)
+PIA1CRB  EQU    $FF23    ; PIA1 Control Register B
+
+; ── SAM  $FFC0-$FFDF  (video address, clock, memory map) ───────
+; Video display address (V0-V6): write $FFC6/$FFC7 to set bit
+SAMV0C   EQU    $FFC6    ; SAM V0 clear
+SAMV0S   EQU    $FFC7    ; SAM V0 set
+SAMV1C   EQU    $FFC8    ; SAM V1 clear
+SAMV1S   EQU    $FFC9    ; SAM V1 set
+SAMV2C   EQU    $FFCA    ; SAM V2 clear
+SAMV2S   EQU    $FFCB    ; SAM V2 set
+SAMV3C   EQU    $FFCC    ; SAM V3 clear
+SAMV3S   EQU    $FFCD    ; SAM V3 set
+SAMV4C   EQU    $FFCE    ; SAM V4 clear
+SAMV4S   EQU    $FFCF    ; SAM V4 set
+SAMV5C   EQU    $FFD0    ; SAM V5 clear
+SAMV5S   EQU    $FFD1    ; SAM V5 set
+SAMV6C   EQU    $FFD2    ; SAM V6 clear
+SAMV6S   EQU    $FFD3    ; SAM V6 set
+; SAM memory map (TY0/TY1): all-RAM mode
+SAMTY0C  EQU    $FFDC    ; SAM TY0 clear
+SAMTY0S  EQU    $FFDD    ; SAM TY0 set
+SAMTY1C  EQU    $FFDE    ; SAM TY1 clear (all-RAM)
+SAMTY1S  EQU    $FFDF    ; SAM TY1 set   (all-RAM)
+
+; ── Color BASIC ROM entry points ────────────────────────────────
+POLCAT   EQU    $A000    ; poll keyboard: returns char in A, 0=none
+CHROUT   EQU    $A002    ; output character in A to screen
+BLINKKY  EQU    $A1B1    ; blink cursor, wait for keypress (ROM-version dependent)
+
+; ================================================================
+"""
+
 OS9_SYSCALLS = {
     0x00:("F$Link",   "module_name→X"),
     0x01:("F$Load",   "name→X  mode=B"),
@@ -629,9 +681,8 @@ class Engine:
             'high_water':high_water,
         }
 
-        # Tell output pass to skip OS-9 header and equates
-        self.project.target       = 'decb'
-        self.project.emit_equates = False
+        # Tell output pass to use DECB header and CoCo hardware equates
+        self.project.target = 'decb'
 
     # ── Header ────────────────────────────────────────────────────────────
 
@@ -1764,6 +1815,8 @@ class Engine:
         if proj.defs_file:
             out.append(f"         use     {proj.defs_file}")
             out.append("")
+        elif proj.target == 'decb':
+            out.append(COCO_EQUATES)
         elif proj.emit_equates:
             out.append(EQUATES_BLOCK)
         if proj.custom_equates:
