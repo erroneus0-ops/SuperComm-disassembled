@@ -2958,14 +2958,17 @@ def main():
 
     parser = argparse.ArgumentParser(
         prog='dis6x09.py',
-        description='OS-9 6809/6309 disassembler',
+        description='6809/6309 disassembler — supports OS-9 modules and DECB/Color BASIC BIN format',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  First run (creates new project JSON):
+  DECB/Color BASIC BIN (no project file needed):
+    python dis6x09.py --source flames.bin --decb
+
+  OS-9 module, first run (creates project JSON):
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
 
-  Subsequent runs:
+  OS-9 module, subsequent runs:
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
 
   Stats only:
