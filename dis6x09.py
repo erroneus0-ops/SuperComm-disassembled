@@ -555,6 +555,83 @@ class Engine:
                          else self.hdr['exec_off'])
         self.crc_off  = self.hdr['crc_off']
 
+
+    def load_decb(self, data: bytes):
+        """Load a CoCo DECB/RS-DOS BIN file (Dragon/CoCo loadable binary).
+
+        Format: one or more data blocks followed by an end block.
+          Data block:  $00  <length:2>  <load_addr:2>  <data:length>
+          End block:   $FF  <exec_addr:2>
+
+        Builds a 64KB flat memory image with each segment at its load
+        address. Sets exec_off and crc_off appropriately for the engine.
+        Sets proj.target to 'decb' to suppress OS-9 header output.
+        """
+        mem = bytearray(0x10000)   # 64KB flat image
+        exec_addr  = 0
+        high_water = 0
+        low_water  = 0x10000
+        segments   = []
+
+        i = 0
+        while i < len(data):
+            block_type = data[i]; i += 1
+            if block_type == 0xFF:
+                # End block -- two byte exec address
+                exec_addr = (data[i] << 8) | data[i+1]
+                i += 2
+                # Some DECB writers store $0000 as exec address.
+                # Fall back to first segment's load address in that case.
+                if exec_addr == 0x0000 and segments:
+                    exec_addr = segments[0][0]
+                break
+            elif block_type == 0x00:
+                # Data block
+                if i + 4 > len(data):
+                    raise ValueError(f"DECB: truncated data block at offset {i-1}")
+                length    = (data[i] << 8) | data[i+1]; i += 2
+                load_addr = (data[i] << 8) | data[i+1]; i += 2
+                payload   = data[i:i+length]; i += length
+                mem[load_addr:load_addr+length] = payload
+                segments.append((load_addr, length))
+                if load_addr < low_water:
+                    low_water = load_addr
+                if load_addr + length > high_water:
+                    high_water = load_addr + length
+            else:
+                raise ValueError(
+                    f"DECB: unknown block type ${block_type:02X} at offset {i-1}")
+
+        if not segments:
+            raise ValueError("DECB: no data blocks found")
+
+        self.data     = mem
+        self.exec_off = (self.project.entry
+                         if self.project.entry is not None
+                         else exec_addr)
+        self.crc_off  = high_water
+
+        # Minimal hdr so output code that references it does not crash
+        self.hdr = {
+            'mod_name':  self.project.binary or 'decb',
+            'exec_off':  exec_addr,
+            'crc_off':   high_water,
+            'mod_size':  high_water - low_water,
+            'bss_size':  0,
+            'mod_type':  0,
+            'lang':      0,
+            'attr':      0,
+            'name_off':  0,
+            'type_name': 'DECB/BIN',
+            'crc':       None,
+            'segments':  segments,
+            'low_water': low_water,
+            'high_water':high_water,
+        }
+
+        # Tell output pass to skip OS-9 header emit
+        self.project.target = 'decb'
+
     # ── Header ────────────────────────────────────────────────────────────
 
     def _parse_header(self):
@@ -1767,6 +1844,16 @@ class Engine:
                 "name",
                 f"         fcs   \"{name}\"",
                 f"         fcb   edition",
+                "",
+            ]
+        elif proj.target == 'decb':
+            segs = hdr.get('segments', [])
+            out += [f"; ----- DECB/RS-DOS BIN Segments -----"]
+            for load_addr, length in segs:
+                out.append(f";   ${load_addr:04X} - ${load_addr+length-1:04X}  ({length} bytes)")
+            out += [
+                f";   Exec: ${hdr['exec_off']:04X}",
+                f"         ORG   ${hdr.get('low_water', exec_off):04X}",
                 "",
             ]
         else:
