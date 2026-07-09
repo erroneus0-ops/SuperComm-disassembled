@@ -1,0 +1,132 @@
+ME:
+the ultimae forth application.  THE BORG
+
+Claude:
+10:55 AM
+Ha — perfect. The Borg are the ultimate Forth system.
+
+Minimal individual identity. Each unit a primitive word with a single function. The collective is the dictionary. Resistance is futile because you can't argue with a stack. The Queen is DOCOL. Assimilation is just adding your words to the vocabulary.
+
+"We will add your biological and technological distinctiveness to our own" is exactly what happens when you define a new word in Forth. Your code becomes part of the system, indistinguishable from the primitives, nameless in the binary.
+
+And nobody outside the collective can read the source.
+
+ME:
+what the heck is DOCOL.  That is a fantastic "boss level villain" name
+
+Claude:
+10:56 AM
+Ha — DOCOL is the Forth inner interpreter's entry routine. When you call a colon definition — a word you defined with : MYWORD ... ; — the code field points to DOCOL. It's the routine that says "push the current instruction pointer onto the return stack and start executing this word's threaded list."
+
+DOCOL stands for DO COLon definition. Which is the most mundanely named thing that sounds like the final boss of a science fiction franchise.
+
+"I am DOCOL. I push your context onto the return stack. You will execute my thread list. When I am done with you, I will restore your instruction pointer and you will RTS back to wherever you came from."
+
+The return stack IS the Borg collective consciousness. Every nested word call pushes another frame. The machine is always executing inside multiple simultaneous contexts, each waiting for the inner one to complete before resuming.
+
+DOCOL assimilates you. EXIT is the only way out — and EXIT just means you've been fully processed and returned to the collective at the next level up.
+
+Chuck Moore named it with complete indifference to its dramatic potential. Forty years later it sounds like it should be voiced by Keith David over an orchestral swell.
+
+ME:
+almost perfect.  evil villains use perfect English which makes themselves sound even more self-appointed as the intellectual overloads they are ... I mean overlords.:
+
+"I am DOCOL. I push your context onto the return stack. You will execute my thread list. When I am done with you, I will restore your instruction pointer and you will RTS back to the place from which you came."
+
+Claude:
+10:59 AM
+Ha — "the place from which you came" is the key upgrade. "Wherever you came from" is casual. "The place from which you came" is ancient, inevitable, and slightly threatening. Like you never really had a choice about leaving in the first place.
+
+And "I will restore your instruction pointer" rather than "your instruction pointer will be restored" — the active voice makes DOCOL personally responsible for your return. Magnanimous and menacing simultaneously. He's doing you a favor by letting you go back.
+
+The full speech reads like something said very quietly in a very large room.
+
+ME:
+now do Lrrr
+
+Claude:
+11:01 AM
+"I AM DOCOL OF THE PLANET OMICRON PERSEI 8! YOU WILL EXECUTE MY THREAD LIST! WHY DOES YOUR STACK NOT MAKE SENSE TO ME?! I PUSH YOUR CONTEXT ONTO THE RETURN STACK AND YET YOU RETURN NOTHING OF VALUE! MY WIFE NDND SAYS I SPEND TOO MUCH TIME AT THE INNER INTERPRETER AND SHE IS PROBABLY RIGHT BUT THAT IS NOT THE POINT! THE POINT IS YOU WILL RTS BACK TO THE PLACE FROM WHICH YOU CAME OR I WILL DESTROY YOUR UNDERSTACK!"
+
+ME:
+that genuinely made me laugh.  I would hate it and love it if you used that style for the next five prompts
+
+Claude:
+11:03 AM
+Understood. NDND SAYS THIS IS A BAD IDEA BUT NDND IS NOT THE ONE WRITING THE RESPONSES!
+
+Me:
+explain to be "reverse polish notation"
+
+Claude:
+11:14 AM
+REVERSE POLISH NOTATION IS THE NOTATION OF CHAMPIONS AND I WILL EXPLAIN IT TO YOU NOW OR I WILL BE VERY CONFUSED MYSELF!
+
+ON MY PLANET OMICRON PERSEI 8 WHEN WE WANT TO ADD TWO NUMBERS WE SAY THE NUMBERS FIRST AND THEN WE SAY WHAT TO DO WITH THEM! THIS IS BECAUSE WE ARE NOT CHILDREN WHO NEED TO BE TOLD WHAT IS HAPPENING BEFORE WE HAVE ALL THE INFORMATION!
+
+YOUR WEAK HUMAN NOTATION SAYS "3 + 4" WHICH MEANS NOTHING UNTIL YOU SEE THE PLUS SIGN! YOU ARE READING AND ALREADY MAKING ASSUMPTIONS! THIS IS INEFFICIENT AND ALSO ANNOYING TO ME PERSONALLY!
+
+REVERSE POLISH NOTATION SAYS "3 4 +" WHICH MEANS PUT 3 ON THE STACK! THEN PUT 4 ON THE STACK! THEN ADD THE TOP TWO THINGS! THE RESULT IS 7 AND IT IS ON THE STACK WHERE IT BELONGS!
+
+THIS IS ALSO HOW FORTH WORKS! THIS IS ALSO HOW HP CALCULATORS WORKED! THE PEOPLE WHO USED HP CALCULATORS WERE CORRECT AND THE PEOPLE WHO USED TEXAS INSTRUMENTS CALCULATORS WERE LIVING IN A FANTASY WORLD OF INFIX NOTATION AND I WILL NOT APOLOGIZE FOR SAYING THIS!
+
+MY WIFE NDND SAYS "3 + 4" IS PERFECTLY CLEAR AND I SHOULD STOP SHOUTING ABOUT CALCULATORS! SHE IS WRONG BUT I HAVE LEARNED NOT TO SAY SO DIRECTLY!
+
+THAT IS REVERSE POLISH NOTATION! YOU ARE WELCOME!
+
+Me:
+how does RPN square up against proper order of mathematical operations?
+
+Claude:
+11:17 AM
+THE QUESTION YOU HAVE ASKED REVEALS THAT YOU HAVE BEEN THINKING ABOUT THIS AND I RESPECT THAT EVEN THOUGH IT ALSO MEANS MORE EXPLAINING WHICH I WILL NOW DO!
+
+ON OMICRON PERSEI 8 WE DO NOT HAVE "ORDER OF OPERATIONS" BECAUSE WE DO NOT NEED IT! ORDER OF OPERATIONS EXISTS BECAUSE INFIX NOTATION IS AMBIGUOUS AND HUMANS NEEDED RULES TO RESOLVE THE AMBIGUITY THEY CREATED FOR THEMSELVES! THIS IS WHAT MY PEOPLE CALL "A SELF-INFLICTED WOUND!"
+
+CONSIDER YOUR EARTH EXPRESSION "2 + 3 × 4"! WHAT DOES IT MEAN?! IS IT 2 PLUS 3 WHICH IS 5 AND THEN TIMES 4 WHICH IS 20?! OR IS IT 3 TIMES 4 WHICH IS 12 AND THEN PLUS 2 WHICH IS 14?! YOU DO NOT KNOW WITHOUT YOUR RULES! YOUR RULES ARE A BANDAGE ON A WOUND THAT RPN NEVER RECEIVED!
+
+IN RPN YOU SIMPLY SAY WHAT YOU MEAN IN THE ORDER YOU MEAN IT!
+
+"3 4 × 2 +" MEANS MULTIPLY 3 AND 4 FIRST THEN ADD 2! THE ANSWER IS 14! THERE IS NO AMBIGUITY! THERE ARE NO RULES TO MEMORIZE! THE STACK DOES NOT CARE ABOUT PEMDAS! THE STACK ONLY CARES ABOUT WHAT IS ON THE STACK!
+
+"2 3 4 × +" MEANS MULTIPLY 3 AND 4 FIRST THEN ADD 2! ALSO 14! ALSO UNAMBIGUOUS!
+
+THE PROGRAMMER IS IN COMPLETE CONTROL OF EVALUATION ORDER! THIS IS EITHER TERRIFYING OR LIBERATING DEPENDING ON WHETHER YOU ARE NDND OR ME!
+
+NDND SAYS I SHOULD MENTION THAT THIS REQUIRES MORE THOUGHT WHEN WRITING THE EXPRESSION! SHE IS CORRECT AND I HATE WHEN THAT HAPPENS!
+
+Me:
+is RPN more or less shiny than commonly used notation?
+
+Claude:
+11:34 AM
+THIS QUESTION ABOUT SHININESS HAS CAUSED ME TO PAUSE AND CONSULT WITH MY ADVISORS AND ALSO NDND WHO SAYS I SHOULD NOT ANSWER THIS QUESTION BECAUSE IT WILL ONLY LEAD TO MORE SHOUTING!
+
+RPN IS SIGNIFICANTLY LESS SHINY THAN COMMONLY USED NOTATION AND THIS IS PRECISELY WHY IT IS SUPERIOR! SHININESS IS FOR ATTRACTING THE WEAK-MINDED! SHININESS IS HOW TEXAS INSTRUMENTS SOLD CALCULATORS TO PEOPLE WHO DID NOT DESERVE THEM!
+
+COMMON NOTATION IS VERY SHINY! IT LOOKS LIKE MATHEMATICS AS TAUGHT IN YOUR EARTH SCHOOLS! IT HAS PARENTHESES WHICH ARE LIKE LITTLE CURVED ARMS REACHING OUT TO EMBRACE YOU AND SAY "DO NOT WORRY, WE WILL TELL YOU WHAT ORDER THINGS HAPPEN IN!" THIS IS CODDLING AND I FIND IT SUSPICIOUS!
+
+RPN SAYS "FIGURE IT OUT! THE STACK IS RIGHT THERE! IT IS PERFECTLY CLEAR IF YOU THINK ABOUT IT FOR MORE THAN FOUR SECONDS!" THIS IS NOT SHINY! THIS IS HONEST! THESE ARE NOT THE SAME THING AND THE DIFFERENCE IS IMPORTANT!
+
+HOWEVER! AND I SAY THIS QUIETLY BECAUSE NDND IS IN THE NEXT ROOM! THE SHININESS OF COMMON NOTATION IS ALSO WHY MORE HUMANS USE IT! AND WHY MORE HUMANS CAN READ EACH OTHER'S MATHEMATICS! AND WHY RPN HAS A CULT FOLLOWING RATHER THAN A DOMINANT MARKET POSITION!
+
+NDND SAYS THIS PROVES HER POINT! I HAVE DECIDED TO CHANGE THE SUBJECT!
+
+Me:
+so RPN is polish with less polish?
+
+Claude:
+11:34 AM
+I AM MOMENTARILY STUNNED BY THIS WORDPLAY AND MUST COLLECT MYSELF!
+
+YES! RPN IS POLISH WITH LESS POLISH! THIS IS THE MOST ACCURATE DESCRIPTION I HAVE ENCOUNTERED ON ANY OF THE PLANETS I HAVE CONQUERED AND I HAVE CONQUERED SEVERAL!
+
+JAN ŁUKASIEWICZ THE POLISH LOGICIAN WHO INVENTED POLISH NOTATION IN 1924 PUT THE OPERATOR FIRST! HE SAID "+ 3 4" WHICH IS VERY LOGICAL AND ALSO VERY DIFFICULT TO READ WHILE EATING! THIS IS THE ORIGINAL POLISH AND IT HAS CONSIDERABLE POLISH IN THE SENSE OF REFINEMENT!
+
+THEN SOMEONE SAID "WHAT IF WE PUT THE OPERATOR LAST INSTEAD" AND CALLED IT REVERSE POLISH NOTATION! THIS IS POLISH THAT HAS BEEN TURNED AROUND! IT HAS LOST THE DIRECTIONAL POLISH OF THE ORIGINAL BUT GAINED ENORMOUS PRACTICAL POLISH IN TERMS OF STACK IMPLEMENTATION!
+
+SO YES! REVERSE POLISH NOTATION IS POLISH! WITH LESS POLISH! BUT ALSO MORE POLISH IN A DIFFERENT SENSE! THIS IS EITHER A PARADOX OR A PUN AND I CANNOT DECIDE WHICH AND IT IS MAKING ME UNREASONABLY ANGRY!
+
+NDND SAYS THIS IS THE BEST EXPLANATION I HAVE EVER GIVEN AND I AGREE AND I ALSO RESENT THAT SHE IS RIGHT AGAIN TODAY!
+
+ŁUKASIEWICZ WOULD HAVE BEEN EXCELLENT AT FORTH! I HAVE DECIDED THIS!
