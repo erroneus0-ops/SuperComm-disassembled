@@ -1044,6 +1044,41 @@ class Engine:
                 pos += 4
             else:
                 pos += 1
+
+        # ── Linear scan: catch branch targets missed by recursive descent ──
+        # Walk every byte in the loaded range. When we find a branch opcode
+        # whose target is in range but wasn't visited, add it as a label.
+        # This catches branches in code regions the entry-point trace missed
+        # (e.g. Forth words reachable only via indirect dispatch).
+        pos = exec_off
+        while pos < crc_off - 1:
+            try:
+                op = d[pos]
+            except IndexError:
+                break
+            t = None
+            adv = 1
+            if op in range(0x20, 0x30):          # short branches Bcc
+                if pos + 1 < crc_off:
+                    off = s8(d[pos+1])
+                    t = pos + 2 + off
+                    adv = 2
+            elif op == 0x16:                     # LBRA
+                if pos + 2 < crc_off:
+                    off = s16((d[pos+1]<<8)|d[pos+2])
+                    t = pos + 3 + off
+                    adv = 3
+            elif op == 0x10 and pos + 2 < crc_off:
+                op2 = d[pos+1]
+                if op2 in range(0x21, 0x30):     # long branches LBcc
+                    off = s16((d[pos+2]<<8)|d[pos+3])
+                    t = pos + 4 + off
+                    adv = 4
+            if t is not None and exec_off <= t < crc_off and t not in labels:
+                labels[t] = f'Br_{t:04X}'
+                regions[t] = KIND_LOC
+            pos += adv
+
         self.xrefs = xrefs
 
         n_data = sum(1 for a,k in regions.items() if k==KIND_DATA and a>=exec_off)
