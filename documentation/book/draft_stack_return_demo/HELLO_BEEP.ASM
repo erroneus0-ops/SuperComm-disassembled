@@ -122,8 +122,8 @@ PRTDONE  EQU   *
 ;* MSG -- null-terminated string to print                     *
 ;***************************************************************
 
-MSG      FCC   "HELLO"
+MSG      FCC   "HELLO YOU RUMMY BUZZARD"
          FCB   $0D          ; carriage return
          FCB   $00          ; null terminator
-
+MSGEND
          END   MAIN
