@@ -69,6 +69,164 @@ import json
 import re
 
 
+
+# ── Markup language reference ─────────────────────────────────────────────────
+
+# The reference content is all comment lines (;-prefixed) -- suitable for
+# embedding in .dasm files directly. Strip the leading '; ' to get plain text.
+
+MARKUP_REF = """
+; ══════════════════════════════════════════════════════════════
+; MARKUP QUICK REFERENCE  (markup.py directives)
+; ══════════════════════════════════════════════════════════════
+;
+; Run:  python markup.py proj.dasm [proj.json]
+; Then: python dis6x09.py --source bin --proj proj.json -n
+;
+; ── Labeling ──────────────────────────────────────────────────
+;
+; /label/ Name
+;     Name the next $XXXX address in the listing.
+;     Example:
+;         /label/ Sub_ReadDir
+;         $0126  96 00    LDA <$00
+;
+; /label/ $addr Name
+;     Name a specific address directly — works for data labels too.
+;     Example:
+;         /label/ $046A cwdChar
+;         /label/ $046B cwdAndCR
+;
+; /rename-label/ OldName NewName
+;     Rename an existing label by its current name.
+;     Works for both code and data labels — no address scanning needed.
+;     Example:
+;         /rename-label/ Dat_046A cwdChar
+;         /rename-label/ Dat_046B cwdAndCR
+;
+; /bss/ $XX Name
+;     Declare a BSS variable at direct page or U-relative offset $XX.
+;     Optional quoted comment appended to the EQU line.
+;     Example:
+;         /bss/ $00 BSS.DirPath
+;         /bss/ $58 BSS.DEntName "29-byte filename field of RBF directory entry"
+;
+; ── Data regions ──────────────────────────────────────────────
+;
+; /region/ $start $end [format] [label] [endlabel]
+; /dlabel/ $start $end [format] [label] [endlabel]
+;     Declare a data region. /dlabel/ is an alias for /region/ with a name
+;     that signals "this is a named data label".
+;     Format: auto text fdb hexdump raw writeblock
+;     +endlabel — emit a NameEnd label at the region boundary.
+;     Example:
+;         /dlabel/ $046A $046B auto cwdChar
+;         /dlabel/ $046B $046C auto cwdAndCR
+;         /region/ $052C $06A7 text +endlabel
+;
+; /format/ fmt
+;     Set format for the preceding data label's region.
+;     Example:
+;         Dat_046E
+;         /format/ text
+;
+; /end-label/
+;     Mark end of a data region at the next address.
+;     Example:
+;         /end-label/
+;         $06A7  5A    Sub_06A7: DECB
+;
+; ── Comments ──────────────────────────────────────────────────
+;
+; /; comment text/
+;     Inline comment appended to the instruction on this line.
+;     Example:
+;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
+;
+; /; /
+;     Empty inline comment — inhibits any auto-generated comment for
+;     this address permanently (stores "" in JSON as a suppressor).
+;     The inhibitor persists across disassembler runs.
+;     Use /remove-line-comment/ $addr to lift the inhibition.
+;
+; /comment/ [$addr]
+; comment line 1
+; comment line 2
+; /end-comment/
+;     Block comment inserted before the target address.
+;     Optional $addr targets a specific address directly.
+;     Without $addr, targets the next $XXXX line.
+;     Example:
+;         /comment/ $0519
+;         This FCC line is a format template updated in place.
+;         /end-comment/
+;
+; /remove-comment/
+; comment line to remove
+; /end-remove-comment/
+;     Remove a block comment matching the given content from the JSON.
+;     Prefix '; ' on each line is stripped before matching.
+;     Example:
+;         /remove-comment/
+;         ; This comment is no longer needed.
+;         /end-remove-comment/
+;
+; /remove-line-comment/ $addr
+;     Remove a line comment or inhibitor from the JSON at the given address.
+;     Auto-generated comments will return on the next disassembler run.
+;     Example:
+;         /remove-line-comment/ $06BC
+;
+; ── Substitutions ─────────────────────────────────────────────
+;
+; /replace/
+; <original disassembler lines>
+; /with/
+; <replacement source lines>
+; /end-replace/
+;     Replace disassembler output with analyst-supplied source.
+;     WARNING: byte counts must match. Instruction substitutions
+;     trigger a confirmation prompt — mismatch breaks byte-perfect.
+;     Example:
+;         /replace/
+;                  FCB    $0A               ; LF
+;                  FCC    "Dir"
+;         /with/
+;                  FCB    C$LF
+;                  FCS    /Dir/
+;         /end-replace/
+;
+; ── Routines ──────────────────────────────────────────────────
+;
+; /routine/ Name
+; ...code...
+; /end-routine/ Name
+;     Mark a routine boundary for structural annotation.
+;
+; ══════════════════════════════════════════════════════════════
+"""
+
+
+def print_ref(asm_format=False):
+    """Print the markup language reference.
+
+    asm_format=True  → output as-is (already comment-formatted, for .dasm)
+    asm_format=False → strip leading '; ' from each line for plain text
+    """
+    lines = MARKUP_REF.splitlines()
+    for line in lines:
+        if asm_format:
+            print(line)
+        else:
+            # Strip leading '; ' or ';' for plain terminal output
+            if line.startswith('; '):
+                print(line[2:])
+            elif line.startswith(';'):
+                print(line[1:])
+            else:
+                print(line)
+
+
 def _count_data_bytes(lines):
     """Count binary bytes represented by a list of FCB/FCC/FDB/FCS lines."""
     total = 0
@@ -778,18 +936,55 @@ def merge_into_json(json_path, changes, warn):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: markup.py appname_proj.asm [appname_proj.json]")
-        sys.exit(1)
+    import argparse
+    parser = argparse.ArgumentParser(
+        prog='markup.py',
+        description='Analyst markup processor for disassembly projects.',
+        add_help=False,
+        epilog='''
+Examples:
+  Process markup directives from a .dasm file:
+    python3 markup.py appname_proj.dasm [appname_proj.json]
 
-    asm_path  = sys.argv[1]
-    if len(sys.argv) >= 3:
-        json_path = sys.argv[2]
+  Print markup language reference (terminal):
+    python3 markup.py --ref
+
+  Print reference as comment lines for embedding in .dasm:
+    python3 markup.py --ref --asm
+''')
+    parser.add_argument('--help', '-h', action='help',
+        help='Show this help message and exit')
+    parser.add_argument('dasm_file', nargs='?', metavar='DASM',
+        help='Path to the .dasm file to process')
+    parser.add_argument('json_file', nargs='?', metavar='JSON',
+        help='Path to the project JSON (inferred from DASM if not given)')
+    parser.add_argument('--ref', action='store_true',
+        help='Print markup language reference and exit')
+    parser.add_argument('--asm', action='store_true',
+        help='With --ref: format output as comment lines for .dasm embedding')
+    args = parser.parse_args()
+
+    # ── --ref mode ────────────────────────────────────────────────────────
+    if args.ref:
+        print_ref(asm_format=args.asm)
+        return
+
+    if not args.dasm_file:
+        parser.print_usage()
+        print()
+        print("  Run with --help for full option descriptions.")
+        sys.exit(0)
+
+    asm_path  = args.dasm_file
+    if args.json_file:
+        json_path = args.json_file
     else:
         # Infer JSON path from ASM path
-        json_path = re.sub(r'_proj\.asm$', '_proj.json', asm_path)
+        json_path = re.sub(r'_proj\.dasm$', '_proj.json', asm_path)
         if json_path == asm_path:
-            json_path = re.sub(r'\.asm$', '.json', asm_path)
+            json_path = re.sub(r'_proj\.asm$', '_proj.json', asm_path)
+        if json_path == asm_path:
+            json_path = re.sub(r'\.dasm$|\.asm$', '.json', asm_path)
 
     print(f"Reading:  {asm_path}")
     print(f"Updating: {json_path}")

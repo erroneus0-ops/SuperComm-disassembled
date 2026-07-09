@@ -686,6 +686,125 @@ class Engine:
 
     # ── Header ────────────────────────────────────────────────────────────
 
+    def load_raw(self, data: bytes, org: int = 0):
+        """Load a raw binary with no header at the given origin address.
+        Entry point is assumed to be the first byte (org).
+        """
+        mem = bytearray(0x10000)
+        end = min(org + len(data), 0x10000)
+        mem[org:end] = data[:end - org]
+        self.data     = mem
+        self.exec_off = (self.project.entry if self.project.entry is not None else org)
+        self.crc_off  = end
+        self.hdr = {
+            'mod_name':  self.project.binary or 'raw',
+            'exec_off':  org,
+            'crc_off':   end,
+            'mod_size':  end - org,
+            'bss_size':  0,
+            'mod_type':  0,
+            'lang':      0,
+            'attr':      0,
+            'name_off':  0,
+            'type_name': 'RAW',
+            'crc':       None,
+        }
+        self.project.target       = 'decb'  # reuse DECB output path
+        self.project.emit_equates = False
+
+
+
+    def _sync_scan(self, exec_off, crc_off, labels, regions, visited,
+                   sync_threshold=5):
+        """Sync-acquisition scan to find code regions missed by recursive descent.
+
+        Extends outward from known instruction boundaries (insn_spans anchors),
+        attempting to decode sequences of consecutive valid instructions.
+        When SYNC_THRESHOLD consecutive valid instructions are decoded, the
+        region is declared a code candidate and its instruction spans are
+        added to insn_spans.
+
+        Only uses decode_one() -- never raw byte patterns -- so prefix bytes
+        ($10/$11) are always handled as part of complete instructions, never
+        as isolated bytes that could cause false sync breaks.
+
+        Sync breaks: decode_one() returns '???' (invalid opcode or operand).
+        Repetition, pattern matching, and value ranges are NOT sync criteria.
+        """
+        d = self.data
+
+        # Candidate start positions: edges of known insn_spans not yet visited
+        # plus every exec_off..crc_off address not yet visited
+        known_ends = set(self.insn_spans.values())
+        candidates = sorted(
+            a for a in known_ends
+            if exec_off <= a < crc_off and a not in visited
+        )
+        # Also try from exec_off itself if not already covered
+        if exec_off not in visited:
+            candidates = [exec_off] + candidates
+
+        new_spans = {}   # addr -> end_addr for sync-acquired instructions
+
+        for anchor in candidates:
+            pos = anchor
+            run = 0
+            run_spans = {}
+
+            while pos < crc_off:
+                if pos in visited:
+                    # Hit already-known code -- good, absorb the run
+                    if run >= sync_threshold:
+                        new_spans.update(run_spans)
+                    break
+
+                try:
+                    mn, op_str, cm, raw, next_pos = self.decode_one(pos)
+                except Exception:
+                    run = 0; run_spans = {}; pos += 1; continue
+
+                if mn == '???' or next_pos <= pos:
+                    # Sync break -- invalid instruction
+                    if run >= sync_threshold:
+                        new_spans.update(run_spans)
+                    run = 0; run_spans = {}
+                    pos += 1
+                    continue
+
+                run_spans[pos] = next_pos
+                run += 1
+
+                # Check for branch targets within the run
+                if raw and len(raw) >= 2:
+                    op = raw[0]
+                    if op in range(0x20, 0x30) and len(raw) >= 2:
+                        off = raw[1] if raw[1] < 128 else raw[1] - 256
+                        t = next_pos + off
+                        if exec_off <= t < crc_off and t not in labels:
+                            labels[t] = f'Br_{t:04X}'
+                            regions[t] = 'LOC'
+
+                if run >= sync_threshold and pos not in new_spans:
+                    # Commit the oldest instruction in the run
+                    oldest = sorted(run_spans)[0]
+                    new_spans[oldest] = run_spans[oldest]
+
+                pos = next_pos
+
+            # End of range -- commit if run met threshold
+            if run >= sync_threshold:
+                new_spans.update(run_spans)
+
+        # Merge new spans into insn_spans
+        self.insn_spans.update(new_spans)
+
+        # Register new code addresses
+        for addr in new_spans:
+            if addr not in labels and addr not in visited:
+                regions[addr] = 'LOC'
+
+        return len(new_spans)
+
     def _parse_header(self):
         d = self.data
         if len(d) < 13 or d[0] != 0x87 or d[1] != 0xCD:
@@ -1017,6 +1136,58 @@ class Engine:
                 pos += 4
             else:
                 pos += 1
+
+        # ── Sync-acquisition scan ─────────────────────────────────────────
+        # Extend code coverage from known instruction boundaries outward.
+        # Uses decode_one() so prefix bytes are never misread as sync breaks.
+        n_sync = self._sync_scan(exec_off, crc_off, labels, regions, visited)
+        if n_sync:
+            print(f"; Sync scan: +{n_sync} instruction spans acquired",
+                  file=__import__('sys').stderr)
+
+        # ── Linear scan: catch branch targets missed by recursive descent ──
+        # Walk the full loaded range looking for branch opcodes whose targets
+        # weren't labeled by recursive descent. Adds Br_XXXX labels for all
+        # branch targets in range.
+        #
+        # Note: this may produce labels in data regions if data bytes happen
+        # to look like branch opcodes. For Forth ITC binaries this is expected
+        # -- use /region/ markup directives to reclassify data areas and
+        # suppress the false labels on subsequent runs.
+        pos = exec_off
+        while pos < crc_off - 1:
+            # Use decode_one to get the correct instruction size -- this
+            # keeps the scan aligned on real instruction boundaries and
+            # prevents operand bytes from being misread as opcodes.
+            try:
+                _mn, _op, _cm, _raw, next_pos = self.decode_one(pos)
+            except Exception:
+                pos += 1
+                continue
+            if next_pos <= pos:
+                pos += 1
+                continue
+
+            op = d[pos]
+            t = None
+            if op in range(0x20, 0x30):          # short branches Bcc
+                if pos + 1 < crc_off:
+                    off = s8(d[pos+1])
+                    t = pos + 2 + off
+            elif op == 0x16:                     # LBRA
+                if pos + 2 < crc_off:
+                    off = s16((d[pos+1]<<8)|d[pos+2])
+                    t = pos + 3 + off
+            elif op == 0x10 and pos + 2 < crc_off:
+                op2 = d[pos+1]
+                if op2 in range(0x21, 0x30):     # long branches LBcc
+                    off = s16((d[pos+2]<<8)|d[pos+3])
+                    t = pos + 4 + off
+            if t is not None and exec_off <= t < crc_off and t not in labels:
+                labels[t] = f'Br_{t:04X}'
+                regions[t] = KIND_LOC
+            pos = next_pos
+
         self.xrefs = xrefs
 
         n_data = sum(1 for a,k in regions.items() if k==KIND_DATA and a>=exec_off)
@@ -1147,6 +1318,9 @@ class Engine:
         lbs  = self.labels
         start= pos
         mn='???'; op_str=''; cm=''
+        # Suppress OS-9-specific auto-comments (control char names, syscall
+        # annotations) for non-OS-9 targets -- they add noise to CoCo binaries.
+        os9_comments = (self.project.target == 'os9')
 
         def rb():
             nonlocal pos; v=d[pos]; pos+=1; return v
@@ -1296,7 +1470,7 @@ class Engine:
                 0x19:('DAA',  'inh', ''), 0x1D:('SEX', 'inh','sign-extend B into A'),
                 0x39:('RTS',  'inh', ''),
                 0x3A:('ABX',  'inh', ''), 0x3B:('RTI', 'inh','return from interrupt'),
-                0x3D:('MUL',  'inh', 'D = A×B unsigned'), 0x3F:('SWI','inh',''),
+                0x3D:('MUL',  'inh', 'D = A\u00d7B unsigned' if os9_comments else ''), 0x3F:('SWI','inh',''),
                 # Accumulator A
                 0x40:('NEGA','inh',''), 0x43:('COMA','inh',''), 0x44:('LSRA','inh',''),
                 0x46:('RORA','inh',''), 0x47:('ASRA','inh',''), 0x48:('LSLA','inh',''),
@@ -1383,21 +1557,21 @@ class Engine:
             # ── Special cases with context-sensitive comments ─────────────
             elif op == 0x81:
                 v=rb(); mn='CMPA'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 and os9_comments else ''
             elif op == 0x86:
                 v=rb(); mn='LDA'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"A = {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"A = {c2}" if c2 and os9_comments else ''
             elif op == 0x8D:
                 l,t=rel8(); mn='BSR'; op_str=l
                 if t in lbs: cm=f"call {lbs[t]}"
             elif op == 0xC1:
                 v=rb(); mn='CMPB'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 and os9_comments else ''
             elif op == 0xC6:
                 v=rb(); mn='LDB'; op_str=f'#${v:02X}'
                 ss=SS_CODES.get(v,''); c2=self._char_ann(v)
-                if ss:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
-                elif c2: cm=f"B = {c2}"
+                if ss and os9_comments:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
+                elif c2 and os9_comments: cm=f"B = {c2}"
             elif op == 0xCC:
                 v=rw(); mn='LDD'; op_str=f'#${v:04X}'
                 hi=v>>8; lo=v&0xFF
@@ -2822,173 +2996,120 @@ def _print_anomaly_report(eng, source):
 
 # ── Markup quick reference ────────────────────────────────────────────────────
 
-MARKUP_QUICK_REF = """
-; ══════════════════════════════════════════════════════════════
-; MARKUP QUICK REFERENCE  (markup.py directives)
-; ══════════════════════════════════════════════════════════════
-;
-; Run:  python markup.py proj.dasm [proj.json]
-; Then: python dis6x09.py --source bin --proj proj.json -n
-;
-; ── Labeling ──────────────────────────────────────────────────
-;
-; /label/ Name
-;     Name the next $XXXX address in the listing.
-;     Example:
-;         /label/ Sub_ReadDir
-;         $0126  96 00    LDA <$00
-;
-; /label/ $addr Name
-;     Name a specific address directly — works for data labels too.
-;     Example:
-;         /label/ $046A cwdChar
-;         /label/ $046B cwdAndCR
-;
-; /rename-label/ OldName NewName
-;     Rename an existing label by its current name.
-;     Works for both code and data labels — no address scanning needed.
-;     Example:
-;         /rename-label/ Dat_046A cwdChar
-;         /rename-label/ Dat_046B cwdAndCR
-;
-; /bss/ $XX Name
-;     Declare a BSS variable at direct page or U-relative offset $XX.
-;     Optional quoted comment appended to the EQU line.
-;     Example:
-;         /bss/ $00 BSS.DirPath
-;         /bss/ $58 BSS.DEntName "29-byte filename field of RBF directory entry"
-;
-; ── Data regions ──────────────────────────────────────────────
-;
-; /region/ $start $end [format] [label] [endlabel]
-; /dlabel/ $start $end [format] [label] [endlabel]
-;     Declare a data region. /dlabel/ is an alias for /region/ with a name
-;     that signals "this is a named data label".
-;     Format: auto text fdb hexdump raw writeblock
-;     +endlabel — emit a NameEnd label at the region boundary.
-;     Example:
-;         /dlabel/ $046A $046B auto cwdChar
-;         /dlabel/ $046B $046C auto cwdAndCR
-;         /region/ $052C $06A7 text +endlabel
-;
-; /format/ fmt
-;     Set format for the preceding data label's region.
-;     Example:
-;         Dat_046E
-;         /format/ text
-;
-; /end-label/
-;     Mark end of a data region at the next address.
-;     Example:
-;         /end-label/
-;         $06A7  5A    Sub_06A7: DECB
-;
-; ── Comments ──────────────────────────────────────────────────
-;
-; /; comment text/
-;     Inline comment appended to the instruction on this line.
-;     Example:
-;         $00E9  A6 80    LDA ,X+    /; loop copying path to buffer/
-;
-; /; /
-;     Empty inline comment — inhibits any auto-generated comment for
-;     this address permanently (stores "" in JSON as a suppressor).
-;     The inhibitor persists across disassembler runs.
-;     Use /remove-line-comment/ $addr to lift the inhibition.
-;
-; /comment/ [$addr]
-; comment line 1
-; comment line 2
-; /end-comment/
-;     Block comment inserted before the target address.
-;     Optional $addr targets a specific address directly.
-;     Without $addr, targets the next $XXXX line.
-;     Example:
-;         /comment/ $0519
-;         This FCC line is a format template updated in place.
-;         /end-comment/
-;
-; /remove-comment/
-; comment line to remove
-; /end-remove-comment/
-;     Remove a block comment matching the given content from the JSON.
-;     Prefix '; ' on each line is stripped before matching.
-;     Example:
-;         /remove-comment/
-;         ; This comment is no longer needed.
-;         /end-remove-comment/
-;
-; /remove-line-comment/ $addr
-;     Remove a line comment or inhibitor from the JSON at the given address.
-;     Auto-generated comments will return on the next disassembler run.
-;     Example:
-;         /remove-line-comment/ $06BC
-;
-; ── Substitutions ─────────────────────────────────────────────
-;
-; /replace/
-; <original disassembler lines>
-; /with/
-; <replacement source lines>
-; /end-replace/
-;     Replace disassembler output with analyst-supplied source.
-;     WARNING: byte counts must match. Instruction substitutions
-;     trigger a confirmation prompt — mismatch breaks byte-perfect.
-;     Example:
-;         /replace/
-;                  FCB    $0A               ; LF
-;                  FCC    "Dir"
-;         /with/
-;                  FCB    C$LF
-;                  FCS    /Dir/
-;         /end-replace/
-;
-; ── Routines ──────────────────────────────────────────────────
-;
-; /routine/ Name
-; ...code...
-; /end-routine/ Name
-;     Mark a routine boundary for structural annotation.
-;
-; ══════════════════════════════════════════════════════════════
-"""
+
+
+
+def _get_markup_ref():
+    """Get markup language reference as comment lines by calling markup.py --ref --asm."""
+    import subprocess, os
+    markup_py = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'markup.py')
+    result = subprocess.run(
+        [sys.executable, markup_py, '--ref', '--asm'],
+        capture_output=True, text=True, timeout=10
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        return result.stdout
+    return '; markup.py not found -- run markup.py --ref for reference\n' 
+
+
+def detect_format(data: bytes) -> str:
+    """Auto-detect binary format. Returns 'os9', 'decb', or 'raw'."""
+    if len(data) >= 2 and data[0] == 0x87 and data[1] == 0xCD:
+        return 'os9'
+    # Try DECB: walk block structure and see if it parses cleanly
+    try:
+        i = 0
+        blocks = 0
+        while i < len(data):
+            bt = data[i]; i += 1
+            if bt == 0xFF:
+                if i + 2 <= len(data):
+                    return 'decb'  # valid end block
+                break
+            elif bt == 0x00:
+                if i + 4 > len(data): break
+                length = (data[i] << 8) | data[i+1]; i += 2
+                load_addr = (data[i] << 8) | data[i+1]; i += 2
+                if i + length > len(data): break
+                i += length
+                blocks += 1
+                if blocks > 32: break  # sanity limit
+            else:
+                break  # not DECB
+    except Exception:
+        pass
+    return 'raw'
+
 
 def main():
     import argparse, sys, os
 
     parser = argparse.ArgumentParser(
         prog='dis6x09.py',
-        description='OS-9 6809/6309 disassembler',
+        description='6809/6309 disassembler. Auto-detects OS-9, DECB/Color BASIC BIN, or raw binary.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False,
         epilog="""
+Format detection (automatic unless overridden):
+  $87CD at offset 0  → OS-9 module
+  valid block structure  → DECB/Color BASIC BIN
+  anything else  → raw binary (use --org to set load address)
+
 Examples:
-  First run (creates new project JSON):
+  Quick first look (auto-detect, no JSON):
+    python dis6x09.py --source flames.bin --quick
+
+  Full workflow with project JSON (OS-9 or DECB):
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
 
-  Subsequent runs:
-    python dis6x09.py --source supercomm22 --proj supercomm22_proj.json
+  Force a specific format:
+    python dis6x09.py --source file.bin --decb --quick
+    python dis6x09.py --source file.bin --os9 --proj file_proj.json
+    python dis6x09.py --source file.bin --raw --org C000 --quick
 
   Stats only:
     python dis6x09.py --source supercomm22 --proj supercomm22_proj.json --stats
 """)
 
+    parser.add_argument('--help', '-h', action='help',
+        help='Show this help message and exit')
     parser.add_argument('--source', metavar='BINARY',
-        help='Path to the OS-9 binary to disassemble')
-    parser.add_argument('--proj',   metavar='JSON',
-        help='Path to the project JSON file')
-    parser.add_argument('--stats',  action='store_true',
-        help='Show pass-1 classification stats only, no output written')
+        help='Path to the binary to disassemble')
+
+    # ── Format flags (override auto-detection) ────────────────────────────
+    fmt_group = parser.add_mutually_exclusive_group()
+    fmt_group.add_argument('--os9',  action='store_true',
+        help='Treat as OS-9 module (default if $87CD magic detected)')
+    fmt_group.add_argument('--decb', action='store_true',
+        help='Treat as DECB/Color BASIC BIN (default if block structure detected)')
+    fmt_group.add_argument('--raw',  action='store_true',
+        help='Treat as raw binary — no header, entry point = load address')
+    parser.add_argument('--org', metavar='HEX',
+        help='Load address for raw binary (hex, e.g. C000). Default: 0000')
+
+    # ── Workflow flags ────────────────────────────────────────────────────
+    parser.add_argument('--quick', '-q', action='store_true',
+        help='Quick mode: no JSON, no prompts, auto-detect format, write .dasm and exit')
+    parser.add_argument('--proj', metavar='JSON',
+        help='Project JSON file for full analyst workflow')
+    parser.add_argument('--stats', action='store_true',
+        help='Show pass-1 classification stats (code/data counts) — no .dasm written')
     parser.add_argument('--update-labels', action='store_true',
-        help='Merge auto-generated labels into the project JSON '
-             '(preserves existing names, adds only new ones)')
+        help='Merge auto-generated labels into project JSON (preserves existing names)')
     parser.add_argument('--report', action='store_true',
-        help='Print anomaly report: unreferenced labels, overlaps, '
-             'mid-data references')
-    parser.add_argument('--markup', action='store_true',
-        help='Append markup quick reference to the end of the output listing')
+        help='Print anomaly report: unreferenced labels, overlaps, mid-data xrefs')
+    parser.add_argument('--ref', action='store_true',
+        help='Append markup directive quick reference to end of .dasm output')
     parser.add_argument('-n', action='store_true', dest='no_confirm',
-        help='Non-interactive mode — skip confirmation prompts')
+        help='Non-interactive: skip confirmation prompts, use defaults')
     args = parser.parse_args()
+
+    # ── No args at all → print usage ──────────────────────────────────────
+    if not args.source and not args.proj:
+        parser.print_usage()
+        print()
+        print("  Run with --help for full option descriptions and examples.")
+        sys.exit(0)
 
     # ── --source: required unless proj.binary provides it ─────────────────
     if not args.source:
@@ -3011,6 +3132,43 @@ Examples:
         sys.exit(1)
 
     actual_crc = binary_crc(source)
+
+    # ── Auto-detect format unless overridden ───────────────────────────────
+    raw_data = open(source, 'rb').read()
+    if not (args.os9 or args.decb or args.raw):
+        detected = detect_format(raw_data)
+        if detected == 'os9':
+            args.os9 = True
+            print(f"; Detected: OS-9 module", file=sys.stderr)
+        elif detected == 'decb':
+            args.decb = True
+            print(f"; Detected: DECB/Color BASIC BIN", file=sys.stderr)
+        else:
+            args.raw = True
+            print(f"; Detected: raw binary", file=sys.stderr)
+
+    # ── Quick mode: no JSON, no prompts ───────────────────────────────────
+    if args.quick or args.decb and not args.proj:
+        proj = Project()
+        proj.binary = source
+        stem = os.path.splitext(source)[0]
+        eng = Engine(proj)
+        if args.decb:
+            eng.load_decb(raw_data)
+        elif args.raw:
+            org = int(args.org, 16) if args.org else 0
+            eng.load_raw(raw_data, org)
+        else:
+            eng.load(raw_data)
+        eng.run()
+        asm = eng.render()
+        if args.ref:
+            asm = asm + _get_markup_ref()
+        out_path = stem + '.dasm'
+        with open(out_path, 'w', encoding='utf-8') as f:
+            f.write(asm)
+        print(f"Written: {out_path}  ({len(asm.splitlines())} lines)", file=sys.stderr)
+        return
 
     # ── Resolve --proj ────────────────────────────────────────────────────
     if args.proj:
@@ -3155,7 +3313,13 @@ Examples:
 
     # ── Run engine ────────────────────────────────────────────────────────
     eng = Engine(proj)
-    eng.load(open(source, 'rb').read())
+    if args.decb:
+        eng.load_decb(raw_data)
+    elif args.raw:
+        org = int(args.org, 16) if args.org else 0
+        eng.load_raw(raw_data, org)
+    else:
+        eng.load(raw_data)
     eng.run()
 
     # ── --stats ───────────────────────────────────────────────────────────
@@ -3195,8 +3359,8 @@ Examples:
 
     # ── Render and write ──────────────────────────────────────────────────
     asm = eng.render()
-    if args.markup:
-        asm = asm + MARKUP_QUICK_REF
+    if args.ref:
+        asm = asm + _get_markup_ref()
     out_path = proj.output or (stem + '_proj.dasm')
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(asm)

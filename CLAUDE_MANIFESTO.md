@@ -1173,3 +1173,87 @@ emmake make -j$(nproc) GL_LIBS=""
 ### WSL2 path to Windows files
 D: drive is at /mnt/d/ in WSL2
 Copy built WASM to repo: cp ~/src/xroar/src/xroar.wasm /mnt/d/git/supercomm/wasm/
+
+---
+
+## Disassembly Workflow: dis6x09.py + markup.py
+
+The disassembler is a multi-tool workflow, not a one-shot script.
+Read analyst_json_tutorial.md and analyst_markup_reference.md before
+working on any disassembly project.
+
+### Tools in the chain
+
+- **dis6x09.py** — disassembler engine. Produces annotated .dasm output.
+  Use --help to see all options. Two formats supported:
+  - OS-9 module: requires --proj JSON file (created on first run if absent)
+  - DECB/Color BASIC BIN: use --decb flag, no JSON required for first pass
+- **markup.py** — reads analyst directives from the .dasm file, updates
+  the project JSON. The analyst never edits JSON directly.
+- **strip_listing.py** — removes directives and address/byte columns,
+  producing a clean .asm file for reassembly
+- **compare_bins.py** — verifies reassembled binary matches original
+
+### Workflow
+
+```
+First run:
+  python3 dis6x09.py --source binary --proj project.json
+  → prompts for JSON name if not found (has timeout -- use -n for default)
+  → writes project.json and binary_proj.dasm
+
+Work cycle (repeat):
+  1. Review binary_proj.dasm
+  2. Add /directives/ to .dasm (labels, data regions, comments)
+  3. python3 markup.py binary_proj.dasm → updates project.json
+  4. Re-run dis6x09.py → cleaner output reflecting analyst knowledge
+
+DECB one-shot:
+  python3 dis6x09.py --source file.bin --decb
+  → no JSON needed, CoCo hardware equates at top, outputs file_proj.dasm
+
+Product stage:
+  strip_listing.py → clean .asm
+  assembler → .bin
+  compare_bins.py ← must match original
+```
+
+### Key docs
+- analyst_json_tutorial.md -- full workflow with directive examples
+- analyst_markup_reference.md -- complete directive reference
+
+### Notes
+- The prompt for JSON name will hang in piped/automated contexts.
+  Use -n flag to skip prompts and accept defaults.
+- DECB project JSON workflow (--decb --proj) not yet implemented --
+  currently DECB is one-shot only. Full DECB workflow is a pending item.
+
+---
+
+## dis6x09.py / markup.py -- Discoverability Design Notes
+
+The tool was redesigned after identifying that the original workflow
+punished natural first-contact behavior:
+
+**Problems identified:**
+- No args → hung indefinitely waiting for JSON name prompt
+- --help showed -h in usage line (unclear)
+- No path to useful output without knowing the full JSON workflow
+- MARKUP_QUICK_REF embedded in dis6x09.py (duplicate, drift risk)
+
+**Solutions applied:**
+- No args → clean usage line + "run with --help" hint, exits cleanly
+- --help shown explicitly in usage line
+- --quick / -q → first-contact mode: auto-detect format, no JSON,
+  no prompts, write .dasm and exit. Natural entry point for new binary.
+- Auto-detection: OS-9 ($87CD), DECB (block structure), raw (fallback)
+- --os9 / --decb / --raw override detection when needed
+- MARKUP_QUICK_REF moved to markup.py as single source of truth
+- markup.py --ref → terminal reference; --ref --asm → comment lines
+- dis6x09.py --ref calls markup.py --ref --asm via subprocess
+
+**Intended first contact with an unknown binary:**
+```bash
+python3 dis6x09.py --source unknown.bin --quick
+```
+Get output, get oriented, then start a full --proj workflow if warranted.
