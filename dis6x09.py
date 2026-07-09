@@ -1214,6 +1214,9 @@ class Engine:
         lbs  = self.labels
         start= pos
         mn='???'; op_str=''; cm=''
+        # Suppress OS-9-specific auto-comments (control char names, syscall
+        # annotations) for non-OS-9 targets -- they add noise to CoCo binaries.
+        os9_comments = (self.project.target == 'os9')
 
         def rb():
             nonlocal pos; v=d[pos]; pos+=1; return v
@@ -1363,7 +1366,7 @@ class Engine:
                 0x19:('DAA',  'inh', ''), 0x1D:('SEX', 'inh','sign-extend B into A'),
                 0x39:('RTS',  'inh', ''),
                 0x3A:('ABX',  'inh', ''), 0x3B:('RTI', 'inh','return from interrupt'),
-                0x3D:('MUL',  'inh', 'D = A×B unsigned'), 0x3F:('SWI','inh',''),
+                0x3D:('MUL',  'inh', 'D = A\u00d7B unsigned' if os9_comments else ''), 0x3F:('SWI','inh',''),
                 # Accumulator A
                 0x40:('NEGA','inh',''), 0x43:('COMA','inh',''), 0x44:('LSRA','inh',''),
                 0x46:('RORA','inh',''), 0x47:('ASRA','inh',''), 0x48:('LSLA','inh',''),
@@ -1450,21 +1453,21 @@ class Engine:
             # ── Special cases with context-sensitive comments ─────────────
             elif op == 0x81:
                 v=rb(); mn='CMPA'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"compare A with {c2}" if c2 and os9_comments else ''
             elif op == 0x86:
                 v=rb(); mn='LDA'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"A = {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"A = {c2}" if c2 and os9_comments else ''
             elif op == 0x8D:
                 l,t=rel8(); mn='BSR'; op_str=l
                 if t in lbs: cm=f"call {lbs[t]}"
             elif op == 0xC1:
                 v=rb(); mn='CMPB'; op_str=f'#${v:02X}'
-                c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 else ''
+                c2=self._char_ann(v); cm=f"compare B with {c2}" if c2 and os9_comments else ''
             elif op == 0xC6:
                 v=rb(); mn='LDB'; op_str=f'#${v:02X}'
                 ss=SS_CODES.get(v,''); c2=self._char_ann(v)
-                if ss:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
-                elif c2: cm=f"B = {c2}"
+                if ss and os9_comments:   cm=f"B = {ss}  (GetStt/SetStt subcode)"
+                elif c2 and os9_comments: cm=f"B = {c2}"
             elif op == 0xCC:
                 v=rw(); mn='LDD'; op_str=f'#${v:04X}'
                 hi=v>>8; lo=v&0xFF
