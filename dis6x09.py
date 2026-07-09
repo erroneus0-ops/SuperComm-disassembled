@@ -1056,33 +1056,37 @@ class Engine:
         # suppress the false labels on subsequent runs.
         pos = exec_off
         while pos < crc_off - 1:
+            # Use decode_one to get the correct instruction size -- this
+            # keeps the scan aligned on real instruction boundaries and
+            # prevents operand bytes from being misread as opcodes.
             try:
-                op = d[pos]
-            except IndexError:
-                break
+                _mn, _op, _cm, _raw, next_pos = self.decode_one(pos)
+            except Exception:
+                pos += 1
+                continue
+            if next_pos <= pos:
+                pos += 1
+                continue
 
+            op = d[pos]
             t = None
-            adv = 1
             if op in range(0x20, 0x30):          # short branches Bcc
                 if pos + 1 < crc_off:
                     off = s8(d[pos+1])
                     t = pos + 2 + off
-                    adv = 2
             elif op == 0x16:                     # LBRA
                 if pos + 2 < crc_off:
                     off = s16((d[pos+1]<<8)|d[pos+2])
                     t = pos + 3 + off
-                    adv = 3
             elif op == 0x10 and pos + 2 < crc_off:
                 op2 = d[pos+1]
                 if op2 in range(0x21, 0x30):     # long branches LBcc
                     off = s16((d[pos+2]<<8)|d[pos+3])
                     t = pos + 4 + off
-                    adv = 4
             if t is not None and exec_off <= t < crc_off and t not in labels:
                 labels[t] = f'Br_{t:04X}'
                 regions[t] = KIND_LOC
-            pos += adv
+            pos = next_pos
 
         self.xrefs = xrefs
 
