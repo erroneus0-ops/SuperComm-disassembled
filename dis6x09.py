@@ -1046,16 +1046,21 @@ class Engine:
                 pos += 1
 
         # ── Linear scan: catch branch targets missed by recursive descent ──
-        # Walk every byte in the loaded range. When we find a branch opcode
-        # whose target is in range but wasn't visited, add it as a label.
-        # This catches branches in code regions the entry-point trace missed
-        # (e.g. Forth words reachable only via indirect dispatch).
+        # Walk the full loaded range looking for branch opcodes whose targets
+        # weren't labeled by recursive descent. Adds Br_XXXX labels for all
+        # branch targets in range.
+        #
+        # Note: this may produce labels in data regions if data bytes happen
+        # to look like branch opcodes. For Forth ITC binaries this is expected
+        # -- use /region/ markup directives to reclassify data areas and
+        # suppress the false labels on subsequent runs.
         pos = exec_off
         while pos < crc_off - 1:
             try:
                 op = d[pos]
             except IndexError:
                 break
+
             t = None
             adv = 1
             if op in range(0x20, 0x30):          # short branches Bcc
