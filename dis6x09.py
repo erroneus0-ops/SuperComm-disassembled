@@ -713,6 +713,98 @@ class Engine:
         self.project.emit_equates = False
 
 
+
+    def _sync_scan(self, exec_off, crc_off, labels, regions, visited,
+                   sync_threshold=5):
+        """Sync-acquisition scan to find code regions missed by recursive descent.
+
+        Extends outward from known instruction boundaries (insn_spans anchors),
+        attempting to decode sequences of consecutive valid instructions.
+        When SYNC_THRESHOLD consecutive valid instructions are decoded, the
+        region is declared a code candidate and its instruction spans are
+        added to insn_spans.
+
+        Only uses decode_one() -- never raw byte patterns -- so prefix bytes
+        ($10/$11) are always handled as part of complete instructions, never
+        as isolated bytes that could cause false sync breaks.
+
+        Sync breaks: decode_one() returns '???' (invalid opcode or operand).
+        Repetition, pattern matching, and value ranges are NOT sync criteria.
+        """
+        d = self.data
+
+        # Candidate start positions: edges of known insn_spans not yet visited
+        # plus every exec_off..crc_off address not yet visited
+        known_ends = set(self.insn_spans.values())
+        candidates = sorted(
+            a for a in known_ends
+            if exec_off <= a < crc_off and a not in visited
+        )
+        # Also try from exec_off itself if not already covered
+        if exec_off not in visited:
+            candidates = [exec_off] + candidates
+
+        new_spans = {}   # addr -> end_addr for sync-acquired instructions
+
+        for anchor in candidates:
+            pos = anchor
+            run = 0
+            run_spans = {}
+
+            while pos < crc_off:
+                if pos in visited:
+                    # Hit already-known code -- good, absorb the run
+                    if run >= sync_threshold:
+                        new_spans.update(run_spans)
+                    break
+
+                try:
+                    mn, op_str, cm, raw, next_pos = self.decode_one(pos)
+                except Exception:
+                    run = 0; run_spans = {}; pos += 1; continue
+
+                if mn == '???' or next_pos <= pos:
+                    # Sync break -- invalid instruction
+                    if run >= sync_threshold:
+                        new_spans.update(run_spans)
+                    run = 0; run_spans = {}
+                    pos += 1
+                    continue
+
+                run_spans[pos] = next_pos
+                run += 1
+
+                # Check for branch targets within the run
+                if raw and len(raw) >= 2:
+                    op = raw[0]
+                    if op in range(0x20, 0x30) and len(raw) >= 2:
+                        off = raw[1] if raw[1] < 128 else raw[1] - 256
+                        t = next_pos + off
+                        if exec_off <= t < crc_off and t not in labels:
+                            labels[t] = f'Br_{t:04X}'
+                            regions[t] = 'LOC'
+
+                if run >= sync_threshold and pos not in new_spans:
+                    # Commit the oldest instruction in the run
+                    oldest = sorted(run_spans)[0]
+                    new_spans[oldest] = run_spans[oldest]
+
+                pos = next_pos
+
+            # End of range -- commit if run met threshold
+            if run >= sync_threshold:
+                new_spans.update(run_spans)
+
+        # Merge new spans into insn_spans
+        self.insn_spans.update(new_spans)
+
+        # Register new code addresses
+        for addr in new_spans:
+            if addr not in labels and addr not in visited:
+                regions[addr] = 'LOC'
+
+        return len(new_spans)
+
     def _parse_header(self):
         d = self.data
         if len(d) < 13 or d[0] != 0x87 or d[1] != 0xCD:
@@ -1044,6 +1136,14 @@ class Engine:
                 pos += 4
             else:
                 pos += 1
+
+        # ── Sync-acquisition scan ─────────────────────────────────────────
+        # Extend code coverage from known instruction boundaries outward.
+        # Uses decode_one() so prefix bytes are never misread as sync breaks.
+        n_sync = self._sync_scan(exec_off, crc_off, labels, regions, visited)
+        if n_sync:
+            print(f"; Sync scan: +{n_sync} instruction spans acquired",
+                  file=__import__('sys').stderr)
 
         # ── Linear scan: catch branch targets missed by recursive descent ──
         # Walk the full loaded range looking for branch opcodes whose targets
