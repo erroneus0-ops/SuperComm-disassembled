@@ -1257,3 +1257,24 @@ punished natural first-contact behavior:
 python3 dis6x09.py --source unknown.bin --quick
 ```
 Get output, get oriented, then start a full --proj workflow if warranted.
+
+---
+
+## Manifesto Maintenance -- Read This After Any Compaction
+
+Long sessions trigger context compaction. The compaction summary preserves
+project state but loses the specific directives in this file. Performance
+degrades without them -- the "Check before claiming inability" directive
+being the most common casualty.
+
+**After any compaction event, or at the start of any session:**
+Read this file in full before proceeding. It takes two minutes. The
+alternative is a session that runs on stale context and makes avoidable
+errors like declaring something absent without actually looking for it.
+
+The analogy: this file is the morning routine. Skip it and the session
+runs on yesterday's summary. The directives exist because specific failures
+happened. Without re-reading them, those failures recur.
+
+If you are Claude reading this after a compaction: run
+`cat CLAUDE_MANIFESTO.md` now if you haven't already this session.
