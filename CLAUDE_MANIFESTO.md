@@ -37,11 +37,41 @@ everything that would otherwise have to be relearned the hard way.
 
 ## Project Overview
 
-Two parallel tracks:
-1. Reverse-engineering SuperComm v2.2 (OS-9 Level II terminal/comms program)
-   toward byte-perfect reassembly
-2. Writing a 6809 assembly language book for the CoCo DECB environment,
-   with a companion Python toolkit replacing platform-specific binaries
+**This project is a learning engine.**
+
+The tools exist because building them requires understanding 6809 assembly,
+OS-9 structure, and CoCo hardware at a level that reading about them doesn't
+produce. The book exists because explaining something requires understanding
+it more completely than using it does. Each activity deepens the other.
+
+The disassembled binaries -- SuperComm, dir, flames.bin -- are examples and
+test cases, not deliverables. They're the homework problems that forced genuine
+understanding.
+
+**The actual deliverables are:**
+1. **dis6x09.py** -- a general 6809/6309 disassembler for any binary format
+2. **The Python cocotools toolkit** -- self-contained replacement for platform-
+   specific binaries (lwasm, toolshed, decb)
+3. **The book** -- 6809 assembly language programming for the CoCo DECB
+   environment, written from first principles
+4. **The XRoar WASM page** -- browser-based CoCo emulator with enhancements
+
+**Example binaries (test cases, not goals):**
+- SuperComm v2.2 -- first test case, reached byte-perfect. Proved basic OS-9
+  module handling. OS-9's rigid structure made it an easy target -- not a
+  general proof of correctness.
+- dir (NitrOS-9) -- second test case, revealed instruction coverage gaps.
+  Analysis stalled as the book became the stronger learning vehicle. Not a
+  failure -- the learning happened.
+- flames.bin (Paul Cunningham's CoCo Forth) -- exposed the complete absence
+  of sync/scan architecture. Led directly to the sync-acquisition scan
+  implementation. Deepened understanding of Forth, ITC, and the limits of
+  static disassembly.
+
+**Disassembler honesty note:**
+The sync-acquisition scan is implemented but validated against one binary.
+OS-9 module structure is so rigid that sync/scan was never needed at a robust
+level for that format -- flames.bin revealed what OS-9 was hiding.
 
 **Repo:** https://github.com/erroneus0-ops/SuperComm-disassembled
 **Daniel's local:** C:\DATA\supercomm (work), D:\git\supercomm (home)
@@ -152,9 +182,12 @@ Auto-migrates old plain-string format on load.
 
 ---
 
-## SuperComm22 Status
+## SuperComm22 Status (example binary -- not a primary goal)
 
 **BYTE-PERFECT** -- assembles to exact match of original binary including CRC.
+This was the first test case that validated basic OS-9 module handling.
+It does not prove general disassembler correctness -- OS-9's rigid structure
+makes it an easy target. Subsequent binaries revealed gaps.
 
 ```
 python dis6x09.py --proj supercomm22.json -n
@@ -167,9 +200,12 @@ forced_equs: $3BC5, $3F3A (genuine mid-instruction overlaps from indirect branch
 
 ---
 
-## dir Binary Status
+## dir Binary Status (example binary -- analysis paused)
 
-**ACTIVE ANALYSIS.** 1728 bytes, OS-9 Level II `dir` command.
+1728 bytes, OS-9 Level II `dir` command.
+Analysis stalled as the book became the stronger learning vehicle.
+The BSS map and key labels below represent work done -- not lost, just paused.
+Resume only if there is a specific reason to do so.
 NitrOS-9 additions confirmed: wildcard matching, -d/-f/-c/-a/-s/-l options
 added to original Microware dir which only had -e and -x.
 
@@ -1278,3 +1314,38 @@ happened. Without re-reading them, those failures recur.
 
 If you are Claude reading this after a compaction: run
 `cat CLAUDE_MANIFESTO.md` now if you haven't already this session.
+
+---
+
+## Unravelled Series -- OCR Conversion (PENDING)
+
+The Color BASIC Unravelled series (Spectral Associates) exists in the repo
+as OCR'd PDFs. The OCR quality is variable -- sufficient for human reading
+but unreliable for programmatic processing. This was at least partly why
+a search for the SOUND ROM entry point failed in one session despite the
+answer being present in the document.
+
+**Goal:** Convert the Unravelled PDFs to clean plain text, preserving:
+- ROM address labels and hex values
+- Assembly source lines
+- Comments and annotations
+- Table structure where present
+
+**Why this matters:**
+- Makes the ROM reference searchable by Claude without PDF parsing uncertainty
+- Enables future tooling that cross-references ROM entry points automatically
+- Preserves the content in a durable, portable format independent of PDF readers
+- The Unravelled series is effectively the CoCo ROM source -- it belongs in
+  the same toolchain as the disassembler and book
+
+**Books to convert:**
+- Color BASIC Unravelled (BAS ROM -- $A000 area)
+- Extended Color BASIC Unravelled (EXTBAS ROM -- includes SOUND at $A94B)
+- Disk BASIC Unravelled (DECB ROM)
+- OS-9 Level II Unravelled (OS-9 kernel)
+
+**Source PDFs:** available at https://techheap.packetizer.com/computers/coco/unravelled_series/
+
+**Note for Claude:** When a ROM entry point or BASIC routine address is needed,
+check the Unravelled text files FIRST and search thoroughly before declaring
+the information absent. The answer is almost certainly there.
