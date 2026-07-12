@@ -25,6 +25,15 @@ import sys
 import os
 import argparse
 
+# ── Translation provenance ─────────────────────────────────────────────────────
+# This toolkit is a faithful Python translation of lwasm from LWTools.
+# If lwasm behavior changes in a future version, the translation must be
+# updated to match -- not "improved" independently.
+LWASM_BASE_VERSION = "4.24"
+LWASM_BASE_DATE    = "2024"          # approximate -- latest at time of translation
+COCOTOOLS_VERSION  = "1.0-dev"
+UPSTREAM_URL       = "https://www.lwtools.ca/"
+
 # Allow running from the repo root without installing
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -736,6 +745,10 @@ examples:
     p_asm.add_argument('-pp',              metavar='KEY=VAL,...',
                        help='Post-processor options (e.g. -pp b=$3F00,e=$3F00)')
 
+    # about
+    sub.add_parser('about',
+        help='Show version and upstream translation provenance')
+
     # makerom
     p_rom = sub.add_parser('makerom',
                             help='Pad a raw binary to 8K CoCo cartridge ROM image')
@@ -779,6 +792,20 @@ examples:
 
     args = parser.parse_args(cocotools_argv)
     args.asm_flags = asm_flags
+
+    if args.command == 'about':
+        print(f"cocotools {COCOTOOLS_VERSION}")
+        print(f"Python translation of lwasm {LWASM_BASE_VERSION} (LWTools, William Astle, GPL v3)")
+        print(f"Upstream: {UPSTREAM_URL}")
+        print()
+        print("Translation fidelity: faithful reproduction of lwasm behavior,")
+        print("bugs and all, to survive lwasm updates cleanly.")
+        print("Diagnostics (W2000, W2001) are separate from the translation layer.")
+        print()
+        print(f"Upstream status last checked: July 2026")
+        print(f"  lwasm core: unchanged since {LWASM_BASE_VERSION}")
+        print(f"  Recent LWTools activity: GCC 6809 backend additions (not lwasm core)")
+        return
 
     if args.command in ('assemble', 'asm'):
         cmd_assemble(args)
