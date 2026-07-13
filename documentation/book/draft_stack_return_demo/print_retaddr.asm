@@ -32,6 +32,7 @@ CHROUT   EQU   $A002
 MAIN
          BSR   PRINTRET     ; return address pushed = address of next line
          BSR   PRINTRET     ; called twice -- each prints its own caller
+         BSR   TESTW2000    ; W2000 test -- [,-S] with PRINTRET as witness
          RTS
 
 ;------------------------------------------------------------------
@@ -99,14 +100,15 @@ ISDIGIT  ADDA  #'0          ; add ASCII '0'
 
 ;------------------------------------------------------------------
 ; W2000 test -- [,-S] with stack in known state
-; The return address is the only thing on S at this point.
-; [,-S] will decrement S, then use the new top-of-stack value
-; as a pointer to jump through. Behavior is undefined.
-; Uncomment to test XRoar's handling:
+; PRINTRET is called first so the return address is printed before
+; [,-S] executes. If [,-S] corrupts the stack, the printed address
+; will be wrong or garbage -- the output IS the diagnostic.
 ;------------------------------------------------------------------
-; TESTW2000
-;        LDA   #$41         ; 'A'
-;        STA   [,-S]        ; W2000: indirect pre-decrement on S
-;        RTS
+TESTW2000
+         BSR   PRINTRET     ; print our return address before the hazard
+         LDA   #$41         ; 'A'
+         STA   [,-S]        ; W2000: indirect pre-decrement on S
+                             ; XRoar behavior here is the test result
+         RTS
 
          END   MAIN
