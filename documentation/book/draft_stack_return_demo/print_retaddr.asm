@@ -99,16 +99,50 @@ ISDIGIT  ADDA  #'0          ; add ASCII '0'
          RTS
 
 ;------------------------------------------------------------------
-; W2000 test -- [,-S] with stack in known state
-; PRINTRET is called first so the return address is printed before
-; [,-S] executes. If [,-S] corrupts the stack, the printed address
-; will be wrong or garbage -- the output IS the diagnostic.
+; W2000 test -- [,-S] with engineered known state
+;
+; Setup: LDS #$A003 points S just past the CHROUT dispatch entry.
+;   [,-S] will decrement S to $A002, read the 2-byte pointer there
+;   ($A282 = address of PUTCHR), then load A with the byte AT $A282.
+;
+; From bas13.rom inspection:
+;   $A002-$A003 = $A282  (CHROUT dispatch pointer -> PUTCHR)
+;   $A282       = $BD    (first byte of PUTCHR = JSR extended opcode)
+;
+; EXPECTED: A = $BD after LDA [,-S]
+; If XRoar implements undocumented 6809 silicon behavior correctly,
+; A will contain $BD. We compare and print Y (yes) or N (no).
+;
+; W2000 WARNING: this instruction is undefined by Motorola,
+; absent on 6309. Diagnostic fires here.
 ;------------------------------------------------------------------
 TESTW2000
-         BSR   PRINTRET     ; print our return address before the hazard
-         LDA   #$41         ; 'A'
-         STA   [,-S]        ; W2000: indirect pre-decrement on S
-                             ; XRoar behavior here is the test result
+         BSR   PRINTRET     ; print our return address as witness
+
+; Set S to known value -- just past CHROUT dispatch entry
+; Save and restore real S afterward
+         PSHS  U            ; save U (we'll use U to preserve real S)
+         TFR   S,U          ; save real S in U
+         LDS   #$A003       ; point S just past $A002 (CHROUT dispatch)
+
+         LDA   [,-S]        ; W2000: S decrements to $A002,
+                             ; reads pointer $A282 (PUTCHR addr),
+                             ; loads A with byte at $A282 = $BD (expected)
+
+         TFR   U,S          ; restore real S from U
+         PULS  U            ; restore U
+
+; Compare result -- print 'Y' if A=$BD, 'N' if not
+         CMPA  #$BD
+         BNE   W2000_FAIL
+         LDA   #'Y          ; correct -- XRoar implements silicon behavior
+         BRA   W2000_DONE
+W2000_FAIL
+         LDA   #'N          ; incorrect -- XRoar doesn't match silicon
+W2000_DONE
+         JSR   [CHROUT]
+         LDA   #$0D
+         JSR   [CHROUT]
          RTS
 
          END   MAIN
