@@ -1349,3 +1349,24 @@ answer being present in the document.
 **Note for Claude:** When a ROM entry point or BASIC routine address is needed,
 check the Unravelled text files FIRST and search thoroughly before declaring
 the information absent. The answer is almost certainly there.
+
+---
+
+## Known cocotools Bug: PSHS D / PULS D
+
+`PSHS D` and `PULS D` assemble incorrectly in cocotools.
+`D` as a register name in PSH/PUL produces postbyte $80 (PC) instead
+of $06 (A+B).
+
+**Workaround:** Always use `PSHS A,B` and `PULS A,B` instead of `PSHS D`
+and `PULS D`. The result is identical bytes and behavior.
+
+**lwasm behavior:** lwasm accepts `PSHS D` as equivalent to `PSHS A,B`.
+Our translation does not handle this equivalence. This is a known gap
+in the faithful translation.
+
+**Status:** Unfixed. All source files in the repo have been corrected to
+use `A,B` explicitly. Do not use `D` in PSH/PUL register lists until fixed.
+
+Discovered: July 2026 via incorrect output when testing print_retaddr.asm
+in XRoar (printed `$$` instead of hex addresses).

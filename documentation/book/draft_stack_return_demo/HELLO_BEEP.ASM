@@ -4,7 +4,7 @@
 ;* Demonstrates:                                               *
 ;*   1. Subroutine entry: PSHS registers at entry             *
 ;*   2. Stack frame as return value channel (STD n,S)         *
-;*   3. Combined register restore + return: PULS D,X,Y,PC    *
+;*   3. Combined register restore + return: PULS A,B,X,Y,PC    *
 ;*   4. The "accidentally infinite" loop experiment           *
 ;*                                                             *
 ;* ROM entry points (Color BASIC / Extended Color BASIC):     *
@@ -55,7 +55,7 @@ MAIN     BSR   ANNOUNCE    ; call the demonstration routine
 ;*         X = unchanged                                      *
 ;*         Y = number of characters actually written          *
 ;*                                                             *
-;* Stack frame after PSHS D,X,Y:                             *
+;* Stack frame after PSHS A,B,X,Y:                             *
 ;*   0,S  = D  (A at 0,S -- B at 1,S)                       *
 ;*   2,S  = X  (high byte at 2,S -- low byte at 3,S)        *
 ;*   4,S  = Y  (high byte at 4,S -- low byte at 5,S)        *
@@ -70,7 +70,7 @@ MAIN     BSR   ANNOUNCE    ; call the demonstration routine
 ;*   Each register lands exactly where it belongs            *
 ;***************************************************************
 
-ANNOUNCE PSHS  D,X,Y       ; save caller's registers at entry
+ANNOUNCE PSHS  A,B,X,Y       ; save caller's registers at entry
                             ; BSR's PC is already at 6,S
 
 ;-- 1. Delay approximately 1 second (two half-second delays) --
@@ -113,7 +113,7 @@ PRTDONE  EQU   *
          STY   4,S          ; update Y's stack frame slot (count)
 
 ;-- 6. Return -- one instruction restores registers AND returns
-         PULS  D,X,Y,PC     ; D = new cursor pos
+         PULS  A,B,X,Y,PC     ; D = new cursor pos
                             ; X = unchanged
                             ; Y = chars written
                             ; PC = return address = return

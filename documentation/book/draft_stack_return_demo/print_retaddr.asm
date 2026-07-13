@@ -50,10 +50,10 @@ PRINTRET PSHS  A,B,X        ; save registers -- return addr now at 6,S
          LDD   4,S          ; D = return address (high byte in A, low in B)
 
 ; Print "$" prefix
-         PSHS  D            ; save return address on stack
+         PSHS  A,B          ; save return address (D) on stack
          LDA   #'$
          JSR   [CHROUT]
-         PULS  D            ; restore return address
+         PULS  A,B          ; restore return address (D)
 
 ; Print high byte (A register) as two hex digits
          PSHS  B            ; save low byte
