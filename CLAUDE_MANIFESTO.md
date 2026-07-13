@@ -1352,21 +1352,21 @@ the information absent. The answer is almost certainly there.
 
 ---
 
-## Known cocotools Bug: PSHS D / PULS D
+## FIXED: PSHS D / PULS D bug in cocotools
 
-`PSHS D` and `PULS D` assemble incorrectly in cocotools.
-`D` as a register name in PSH/PUL produces postbyte $80 (PC) instead
-of $06 (A+B).
+`PSHS D` and `PULS D` were assembling incorrectly -- producing postbyte
+$80 (PC) instead of $06 (A+B).
 
-**Workaround:** Always use `PSHS A,B` and `PULS A,B` instead of `PSHS D`
-and `PULS D`. The result is identical bytes and behavior.
+**Root cause:** _RLIST_REGS table has D at rval 8, but the mapping code
+checked `rn == 8` for PC (should be rval 7). PC and D indices were swapped
+in the bit-mapping logic.
 
-**lwasm behavior:** lwasm accepts `PSHS D` as equivalent to `PSHS A,B`.
-Our translation does not handle this equivalence. This is a known gap
-in the faithful translation.
+**Fix:** insn_funcs.py -- corrected rval→bit mapping:
+  rn==7 → PC ($80), rn==8 → D ($06 = A|B), rn==9 → S ($40)
 
-**Status:** Unfixed. All source files in the repo have been corrected to
-use `A,B` explicitly. Do not use `D` in PSH/PUL register lists until fixed.
+**Status:** Fixed July 2026. `PSHS D` and `PULS D` now produce correct
+output identical to `PSHS A,B` and `PULS A,B`.
 
-Discovered: July 2026 via incorrect output when testing print_retaddr.asm
-in XRoar (printed `$$` instead of hex addresses).
+Discovered: via XRoar test output -- print_retaddr.asm printed `$$`
+instead of hex addresses. The bug caused `PSHS D` to push PC instead
+of saving the return address, corrupting the stack frame.
