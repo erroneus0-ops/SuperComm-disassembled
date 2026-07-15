@@ -179,6 +179,118 @@
     </tbody>
   </table>
   
+  <div class="reg-codes">
+    <h4>Register codes</h4>
+    <p>Postbyte: source in high nibble, destination in low nibble.
+    <code>TFR D,X</code> &rarr; <code>$0</code>&nbsp;|&nbsp;<code>$1</code> &rarr; postbyte <code>$01</code> &rarr; bytes <code>$1F $01</code>.</p>
+    <div style="display:flex;gap:2rem;align-items:flex-start">
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody><tr><td style="text-align:center"><code>D</code></td><td style="text-align:center"><code>$0</code></td></tr><tr><td style="text-align:center"><code>X</code></td><td style="text-align:center"><code>$1</code></td></tr><tr><td style="text-align:center"><code>Y</code></td><td style="text-align:center"><code>$2</code></td></tr><tr><td style="text-align:center"><code>U</code></td><td style="text-align:center"><code>$3</code></td></tr><tr><td style="text-align:center"><code>S</code></td><td style="text-align:center"><code>$4</code></td></tr><tr><td style="text-align:center"><code>PC</code></td><td style="text-align:center"><code>$5</code></td></tr></tbody>
+      </table>
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody><tr><td style="text-align:center"><code>A</code></td><td style="text-align:center"><code>$8</code></td></tr><tr><td style="text-align:center"><code>B</code></td><td style="text-align:center"><code>$9</code></td></tr><tr><td style="text-align:center"><code>CC</code></td><td style="text-align:center"><code>$A</code></td></tr><tr><td style="text-align:center"><code>DP</code></td><td style="text-align:center"><code>$B</code></td></tr></tbody>
+      </table>
+    </div>
+    <div class="interactive no-print" style="margin-top:1rem">
+      <h4>EXG builder</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;display:inline-flex">
+        <div style="display:flex;gap:2rem">
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px;min-width:200px">16-bit transfers</div>
+            <div style="display:flex;gap:8px">
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
+                <div id="src16-EXG" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
+                <div id="dst16-EXG" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px;min-width:200px">8-bit transfers</div>
+            <div style="display:flex;gap:8px">
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
+                <div id="src8-EXG" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
+                <div id="dst8-EXG" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:2rem">
+          <div id="out16-EXG" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1;min-width:200px;white-space:nowrap">&nbsp;</div>
+          <div id="out8-EXG" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1;min-width:200px;white-space:nowrap">&nbsp;</div>
+        </div>
+      </div>
+      <script>
+      (function() {
+        var mn = 'EXG';
+        var regs16 = ['D', 'X', 'Y', 'U', 'S', 'PC'];
+        var regs8  = ['A', 'B', 'CC', 'DP'];
+        var nibbles = {"D": "0", "X": "1", "Y": "2", "U": "3", "S": "4", "PC": "5", "A": "8", "B": "9", "CC": "A", "DP": "B"};
+        var opcodes = {"TFR":"1F","EXG":"1E"};
+        var opcode = opcodes[mn];
+
+        function makeGroup(containerId, regs, role, partner16, partner8) {
+          var c = document.getElementById(containerId);
+          regs.forEach(function(reg) {
+            var b = document.createElement('button');
+            b.textContent = reg;
+            b.dataset.reg = reg;
+            b.style.cssText = 'font-family:monospace;padding:2px 8px;border:1px solid var(--border-strong,#bbb);border-radius:3px;background:var(--surface-2,#fff);color:var(--text-primary,#111);cursor:pointer;font-size:0.85rem';
+            b.addEventListener('click', function() {
+              c.querySelectorAll('button').forEach(function(x){x.style.background='var(--surface-2,#fff)';x.style.borderColor='var(--border-strong,#bbb)';x.style.color='var(--text-primary,#111)';});
+              b.style.background = (role==='src') ? 'var(--bg-accent,#dbeafe)' : 'var(--bg-success,#dcfce7)';
+              b.style.borderColor = (role==='src') ? 'var(--border-accent,#3b82f6)' : 'var(--border-success,#22c55e)';
+              b.style.color = (role==='src') ? 'var(--text-accent,#1d4ed8)' : 'var(--text-success,#15803d)';
+              updateOut(containerId, role, reg);
+            });
+            c.appendChild(b);
+          });
+        }
+
+        var state = {src16: null, dst16: null, src8: null, dst8: null};
+
+        function updateOut(containerId, role, reg) {
+          var is16 = containerId.includes('16');
+          var srcKey = is16 ? 'src16' : 'src8';
+          var dstKey = is16 ? 'dst16' : 'dst8';
+          state[srcKey.replace('src','src')] = (role==='src') ? reg : state[srcKey];
+          state[dstKey.replace('dst','dst')] = (role==='dst') ? reg : state[dstKey];
+          if (role==='src') state[srcKey] = reg;
+          else state[dstKey] = reg;
+          var outId = is16 ? 'out16-'+mn : 'out8-'+mn;
+          var src = is16 ? state.src16 : state.src8;
+          var dst = is16 ? state.dst16 : state.dst8;
+          var out = document.getElementById(outId);
+          if (src && dst) {
+            var pb = (parseInt(nibbles[src],16) << 4) | parseInt(nibbles[dst],16);
+            var pbHex = pb.toString(16).toUpperCase().padStart(2,'0');
+            out.textContent = mn+' '+src+','+dst+'  →  $'+opcode+' $'+pbHex;
+          } else if (src) {
+            out.textContent = mn+' '+src+',?';
+          } else if (dst) {
+            out.textContent = mn+' ?,'+dst;
+          } else {
+            out.innerHTML = '&nbsp;';
+          }
+        }
+
+        makeGroup('src16-'+mn, regs16, 'src');
+        makeGroup('dst16-'+mn, regs16, 'dst');
+        makeGroup('src8-'+mn,  regs8,  'src');
+        makeGroup('dst8-'+mn,  regs8,  'dst');
+      })();
+      </script>
+    </div>
+  </div>
   <p class="notes">Same postbyte encoding as TFR. Both registers must be the same size. Exchanging different-sized registers produces undefined results on 6809; 6309 handles it differently.</p>
 </div>
 

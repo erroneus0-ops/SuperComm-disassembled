@@ -5,29 +5,72 @@
     {
       "mnemonic": "TFR",
       "full_name": "Transfer Register to Register",
-      "operation": "R1 ← R2",
-      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "operation": "R1 \u2190 R2",
+      "condition_codes": {
+        "H": "\u2195",
+        "N": "\u2195",
+        "Z": "\u2195",
+        "V": "\u2195",
+        "C": "\u2195"
+      },
       "modes": [
-        { "mode": "inherent", "syntax": "TFR R1,R2", "opcode": "1F", "bytes": 2, "cycles": 6 }
+        {
+          "mode": "inherent",
+          "syntax": "TFR R1,R2",
+          "opcode": "1F",
+          "bytes": 2,
+          "cycles": 6
+        }
       ],
       "flow": "sequential",
       "register_codes": {
-        "D": "0000", "X": "0001", "Y": "0010", "U": "0011",
-        "S": "0100", "PC": "0101",
-        "A": "1000", "B": "1001", "CC": "1010", "DP": "1011"
+        "D": "0000",
+        "X": "0001",
+        "Y": "0010",
+        "U": "0011",
+        "S": "0100",
+        "PC": "0101",
+        "A": "1000",
+        "B": "1001",
+        "CC": "1010",
+        "DP": "1011"
       },
       "notes": "Postbyte encodes source (high nibble) and destination (low nibble). Transferring between different-sized registers: 8-bit to 16-bit zero-extends; 16-bit to 8-bit takes low byte. CC and DP are affected only when transferred to. When CC is the destination, all flags are set from the transferred value."
     },
     {
       "mnemonic": "EXG",
       "full_name": "Exchange Registers",
-      "operation": "R1 ↔ R2",
-      "condition_codes": { "H": "↕", "N": "↕", "Z": "↕", "V": "↕", "C": "↕" },
+      "operation": "R1 \u2194 R2",
+      "condition_codes": {
+        "H": "\u2195",
+        "N": "\u2195",
+        "Z": "\u2195",
+        "V": "\u2195",
+        "C": "\u2195"
+      },
       "modes": [
-        { "mode": "inherent", "syntax": "EXG R1,R2", "opcode": "1E", "bytes": 2, "cycles": 8 }
+        {
+          "mode": "inherent",
+          "syntax": "EXG R1,R2",
+          "opcode": "1E",
+          "bytes": 2,
+          "cycles": 8
+        }
       ],
       "flow": "sequential",
-      "notes": "Same postbyte encoding as TFR. Both registers must be the same size. Exchanging different-sized registers produces undefined results on 6809; 6309 handles it differently."
+      "notes": "Same postbyte encoding as TFR. Both registers must be the same size. Exchanging different-sized registers produces undefined results on 6809; 6309 handles it differently.",
+      "register_codes": {
+        "D": "0000",
+        "X": "0001",
+        "Y": "0010",
+        "U": "0011",
+        "S": "0100",
+        "PC": "0101",
+        "A": "1000",
+        "B": "1001",
+        "CC": "1010",
+        "DP": "1011"
+      }
     }
   ]
 }
