@@ -272,6 +272,14 @@ def cmd_assemble(args):
     as_ = AsmState(output_fmt)
     as_.input = InputSystem(as_)
 
+    # Apply CPU mode from first-class flags
+    if hasattr(args, 'cpu_6309') and args.cpu_6309:
+        from cocotools.lwasm_types import PRAGMA_6809
+        as_.pragmas &= ~PRAGMA_6809   # clear 6809-only flag -> enable 6309
+    elif hasattr(args, 'cpu_6809') and args.cpu_6809:
+        from cocotools.lwasm_types import PRAGMA_6809
+        as_.pragmas |= PRAGMA_6809    # force 6809 mode (default anyway)
+
     # Apply -- passthrough flags before opening source
     if hasattr(args, 'asm_flags') and args.asm_flags:
         _parse_asm_flags(as_, args.asm_flags)
@@ -744,6 +752,12 @@ examples:
                        help='Output format: decb (default) or raw')
     p_asm.add_argument('-pp',              metavar='KEY=VAL,...',
                        help='Post-processor options (e.g. -pp b=$3F00,e=$3F00)')
+    p_asm.add_argument('-3', '--6309',     dest='cpu_6309', action='store_true',
+                       default=False,
+                       help='Enable HD6309 instruction set (default: 6809 only)')
+    p_asm.add_argument('-9', '--6809',     dest='cpu_6809', action='store_true',
+                       default=False,
+                       help='Force 6809 mode (default)')
 
     # about
     sub.add_parser('about',
