@@ -195,6 +195,17 @@ def _expand_indexed(mode_entry):
 
 
 def render_modes_table(modes):
+    # Render extended before indexed so the expanded indexed block
+    # doesn't bury extended at the bottom
+    mode_order = ['immediate', 'direct', 'extended', 'indexed']
+    def mode_key(m):
+        base = m.get('mode', '').split()[0].lower()
+        try:
+            return mode_order.index(base)
+        except ValueError:
+            return len(mode_order)
+    modes = sorted(modes, key=mode_key)
+
     rows = []
     for m in modes:
         # Expand indexed mode into all postbyte variants
