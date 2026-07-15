@@ -121,9 +121,9 @@ def render_modes_table(modes):
             f'<tr>'
             f'<td class="mode">{m["mode"].replace("-", "&#8209;")}</td>'
             f'<td class="syntax"><code>{syntax}</code></td>'
-            f'<td class="opcode"><code>${m["opcode"]}</code></td>'
-            f'<td class="bytes">{bytes_}</td>'
-            f'<td class="cycles">{cycles}</td>'
+            f'<td class="col-opcode"><code>${m["opcode"]}</code></td>'
+            f'<td class="col-bytes">{bytes_}</td>'
+            f'<td class="col-cycles">{cycles}</td>'
             f'</tr>'
         )
     return '\n'.join(rows)
@@ -278,25 +278,27 @@ def render_instruction(instr):
   <h3 class="mnemonic">{mnemonic} <span class="full-name">— {full_name}</span></h3>
   <div class="operation"><code>{operation}</code></div>
   {desc_html}
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      {render_modes_table(modes)}
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr>{cc_html_cells}</tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        {render_modes_table(modes)}
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr>{cc_html_cells}</tr>
+      </tbody>
+    </table>
+  </div>
   {reg_codes_html}
   {notes_html}
 </div>

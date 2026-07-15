@@ -19,25 +19,27 @@
   <h3 class="mnemonic">LEAX <span class="full-name">— Load Effective Address into X</span></h3>
   <div class="operation"><code>X ← EA</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">indexed</td><td class="syntax"><code>LEAX expr,R</code></td><td class="opcode"><code>$30</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">indexed</td><td class="syntax"><code>LEAX expr,R</code></td><td class="col-opcode"><code>$30</code></td><td class="col-bytes">2+</td><td class="col-cycles">4+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Computes the effective address and loads it into X — no memory access. Z is set if the computed address is zero. Used for PC-relative data addressing (LEAX label,PCR), pointer arithmetic, and fast 16-bit addition (LEAX n,X adds n to X in place).</p>
 </div>
@@ -47,25 +49,27 @@
   <h3 class="mnemonic">LEAY <span class="full-name">— Load Effective Address into Y</span></h3>
   <div class="operation"><code>Y ← EA</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">indexed</td><td class="syntax"><code>LEAY expr,R</code></td><td class="opcode"><code>$31</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">indexed</td><td class="syntax"><code>LEAY expr,R</code></td><td class="col-opcode"><code>$31</code></td><td class="col-bytes">2+</td><td class="col-cycles">4+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Same as LEAX but loads Y. Z reflects whether result is zero.</p>
 </div>
@@ -75,25 +79,27 @@
   <h3 class="mnemonic">LEAS <span class="full-name">— Load Effective Address into S</span></h3>
   <div class="operation"><code>S ← EA</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">indexed</td><td class="syntax"><code>LEAS expr,R</code></td><td class="opcode"><code>$32</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">indexed</td><td class="syntax"><code>LEAS expr,R</code></td><td class="col-opcode"><code>$32</code></td><td class="col-bytes">2+</td><td class="col-cycles">4+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Does not affect Z. Used to adjust the stack pointer — LEAS -n,S reserves n bytes on the stack; LEAS n,S releases them.</p>
 </div>
@@ -103,25 +109,27 @@
   <h3 class="mnemonic">LEAU <span class="full-name">— Load Effective Address into U</span></h3>
   <div class="operation"><code>U ← EA</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">indexed</td><td class="syntax"><code>LEAU expr,R</code></td><td class="opcode"><code>$33</code></td><td class="bytes">2+</td><td class="cycles">4+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">indexed</td><td class="syntax"><code>LEAU expr,R</code></td><td class="col-opcode"><code>$33</code></td><td class="col-bytes">2+</td><td class="col-cycles">4+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Does not affect Z. Used to set up the U pointer for data access.</p>
 </div>

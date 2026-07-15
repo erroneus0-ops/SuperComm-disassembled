@@ -19,25 +19,27 @@
   <h3 class="mnemonic">NOP <span class="full-name">— No Operation</span></h3>
   <div class="operation"><code>none</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>NOP</code></td><td class="opcode"><code>$12</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>NOP</code></td><td class="col-opcode"><code>$12</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Does nothing for 2 cycles. Used for timing loops, code patching placeholders, and alignment.</p>
 </div>
@@ -47,25 +49,27 @@
   <h3 class="mnemonic">ABX <span class="full-name">— Add Accumulator B to X</span></h3>
   <div class="operation"><code>X ← X + B  (unsigned)</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>ABX</code></td><td class="opcode"><code>$3A</code></td><td class="bytes">1</td><td class="cycles">3</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>ABX</code></td><td class="col-opcode"><code>$3A</code></td><td class="col-bytes">1</td><td class="col-cycles">3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">B is treated as unsigned (0-255). No flags affected. Equivalent to LEAX B,X but faster (3 vs 4+ cycles) and does not affect Z. Useful for indexing into a table using B as an unsigned offset.</p>
 </div>
@@ -75,25 +79,27 @@
   <h3 class="mnemonic">SEX <span class="full-name">— Sign Extend B into A</span></h3>
   <div class="operation"><code>A ← sign extend of B  (A ← $FF if B7=1, else A ← $00)</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>SEX</code></td><td class="opcode"><code>$1D</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>SEX</code></td><td class="col-opcode"><code>$1D</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Sign extends the 8-bit value in B into the 16-bit D register. If B is negative (bit 7 set), A is set to $FF; otherwise A is cleared. Allows treating B as a signed 16-bit value in D.</p>
 </div>
@@ -103,25 +109,27 @@
   <h3 class="mnemonic">CWAI <span class="full-name">— AND Condition Codes and Wait for Interrupt</span></h3>
   <div class="operation"><code>CC ← CC AND M; push all registers; wait for interrupt</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">immediate</td><td class="syntax"><code>CWAI #n</code></td><td class="opcode"><code>$3C</code></td><td class="bytes">2</td><td class="cycles">20+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>CWAI #n</code></td><td class="col-opcode"><code>$3C</code></td><td class="col-bytes">2</td><td class="col-cycles">20+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Clears selected CC bits via AND mask, then pushes all registers (sets E flag in CC), then halts execution until an unmasked interrupt arrives. Faster interrupt response than SYNC because all registers are pre-saved. Minimum 20 cycles before interrupt vector is fetched.</p>
 </div>
@@ -131,25 +139,27 @@
   <h3 class="mnemonic">SYNC <span class="full-name">— Synchronize with Interrupt</span></h3>
   <div class="operation"><code>halt until interrupt</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>SYNC</code></td><td class="opcode"><code>$13</code></td><td class="bytes">1</td><td class="cycles">2+</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>SYNC</code></td><td class="col-opcode"><code>$13</code></td><td class="col-bytes">1</td><td class="col-cycles">2+</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Halts execution and waits for any interrupt. If the interrupt is masked, execution resumes at the next instruction after 2 cycles (without servicing the interrupt). If unmasked, the interrupt is serviced normally. Used for precise timing synchronization.</p>
 </div>
@@ -159,25 +169,27 @@
   <h3 class="mnemonic">SWI <span class="full-name">— Software Interrupt 1</span></h3>
   <div class="operation"><code>push all registers; PC ← M[$FFFA:$FFFB]</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>SWI</code></td><td class="opcode"><code>$3F</code></td><td class="bytes">1</td><td class="cycles">19</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>SWI</code></td><td class="col-opcode"><code>$3F</code></td><td class="col-bytes">1</td><td class="col-cycles">19</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Pushes all registers with E set, then vectors through $FFFA/$FFFB. Under OS-9 this is the syscall mechanism — the byte following SWI is the syscall number.</p>
 </div>
@@ -187,25 +199,27 @@
   <h3 class="mnemonic">SWI2 <span class="full-name">— Software Interrupt 2</span></h3>
   <div class="operation"><code>push all registers; PC ← M[$FFF4:$FFF5]</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>SWI2</code></td><td class="opcode"><code>$103F</code></td><td class="bytes">2</td><td class="cycles">20</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>SWI2</code></td><td class="col-opcode"><code>$103F</code></td><td class="col-bytes">2</td><td class="col-cycles">20</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Page 2 instruction. Vectors through $FFF4/$FFF5. Under OS-9 Level II this is the user-mode syscall.</p>
 </div>
@@ -215,25 +229,27 @@
   <h3 class="mnemonic">SWI3 <span class="full-name">— Software Interrupt 3</span></h3>
   <div class="operation"><code>push all registers; PC ← M[$FFF2:$FFF3]</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>SWI3</code></td><td class="opcode"><code>$113F</code></td><td class="bytes">2</td><td class="cycles">20</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>SWI3</code></td><td class="col-opcode"><code>$113F</code></td><td class="col-bytes">2</td><td class="col-cycles">20</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Page 3 instruction. Vectors through $FFF2/$FFF3.</p>
 </div>

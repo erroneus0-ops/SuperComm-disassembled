@@ -19,25 +19,27 @@
   <h3 class="mnemonic">TFR <span class="full-name">— Transfer Register to Register</span></h3>
   <div class="operation"><code>R1 ← R2</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>TFR R1,R2</code></td><td class="opcode"><code>$1F</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>TFR R1,R2</code></td><td class="col-opcode"><code>$1F</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <div class="reg-codes">
     <h4>Register codes</h4>
@@ -159,25 +161,27 @@
   <h3 class="mnemonic">EXG <span class="full-name">— Exchange Registers</span></h3>
   <div class="operation"><code>R1 ↔ R2</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>EXG R1,R2</code></td><td class="opcode"><code>$1E</code></td><td class="bytes">2</td><td class="cycles">8</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>EXG R1,R2</code></td><td class="col-opcode"><code>$1E</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <div class="reg-codes">
     <h4>Register codes</h4>

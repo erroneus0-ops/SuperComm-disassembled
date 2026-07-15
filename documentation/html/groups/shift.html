@@ -19,25 +19,27 @@
   <h3 class="mnemonic">LSLA <span class="full-name">— Logical Shift Left Accumulator A</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← 0</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>LSLA</code></td><td class="opcode"><code>$48</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>LSLA</code></td><td class="col-opcode"><code>$48</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Also called ASLA. Shifts all bits left one position; bit 7 goes to C, bit 0 filled with 0. Equivalent to multiplying by 2. V is set if the sign changes (bit 7 XOR bit 6 before shift).</p>
 </div>
@@ -47,25 +49,27 @@
   <h3 class="mnemonic">LSLB <span class="full-name">— Logical Shift Left Accumulator B</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← 0</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>LSLB</code></td><td class="opcode"><code>$58</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>LSLB</code></td><td class="col-opcode"><code>$58</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Also called ASLB. Same operation as LSLA on B.</p>
 </div>
@@ -75,27 +79,29 @@
   <h3 class="mnemonic">LSL <span class="full-name">— Logical Shift Left Memory</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← 0</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>LSL &lt;addr</code></td><td class="opcode"><code>$08</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-<tr><td class="mode">indexed</td><td class="syntax"><code>LSL addr,R</code></td><td class="opcode"><code>$68</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
-<tr><td class="mode">extended</td><td class="syntax"><code>LSL addr</code></td><td class="opcode"><code>$78</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>LSL &lt;addr</code></td><td class="col-opcode"><code>$08</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LSL addr,R</code></td><td class="col-opcode"><code>$68</code></td><td class="col-bytes">2+</td><td class="col-cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LSL addr</code></td><td class="col-opcode"><code>$78</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Also called ASL. Read-modify-write on memory.</p>
 </div>
@@ -105,25 +111,27 @@
   <h3 class="mnemonic">LSRA <span class="full-name">— Logical Shift Right Accumulator A</span></h3>
   <div class="operation"><code>0 → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>LSRA</code></td><td class="opcode"><code>$44</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>LSRA</code></td><td class="col-opcode"><code>$44</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Shifts all bits right one position; bit 0 goes to C, bit 7 filled with 0. Equivalent to dividing unsigned value by 2. N is always cleared (bit 7 is always 0 after). Unlike ASRA, does not propagate sign.</p>
 </div>
@@ -133,25 +141,27 @@
   <h3 class="mnemonic">LSRB <span class="full-name">— Logical Shift Right Accumulator B</span></h3>
   <div class="operation"><code>0 → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>LSRB</code></td><td class="opcode"><code>$54</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>LSRB</code></td><td class="col-opcode"><code>$54</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Same operation as LSRA on B.</p>
 </div>
@@ -161,27 +171,29 @@
   <h3 class="mnemonic">LSR <span class="full-name">— Logical Shift Right Memory</span></h3>
   <div class="operation"><code>0 → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>LSR &lt;addr</code></td><td class="opcode"><code>$04</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-<tr><td class="mode">indexed</td><td class="syntax"><code>LSR addr,R</code></td><td class="opcode"><code>$64</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
-<tr><td class="mode">extended</td><td class="syntax"><code>LSR addr</code></td><td class="opcode"><code>$74</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>LSR &lt;addr</code></td><td class="col-opcode"><code>$04</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>LSR addr,R</code></td><td class="col-opcode"><code>$64</code></td><td class="col-bytes">2+</td><td class="col-cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>LSR addr</code></td><td class="col-opcode"><code>$74</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Read-modify-write on memory.</p>
 </div>
@@ -191,25 +203,27 @@
   <h3 class="mnemonic">ASRA <span class="full-name">— Arithmetic Shift Right Accumulator A</span></h3>
   <div class="operation"><code>b7 → b7...b0 → C  (sign bit propagates)</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>ASRA</code></td><td class="opcode"><code>$47</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>ASRA</code></td><td class="col-opcode"><code>$47</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Bit 7 is reproduced (sign extension). Bit 0 goes to C. Equivalent to dividing signed value by 2, rounding toward negative infinity. V is not affected.</p>
 </div>
@@ -219,25 +233,27 @@
   <h3 class="mnemonic">ASRB <span class="full-name">— Arithmetic Shift Right Accumulator B</span></h3>
   <div class="operation"><code>b7 → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>ASRB</code></td><td class="opcode"><code>$57</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>ASRB</code></td><td class="col-opcode"><code>$57</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Same operation as ASRA on B.</p>
 </div>
@@ -247,27 +263,29 @@
   <h3 class="mnemonic">ASR <span class="full-name">— Arithmetic Shift Right Memory</span></h3>
   <div class="operation"><code>b7 → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>ASR &lt;addr</code></td><td class="opcode"><code>$07</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-<tr><td class="mode">indexed</td><td class="syntax"><code>ASR addr,R</code></td><td class="opcode"><code>$67</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
-<tr><td class="mode">extended</td><td class="syntax"><code>ASR addr</code></td><td class="opcode"><code>$77</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>ASR &lt;addr</code></td><td class="col-opcode"><code>$07</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>ASR addr,R</code></td><td class="col-opcode"><code>$67</code></td><td class="col-bytes">2+</td><td class="col-cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ASR addr</code></td><td class="col-opcode"><code>$77</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Read-modify-write on memory.</p>
 </div>
@@ -277,25 +295,27 @@
   <h3 class="mnemonic">ROLA <span class="full-name">— Rotate Left Accumulator A through Carry</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>ROLA</code></td><td class="opcode"><code>$49</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>ROLA</code></td><td class="col-opcode"><code>$49</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">9-bit rotation through carry. Old C goes to bit 0; bit 7 goes to new C. Used for multi-byte shifts — ROL/ROR pairs can shift values wider than 8 bits.</p>
 </div>
@@ -305,25 +325,27 @@
   <h3 class="mnemonic">ROLB <span class="full-name">— Rotate Left Accumulator B through Carry</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>ROLB</code></td><td class="opcode"><code>$59</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>ROLB</code></td><td class="col-opcode"><code>$59</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Same operation as ROLA on B.</p>
 </div>
@@ -333,27 +355,29 @@
   <h3 class="mnemonic">ROL <span class="full-name">— Rotate Left Memory through Carry</span></h3>
   <div class="operation"><code>C ← b7 ← b6...b0 ← C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>ROL &lt;addr</code></td><td class="opcode"><code>$09</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-<tr><td class="mode">indexed</td><td class="syntax"><code>ROL addr,R</code></td><td class="opcode"><code>$69</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
-<tr><td class="mode">extended</td><td class="syntax"><code>ROL addr</code></td><td class="opcode"><code>$79</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>ROL &lt;addr</code></td><td class="col-opcode"><code>$09</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>ROL addr,R</code></td><td class="col-opcode"><code>$69</code></td><td class="col-bytes">2+</td><td class="col-cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ROL addr</code></td><td class="col-opcode"><code>$79</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Read-modify-write on memory.</p>
 </div>
@@ -363,25 +387,27 @@
   <h3 class="mnemonic">RORA <span class="full-name">— Rotate Right Accumulator A through Carry</span></h3>
   <div class="operation"><code>C → b7...b0 → C  (old C to bit 7)</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>RORA</code></td><td class="opcode"><code>$46</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>RORA</code></td><td class="col-opcode"><code>$46</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">9-bit rotation through carry. Old C goes to bit 7; bit 0 goes to new C. V is not affected.</p>
 </div>
@@ -391,25 +417,27 @@
   <h3 class="mnemonic">RORB <span class="full-name">— Rotate Right Accumulator B through Carry</span></h3>
   <div class="operation"><code>C → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">inherent</td><td class="syntax"><code>RORB</code></td><td class="opcode"><code>$56</code></td><td class="bytes">1</td><td class="cycles">2</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>RORB</code></td><td class="col-opcode"><code>$56</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Same operation as RORA on B.</p>
 </div>
@@ -419,27 +447,29 @@
   <h3 class="mnemonic">ROR <span class="full-name">— Rotate Right Memory through Carry</span></h3>
   <div class="operation"><code>C → b7...b0 → C</code></div>
   
-  <table class="modes-table">
-    <thead>
-      <tr>
-        <th>Mode</th><th>Syntax</th><th>Opcode</th><th>Bytes</th><th>Cycles</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td class="mode">direct</td><td class="syntax"><code>ROR &lt;addr</code></td><td class="opcode"><code>$06</code></td><td class="bytes">2</td><td class="cycles">6</td></tr>
-<tr><td class="mode">indexed</td><td class="syntax"><code>ROR addr,R</code></td><td class="opcode"><code>$66</code></td><td class="bytes">2+</td><td class="cycles">6+</td></tr>
-<tr><td class="mode">extended</td><td class="syntax"><code>ROR addr</code></td><td class="opcode"><code>$76</code></td><td class="bytes">3</td><td class="cycles">7</td></tr>
-    </tbody>
-  </table>
-  <table class="cc-table">
-    <thead>
-      <tr><th colspan="5">Condition Codes</th></tr>
-      <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
-    </tbody>
-  </table>
+  <div class="tables-wrap">
+    <table class="modes-table">
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>ROR &lt;addr</code></td><td class="col-opcode"><code>$06</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed</td><td class="syntax"><code>ROR addr,R</code></td><td class="col-opcode"><code>$66</code></td><td class="col-bytes">2+</td><td class="col-cycles">6+</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ROR addr</code></td><td class="col-opcode"><code>$76</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
   
   <p class="notes">Read-modify-write on memory. V is not affected.</p>
 </div>
