@@ -166,29 +166,48 @@ h3.mnemonic {
 
 /* Modes table */
 .modes-table {
-  width: 100%;
+  width: max-content;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-bottom: 0.75rem;
   font-size: 0.9rem;
 }
 
+.modes-table col.col-mode   { width: 8rem; }
+.modes-table col.col-syntax { width: 16rem; }
+.modes-table col.col-opcode { width: 4.5rem; }
+.modes-table col.col-bytes  { width: 3.5rem; }
+.modes-table col.col-cycles { width: 3.5rem; }
+
 .modes-table th {
   background: var(--bg3);
   color: var(--text-dim);
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   text-align: left;
   border: 1px solid var(--border);
   font-weight: normal;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
+.modes-table th.col-opcode,
+.modes-table th.col-bytes,
+.modes-table th.col-cycles { text-align: center; }
+
 .modes-table td {
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border);
   background: var(--bg2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.modes-table td.col-opcode,
+.modes-table td.col-bytes,
+.modes-table td.col-cycles { text-align: center; color: var(--text-dim); }
 
 .modes-table code {
   font-family: 'Courier New', monospace;
@@ -197,7 +216,13 @@ h3.mnemonic {
 }
 
 td.mode  { color: var(--text-dim); font-size: 0.85rem; }
-td.bytes, td.cycles { text-align: center; color: var(--text-dim); }
+
+.tables-wrap {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
 
 /* Condition codes table */
 .cc-table {
