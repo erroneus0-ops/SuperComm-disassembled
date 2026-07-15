@@ -38,6 +38,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">8-bit signed offset — range is -128 to +127 bytes from the instruction following BRA. For longer range use LBRA.</p>
 </div>
 
@@ -65,6 +66,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">16-bit signed offset — full 64K range. Note: $16 is a single-byte opcode (not prefixed), unlike most long branches.</p>
 </div>
 
@@ -92,6 +94,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Never branches. Equivalent to a 2-byte NOP. Useful for patching — replace BEQ/BNE with BRN to disable a branch without changing code size.</p>
 </div>
 
@@ -119,6 +122,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if the Z flag is set. Typically follows CMP or TST. Cycles are 3 whether branch is taken or not (6809 always takes 3 for short branches).</p>
 </div>
 
@@ -146,6 +150,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction. 5 cycles if not taken, 6 if taken.</p>
 </div>
 
@@ -173,6 +178,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if Z is clear. Common loop termination: DECB / BNE loop.</p>
 </div>
 
@@ -200,6 +206,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -227,6 +234,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Also called BLO (Branch if Lower, Unsigned). Branches if C=1. Used after unsigned comparison: CMPA / BCS means 'branch if A < M (unsigned)'.</p>
 </div>
 
@@ -254,6 +262,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Also called LBLO.</p>
 </div>
 
@@ -281,6 +290,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Also called BHS (Branch if Higher or Same, Unsigned). Branches if C=0.</p>
 </div>
 
@@ -308,6 +318,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Also called LBHS.</p>
 </div>
 
@@ -335,6 +346,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if N=1 (result was negative, bit 7 was set).</p>
 </div>
 
@@ -362,6 +374,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -389,6 +402,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if N=0 (result was positive or zero).</p>
 </div>
 
@@ -416,6 +430,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -443,6 +458,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if signed overflow occurred.</p>
 </div>
 
@@ -470,6 +486,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -497,6 +514,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Branches if no signed overflow.</p>
 </div>
 
@@ -524,6 +542,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -551,6 +570,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Signed comparison. Branches if result was greater than zero (neither zero nor negative with overflow correction).</p>
 </div>
 
@@ -578,6 +598,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -605,6 +626,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Signed comparison. Branches if result was >= 0.</p>
 </div>
 
@@ -632,6 +654,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -659,6 +682,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Signed comparison. Branches if result was < 0.</p>
 </div>
 
@@ -686,6 +710,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -713,6 +738,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Signed comparison. Branches if result was <= 0.</p>
 </div>
 
@@ -740,6 +766,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -767,6 +794,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Unsigned comparison. Branches if result was strictly greater than (not equal, not lower).</p>
 </div>
 
@@ -794,6 +822,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -821,6 +850,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Unsigned comparison. Branches if result was <= (lower or equal).</p>
 </div>
 
@@ -848,6 +878,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction.</p>
 </div>
 
@@ -875,6 +906,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Pushes return address (next instruction) onto S stack, then branches. 8-bit signed offset. For longer range use LBSR.</p>
 </div>
 
@@ -902,6 +934,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">16-bit signed offset. Note: $17 is a single-byte opcode, not prefixed.</p>
 </div>
 
@@ -931,6 +964,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Jumps to an absolute or computed address rather than a relative offset. Useful for computed dispatch tables or calling through pointers.</p>
 </div>
 
@@ -958,6 +992,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Pulls return address from S stack. Pairs with BSR, LBSR, or JSR.</p>
 </div>
 
@@ -987,6 +1022,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Absolute jump to effective address. Indexed mode allows computed jumps — dispatch tables, state machines. No immediate mode (jumping to a literal address makes no sense as a concept).</p>
 </div>
 
@@ -1014,6 +1050,7 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Restores CPU state from S stack. If the E (Entire) flag in the stacked CC is set, all 9 registers are restored (15 cycles). If E is clear, only CC and PC are restored (6 cycles — fast interrupt return). See CWAI and SYNC for interrupt handling.</p>
 </div>
 

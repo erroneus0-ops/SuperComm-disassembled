@@ -41,6 +41,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Used to clear specific bits. Mask immediate value with 0s in bit positions to clear. V is always cleared.</p>
 </div>
 
@@ -71,6 +72,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">V is always cleared.</p>
 </div>
 
@@ -98,6 +100,7 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Used to clear specific condition code bits. Bits set to 0 in the immediate mask are cleared in CC. Commonly used to clear the interrupt mask bits (enable interrupts) or clear the carry flag.</p>
 </div>
 
@@ -128,6 +131,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Used to set specific bits. Mask immediate value with 1s in bit positions to set. V is always cleared.</p>
 </div>
 
@@ -158,6 +162,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">V is always cleared.</p>
 </div>
 
@@ -185,6 +190,7 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Used to set specific condition code bits. Bits set to 1 in the immediate mask are set in CC. Commonly used to set the interrupt mask bits (disable interrupts) or set the carry flag.</p>
 </div>
 
@@ -215,6 +221,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Used to toggle specific bits, or to test equality (result is zero if A equals M). V is always cleared.</p>
 </div>
 
@@ -245,6 +252,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">V is always cleared.</p>
 </div>
 
@@ -272,6 +280,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Inverts all bits of A. C is always set to 1 after COM. V is always cleared. For two's complement negation use NEGA.</p>
 </div>
 
@@ -299,6 +308,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Inverts all bits of B. C is always set to 1. V is always cleared.</p>
 </div>
 
@@ -328,6 +338,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Inverts all bits of memory byte. C is always set to 1. V is always cleared.</p>
 </div>
 
@@ -355,6 +366,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">All affected flags are set to fixed values — N=0, Z=1, V=0, C=0. Faster than LDA #0.</p>
 </div>
 
@@ -382,6 +394,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Faster than LDB #0.</p>
 </div>
 
@@ -411,6 +424,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-set"     title="Always set">1</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td><td class="cc-cell"><span class="cc-cleared" title="Always cleared">0</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">All affected flags set to fixed values. Faster than loading 0 into a register and storing.</p>
 </div>
 

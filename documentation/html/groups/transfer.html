@@ -38,6 +38,52 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
+  <div class="reg-codes">
+    <h4>Register Codes</h4>
+    <p>The postbyte encodes source register in the high nibble and destination in the low nibble.
+    Example: <code>TFR D,X</code> &rarr; high nibble <code>$0</code> (D), low nibble <code>$1</code> (X) &rarr; postbyte <code>$01</code> &rarr; instruction bytes <code>$1F $01</code>.</p>
+    <table class="modes-table reg-codes-table">
+      <thead>
+        <tr><th>Register</th><th>Bits</th><th>Nibble</th><th>Size</th></tr>
+      </thead>
+      <tbody><tr><td><code>D</code></td><td><code>0000</code></td><td><code>$0</code></td><td>16-bit</td></tr><tr><td><code>X</code></td><td><code>0001</code></td><td><code>$1</code></td><td>16-bit</td></tr><tr><td><code>Y</code></td><td><code>0010</code></td><td><code>$2</code></td><td>16-bit</td></tr><tr><td><code>U</code></td><td><code>0011</code></td><td><code>$3</code></td><td>16-bit</td></tr><tr><td><code>S</code></td><td><code>0100</code></td><td><code>$4</code></td><td>16-bit</td></tr><tr><td><code>PC</code></td><td><code>0101</code></td><td><code>$5</code></td><td>16-bit</td></tr><tr><td><code>A</code></td><td><code>1000</code></td><td><code>$8</code></td><td>8-bit</td></tr><tr><td><code>B</code></td><td><code>1001</code></td><td><code>$9</code></td><td>8-bit</td></tr><tr><td><code>CC</code></td><td><code>1010</code></td><td><code>$A</code></td><td>8-bit</td></tr><tr><td><code>DP</code></td><td><code>1011</code></td><td><code>$B</code></td><td>8-bit</td></tr></tbody>
+    </table>
+    <div class="interactive no-print">
+      <h4>Postbyte Decoder</h4>
+      <p>Enter a postbyte value to decode the transfer:</p>
+      <label>Postbyte: <code>$</code><input type="text" id="pb-TFR" maxlength="2" size="2"
+        placeholder="01" style="font-family:monospace;width:3em;"
+        oninput="decodePB(this, 'pb-out-TFR', {})"></label>
+      <span id="pb-out-TFR" style="margin-left:1em;font-family:monospace;"></span>
+      <script>
+      (function() {
+        var codes = {'D': '0000', 'X': '0001', 'Y': '0010', 'U': '0011', 'S': '0100', 'PC': '0101', 'A': '1000', 'B': '1001', 'CC': '1010', 'DP': '1011'};
+        var byNibble = {};
+        Object.entries(codes).forEach(function(e) {
+          byNibble[parseInt(e[1], 2).toString(16).toUpperCase()] = e[0];
+        });
+        window.decodePB = window.decodePB || function(inp, outId, _) {
+          var val = inp.value.toUpperCase().replace(/[^0-9A-F]/g,'');
+          var out = document.getElementById(outId);
+          if (val.length < 2) { out.textContent = ''; return; }
+          var src = byNibble[val[0]] || '?';
+          var dst = byNibble[val[1]] || '?';
+          out.textContent = inp.closest('.instruction').querySelector('h3').textContent.split(' ')[0]
+            + ' ' + src + ',' + dst;
+        };
+        document.getElementById('pb-TFR').addEventListener('input', function() {
+          var val = this.value.toUpperCase().replace(/[^0-9A-F]/g,'');
+          var out = document.getElementById('pb-out-TFR');
+          if (val.length < 2) { out.textContent = ''; return; }
+          var src = byNibble[val[0]] || '?';
+          var dst = byNibble[val[1]] || '?';
+          out.textContent = 'TFR ' + src + ',' + dst;
+        });
+      })();
+      </script>
+    </div>
+  </div>
   <p class="notes">Postbyte encodes source (high nibble) and destination (low nibble). Transferring between different-sized registers: 8-bit to 16-bit zero-extends; 16-bit to 8-bit takes low byte. CC and DP are affected only when transferred to. When CC is the destination, all flags are set from the transferred value.</p>
 </div>
 
@@ -65,6 +111,7 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Same postbyte encoding as TFR. Both registers must be the same size. Exchanging different-sized registers produces undefined results on 6809; 6309 handles it differently.</p>
 </div>
 

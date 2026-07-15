@@ -38,6 +38,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Computes the effective address and loads it into X — no memory access. Z is set if the computed address is zero. Used for PC-relative data addressing (LEAX label,PCR), pointer arithmetic, and fast 16-bit addition (LEAX n,X adds n to X in place).</p>
 </div>
 
@@ -65,6 +66,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Same as LEAX but loads Y. Z reflects whether result is zero.</p>
 </div>
 
@@ -92,6 +94,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Does not affect Z. Used to adjust the stack pointer — LEAS -n,S reserves n bytes on the stack; LEAS n,S releases them.</p>
 </div>
 
@@ -119,6 +122,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Does not affect Z. Used to set up the U pointer for data access.</p>
 </div>
 

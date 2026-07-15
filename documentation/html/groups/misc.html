@@ -38,6 +38,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Does nothing for 2 cycles. Used for timing loops, code patching placeholders, and alignment.</p>
 </div>
 
@@ -65,6 +66,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">B is treated as unsigned (0-255). No flags affected. Equivalent to LEAX B,X but faster (3 vs 4+ cycles) and does not affect Z. Useful for indexing into a table using B as an unsigned offset.</p>
 </div>
 
@@ -92,6 +94,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Sign extends the 8-bit value in B into the 16-bit D register. If B is negative (bit 7 set), A is set to $FF; otherwise A is cleared. Allows treating B as a signed 16-bit value in D.</p>
 </div>
 
@@ -119,6 +122,7 @@
       <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Clears selected CC bits via AND mask, then pushes all registers (sets E flag in CC), then halts execution until an unmasked interrupt arrives. Faster interrupt response than SYNC because all registers are pre-saved. Minimum 20 cycles before interrupt vector is fetched.</p>
 </div>
 
@@ -146,6 +150,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Halts execution and waits for any interrupt. If the interrupt is masked, execution resumes at the next instruction after 2 cycles (without servicing the interrupt). If unmasked, the interrupt is serviced normally. Used for precise timing synchronization.</p>
 </div>
 
@@ -173,6 +178,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Pushes all registers with E set, then vectors through $FFFA/$FFFB. Under OS-9 this is the syscall mechanism — the byte following SWI is the syscall number.</p>
 </div>
 
@@ -200,6 +206,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 2 instruction. Vectors through $FFF4/$FFF5. Under OS-9 Level II this is the user-mode syscall.</p>
 </div>
 
@@ -227,6 +234,7 @@
       <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
     </tbody>
   </table>
+  
   <p class="notes">Page 3 instruction. Vectors through $FFF2/$FFF3.</p>
 </div>
 

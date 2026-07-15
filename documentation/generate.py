@@ -145,6 +145,64 @@ def render_instruction(instr):
     notes_html = f'<p class="notes">{notes}</p>' if notes else ''
     desc_html  = f'<p class="description">{description}</p>' if description else ''
 
+    # Register codes table (TFR/EXG)
+    reg_codes = instr.get('register_codes', {})
+    reg_codes_html = ''
+    if reg_codes:
+        # Sort by binary value
+        sorted_regs = sorted(reg_codes.items(), key=lambda x: int(x[1], 2))
+        rows = ''
+        for reg, bits in sorted_regs:
+            nibble = f'${int(bits, 2):X}'
+            size = '16-bit' if int(bits, 2) < 8 else '8-bit'
+            rows += f'<tr><td><code>{reg}</code></td><td><code>{bits}</code></td><td><code>{nibble}</code></td><td>{size}</td></tr>'
+        reg_codes_html = f'''
+  <div class="reg-codes">
+    <h4>Register Codes</h4>
+    <p>The postbyte encodes source register in the high nibble and destination in the low nibble.
+    Example: <code>TFR D,X</code> &rarr; high nibble <code>$0</code> (D), low nibble <code>$1</code> (X) &rarr; postbyte <code>$01</code> &rarr; instruction bytes <code>$1F $01</code>.</p>
+    <table class="modes-table reg-codes-table">
+      <thead>
+        <tr><th>Register</th><th>Bits</th><th>Nibble</th><th>Size</th></tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+    <div class="interactive no-print">
+      <h4>Postbyte Decoder</h4>
+      <p>Enter a postbyte value to decode the transfer:</p>
+      <label>Postbyte: <code>$</code><input type="text" id="pb-{mnemonic}" maxlength="2" size="2"
+        placeholder="01" style="font-family:monospace;width:3em;"
+        oninput="decodePB(this, 'pb-out-{mnemonic}', {{}})"></label>
+      <span id="pb-out-{mnemonic}" style="margin-left:1em;font-family:monospace;"></span>
+      <script>
+      (function() {{
+        var codes = {dict(reg_codes)!r};
+        var byNibble = {{}};
+        Object.entries(codes).forEach(function(e) {{
+          byNibble[parseInt(e[1], 2).toString(16).toUpperCase()] = e[0];
+        }});
+        window.decodePB = window.decodePB || function(inp, outId, _) {{
+          var val = inp.value.toUpperCase().replace(/[^0-9A-F]/g,'');
+          var out = document.getElementById(outId);
+          if (val.length < 2) {{ out.textContent = ''; return; }}
+          var src = byNibble[val[0]] || '?';
+          var dst = byNibble[val[1]] || '?';
+          out.textContent = inp.closest('.instruction').querySelector('h3').textContent.split(' ')[0]
+            + ' ' + src + ',' + dst;
+        }};
+        document.getElementById('pb-{mnemonic}').addEventListener('input', function() {{
+          var val = this.value.toUpperCase().replace(/[^0-9A-F]/g,'');
+          var out = document.getElementById('pb-out-{mnemonic}');
+          if (val.length < 2) {{ out.textContent = ''; return; }}
+          var src = byNibble[val[0]] || '?';
+          var dst = byNibble[val[1]] || '?';
+          out.textContent = '{mnemonic} ' + src + ',' + dst;
+        }});
+      }})();
+      </script>
+    </div>
+  </div>'''
+
     return f'''
 <div class="instruction" id="{mnemonic}">
   <h3 class="mnemonic">{mnemonic} <span class="full-name">— {full_name}</span></h3>
@@ -169,6 +227,7 @@ def render_instruction(instr):
       <tr>{cc_html_cells}</tr>
     </tbody>
   </table>
+  {reg_codes_html}
   {notes_html}
 </div>
 '''
