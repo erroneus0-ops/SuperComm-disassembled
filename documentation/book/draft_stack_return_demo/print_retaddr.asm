@@ -33,6 +33,7 @@ MAIN
          BSR   PRINTRET     ; return address pushed = address of next line
          BSR   PRINTRET     ; called twice -- each prints its own caller
          BSR   TESTW2000    ; W2000 test -- [,-S] with PRINTRET as witness
+         BSR   TESTCPU      ; CPU detection -- 6809 vs 6309 via TFR 0,D
          RTS
 
 ;------------------------------------------------------------------
@@ -141,6 +142,65 @@ W2000_FAIL
          LDA   #'N          ; incorrect -- XRoar doesn't match silicon
 W2000_DONE
          JSR   [CHROUT]
+         LDA   #$0D
+         JSR   [CHROUT]
+         RTS
+
+;------------------------------------------------------------------
+; TESTCPU -- detect 6809 vs 6309 using TFR 0,D
+;
+; William Astle's detection idiom:
+;   6809: TFR 0,D is TFR D,D (undefined) -- typically leaves D unchanged
+;         or produces $FFFF depending on silicon
+;   6309: register 0 = literal zero source -- loads D with $0000
+;
+; We print:
+;   "CPU:6809" if D != $0000 after TFR 0,D
+;   "CPU:6309" if D == $0000 after TFR 0,D
+;------------------------------------------------------------------
+TESTCPU
+         BSR   PRINTRET     ; print our return address as witness
+
+         LDD   #$FFFF       ; pre-load D with $FFFF as baseline
+         TFR   D,D          ; 6809: D->D no-op (leaves D=$FFFF)
+                             ; 6309: register 0 = zero source, D=$0000
+
+; Print "CPU:" label
+         PSHS  D            ; save result
+         LDA   #'C
+         JSR   [CHROUT]
+         LDA   #'P
+         JSR   [CHROUT]
+         LDA   #'U
+         JSR   [CHROUT]
+         LDA   #':
+         JSR   [CHROUT]
+         PULS  D            ; restore TFR result
+
+; Test result
+         CMPD  #$0000
+         BNE   IS6809
+; 6309 detected
+         LDA   #'6
+         JSR   [CHROUT]
+         LDA   #'3
+         JSR   [CHROUT]
+         LDA   #'0
+         JSR   [CHROUT]
+         LDA   #'9
+         JSR   [CHROUT]
+         BRA   CPUTDONE
+IS6809
+; 6809 detected (or 6309 in compatibility mode behaving as 6809)
+         LDA   #'6
+         JSR   [CHROUT]
+         LDA   #'8
+         JSR   [CHROUT]
+         LDA   #'0
+         JSR   [CHROUT]
+         LDA   #'9
+         JSR   [CHROUT]
+CPUTDONE
          LDA   #$0D
          JSR   [CHROUT]
          RTS
