@@ -176,34 +176,38 @@ def render_instruction(instr):
     </div>
     <div class="interactive no-print" style="margin-top:1rem">
       <h4>{mnemonic} builder</h4>
-      <div style="display:flex;gap:2rem;flex-wrap:wrap">
-        <div>
-          <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">16-bit transfers</div>
-          <div style="display:flex;gap:8px;margin-bottom:6px">
-            <div>
-              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
-              <div id="src16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
-            </div>
-            <div>
-              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
-              <div id="dst16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;display:inline-flex">
+        <div style="display:flex;gap:2rem">
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">16-bit transfers</div>
+            <div style="display:flex;gap:8px">
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
+                <div id="src16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
+                <div id="dst16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
             </div>
           </div>
-          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);min-width:160px">&nbsp;</div>
+          <div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">8-bit transfers</div>
+            <div style="display:flex;gap:8px">
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
+                <div id="src8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+              <div>
+                <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
+                <div id="dst8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">8-bit transfers</div>
-          <div style="display:flex;gap:8px;margin-bottom:6px">
-            <div>
-              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
-              <div id="src8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
-            </div>
-            <div>
-              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
-              <div id="dst8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
-            </div>
-          </div>
-          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);min-width:160px">&nbsp;</div>
+        <div style="display:flex;gap:2rem">
+          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1">&nbsp;</div>
+          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1">&nbsp;</div>
         </div>
       </div>
       <script>
