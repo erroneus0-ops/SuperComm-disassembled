@@ -178,32 +178,32 @@ def render_instruction(instr):
       <h4>{mnemonic} builder</h4>
       <div style="display:flex;gap:2rem;flex-wrap:wrap">
         <div>
-          <div style="font-size:0.8rem;color:#666;margin-bottom:4px">16-bit transfers</div>
+          <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">16-bit transfers</div>
           <div style="display:flex;gap:8px;margin-bottom:6px">
             <div>
-              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">from</div>
+              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
               <div id="src16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
             <div>
-              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">to</div>
+              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
               <div id="dst16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
           </div>
-          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid #ccc;border-radius:4px;background:#f8f8f8;min-width:160px">&nbsp;</div>
+          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);min-width:160px">&nbsp;</div>
         </div>
         <div>
-          <div style="font-size:0.8rem;color:#666;margin-bottom:4px">8-bit transfers</div>
+          <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">8-bit transfers</div>
           <div style="display:flex;gap:8px;margin-bottom:6px">
             <div>
-              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">from</div>
+              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
               <div id="src8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
             <div>
-              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">to</div>
+              <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">to</div>
               <div id="dst8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
             </div>
           </div>
-          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid #ccc;border-radius:4px;background:#f8f8f8;min-width:160px">&nbsp;</div>
+          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);min-width:160px">&nbsp;</div>
         </div>
       </div>
       <script>
@@ -221,11 +221,12 @@ def render_instruction(instr):
             var b = document.createElement('button');
             b.textContent = reg;
             b.dataset.reg = reg;
-            b.style.cssText = 'font-family:monospace;padding:2px 8px;border:1px solid #bbb;border-radius:3px;background:#fff;cursor:pointer;font-size:0.85rem';
+            b.style.cssText = 'font-family:monospace;padding:2px 8px;border:1px solid var(--border-strong,#bbb);border-radius:3px;background:var(--surface-2,#fff);color:var(--text-primary,#111);cursor:pointer;font-size:0.85rem';
             b.addEventListener('click', function() {{
-              c.querySelectorAll('button').forEach(function(x){{x.style.background='#fff';x.style.borderColor='#bbb';}});
-              b.style.background = (role==='src') ? '#dbeafe' : '#dcfce7';
-              b.style.borderColor = (role==='src') ? '#3b82f6' : '#22c55e';
+              c.querySelectorAll('button').forEach(function(x){{x.style.background='var(--surface-2,#fff)';x.style.borderColor='var(--border-strong,#bbb)';x.style.color='var(--text-primary,#111)';}});
+              b.style.background = (role==='src') ? 'var(--bg-accent,#dbeafe)' : 'var(--bg-success,#dcfce7)';
+              b.style.borderColor = (role==='src') ? 'var(--border-accent,#3b82f6)' : 'var(--border-success,#22c55e)';
+              b.style.color = (role==='src') ? 'var(--text-accent,#1d4ed8)' : 'var(--text-success,#15803d)';
               updateOut(containerId, role, reg);
             }});
             c.appendChild(b);
