@@ -280,6 +280,9 @@ def render_instruction(instr):
   {desc_html}
   <div class="tables-wrap">
     <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
       <thead>
         <tr>
           <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
