@@ -472,6 +472,10 @@ def render_index(groups):
     <h2>Instruction Reference</h2>
   </header>
   <main>
+    <section class="index-group">
+      <h3>Addressing References</h3>
+      <div class="mnemonic-list"><a href="groups/indexed_postbyte.html">Indexed Addressing Postbyte</a></div>
+    </section>
     {''.join(nav_items)}
   </main>
   <footer>
