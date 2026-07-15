@@ -326,12 +326,56 @@ DATA statements from ch1. Closes loop from COMTRAN TEN story.
 
 ### Writing Style Notes
 
-Avoid: short punchy sentences with em-dashes, performed enthusiasm,
-"Forty-nine lines. The program is complete." style (AI dramatic-reading).
-Aim for: direct, plain, trusts the reader.
 Reference: Leventhal 6809 Assembly Language Programming book (scanned at
 https://colorcomputerarchive.com/repo/Documents/Books/6809%20Assembly%20Language%20Programming%20(Lance%20Leventhal).pdf
 and at https://archive.org/details/6809_Assembly_Language_Programming_by_Lance_Leventhal)
+Aim for: direct, plain, trusts the reader.
+
+**The actual test, not a blacklist:** none of the words or constructions
+below are forbidden. Each one is the correct choice in some sentence.
+The failure isn't the word -- it's deploying it without checking whether
+its specific flavor actually fits the thing being described. This is the
+same principle as picking "relative offset" vs. "branch vector" vs.
+"dynamically computed address" for the same byte (see Terminology
+Variety, below) -- three correct terms, each earning its place by
+matching a specific aspect of the moment. A tic is what happens when
+that check gets skipped: the word shows up because it's available and
+sounds right, not because this particular sentence needed its particular
+weight. "Let's delve into whether this returned zero" is the failure
+mode exactly -- "delve" carrying its full connotation of effortful depth,
+aimed at a fact with no depth to plumb at all.
+
+**Named categories to check against** (so the rule generalizes past any
+one example sentence -- if a new instance doesn't match any category
+below, that's a sign the category list needs a new entry, not that the
+instance is fine):
+
+- Sycophantic openers -- "That's a great question!", "Excellent point!"
+- Emphatic affirmations used as filler, not agreement -- "Absolutely!",
+  "Exactly!" deployed as rhythm rather than because something specific
+  is being affirmed
+- Pseudo-empathetic affirmations -- "I completely understand your
+  concern" doing the *shape* of empathy without any actual content
+  specific to what was said
+- Hedging phrases -- "It's important to note that...", "I have to be
+  honest..." -- used as throat-clearing rather than because a real
+  caveat follows
+- Overused vocabulary -- delve, tapestry, nuanced, multifaceted,
+  landscape, foster, leverage, robust, streamline, holistic -- fine
+  words, wrong this often
+- Filler transitions -- "Furthermore," "Moreover," -- connective tissue
+  added to pad rhythm, not because one sentence actually follows from
+  the last
+- Performed enthusiasm / dramatic-reading cadence -- short punchy
+  sentences with em-dashes built for impact rather than clarity.
+  Symptom sentence, still the clearest example: "Forty-nine lines. The
+  program is complete."
+
+**Quick check before finalizing any passage:** for each of the categories
+above that shows up, ask whether this specific instance was selected
+because it's the correct flavor for this specific fact, or because it's
+available and sounds confident/warm/impactful. Keep the former. Cut or
+replace the latter.
 
 ---
 
