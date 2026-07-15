@@ -147,62 +147,42 @@ W2000_DONE
          RTS
 
 ;------------------------------------------------------------------
-; TESTCPU -- detect 6809 vs 6309 using TFR 0,D
+; PRINTSTR -- print null-terminated string pointed to by X
+; Entry: X = address of string
+; Exit:  X points past null terminator
+;------------------------------------------------------------------
+PRINTSTR LDA   ,X+
+         BEQ   PSTREND
+         JSR   [CHROUT]
+         BRA   PRINTSTR
+PSTREND  RTS
+
+;------------------------------------------------------------------
+; TESTCPU -- detect 6809 vs 6309 using TFR D,D (postbyte $00)
 ;
 ; William Astle's detection idiom:
-;   6809: TFR 0,D is TFR D,D (undefined) -- typically leaves D unchanged
-;         or produces $FFFF depending on silicon
-;   6309: register 0 = literal zero source -- loads D with $0000
-;
-; We print:
-;   "CPU:6809" if D != $0000 after TFR 0,D
-;   "CPU:6309" if D == $0000 after TFR 0,D
+;   6809: TFR D,D is no-op -- D stays $FFFF
+;   6309: register code 0 = zero source -- D becomes $0000
 ;------------------------------------------------------------------
 TESTCPU
          BSR   PRINTRET     ; print our return address as witness
 
-         LDD   #$FFFF       ; pre-load D with $FFFF as baseline
-         TFR   D,D          ; 6809: D->D no-op (leaves D=$FFFF)
-                             ; 6309: register 0 = zero source, D=$0000
+         LDD   #$FFFF       ; pre-load D with known non-zero value
+         TFR   D,D          ; postbyte $00: D->D (6809) or 0->D (6309)
 
-; Print "CPU:" label
-         PSHS  D            ; save result
-         LDA   #'C
-         JSR   [CHROUT]
-         LDA   #'P
-         JSR   [CHROUT]
-         LDA   #'U
-         JSR   [CHROUT]
-         LDA   #':
-         JSR   [CHROUT]
-         PULS  D            ; restore TFR result
-
-; Test result
          CMPD  #$0000
          BNE   IS6809
-; 6309 detected
-         LDA   #'6
-         JSR   [CHROUT]
-         LDA   #'3
-         JSR   [CHROUT]
-         LDA   #'0
-         JSR   [CHROUT]
-         LDA   #'9
-         JSR   [CHROUT]
-         BRA   CPUTDONE
-IS6809
-; 6809 detected (or 6309 in compatibility mode behaving as 6809)
-         LDA   #'6
-         JSR   [CHROUT]
-         LDA   #'8
-         JSR   [CHROUT]
-         LDA   #'0
-         JSR   [CHROUT]
-         LDA   #'9
-         JSR   [CHROUT]
-CPUTDONE
+         LDX   #STR6309
+         BRA   CPUPRINT
+IS6809   LDX   #STR6809
+CPUPRINT BSR   PRINTSTR
          LDA   #$0D
          JSR   [CHROUT]
          RTS
+
+STR6809  FCC   "CPU:6809"
+         FCB   $00
+STR6309  FCC   "CPU:6309"
+         FCB   $00
 
          END   MAIN
