@@ -1,6 +1,7 @@
 # CLAUDE_MANIFESTO.md
 # Project continuity file — paste this at the start of a new conversation
-# Last updated: July 1 2026 (session: XRoar cart-autorun investigation,
+# Last updated: July 15 2026 (session: XRoar debug exports, cocotools PSHS D fix,
+#   source diagnostic pass, lwasm audit briefing, print_retaddr demo, writing style notes)
 #   COMTRAN TEN reference, book Ch02/Ch03, GitHub Pages, screenshot workflow)
 # Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
 # philosophy document, not just context.
