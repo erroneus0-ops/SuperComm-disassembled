@@ -151,22 +151,29 @@ def render_instruction(instr):
     if reg_codes:
         # Sort by binary value
         sorted_regs = sorted(reg_codes.items(), key=lambda x: int(x[1], 2))
-        rows = ''
+        rows16 = ''
+        rows8  = ''
         for reg, bits in sorted_regs:
             nibble = f'${int(bits, 2):X}'
-            size = '16-bit' if int(bits, 2) < 8 else '8-bit'
-            rows += f'<tr><td><code>{reg}</code></td><td><code>{bits}</code></td><td><code>{nibble}</code></td><td>{size}</td></tr>'
+            if int(bits, 2) < 8:
+                rows16 += f'<tr><td><code>{reg}</code></td><td><code>{nibble}</code></td></tr>'
+            else:
+                rows8  += f'<tr><td><code>{reg}</code></td><td><code>{nibble}</code></td></tr>'
         reg_codes_html = f'''
   <div class="reg-codes">
-    <h4>Register Codes</h4>
-    <p>The postbyte encodes source register in the high nibble and destination in the low nibble.
-    Example: <code>TFR D,X</code> &rarr; high nibble <code>$0</code> (D), low nibble <code>$1</code> (X) &rarr; postbyte <code>$01</code> &rarr; instruction bytes <code>$1F $01</code>.</p>
-    <table class="modes-table reg-codes-table">
-      <thead>
-        <tr><th>Register</th><th>Bits</th><th>Nibble</th><th>Size</th></tr>
-      </thead>
-      <tbody>{rows}</tbody>
-    </table>
+    <h4>Register codes</h4>
+    <p>Postbyte: source in high nibble, destination in low nibble.
+    <code>TFR D,X</code> &rarr; <code>$0</code>&nbsp;|&nbsp;<code>$1</code> &rarr; postbyte <code>$01</code> &rarr; bytes <code>$1F $01</code>.</p>
+    <div style="display:flex;gap:2rem;align-items:flex-start">
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody>{rows16}</tbody>
+      </table>
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody>{rows8}</tbody>
+      </table>
+    </div>
     <div class="interactive no-print">
       <h4>Postbyte Decoder</h4>
       <p>Enter a postbyte value to decode the transfer:</p>

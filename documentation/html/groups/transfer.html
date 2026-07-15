@@ -40,15 +40,19 @@
   </table>
   
   <div class="reg-codes">
-    <h4>Register Codes</h4>
-    <p>The postbyte encodes source register in the high nibble and destination in the low nibble.
-    Example: <code>TFR D,X</code> &rarr; high nibble <code>$0</code> (D), low nibble <code>$1</code> (X) &rarr; postbyte <code>$01</code> &rarr; instruction bytes <code>$1F $01</code>.</p>
-    <table class="modes-table reg-codes-table">
-      <thead>
-        <tr><th>Register</th><th>Bits</th><th>Nibble</th><th>Size</th></tr>
-      </thead>
-      <tbody><tr><td><code>D</code></td><td><code>0000</code></td><td><code>$0</code></td><td>16-bit</td></tr><tr><td><code>X</code></td><td><code>0001</code></td><td><code>$1</code></td><td>16-bit</td></tr><tr><td><code>Y</code></td><td><code>0010</code></td><td><code>$2</code></td><td>16-bit</td></tr><tr><td><code>U</code></td><td><code>0011</code></td><td><code>$3</code></td><td>16-bit</td></tr><tr><td><code>S</code></td><td><code>0100</code></td><td><code>$4</code></td><td>16-bit</td></tr><tr><td><code>PC</code></td><td><code>0101</code></td><td><code>$5</code></td><td>16-bit</td></tr><tr><td><code>A</code></td><td><code>1000</code></td><td><code>$8</code></td><td>8-bit</td></tr><tr><td><code>B</code></td><td><code>1001</code></td><td><code>$9</code></td><td>8-bit</td></tr><tr><td><code>CC</code></td><td><code>1010</code></td><td><code>$A</code></td><td>8-bit</td></tr><tr><td><code>DP</code></td><td><code>1011</code></td><td><code>$B</code></td><td>8-bit</td></tr></tbody>
-    </table>
+    <h4>Register codes</h4>
+    <p>Postbyte: source in high nibble, destination in low nibble.
+    <code>TFR D,X</code> &rarr; <code>$0</code>&nbsp;|&nbsp;<code>$1</code> &rarr; postbyte <code>$01</code> &rarr; bytes <code>$1F $01</code>.</p>
+    <div style="display:flex;gap:2rem;align-items:flex-start">
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody><tr><td><code>D</code></td><td><code>$0</code></td></tr><tr><td><code>X</code></td><td><code>$1</code></td></tr><tr><td><code>Y</code></td><td><code>$2</code></td></tr><tr><td><code>U</code></td><td><code>$3</code></td></tr><tr><td><code>S</code></td><td><code>$4</code></td></tr><tr><td><code>PC</code></td><td><code>$5</code></td></tr></tbody>
+      </table>
+      <table class="modes-table" style="width:auto">
+        <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <tbody><tr><td><code>A</code></td><td><code>$8</code></td></tr><tr><td><code>B</code></td><td><code>$9</code></td></tr><tr><td><code>CC</code></td><td><code>$A</code></td></tr><tr><td><code>DP</code></td><td><code>$B</code></td></tr></tbody>
+      </table>
+    </div>
     <div class="interactive no-print">
       <h4>Postbyte Decoder</h4>
       <p>Enter a postbyte value to decode the transfer:</p>
