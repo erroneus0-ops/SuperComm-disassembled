@@ -257,6 +257,8 @@ footer {
 
 /* ── Print / PDF ─────────────────────────────────────────────── */
 @media print {
+  .no-print, .interactive { display: none !important; }
+
   :root {
     --bg:          #ffffff;
     --bg2:         #f8f8f8;
