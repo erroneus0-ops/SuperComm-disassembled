@@ -111,21 +111,79 @@ CC_SYMBOLS = {
 def cc_html(val):
     return CC_SYMBOLS.get(val, val)
 
+def _load_indexed_postbyte_data():
+    """Load indexed postbyte extra cycles/bytes from JSON."""
+    import json, os
+    pb_path = os.path.join(os.path.dirname(__file__),
+                           'opcodes', 'opcodes_indexed_postbyte.json')
+    with open(pb_path) as f:
+        return json.load(f)['modes']
+
+_PB_MODES = None
+
+def _expand_indexed(mode_entry):
+    """Expand a single indexed mode row into all postbyte variants."""
+    global _PB_MODES
+    if _PB_MODES is None:
+        _PB_MODES = _load_indexed_postbyte_data()
+
+    cycles_str = str(mode_entry.get('cycles', ''))
+    if not cycles_str.endswith('+'):
+        return [mode_entry]
+
+    base_cycles = int(cycles_str[:-1])
+    base_bytes  = 2  # opcode + postbyte minimum
+    opcode = mode_entry['opcode']
+    rows = []
+
+    for m in _PB_MODES:
+        extra_c = m.get('extra_cycles', 0)
+        extra_b = m.get('extra_bytes', 0)
+        syntax  = m.get('syntax', '')
+        mtype   = m.get('type', '')
+        indirect = m.get('indirect_available', False)
+
+        total_bytes  = base_bytes + extra_b
+        total_cycles = base_cycles + extra_c
+
+        rows.append({
+            'mode':   f'indexed — {mtype}',
+            'syntax': syntax,
+            'opcode': opcode,
+            'bytes':  total_bytes,
+            'cycles': total_cycles,
+        })
+
+        if indirect:
+            rows.append({
+                'mode':   f'indexed — {mtype}, indirect',
+                'syntax': f'[{syntax}]',
+                'opcode': opcode,
+                'bytes':  total_bytes,
+                'cycles': total_cycles + 3,
+            })
+
+    return rows
+
+
 def render_modes_table(modes):
     rows = []
     for m in modes:
-        cycles = m.get('cycles', '?')
-        bytes_ = m.get('bytes', '?')
-        syntax = m['syntax'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-        rows.append(
-            f'<tr>'
-            f'<td class="mode">{m["mode"].replace("-", "&#8209;")}</td>'
-            f'<td class="syntax"><code>{syntax}</code></td>'
-            f'<td class="col-opcode"><code>${m["opcode"]}</code></td>'
-            f'<td class="col-bytes">{bytes_}</td>'
-            f'<td class="col-cycles">{cycles}</td>'
-            f'</tr>'
-        )
+        # Expand indexed mode into all postbyte variants
+        for em in _expand_indexed(m):
+            cycles = em.get('cycles', '?')
+            bytes_ = em.get('bytes', '?')
+            syntax = em['syntax'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+            mode_label = em["mode"].replace("-", "&#8209;")
+            rows.append(
+                f'<tr>'
+                f'<td class="mode">{mode_label}</td>'
+                f'<td class="syntax"><code>{syntax}</code></td>'
+                f'<td class="col-opcode"><code>${em["opcode"]}</code></td>'
+                f'<td class="col-bytes">{bytes_}</td>'
+                f'<td class="col-cycles">{cycles}</td>'
+                f'</tr>'
+            )
     return '\n'.join(rows)
 
 def render_instruction(instr):
