@@ -179,7 +179,7 @@ def render_instruction(instr):
       <div style="display:flex;flex-direction:column;gap:8px;display:inline-flex">
         <div style="display:flex;gap:2rem">
           <div>
-            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">16-bit transfers</div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px;min-width:200px">16-bit transfers</div>
             <div style="display:flex;gap:8px">
               <div>
                 <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
@@ -192,7 +192,7 @@ def render_instruction(instr):
             </div>
           </div>
           <div>
-            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px">8-bit transfers</div>
+            <div style="font-size:0.8rem;color:var(--text-secondary,#666);margin-bottom:4px;min-width:200px">8-bit transfers</div>
             <div style="display:flex;gap:8px">
               <div>
                 <div style="font-size:0.75rem;color:var(--text-muted,#888);margin-bottom:3px">from</div>
