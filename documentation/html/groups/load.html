@@ -45,10 +45,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
@@ -56,6 +52,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$A6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDA addr</code></td><td class="col-opcode"><code>$B6</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
       </tbody>
     </table>
@@ -104,10 +102,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
@@ -115,6 +109,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$E6</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDB addr</code></td><td class="col-opcode"><code>$F6</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
       </tbody>
     </table>
@@ -163,10 +159,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">3</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
@@ -174,6 +166,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$EC</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDD addr</code></td><td class="col-opcode"><code>$FC</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
       </tbody>
     </table>
@@ -222,10 +216,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">3</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
@@ -233,6 +223,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$AE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDX addr</code></td><td class="col-opcode"><code>$BE</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
       </tbody>
     </table>
@@ -281,10 +273,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
@@ -292,6 +280,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">4</td><td class="col-cycles">14</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$10AE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDY addr</code></td><td class="col-opcode"><code>$10BE</code></td><td class="col-bytes">4</td><td class="col-cycles">7</td></tr>
       </tbody>
     </table>
@@ -340,10 +330,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
@@ -351,6 +337,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">4</td><td class="col-cycles">14</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$10EE</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDS addr</code></td><td class="col-opcode"><code>$10FE</code></td><td class="col-bytes">4</td><td class="col-cycles">7</td></tr>
       </tbody>
     </table>
@@ -399,10 +387,6 @@
 <tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">3</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset</td><td class="syntax"><code>A,R</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator A offset, indirect</td><td class="syntax"><code>[A,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset</td><td class="syntax"><code>B,R</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
-<tr><td class="mode">indexed — Accumulator B offset, indirect</td><td class="syntax"><code>[B,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
 <tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
@@ -410,6 +394,8 @@
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
 <tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
 <tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$EE</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
 <tr><td class="mode">extended</td><td class="syntax"><code>LDU addr</code></td><td class="col-opcode"><code>$FE</code></td><td class="col-bytes">3</td><td class="col-cycles">6</td></tr>
       </tbody>
     </table>

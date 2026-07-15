@@ -136,15 +136,31 @@ def _expand_indexed(mode_entry):
     opcode = mode_entry['opcode']
     rows = []
 
+    # Build rows, merging A,R and B,R if they have identical specs
+    pending = {}  # key=(extra_b,extra_c,indirect) -> partial row for merging
     for m in _PB_MODES:
-        extra_c = m.get('extra_cycles', 0)
-        extra_b = m.get('extra_bytes', 0)
-        syntax  = m.get('syntax', '')
-        mtype   = m.get('type', '')
+        extra_c  = m.get('extra_cycles', 0)
+        extra_b  = m.get('extra_bytes', 0)
+        syntax   = m.get('syntax', '')
+        mtype    = m.get('type', '')
         indirect = m.get('indirect_available', False)
 
         total_bytes  = base_bytes + extra_b
         total_cycles = base_cycles + extra_c
+
+        # Merge accumulator A and B offset rows -- same stats, different letter
+        if 'Accumulator' in mtype and ('A offset' in mtype or 'B offset' in mtype) and 'D' not in mtype:
+            key = ('acc_ab', extra_b, extra_c)
+            if key not in pending:
+                pending[key] = {
+                    'mode':   'indexed — accumulator A/B offset',
+                    'syntax': 'A/B,R',
+                    'opcode': opcode,
+                    'bytes':  total_bytes,
+                    'cycles': total_cycles,
+                    'indirect': indirect,
+                }
+            continue  # second one (B) just confirms, skip adding again
 
         rows.append({
             'mode':   f'indexed — {mtype}',
@@ -161,6 +177,24 @@ def _expand_indexed(mode_entry):
                 'opcode': opcode,
                 'bytes':  total_bytes,
                 'cycles': total_cycles + 3,
+            })
+
+    # Flush merged rows (A/B accumulator) at the right position
+    for key, r in pending.items():
+        rows.append({
+            'mode':   r['mode'],
+            'syntax': r['syntax'],
+            'opcode': r['opcode'],
+            'bytes':  r['bytes'],
+            'cycles': r['cycles'],
+        })
+        if r.get('indirect'):
+            rows.append({
+                'mode':   r['mode'] + ', indirect',
+                'syntax': f'[{r["syntax"]}]',
+                'opcode': r['opcode'],
+                'bytes':  r['bytes'],
+                'cycles': r['cycles'] + 3,
             })
 
     return rows
