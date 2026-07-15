@@ -206,8 +206,8 @@ def render_instruction(instr):
           </div>
         </div>
         <div style="display:flex;gap:2rem">
-          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1">&nbsp;</div>
-          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1">&nbsp;</div>
+          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1;min-width:200px;white-space:nowrap">&nbsp;</div>
+          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid var(--border,#ccc);border-radius:4px;background:var(--surface-1,#f8f8f8);color:var(--text-primary,#111);flex:1;min-width:200px;white-space:nowrap">&nbsp;</div>
         </div>
       </div>
       <script>
