@@ -156,9 +156,9 @@ def render_instruction(instr):
         for reg, bits in sorted_regs:
             nibble = f'${int(bits, 2):X}'
             if int(bits, 2) < 8:
-                rows16 += f'<tr><td><code>{reg}</code></td><td><code>{nibble}</code></td></tr>'
+                rows16 += f'<tr><td style="text-align:center"><code>{reg}</code></td><td style="text-align:center"><code>{nibble}</code></td></tr>'
             else:
-                rows8  += f'<tr><td><code>{reg}</code></td><td><code>{nibble}</code></td></tr>'
+                rows8  += f'<tr><td style="text-align:center"><code>{reg}</code></td><td style="text-align:center"><code>{nibble}</code></td></tr>'
         reg_codes_html = f'''
   <div class="reg-codes">
     <h4>Register codes</h4>
@@ -174,37 +174,95 @@ def render_instruction(instr):
         <tbody>{rows8}</tbody>
       </table>
     </div>
-    <div class="interactive no-print">
-      <h4>Postbyte Decoder</h4>
-      <p>Enter a postbyte value to decode the transfer:</p>
-      <label>Postbyte: <code>$</code><input type="text" id="pb-{mnemonic}" maxlength="2" size="2"
-        placeholder="01" style="font-family:monospace;width:3em;"
-        oninput="decodePB(this, 'pb-out-{mnemonic}', {{}})"></label>
-      <span id="pb-out-{mnemonic}" style="margin-left:1em;font-family:monospace;"></span>
+    <div class="interactive no-print" style="margin-top:1rem">
+      <h4>{mnemonic} builder</h4>
+      <div style="display:flex;gap:2rem;flex-wrap:wrap">
+        <div>
+          <div style="font-size:0.8rem;color:#666;margin-bottom:4px">16-bit transfers</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <div>
+              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">from</div>
+              <div id="src16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">to</div>
+              <div id="dst16-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+            </div>
+          </div>
+          <div id="out16-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid #ccc;border-radius:4px;background:#f8f8f8;min-width:160px">&nbsp;</div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem;color:#666;margin-bottom:4px">8-bit transfers</div>
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <div>
+              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">from</div>
+              <div id="src8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem;color:#888;margin-bottom:3px">to</div>
+              <div id="dst8-{mnemonic}" style="display:flex;flex-direction:column;gap:4px"></div>
+            </div>
+          </div>
+          <div id="out8-{mnemonic}" style="font-family:monospace;font-size:0.9rem;min-height:1.4em;padding:4px 6px;border:1px solid #ccc;border-radius:4px;background:#f8f8f8;min-width:160px">&nbsp;</div>
+        </div>
+      </div>
       <script>
       (function() {{
-        var codes = {dict(reg_codes)!r};
-        var byNibble = {{}};
-        Object.entries(codes).forEach(function(e) {{
-          byNibble[parseInt(e[1], 2).toString(16).toUpperCase()] = e[0];
-        }});
-        window.decodePB = window.decodePB || function(inp, outId, _) {{
-          var val = inp.value.toUpperCase().replace(/[^0-9A-F]/g,'');
+        var mn = '{mnemonic}';
+        var regs16 = {[r for r, b in reg_codes.items() if int(b,2) < 8]!r};
+        var regs8  = {[r for r, b in reg_codes.items() if int(b,2) >= 8]!r};
+        var nibbles = {{{', '.join([f'"{r}": "{int(b,2):X}"' for r,b in reg_codes.items()])}}};
+        var opcodes = {{"TFR":"1F","EXG":"1E"}};
+        var opcode = opcodes[mn];
+
+        function makeGroup(containerId, regs, role, partner16, partner8) {{
+          var c = document.getElementById(containerId);
+          regs.forEach(function(reg) {{
+            var b = document.createElement('button');
+            b.textContent = reg;
+            b.dataset.reg = reg;
+            b.style.cssText = 'font-family:monospace;padding:2px 8px;border:1px solid #bbb;border-radius:3px;background:#fff;cursor:pointer;font-size:0.85rem';
+            b.addEventListener('click', function() {{
+              c.querySelectorAll('button').forEach(function(x){{x.style.background='#fff';x.style.borderColor='#bbb';}});
+              b.style.background = (role==='src') ? '#dbeafe' : '#dcfce7';
+              b.style.borderColor = (role==='src') ? '#3b82f6' : '#22c55e';
+              updateOut(containerId, role, reg);
+            }});
+            c.appendChild(b);
+          }});
+        }}
+
+        var state = {{src16: null, dst16: null, src8: null, dst8: null}};
+
+        function updateOut(containerId, role, reg) {{
+          var is16 = containerId.includes('16');
+          var srcKey = is16 ? 'src16' : 'src8';
+          var dstKey = is16 ? 'dst16' : 'dst8';
+          state[srcKey.replace('src','src')] = (role==='src') ? reg : state[srcKey];
+          state[dstKey.replace('dst','dst')] = (role==='dst') ? reg : state[dstKey];
+          if (role==='src') state[srcKey] = reg;
+          else state[dstKey] = reg;
+          var outId = is16 ? 'out16-'+mn : 'out8-'+mn;
+          var src = is16 ? state.src16 : state.src8;
+          var dst = is16 ? state.dst16 : state.dst8;
           var out = document.getElementById(outId);
-          if (val.length < 2) {{ out.textContent = ''; return; }}
-          var src = byNibble[val[0]] || '?';
-          var dst = byNibble[val[1]] || '?';
-          out.textContent = inp.closest('.instruction').querySelector('h3').textContent.split(' ')[0]
-            + ' ' + src + ',' + dst;
-        }};
-        document.getElementById('pb-{mnemonic}').addEventListener('input', function() {{
-          var val = this.value.toUpperCase().replace(/[^0-9A-F]/g,'');
-          var out = document.getElementById('pb-out-{mnemonic}');
-          if (val.length < 2) {{ out.textContent = ''; return; }}
-          var src = byNibble[val[0]] || '?';
-          var dst = byNibble[val[1]] || '?';
-          out.textContent = '{mnemonic} ' + src + ',' + dst;
-        }});
+          if (src && dst) {{
+            var pb = (parseInt(nibbles[src],16) << 4) | parseInt(nibbles[dst],16);
+            var pbHex = pb.toString(16).toUpperCase().padStart(2,'0');
+            out.textContent = mn+' '+src+','+dst+'  →  $'+opcode+' $'+pbHex;
+          }} else if (src) {{
+            out.textContent = mn+' '+src+',?';
+          }} else if (dst) {{
+            out.textContent = mn+' ?,'+dst;
+          }} else {{
+            out.innerHTML = '&nbsp;';
+          }}
+        }}
+
+        makeGroup('src16-'+mn, regs16, 'src');
+        makeGroup('dst16-'+mn, regs16, 'dst');
+        makeGroup('src8-'+mn,  regs8,  'src');
+        makeGroup('dst8-'+mn,  regs8,  'dst');
       }})();
       </script>
     </div>
