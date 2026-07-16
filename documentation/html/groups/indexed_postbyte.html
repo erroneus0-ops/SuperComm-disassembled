@@ -123,30 +123,13 @@
     <p>To use a different register, change bits 6-5. To use a different mode, change bits 3-0.
     The fields never overlap so the OR always produces a unique, valid postbyte.</p>
 
-    <div style="margin: 1rem 0;">
-      <button onclick="collectNotes()" style="font-family:monospace; padding:0.4rem 1rem; background:var(--bg3); color:var(--accent); border:1px solid var(--border); border-radius:3px; cursor:pointer;">Collect Notes as CSV</button>
-      <textarea id="notes-csv" rows="6" style="display:none; width:100%; margin-top:0.5rem; font-family:monospace; font-size:0.8rem; background:var(--code-bg); color:var(--accent2); border:1px solid var(--border); border-radius:3px; padding:0.5rem;" readonly></textarea>
-    </div>
-    <script>
-    function collectNotes() {
-      var rows = document.querySelectorAll('.postbyte-table tbody tr:not(.section-header)');
-      var lines = ['syntax,notes'];
-      rows.forEach(function(row) {
-        var cells = row.querySelectorAll('td');
-        if (cells.length < 10) return;
-        var syntax = cells[0].textContent.trim();
-        var notes  = cells[9].textContent.trim();
-        if (!syntax) return;
-        // CSV-escape: wrap in quotes, double any internal quotes
-        function esc(s) { return '"' + s.replace(/"/g, '""') + '"'; }
-        lines.push(esc(syntax) + ',' + esc(notes));
-      });
-      var ta = document.getElementById('notes-csv');
-      ta.value = lines.join('\n');
-      ta.style.display = 'block';
-      ta.select();
-    }
-    </script>
+    <!-- NOTE: "Collect Notes as CSV" button and collectNotes() function removed.
+         The feature exported the postbyte table notes column as CSV -- a half-formed
+         version of a byte-to-instruction decoder (bytes in, human-readable out).
+         The concept is worth revisiting as part of a debugging tool: given a raw
+         opcode byte + postbyte, identify the instruction and addressing mode.
+         See git history (generate.py around line 1269) for the original implementation.
+    -->
 
     <h3>Encoding Examples</h3>
     <table class="modes-table" style="width:100%">
