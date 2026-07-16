@@ -167,19 +167,6 @@ PSTREND  RTS
 TESTCPU
          BSR   PRINTRET     ; print our return address as witness
 
-; Attempt to switch to 6309 native mode via LDMD
-; On real 6309: LDMD is the gateway to native mode -- should execute in emulation mode
-; On 6809 or XRoar 6809 emulation: LDMD is illegal -- traps or crashes
-         LDMD  #$01         ; set mode register bit 0 -- enter 6309 native mode
-
-         LDD   #$FFFF       ; pre-load D with known non-zero value
-         TFR   D,D          ; postbyte $00
-                             ; 6809 mode: D->D no-op, D stays $FFFF -> CPU:6809
-                             ; 6309 native mode: register code 0 = zero reg, D=$0000 -> CPU:6309
-
-; Switch back to emulation mode before returning
-         LDMD  #$00         ; clear mode register -- return to emulation mode
-
          CMPD  #$0000
          BNE   IS6809
          LDX   #STR6309
