@@ -19,7 +19,32 @@
   <h3 class="mnemonic">BRA <span class="full-name">— Branch Always</span></h3>
   <div class="operation"><code>PC ← PC + offset</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BRA label</td><td class="col-opcode"><code>$20</code></td><td class="col-bytes">2</td><td class="col-cycles">3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -52,7 +77,32 @@
   <h3 class="mnemonic">LBRA <span class="full-name">— Long Branch Always</span></h3>
   <div class="operation"><code>PC ← PC + offset</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBRA label</td><td class="col-opcode"><code>$16</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -85,7 +135,32 @@
   <h3 class="mnemonic">BRN <span class="full-name">— Branch Never</span></h3>
   <div class="operation"><code>no branch</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BRN label</td><td class="col-opcode"><code>$21</code></td><td class="col-bytes">2</td><td class="col-cycles">3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -118,7 +193,32 @@
   <h3 class="mnemonic">BEQ <span class="full-name">— Branch if Equal  (Z=1)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BEQ label</td><td class="col-opcode"><code>$27</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -151,7 +251,32 @@
   <h3 class="mnemonic">LBEQ <span class="full-name">— Long Branch if Equal  (Z=1)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBEQ label</td><td class="col-opcode"><code>$1027</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -184,7 +309,32 @@
   <h3 class="mnemonic">BNE <span class="full-name">— Branch if Not Equal  (Z=0)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BNE label</td><td class="col-opcode"><code>$26</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -217,7 +367,32 @@
   <h3 class="mnemonic">LBNE <span class="full-name">— Long Branch if Not Equal  (Z=0)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBNE label</td><td class="col-opcode"><code>$1026</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -250,7 +425,32 @@
   <h3 class="mnemonic">BCS <span class="full-name">— Branch if Carry Set  (C=1)  [Branch if Lower/Unsigned]</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BCS label</td><td class="col-opcode"><code>$25</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -283,7 +483,32 @@
   <h3 class="mnemonic">LBCS <span class="full-name">— Long Branch if Carry Set</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBCS label</td><td class="col-opcode"><code>$1025</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -316,7 +541,32 @@
   <h3 class="mnemonic">BCC <span class="full-name">— Branch if Carry Clear  (C=0)  [Branch if Higher or Same/Unsigned]</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BCC label</td><td class="col-opcode"><code>$24</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -349,7 +599,32 @@
   <h3 class="mnemonic">LBCC <span class="full-name">— Long Branch if Carry Clear</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBCC label</td><td class="col-opcode"><code>$1024</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -382,7 +657,32 @@
   <h3 class="mnemonic">BMI <span class="full-name">— Branch if Minus  (N=1)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if N=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BMI label</td><td class="col-opcode"><code>$2B</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -415,7 +715,32 @@
   <h3 class="mnemonic">LBMI <span class="full-name">— Long Branch if Minus</span></h3>
   <div class="operation"><code>PC ← PC + offset  if N=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBMI label</td><td class="col-opcode"><code>$102B</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -448,7 +773,32 @@
   <h3 class="mnemonic">BPL <span class="full-name">— Branch if Plus  (N=0)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if N=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BPL label</td><td class="col-opcode"><code>$2A</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -481,7 +831,32 @@
   <h3 class="mnemonic">LBPL <span class="full-name">— Long Branch if Plus</span></h3>
   <div class="operation"><code>PC ← PC + offset  if N=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBPL label</td><td class="col-opcode"><code>$102A</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -514,7 +889,32 @@
   <h3 class="mnemonic">BVS <span class="full-name">— Branch if Overflow Set  (V=1)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if V=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BVS label</td><td class="col-opcode"><code>$29</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -547,7 +947,32 @@
   <h3 class="mnemonic">LBVS <span class="full-name">— Long Branch if Overflow Set</span></h3>
   <div class="operation"><code>PC ← PC + offset  if V=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBVS label</td><td class="col-opcode"><code>$1029</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -580,7 +1005,32 @@
   <h3 class="mnemonic">BVC <span class="full-name">— Branch if Overflow Clear  (V=0)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if V=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BVC label</td><td class="col-opcode"><code>$28</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -613,7 +1063,32 @@
   <h3 class="mnemonic">LBVC <span class="full-name">— Long Branch if Overflow Clear</span></h3>
   <div class="operation"><code>PC ← PC + offset  if V=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBVC label</td><td class="col-opcode"><code>$1028</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -646,7 +1121,32 @@
   <h3 class="mnemonic">BGT <span class="full-name">— Branch if Greater Than  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=0 AND (N XOR V)=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BGT label</td><td class="col-opcode"><code>$2E</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -679,7 +1179,32 @@
   <h3 class="mnemonic">LBGT <span class="full-name">— Long Branch if Greater Than  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=0 AND (N XOR V)=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBGT label</td><td class="col-opcode"><code>$102E</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -712,7 +1237,32 @@
   <h3 class="mnemonic">BGE <span class="full-name">— Branch if Greater Than or Equal  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if (N XOR V)=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BGE label</td><td class="col-opcode"><code>$2C</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -745,7 +1295,32 @@
   <h3 class="mnemonic">LBGE <span class="full-name">— Long Branch if Greater Than or Equal  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if (N XOR V)=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBGE label</td><td class="col-opcode"><code>$102C</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -778,7 +1353,32 @@
   <h3 class="mnemonic">BLT <span class="full-name">— Branch if Less Than  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if (N XOR V)=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BLT label</td><td class="col-opcode"><code>$2D</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -811,7 +1411,32 @@
   <h3 class="mnemonic">LBLT <span class="full-name">— Long Branch if Less Than  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if (N XOR V)=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBLT label</td><td class="col-opcode"><code>$102D</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -844,7 +1469,32 @@
   <h3 class="mnemonic">BLE <span class="full-name">— Branch if Less Than or Equal  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=1 OR (N XOR V)=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BLE label</td><td class="col-opcode"><code>$2F</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -877,7 +1527,32 @@
   <h3 class="mnemonic">LBLE <span class="full-name">— Long Branch if Less Than or Equal  (signed)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if Z=1 OR (N XOR V)=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBLE label</td><td class="col-opcode"><code>$102F</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -910,7 +1585,32 @@
   <h3 class="mnemonic">BHI <span class="full-name">— Branch if Higher  (unsigned)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=0 AND Z=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BHI label</td><td class="col-opcode"><code>$22</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -943,7 +1643,32 @@
   <h3 class="mnemonic">LBHI <span class="full-name">— Long Branch if Higher  (unsigned)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=0 AND Z=0</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBHI label</td><td class="col-opcode"><code>$1022</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -976,7 +1701,32 @@
   <h3 class="mnemonic">BLS <span class="full-name">— Branch if Lower or Same  (unsigned)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=1 OR Z=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BLS label</td><td class="col-opcode"><code>$23</code></td><td class="col-bytes">2</td><td class="col-cycles">3/3</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1009,7 +1759,32 @@
   <h3 class="mnemonic">LBLS <span class="full-name">— Long Branch if Lower or Same  (unsigned)</span></h3>
   <div class="operation"><code>PC ← PC + offset  if C=1 OR Z=1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBLS label</td><td class="col-opcode"><code>$1023</code></td><td class="col-bytes">4</td><td class="col-cycles">5/6</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1042,7 +1817,32 @@
   <h3 class="mnemonic">BSR <span class="full-name">— Branch to Subroutine</span></h3>
   <div class="operation"><code>SP ← SP-2; M[SP] ← PC; PC ← PC + offset</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">BSR label</td><td class="col-opcode"><code>$8D</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1075,7 +1875,32 @@
   <h3 class="mnemonic">LBSR <span class="full-name">— Long Branch to Subroutine</span></h3>
   <div class="operation"><code>SP ← SP-2; M[SP] ← PC; PC ← PC + offset</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">relative</td><td style="font-family:monospace;font-size:0.85rem">LBSR label</td><td class="col-opcode"><code>$17</code></td><td class="col-bytes">3</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1108,7 +1933,39 @@
   <h3 class="mnemonic">JSR <span class="full-name">— Jump to Subroutine</span></h3>
   <div class="operation"><code>SP ← SP-2; M[SP] ← PC; PC ← EA</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">JSR <addr</td><td class="col-opcode"><code>$9D</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">JSR addr</td><td class="col-opcode"><code>$BD</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$AD</code></td><td class="col-bytes">2</td><td class="col-cycles">9&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">11&#8211;15</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1164,7 +2021,32 @@
   <h3 class="mnemonic">RTS <span class="full-name">— Return from Subroutine</span></h3>
   <div class="operation"><code>PC ← M[SP]; SP ← SP+2</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">RTS</td><td class="col-opcode"><code>$39</code></td><td class="col-bytes">1</td><td class="col-cycles">5</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1197,7 +2079,39 @@
   <h3 class="mnemonic">JMP <span class="full-name">— Jump</span></h3>
   <div class="operation"><code>PC ← EA</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">JMP <addr</td><td class="col-opcode"><code>$0E</code></td><td class="col-bytes">2</td><td class="col-cycles">3</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">JMP addr</td><td class="col-opcode"><code>$7E</code></td><td class="col-bytes">3</td><td class="col-cycles">4</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$6E</code></td><td class="col-bytes">2</td><td class="col-cycles">5&#8211;6</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">3&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -1253,7 +2167,32 @@
   <h3 class="mnemonic">RTI <span class="full-name">— Return from Interrupt</span></h3>
   <div class="operation"><code>Pull CC,A,B,DP,X,Y,U,PC from stack</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">RTI</td><td class="col-opcode"><code>$3B</code></td><td class="col-bytes">1</td><td class="col-cycles">6/15</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">

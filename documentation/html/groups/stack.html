@@ -19,7 +19,32 @@
   <h3 class="mnemonic">PSHS <span class="full-name">— Push Registers to S Stack</span></h3>
   <div class="operation"><code>S ← S - n; M[S] ← registers</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">PSHS reglist</td><td class="col-opcode"><code>$34</code></td><td class="col-bytes">2</td><td class="col-cycles">5+n</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -52,7 +77,32 @@
   <h3 class="mnemonic">PULS <span class="full-name">— Pull Registers from S Stack</span></h3>
   <div class="operation"><code>registers ← M[S]; S ← S + n</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">PULS reglist</td><td class="col-opcode"><code>$35</code></td><td class="col-bytes">2</td><td class="col-cycles">5+n</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -85,7 +135,32 @@
   <h3 class="mnemonic">PSHU <span class="full-name">— Push Registers to U Stack</span></h3>
   <div class="operation"><code>U ← U - n; M[U] ← registers</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">PSHU reglist</td><td class="col-opcode"><code>$36</code></td><td class="col-bytes">2</td><td class="col-cycles">5+n</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -118,7 +193,32 @@
   <h3 class="mnemonic">PULU <span class="full-name">— Pull Registers from U Stack</span></h3>
   <div class="operation"><code>registers ← M[U]; U ← U + n</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">PULU reglist</td><td class="col-opcode"><code>$37</code></td><td class="col-bytes">2</td><td class="col-cycles">5+n</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">

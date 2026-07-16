@@ -194,6 +194,194 @@ def _expand_indexed(mode_entry):
     return rows
 
 
+def _compact_indexed(mode_entry):
+    """Produce compact grouped rows for indexed mode -- screen version."""
+    global _PB_MODES
+    if _PB_MODES is None:
+        _PB_MODES = _load_indexed_postbyte_data()
+
+    cycles_str = str(mode_entry.get('cycles', ''))
+    if not cycles_str.endswith('+'):
+        return None  # not an indexed mode entry
+    base_cycles = int(cycles_str[:-1])
+    base_bytes  = 2
+    opcode = mode_entry['opcode']
+
+    # Collect all variants into families
+    families = {
+        'auto':   {'direct': [], 'indirect': []},
+        'offset': {'direct': [], 'indirect': []},
+        'pc':     {'direct': [], 'indirect': []},
+    }
+
+    acc_ab_pending = None
+    for m in _PB_MODES:
+        extra_c  = m.get('extra_cycles', 0)
+        extra_b  = m.get('extra_bytes', 0)
+        syntax   = m.get('syntax', '')
+        mtype    = m.get('type', '')
+        indirect = m.get('indirect_available', False)
+        total_bytes  = base_bytes + extra_b
+        total_cycles = base_cycles + extra_c
+
+        # Extended indirect handled separately on the instruction page
+        if mtype == 'Extended indirect':
+            continue
+
+        # PC-relative family
+        if 'PC-relative' in mtype or 'PC relative' in mtype:
+            families['pc']['direct'].append((syntax, total_bytes, total_cycles))
+            if indirect:
+                families['pc']['indirect'].append((f'[{syntax}]', total_bytes, total_cycles + 3))
+            continue
+
+        # Auto-increment/decrement family
+        if 'increment' in mtype.lower() or 'decrement' in mtype.lower():
+            families['auto']['direct'].append((syntax, total_bytes, total_cycles))
+            if indirect:
+                families['auto']['indirect'].append((f'[{syntax}]', total_bytes, total_cycles + 3))
+            continue
+
+        # Accumulator A -- merge with B
+        if 'Accumulator A offset' in mtype:
+            acc_ab_pending = (total_bytes, total_cycles, indirect)
+            continue
+        if 'Accumulator B offset' in mtype:
+            if acc_ab_pending:
+                ab_bytes, ab_cycles, ab_ind = acc_ab_pending
+                families['offset']['direct'].append(('A/B,R', ab_bytes, ab_cycles))
+                if ab_ind:
+                    families['offset']['indirect'].append(('[A/B,R]', ab_bytes, ab_cycles + 3))
+            acc_ab_pending = None
+            continue
+
+        # Everything else is offset family
+        families['offset']['direct'].append((syntax, total_bytes, total_cycles))
+        if indirect:
+            families['offset']['indirect'].append((f'[{syntax}]', total_bytes, total_cycles + 3))
+
+    def rng(items, idx):
+        vals = [x[idx] for x in items]
+        mn, mx = min(vals), max(vals)
+        return str(mn) if mn == mx else f'{mn}&#8211;{mx}'
+
+    def syns(items):
+        seen = []
+        for x in items:
+            if x[0] not in seen:
+                seen.append(x[0])
+        return ' &nbsp; '.join(seen)
+
+    rows = []
+    first_indexed = True
+
+    for fname, flabel, fsyntax_key in [
+        ('auto',   'indexed — auto ±',    None),
+        ('offset', 'indexed — offset',    None),
+        ('pc',     'indexed — PC-relative', None),
+    ]:
+        fam = families[fname]
+        if not fam['direct']:
+            continue
+
+        op_cell = opcode if first_indexed else '″'
+        first_indexed = False
+
+        rows.append({
+            'mode':   flabel,
+            'syntax': syns(fam['direct']),
+            'opcode': op_cell,
+            'bytes':  rng(fam['direct'], 1),
+            'cycles': rng(fam['direct'], 2),
+            'group_top': True,
+            'italic': True,
+        })
+        if fam['indirect']:
+            rows.append({
+                'mode':   'indirect',
+                'syntax': syns(fam['indirect']),
+                'opcode': '″',
+                'bytes':  rng(fam['indirect'], 1),
+                'cycles': rng(fam['indirect'], 2),
+                'italic': True,
+            })
+
+    return rows, opcode
+
+
+def render_modes_table_compact(modes, ref_url='../groups/indexed_postbyte.html'):
+    """Compact grouped table for screen display."""
+    rows = []
+    ext_indirect_opcode = None
+
+    # Sort order: immediate, direct, extended, indexed
+    mode_order = ['immediate', 'direct', 'extended', 'indexed']
+    def mode_key(m):
+        base = m.get('mode', '').split()[0].lower()
+        try: return mode_order.index(base)
+        except ValueError: return len(mode_order)
+    sorted_modes = sorted(modes, key=mode_key)
+
+    for m in sorted_modes:
+        cycles_str = str(m.get('cycles', ''))
+        if cycles_str.endswith('+'):
+            # Extended indirect row -- extract before indexed compact
+            ext_indirect_opcode = m['opcode']
+            continue  # indexed handled below
+
+        rows.append({
+            'mode':   m['mode'],
+            'syntax': m['syntax'],
+            'opcode': m['opcode'],
+            'bytes':  m.get('bytes', '?'),
+            'cycles': m.get('cycles', '?'),
+        })
+
+        # Extended indirect slots in right after extended
+        if m['mode'] == 'extended' and ext_indirect_opcode:
+            rows.append({
+                'mode':   'indirect',
+                'syntax': '[$addr]',
+                'opcode': ext_indirect_opcode,
+                'bytes':  3,
+                'cycles': 9,
+                'italic': True,
+            })
+            ext_indirect_opcode = None
+
+    # Now add compact indexed groups
+    for m in sorted_modes:
+        if not str(m.get('cycles','')).endswith('+'):
+            continue
+        result = _compact_indexed(m)
+        if result:
+            indexed_rows, _ = result
+            rows.extend(indexed_rows)
+
+    # Build HTML
+    html_rows = []
+    for r in rows:
+        italic = r.get('italic', False)
+        group_top = r.get('group_top', False)
+        top_style = 'border-top:1px solid var(--border-strong)' if group_top else ''
+        mode_style = 'color:var(--text-muted);font-size:0.8rem;font-style:italic' if italic else ''
+        op = r['opcode']
+        op_cell = f'<td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">{op}</td>' if op == '″' else f'<td class="col-opcode"><code>${op}</code></td>'
+        html_rows.append(
+            f'<tr style="{top_style}">'
+            f'<td style="{mode_style}">{r["mode"]}</td>'
+            f'<td style="font-family:monospace;font-size:0.85rem">{r["syntax"]}</td>'
+            f'{op_cell}'
+            f'<td class="col-bytes">{r["bytes"]}</td>'
+            f'<td class="col-cycles">{r["cycles"]}</td>'
+            f'</tr>'
+        )
+
+    ref = f'<p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="{ref_url}">Indexed Addressing Reference</a></p>'
+
+    return '\n'.join(html_rows), ref
+
+
 def render_modes_table(modes):
     # Render extended before indexed so the expanded indexed block
     # doesn't bury extended at the bottom
@@ -241,6 +429,9 @@ def render_instruction(instr):
 
     notes_html = f'<p class="notes">{notes}</p>' if notes else ''
     desc_html  = f'<p class="description">{description}</p>' if description else ''
+
+    # Compact table for screen display
+    compact_rows, compact_ref = render_modes_table_compact(modes)
 
     # Register codes table (TFR/EXG)
     reg_codes = instr.get('register_codes', {})
@@ -375,7 +566,32 @@ def render_instruction(instr):
   <h3 class="mnemonic">{mnemonic} <span class="full-name">— {full_name}</span></h3>
   <div class="operation"><code>{operation}</code></div>
   {desc_html}
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        {compact_rows}
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr>{cc_html_cells}</tr>
+      </tbody>
+    </table>
+  </div>
+  {compact_ref}
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -711,6 +927,8 @@ td.mode  { color: var(--text-dim); font-size: 0.85rem; }
   align-items: flex-start;
   margin-bottom: 0.75rem;
 }
+
+.print-only { display: none; }
 
 /* Condition codes table */
 .cc-table {

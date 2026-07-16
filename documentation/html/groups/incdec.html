@@ -19,7 +19,32 @@
   <h3 class="mnemonic">INCA <span class="full-name">— Increment Accumulator A</span></h3>
   <div class="operation"><code>A ← A + 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">INCA</td><td class="col-opcode"><code>$4C</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -52,7 +77,32 @@
   <h3 class="mnemonic">INCB <span class="full-name">— Increment Accumulator B</span></h3>
   <div class="operation"><code>B ← B + 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">INCB</td><td class="col-opcode"><code>$5C</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -85,7 +135,39 @@
   <h3 class="mnemonic">INC <span class="full-name">— Increment Memory</span></h3>
   <div class="operation"><code>M ← M + 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">INC <addr</td><td class="col-opcode"><code>$0C</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">INC addr</td><td class="col-opcode"><code>$7C</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$6C</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -141,7 +223,32 @@
   <h3 class="mnemonic">DECA <span class="full-name">— Decrement Accumulator A</span></h3>
   <div class="operation"><code>A ← A - 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">DECA</td><td class="col-opcode"><code>$4A</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -174,7 +281,32 @@
   <h3 class="mnemonic">DECB <span class="full-name">— Decrement Accumulator B</span></h3>
   <div class="operation"><code>B ← B - 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">DECB</td><td class="col-opcode"><code>$5A</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
@@ -207,7 +339,39 @@
   <h3 class="mnemonic">DEC <span class="full-name">— Decrement Memory</span></h3>
   <div class="operation"><code>M ← M - 1</code></div>
   
-  <div class="tables-wrap">
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">DEC <addr</td><td class="col-opcode"><code>$0A</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">DEC addr</td><td class="col-opcode"><code>$7A</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$6A</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">

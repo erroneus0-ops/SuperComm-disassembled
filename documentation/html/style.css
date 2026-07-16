@@ -224,6 +224,8 @@ td.mode  { color: var(--text-dim); font-size: 0.85rem; }
   margin-bottom: 0.75rem;
 }
 
+.print-only { display: none; }
+
 /* Condition codes table */
 .cc-table {
   border-collapse: collapse;
