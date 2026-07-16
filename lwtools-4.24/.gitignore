@@ -1,0 +1,15 @@
+# Built binaries
+lwasm/lwasm
+lwlink/lwlink
+lwlink/lwobjdump
+lwar/lwar
+lwcc/lwcc-cpp
+
+# Object files and dependency files
+**/*.o
+**/*.d
+**/*.a
+
+# Generated files
+lwcc/lex.c
+lwcc/grammar.c
