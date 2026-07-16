@@ -168,7 +168,10 @@ TESTCPU
          BSR   PRINTRET     ; print our return address as witness
 
          LDD   #$FFFF       ; pre-load D with known non-zero value
-         TFR   D,D          ; postbyte $00: D->D (6809) or 0->D (6309)
+         TFR   0,D          ; 6309: postbyte $C0 -- zero register -> D = $0000
+                             ; 6809: postbyte $00 -- D->D no-op, D stays $FFFF
+                             ; NOTE: requires -3 (6309 mode) to assemble correctly
+                             ; TFR D,D produces same postbyte $00 on both -- does NOT detect
 
          CMPD  #$0000
          BNE   IS6809
