@@ -1415,3 +1415,15 @@ output identical to `PSHS A,B` and `PULS A,B`.
 Discovered: via XRoar test output -- print_retaddr.asm printed `$$`
 instead of hex addresses. The bug caused `PSHS D` to push PC instead
 of saving the return address, corrupting the stack frame.
+
+---
+
+## cocotools Validation Against asm6809
+
+July 16 2026 -- cocotools and Ciaran's asm6809 2.12 produced byte-for-byte
+identical output assembling print_retaddr.asm with 6309 mode enabled.
+
+asm6809 also warns on [,-S] as "illegal indirect indexed mode" --
+independently confirming W2000 diagnostic is correct.
+
+TFR 0,D in 6309 mode = $1F $C0 confirmed by both assemblers.
