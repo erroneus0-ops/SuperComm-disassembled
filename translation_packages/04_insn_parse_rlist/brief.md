@@ -63,6 +63,11 @@ Fix the translation until the tests pass.
 
 ## Reference
 
-lwtools 4.24: http://www.lwtools.ca/hg/index.cgi/file/0baeffe2747f/lwtools-4.24/lwasm/insn_rlist.c
+C source (from repo tarball): https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/lwtools-4.24/lwasm/insn_rlist.c
 Repository: https://github.com/erroneus0-ops/SuperComm-disassembled
-TRANSLATION_GUIDE: cocotools/TRANSLATION_GUIDE.md
+TRANSLATION_GUIDE: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/TRANSLATION_GUIDE.md
+DATA_STRUCTURE_AUDIT: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/DATA_STRUCTURE_AUDIT.md
+c_compat.py: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/c_compat.py
+source.c: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/04_insn_parse_rlist/source.c
+checklist.md: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/04_insn_parse_rlist/checklist.md
+existing.py: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/04_insn_parse_rlist/existing.py
