@@ -1,8 +1,8 @@
-# Translation Brief: `insn_parse_bitbit`
+# Translation Brief: `lw_expr_simplify_l`
 
 ## Your task
 
-Produce a faithful Python translation of the C function `insn_parse_bitbit`.
+Produce a faithful Python translation of the C function `lw_expr_simplify_l`.
 
 **Translate this faithfully because a learner who cannot distinguish tool
 errors from their own errors will incorrectly conclude they are wrong.**
@@ -12,9 +12,9 @@ behavior exactly -- same bytes, same errors, same internal state.
 
 ## The function
 
-C source: `lwtools-4.24/lwasm/insn_bitbit.c`
-Python target: `cocotools/insn_funcs.py`
-Size: 70 lines, 12 branches, 0 gotos
+C source: `lwtools-4.24/lwlib/lw_expr.c`
+Python target: `cocotools/lw_expr.py`
+Size: 576 lines, 117 branches, 5 gotos
 
 The C function is in `source.c`.
 The current Python translation (if any) is in `existing.py`.
@@ -31,26 +31,26 @@ git clone https://github.com/erroneus0-ops/SuperComm-disassembled.git /tmp/super
 Wait for READY before proceeding. All files are now in /tmp/supercomm/.
 Do not use web_fetch to fetch any files from this repository. Use bash_tool to read them:
 ```bash
-cat /tmp/supercomm/translation_packages/13_insn_parse_bitbit/source.c
-cat /tmp/supercomm/translation_packages/13_insn_parse_bitbit/checklist.md
-cat /tmp/supercomm/translation_packages/13_insn_parse_bitbit/existing.py
+cat /tmp/supercomm/translation_packages/01_lw_expr_simplify_l/source.c
+cat /tmp/supercomm/translation_packages/01_lw_expr_simplify_l/checklist.md
+cat /tmp/supercomm/translation_packages/01_lw_expr_simplify_l/existing.py
 cat /tmp/supercomm/cocotools/TRANSLATION_GUIDE.md
 cat /tmp/supercomm/cocotools/DATA_STRUCTURE_AUDIT.md
 cat /tmp/supercomm/cocotools/c_compat.py
-cat /tmp/supercomm/cocotools/insn_funcs.py
+cat /tmp/supercomm/cocotools/lw_expr.py
 ```
 
 ## Required reading (in order)
 
 After cloning, read these files locally:
 
-1. `translation_packages/13_insn_parse_bitbit/source.c` -- THE SPEC. THE TRUTH.
-2. `translation_packages/13_insn_parse_bitbit/checklist.md` -- pre-filled risk analysis
+1. `translation_packages/01_lw_expr_simplify_l/source.c` -- THE SPEC. THE TRUTH.
+2. `translation_packages/01_lw_expr_simplify_l/checklist.md` -- pre-filled risk analysis
 3. `cocotools/TRANSLATION_GUIDE.md` -- full checklist and risk catalog
 4. `cocotools/DATA_STRUCTURE_AUDIT.md` -- shared struct reference
 5. `cocotools/c_compat.py` -- C compatibility primitives
-6. `translation_packages/13_insn_parse_bitbit/existing.py` -- current translation (SUSPECT)
-7. `cocotools/insn_funcs.py` -- full Python file containing the translation target
+6. `translation_packages/01_lw_expr_simplify_l/existing.py` -- current translation (SUSPECT)
+7. `cocotools/lw_expr.py` -- full Python file containing the translation target
 
 ## Translation order (critical)
 
@@ -107,17 +107,17 @@ When all tests pass, produce the following and present for download:
 3. **Updated package files** -- checklist.md and existing.py updated to reflect
    current state of the translation
 
-Package all of the above into a zip file named `insn_parse_bitbit_audit.zip`
+Package all of the above into a zip file named `lw_expr_simplify_l_audit.zip`
 and present it for download. This zip will be placed in the
-`translation_packages/13_insn_parse_bitbit/` directory for review.
+`translation_packages/01_lw_expr_simplify_l/` directory for review.
 
 ## Reference
 
-C source (from repo tarball): https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/lwtools-4.24/lwasm/insn_bitbit.c
+C source (from repo tarball): https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/lwtools-4.24/lwlib/lw_expr.c
 Repository: https://github.com/erroneus0-ops/SuperComm-disassembled
 TRANSLATION_GUIDE: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/TRANSLATION_GUIDE.md
 DATA_STRUCTURE_AUDIT: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/DATA_STRUCTURE_AUDIT.md
 c_compat.py: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/c_compat.py
-source.c: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/13_insn_parse_bitbit/source.c
-checklist.md: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/13_insn_parse_bitbit/checklist.md
-existing.py: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/13_insn_parse_bitbit/existing.py
+source.c: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/01_lw_expr_simplify_l/source.c
+checklist.md: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/01_lw_expr_simplify_l/checklist.md
+existing.py: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/translation_packages/01_lw_expr_simplify_l/existing.py
