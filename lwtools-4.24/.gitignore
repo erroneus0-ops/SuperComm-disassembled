@@ -1,5 +1,4 @@
-# Built binaries
-lwasm/lwasm
+# Built binaries (lwasm/lwasm is tracked -- pre-built for translation sessions)
 lwlink/lwlink
 lwlink/lwobjdump
 lwar/lwar
