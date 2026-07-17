@@ -12,9 +12,9 @@ behavior exactly -- same bytes, same errors, same internal state.
 
 ## The function
 
-C source: `lwtools-4.24/lwasm/insn_gen.c`
+C source: `lwtools-4.24/lwasm/insn_indexed.c`
 Python target: `cocotools/insn_funcs.py`
-Size: 155 lines, 29 branches, 10 gotos
+Size: 271 lines, 56 branches, 1 gotos
 
 The C function is in `source.c`.
 The current Python translation (if any) is in `existing.py`.
@@ -115,7 +115,7 @@ and present it for download. This zip will be placed in the
 
 ## Reference
 
-C source (from repo tarball): https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/lwtools-4.24/lwasm/insn_gen.c
+C source (from repo tarball): https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/lwtools-4.24/lwasm/insn_indexed.c
 Repository: https://github.com/erroneus0-ops/SuperComm-disassembled
 TRANSLATION_GUIDE: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/TRANSLATION_GUIDE.md
 DATA_STRUCTURE_AUDIT: https://raw.githubusercontent.com/erroneus0-ops/SuperComm-disassembled/main/cocotools/DATA_STRUCTURE_AUDIT.md

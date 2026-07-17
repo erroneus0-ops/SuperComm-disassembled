@@ -1,37 +1,29 @@
 # Pre-Translation Checklist: `insn_resolve_indexed_aux`
 
-Metrics: 155 lines, 29 branches, 10 gotos
+Metrics: 271 lines, 56 branches, 1 gotos
 
 ## 1. Integer width at assignment sites
 Check every assignment destination type.
 Bit mask operations found (may need `c_uint8` etc.):
-  - `if (((v1 >> 8) & 0xff) == (l -> dpval & 0xff))`
-  - `min = (min >> 8) & 0xff;`
-  - `max = (max >> 8) & 0xff;`
-  - `if ((l -> dpval & 0xff) < min || (l -> dpval & 0xff) > max)`
-  - `if (min == max && (l -> dpval & 0xff) == min)`
+  - `if (v == 0 && !CURPRAGMA(l, PRAGMA_NOINDEX0TONONE) && (l -> pb & 0x07) <= 4)`
+  - `if ((l -> pb & 0x07) < 4)`
+  - `pb = 0x84 | ((l -> pb & 0x03) << 5) | ((l -> pb & 0x80) ? 0x10 : 0);`
+  - `pb = (l -> pb & 0x80) ? 0x90 : 0x8F;`
+  - `switch (l -> pb & 0x07)`
+  - `pb = 0x89 | ((l -> pb & 0x03) << 5) | ((l -> pb & 0x80) ? 0x10 : 0);`
 
 ## 2. Division / modulo
-**FOUND** -- use `c_trunc_div()` / `c_trunc_mod()` for signed operands.
+Not found.
 
 ## 3. char ** pointer parameters
-**FOUND** -- pass the same `Ptr` instance through all callers. Do NOT create new Ptr from `p.remaining()`.
+Not found.
 
 ## 4. goto statements
-  - `goto out;`
-  - `goto indexed;`
-  - `goto indexed;`
-  - `goto out;`
-  - `goto out;`
-  - `goto out;`
-  - `goto out;`
-  - `goto out;`
-  - `goto out;`
-  - `goto out;`
+  - `goto do16bit;`
 Classify each: A=exit (return), B=shared code (helper fn), C=alternate parse (call fn).
 
 ## 5. char signedness
-Low risk -- check comparisons of `*p` > 127.
+Low risk.
 
 ## 6. Argument evaluation order
 Check for `(*p)++` in function argument position.
@@ -44,7 +36,7 @@ Check compound expressions. Add mask only where C destination type truncates.
 Not found.
 
 ## 9. Register lookup advancement
-**Check** lookupreg2/3 calls share Ptr correctly.
+N/A.
 
 ## Character classification
 
