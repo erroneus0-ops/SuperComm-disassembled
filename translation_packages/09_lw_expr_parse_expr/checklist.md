@@ -1,6 +1,6 @@
 # Pre-Translation Checklist: `lw_expr_parse_expr`
 
-Metrics: 9 lines, 2 branches, 0 gotos
+Metrics: 102 lines, 9 branches, 1 gotos
 
 ## 1. Integer width at assignment sites
 Check every assignment destination type.
@@ -14,7 +14,7 @@ Bit mask operations found (may need `c_uint8` etc.):
 **FOUND** -- pass the same `Ptr` instance through all callers. Do NOT create new Ptr from `p.remaining()`.
 
 ## 4. goto statements
-  None.
+  - `goto eval_next;`
 Classify each: A=exit (return), B=shared code (helper fn), C=alternate parse (call fn).
 
 ## 5. char signedness

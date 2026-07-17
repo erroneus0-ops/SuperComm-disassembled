@@ -14,7 +14,7 @@ behavior exactly -- same bytes, same errors, same internal state.
 
 C source: `lwtools-4.24/lwlib/lw_expr.c`
 Python target: `cocotools/lw_expr.py`
-Size: 9 lines, 2 branches, 0 gotos
+Size: 102 lines, 9 branches, 1 gotos
 
 The C function is in `source.c`.
 The current Python translation (if any) is in `existing.py`.
