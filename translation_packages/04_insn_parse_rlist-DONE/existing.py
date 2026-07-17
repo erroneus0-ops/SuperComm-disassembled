@@ -1,5 +1,11 @@
 # Current Python translation of insn_parse_rlist
 # cocotools/insn_funcs.py
+#
+# UPDATED per translation_packages/04_insn_parse_rlist audit (see SUMMARY.md):
+# the '#' immediate branch now returns insn_parse_imm8's own return value
+# (the properly advanced cursor) instead of the outer p's stale,
+# unadvanced remainder. See SUMMARY.md for full details, C reference,
+# and reproduction.
 
 def insn_parse_rlist(as_, cl, operand):
     p    = Ptr(operand)
@@ -7,9 +13,14 @@ def insn_parse_rlist(as_, cl, operand):
     cl.lint = 0
 
     if p.peek() == '#':
-        insn_parse_imm8(as_, cl, operand)
+        # FIXED: capture and return insn_parse_imm8's own remainder.
+        # insn_parse_imm8 builds its own independent Ptr internally, so
+        # this outer `p` is never advanced by that call -- the ONLY way
+        # to get the correct post-parse cursor position back to the
+        # caller is to use insn_parse_imm8's return value directly.
+        remaining = insn_parse_imm8(as_, cl, operand)
         cl.lint = 1
-        return p.remaining()
+        return remaining
 
     rb = 0
     while p.peek() and not p.peek().isspace() \
@@ -58,4 +69,3 @@ def insn_parse_rlist(as_, cl, operand):
     cl.len = _oplen(ops[0]) + 1
     cl.pb  = rb
     return p.remaining()
-
