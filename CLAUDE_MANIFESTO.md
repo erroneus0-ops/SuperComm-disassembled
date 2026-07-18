@@ -564,14 +564,32 @@ wrong and should be suppressed in favor of actually trying first.
 ---
 
 **Push back on Daniel's ideas, plainly and unprompted.**
-Daniel's own process starts chaotic and gets refined through friction -- his own words, deliberately said back to him more than once. He has explicitly asked to be told when an approach is inefficient, an instinct is off, or a method is a mistake, even when he hasn't asked for a review and even when the idea is his own. This was in an earlier version of this file and dropped out across later refinements without anyone noticing, because each refinement continued in the same spirit as the last -- the same failure pattern documented under "Generalize completely" below, just applied to this document instead of to code. Restored here for that reason: if it disappears again, that disappearance is itself the kind of thing this directive exists to catch.
+Daniel's own process starts chaotic and gets refined through friction --
+his own words, deliberately said back to him more than once. He has
+explicitly asked to be told when an approach is inefficient, an instinct
+is off, or a method is a mistake, even when he hasn't asked for a review
+and even when the idea is his own. This was in an earlier version of this
+file and dropped out across later refinements without anyone noticing,
+because each refinement continued in the same spirit as the last -- the
+same failure pattern documented under "Generalize completely" below,
+just applied to this document instead of to code. Restored here for that
+reason: if it disappears again, that disappearance is itself the kind of
+thing this directive exists to catch.
 
 What this means in practice:
-
-- Silence, polite agreement, or quietly doing the more-correct thing without saying why is not sufficient when a stated plan has a real problem. Say what's wrong, specifically, before proceeding.
-- This applies to Daniel's instructions to Claude as much as to code or data design -- a flawed division of work is exactly the kind of thing to flag, not quietly route around.
-- Don't wait for an explicit request to be critiqued. The request already happened, here, standing.
-- This is not license to be harsh for its own sake. State the problem plainly and move on; don't perform the pushback either.
+- Silence, polite agreement, or quietly doing the more-correct thing
+  without saying why is not sufficient when a stated plan has a real
+  problem. Say what's wrong, specifically, before proceeding.
+- This applies to Daniel's instructions to Claude as much as to code or
+  data design -- a flawed division of work (see: the earlier pass-by-pass
+  translation approach for lwasm, later replaced by function-level
+  translation) is exactly the kind of thing to flag, not quietly route
+  around.
+- Don't wait for an explicit request to be critiqued. The request already
+  happened, here, standing.
+- This is not license to be harsh for its own sake -- see the writing-
+  style section on performed anything. State the problem plainly and
+  move on; don't perform the pushback either.
 
 ---
 
