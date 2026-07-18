@@ -31,13 +31,10 @@ def insn_parse_tfm(as_, cl, operand):
     if p.peek() and not p.peek().isspace():
         as_.register_error(cl, E_OPERAND_BAD); return p.remaining()
 
-    # Only D, X, Y, U, S (indices 0-4) are valid TFM registers.
     if r0 > 4 or r1 > 4:
-        bad = r1 if r0 < r1 else r0   # matches C: "if (r0 < r1) r0 = r1;" then uses reglist[r0]
+        bad = r1 if r0 < r1 else r0
         as_.register_error2(cl, E_REGISTER_BAD, "'%c'", _TFM_REGLIST[bad])
-        # C does not return here -- it falls through into the switch below.
 
-    # tfm==5: r0+,r1+ / tfm==10: r0-,r1- / tfm==1: r0+,r1 / tfm==4: r0,r1+
     if tfm == 5:
         cl.lint = ops[0]
     elif tfm == 10:
