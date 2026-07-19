@@ -189,3 +189,55 @@ loop    lda     PIA0SideADataRegister_FF00
 
 Worth a "tricks and idioms" reference section later, possibly its own
 chapter or appendix once the core teaching chapters are done.
+
+---
+
+## lwtools + toolshed WASM Project
+
+**Goal:** Build lwasm and toolshed as WebAssembly modules, replacing the
+Python cocotools translation layer with WASM builds of the original C tools.
+
+**Motivation:**
+
+1. Trust: WASM built from published source via Emscripten is auditable
+   end-to-end. No binary trust concerns -- it's readable C compiled to
+   a browser sandbox.
+
+2. Updates: when William releases 4.26, pull source, run Emscripten,
+   get new lwasm.wasm. No translation audit series required.
+
+3. Completeness: browser-based lwasm + toolshed + XRoar = complete CoCo
+   development environment at a single URL. Zero installation friction
+   for learners.
+
+4. Correctness: the Python translation audit found 20+ bugs across 16
+   functions. WASM eliminates that entire class of problem -- William's
+   logic runs as William wrote it.
+
+**Architecture:**
+
+- `wasm/lwasm.wasm` -- lwasm compiled via Emscripten
+- `wasm/toolshed.wasm` -- decb/dskini/copy compiled via Emscripten
+- JavaScript glue layer connecting WASM modules to the browser UI
+- Wrapper functions outside the original code for cocotools-specific
+  behavior (diagnostics, W2000/W2001 warnings, book-oriented messages)
+- XRoar already present and working
+
+**The name:** cocotools remains the wrapper name. It's friendly, it implies
+"someone else is responsible for the core tools, don't bother the original
+authors with problems you encounter here." An About section should state
+this explicitly -- questions about cocotools behavior come here, questions
+about lwasm/toolshed behavior go to their authors only after ruling out
+the wrapper as the cause.
+
+**The Python cocotools becomes:** reference implementation and fallback for
+non-WASM environments. The 296-test fidelity harness remains valid as a
+regression suite and as documentation of what the tools are supposed to do.
+
+**Prior art:** Ciaran built XRoar as WASM. The pattern is established.
+lwtools and toolshed are straightforward C projects with no unusual
+dependencies -- should build with Emscripten similarly.
+
+**Precedence:** 4.25 is already released. The shift operator addition
+(lw_expr.c) and PCR phase support (insn_indexed.c) come along free in a
+WASM build. No audit required.
