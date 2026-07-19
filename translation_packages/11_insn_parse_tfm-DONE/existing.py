@@ -1,5 +1,21 @@
 # Current Python translation of insn_parse_tfm
 # cocotools/insn_funcs.py
+#
+# Updated 2026-07-18: added the two `_skip_to_next_token(cl, p)` calls that
+# were missing from this file (see SUMMARY.md / checklist.md for the full
+# writeup). Everything else is unchanged from the version audited.
+
+_TFM_REGLIST = "DXYUS   AB  00EF"
+
+def _tfm_reg(p):
+    c = p.peek()
+    if not c:
+        return None
+    idx = _TFM_REGLIST.find(c.upper())
+    if idx < 0:
+        return None
+    p.advance()
+    return idx
 
 def insn_parse_tfm(as_, cl, operand):
     p = Ptr(operand)
@@ -15,10 +31,12 @@ def insn_parse_tfm(as_, cl, operand):
     elif p.peek() == '-':
         p.advance(); tfm = 2
 
+    _skip_to_next_token(cl, p)
     if p.peek() != ',':
         as_.register_error(cl, E_UNKNOWN_OPERATION); return p.remaining()
     p.advance()
 
+    _skip_to_next_token(cl, p)
     r1 = _tfm_reg(p)
     if r1 is None:
         as_.register_error(cl, E_REGISTER_BAD); return p.remaining()
@@ -49,4 +67,3 @@ def insn_parse_tfm(as_, cl, operand):
     cl.pb  = (r0 << 4) | r1
     cl.len = _oplen(cl.lint) + 1
     return p.remaining()
-
