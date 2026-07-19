@@ -16,6 +16,11 @@ C source: `lwtools-4.24/lwasm/insn_logicmem.c`
 Python target: `cocotools/insn_funcs.py`
 Size: 22 lines, 2 branches, 0 gotos
 
+Note on scope: this brief format is uniform across all 16 packages
+regardless of function size. If this function is small, the infrastructure
+exists because earlier packages were significantly more complex.
+The task size varies; the process stays the same.
+
 The C function is in `source.c`.
 The current Python translation (if any) is in `existing.py`.
 
