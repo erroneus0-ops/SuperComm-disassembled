@@ -28,7 +28,11 @@ because repeated fetches to raw GitHub URLs hit tool restrictions and burn token
 git clone https://github.com/erroneus0-ops/SuperComm-disassembled.git /tmp/supercomm && echo "READY"
 ```
 
-lwasm 4.24 is pre-built at /tmp/supercomm/lwtools-4.24/lwasm/lwasm -- no build step needed.
+A pre-built lwasm 4.24 binary is at /tmp/supercomm/lwtools-4.24/lwasm/lwasm
+as a convenience. You may verify it or replace it by building from source:
+  cd /tmp/supercomm/lwtools-4.24 && make -j$(nproc)
+The source tarball is also present at /tmp/supercomm/lwtools-4.24.tar.gz.
+The Build ID of the pre-built binary will match a from-source build.
 
 Wait for READY before proceeding. All files are now in /tmp/supercomm/.
 Do not use web_fetch to fetch any files from this repository. Use bash_tool to read them:
