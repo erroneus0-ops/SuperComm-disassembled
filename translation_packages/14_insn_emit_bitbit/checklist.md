@@ -2,6 +2,11 @@
 
 Metrics: 47 lines, 6 branches, 0 gotos
 
+Note on scope: this brief format is uniform across all 16 packages
+regardless of function size. If this function is small, the infrastructure
+exists because earlier packages were significantly more complex.
+The task size varies; the process stays the same.
+
 ## 1. Integer width at assignment sites
 Check every assignment destination type.
 Bit mask operations found (may need `c_uint8` etc.):

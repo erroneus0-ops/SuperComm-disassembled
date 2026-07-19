@@ -16,10 +16,10 @@ C source: `lwtools-4.24/lwasm/insn_bitbit.c`
 Python target: `cocotools/insn_funcs.py`
 Size: 70 lines, 12 branches, 0 gotos
 
-Note on scope: this brief format is uniform across all 16 packages
-regardless of function size. If this function is small, the infrastructure
-exists because earlier packages were significantly more complex.
-The task size varies; the process stays the same.
+Note on scope: this brief format is uniform across all 16 packages in the
+series regardless of function size. If this function is small, the
+surrounding infrastructure exists because earlier packages were significantly
+more complex. The task size varies; the process stays the same.
 
 The C function is in `source.c`.
 The current Python translation (if any) is in `existing.py`.
@@ -33,11 +33,7 @@ because repeated fetches to raw GitHub URLs hit tool restrictions and burn token
 git clone https://github.com/erroneus0-ops/SuperComm-disassembled.git /tmp/supercomm && echo "READY"
 ```
 
-A pre-built lwasm 4.24 binary is at /tmp/supercomm/lwtools-4.24/lwasm/lwasm
-as a convenience. You may verify it or replace it by building from source:
-  cd /tmp/supercomm/lwtools-4.24 && make -j$(nproc)
-The source tarball is also present at /tmp/supercomm/lwtools-4.24.tar.gz.
-The Build ID of the pre-built binary will match a from-source build.
+lwasm 4.24 is pre-built at /tmp/supercomm/lwtools-4.24/lwasm/lwasm -- no build step needed.
 
 Wait for READY before proceeding. All files are now in /tmp/supercomm/.
 Do not use web_fetch to fetch any files from this repository. Use bash_tool to read them:
@@ -92,13 +88,19 @@ from cocotools.c_compat import (
 
 ## Verification
 
-After translating:
-1. Run `python cocotools/test_fidelity.py` -- all existing tests must pass
-2. Add 3+ new test cases covering branches in this function
-3. Run `-v` to inspect structural state for new tests
+You do not need to run the fidelity harness. The project maintainer
+will run it against your deliverable.
 
-Do not modify existing tests to make them pass.
-Fix the translation until the tests pass.
+Your verification is:
+1. Trace through your Python translation against the C source line by line
+2. Confirm every branch, every edge case, every sentinel value matches
+3. Write 3+ standalone test cases (using stub objects if needed) that
+   exercise the branches specific to this function
+4. Document any divergences found in SUMMARY.md with:
+   - The C code
+   - The old Python code  
+   - Your corrected Python code
+   - Why the old code was wrong
 
 ## Deliverables (required at end of session)
 
