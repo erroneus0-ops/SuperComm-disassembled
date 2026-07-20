@@ -241,3 +241,27 @@ dependencies -- should build with Emscripten similarly.
 **Precedence:** 4.25 is already released. The shift operator addition
 (lw_expr.c) and PCR phase support (insn_indexed.c) come along free in a
 WASM build. No audit required.
+
+---
+
+## XRoar Integration -- Assembly Workflow
+
+Two distinct paths for getting assembled code into XRoar:
+
+**Direct load** (standalone ML programs -- most book examples):
+  Source → lwasm WASM → binary bytes → wasm_load_file() → XRoar EXEC
+  No disk required. Simplest path. Works for HELLO.ASM, GUESS.ASM, etc.
+
+**Disk-based** (BASIC + ML integration, file I/O, multi-file programs):
+  Source → lwasm WASM → .BIN bytes
+  BASIC source → tokenizer → .BAS bytes  
+  Both → toolshed WASM makedsk → DSK image → XRoar mount
+  Required when BASIC loader loads the ML program (current book approach),
+  or when program does disk file I/O.
+
+The page should support both transparently. The presence of a BASIC loader
+file determines which path is taken -- user doesn't need to choose.
+
+Note: HELLO.BAS + HELLO.BIN already use the disk path. New standalone
+examples can use direct load. Both paths should work before calling the
+integration "done."
