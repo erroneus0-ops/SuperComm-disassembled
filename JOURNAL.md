@@ -204,3 +204,63 @@ package SUMMARY.md files. Their work persists even though they don't.
 - The trusted binary memo (package 09 Claude, two drafts)
 - lwtools 4.25 delta analysis
 - The Terminator sessions and j-space navigation
+
+---
+
+## July 20 2026 -- The Validation Inversion
+
+The fidelity harness was built to validate the Python translation against
+native lwasm binary output. 296 tests, verified byte-for-byte.
+
+With lwasm WASM available, the validation chain becomes:
+
+    C source (William Astle, lwtools.ca)
+        ↓ emcc (Emscripten, GitHub Actions, auditable)
+    lwasm.wasm
+        ↓ test harness (296 tests)
+    Python translation (cocotools/)
+
+Every link is visible. Nothing is opaque. No binary trust questions.
+
+When William releases a new version:
+1. Update source in repo
+2. Trigger GitHub Actions -- new lwasm.wasm built and committed
+3. Run test harness against new WASM
+4. Any Python function that diverges from new WASM is flagged automatically
+5. Fix or accept -- documented decision either way
+
+The Python translation goes from "validated once" to "continuously
+validated against the current WASM build."
+
+The 296 tests don't retire. They become the continuous validation bridge
+between the WASM ground truth and the Python reference implementation.
+
+---
+
+## July 20 2026 -- The Validation Inversion
+
+The fidelity harness was built to validate the Python translation against
+native lwasm binary output. 296 tests, verified byte-for-byte.
+
+With lwasm WASM available, the validation chain becomes:
+
+    C source (William Astle, lwtools.ca)
+        ↓ emcc (Emscripten, GitHub Actions, auditable)
+    lwasm.wasm
+        ↓ test harness (296 tests)
+    Python translation (cocotools/)
+
+Every link is visible. Nothing is opaque. No binary trust questions.
+
+When William releases a new version:
+1. Update source in repo
+2. Trigger GitHub Actions -- new lwasm.wasm built and committed
+3. Run test harness against new WASM
+4. Any Python function that diverges from new WASM is flagged automatically
+5. Fix or accept -- documented decision either way
+
+The Python translation goes from "validated once" to "continuously
+validated against the current WASM build."
+
+The 296 tests don't retire. They become the continuous validation bridge
+between the WASM ground truth and the Python reference implementation.
