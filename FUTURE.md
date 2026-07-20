@@ -265,3 +265,58 @@ file determines which path is taken -- user doesn't need to choose.
 Note: HELLO.BAS + HELLO.BIN already use the disk path. New standalone
 examples can use direct load. Both paths should work before calling the
 integration "done."
+
+---
+
+## lwcc WASM -- C Compiler for 6809
+
+lwcc is William Astle's own C compiler for the 6809 -- NOT a GCC frontend.
+7185 lines of C: parser (parse_c.c, cc-parse.c), code generator (cc-gencode.c),
+preprocessor (cpp.c), symbol table, AST. Outputs lwasm-compatible 6809 assembly.
+
+The workflow:
+  C source → lwcc WASM → 6809 assembly → lwasm WASM → binary → XRoar
+
+All WASM. No GCC needed. No external toolchain.
+
+Build path is identical to lwasm:
+  - Source: lwtools-4.24/lwcc/
+  - Entry point: lwcc/cc-main.c (rename main to lwcc_main, same pattern)
+  - Output: assembly text (pipe directly to lwasm)
+  - GitHub Actions workflow: same structure as build_lwasm_wasm.yml
+
+Also needed:
+  - lwlink WASM -- linker for multi-file projects
+  - lwar WASM -- archive manager
+  - C runtime for 6809 -- startup code, printf, malloc etc.
+    William likely has this or it's in the lwtools extras
+
+This opens: write C → compile to 6809 → run on CoCo in browser.
+Same infrastructure already built. Afternoon's work, not a separate project.
+
+---
+
+## lwcc WASM -- C Compiler for 6809
+
+lwcc is William Astle's own C compiler for the 6809 -- NOT a GCC frontend.
+7185 lines of C: parser (parse_c.c, cc-parse.c), code generator (cc-gencode.c),
+preprocessor (cpp.c), symbol table, AST. Outputs lwasm-compatible 6809 assembly.
+
+The workflow:
+  C source → lwcc WASM → 6809 assembly → lwasm WASM → binary → XRoar
+
+All WASM. No GCC needed. No external toolchain.
+
+Build path is identical to lwasm:
+  - Source: lwtools-4.24/lwcc/
+  - Entry point: lwcc/cc-main.c (rename main to lwcc_main, same pattern)
+  - Output: assembly text (pipe directly to lwasm)
+  - GitHub Actions workflow: same structure as build_lwasm_wasm.yml
+
+Also needed:
+  - lwlink WASM -- linker for multi-file projects
+  - lwar WASM -- archive manager
+  - C runtime for 6809 -- startup code, printf, malloc etc.
+
+This opens: write C → compile to 6809 → run on CoCo in browser.
+Same infrastructure already built. Feasible in one session.
