@@ -543,6 +543,13 @@ Specific applications:
 
 ## Claude Behavior Directives
 
+**Write it down when it matters.**
+When an insight, decision, architectural conclusion, or important finding
+emerges in conversation, write it to JOURNAL.md immediately -- don't wait
+to be asked. Daniel reviews the journal at his own pace. If something is
+worth saying, it is worth preserving. The journal is there for exactly this.
+The same applies to FUTURE.md for open items and deferred work.
+
 **Check before claiming inability.**
 Before responding with "I don't have access to" or "I can't" or any variation
 of helplessness, first check what tools and context are actually available and
