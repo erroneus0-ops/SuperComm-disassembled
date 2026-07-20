@@ -320,3 +320,67 @@ Also needed:
 
 This opens: write C → compile to 6809 → run on CoCo in browser.
 Same infrastructure already built. Feasible in one session.
+
+---
+
+## Virtual Filesystem -- Local Directory Mapping
+
+The Emscripten virtual FS can be mapped to real storage several ways:
+
+**Browser (IDBFS):**
+Files persist to IndexedDB between sessions. Not a real directory but
+persistent. Good for saving work between browser sessions.
+
+**Node.js (NODEFS):**
+Real bidirectional directory mapping:
+  m.FS.mkdir('/host');
+  m.FS.mount(m.NODEFS, { root: '/real/path' }, '/host');
+Files written to /host/ appear on disk. Full read/write.
+
+**Browser + local server (hybrid):**
+Python HTTP server exposes a file API endpoint.
+JavaScript reads/writes via fetch(), maps into virtual FS.
+Local directory becomes the CoCo's working directory.
+Architecture: local dir ↔ Python server ↔ JS ↔ virtual FS ↔ WASM
+
+**Browser File System Access API (Chrome/Edge):**
+User grants folder access via picker dialog.
+JavaScript can read/write files in that folder.
+Emscripten bridges to it. No server needed.
+Limitation: not supported in Firefox.
+
+For the development environment the hybrid Python server approach
+is most flexible -- works in all browsers, full control, no permission
+dialogs after initial setup.
+
+---
+
+## Virtual Filesystem -- Local Directory Mapping
+
+The Emscripten virtual FS can be mapped to real storage several ways:
+
+**Browser (IDBFS):**
+Files persist to IndexedDB between sessions. Not a real directory but
+persistent. Good for saving work between browser sessions.
+
+**Node.js (NODEFS):**
+Real bidirectional directory mapping:
+  m.FS.mkdir('/host');
+  m.FS.mount(m.NODEFS, { root: '/real/path' }, '/host');
+Files written to /host/ appear on disk. Full read/write.
+
+**Browser + local server (hybrid):**
+Python HTTP server exposes a file API endpoint.
+JavaScript reads/writes via fetch(), maps into virtual FS.
+Local directory becomes the CoCo's working directory.
+Architecture: local dir ↔ Python server ↔ JS ↔ virtual FS ↔ WASM
+
+**Browser File System Access API (Chrome/Edge):**
+User grants folder access via picker dialog.
+JavaScript can read/write files in that folder.
+Emscripten bridges to it. No server needed.
+Limitation: not supported in Firefox yet.
+
+For the development environment the hybrid Python server approach
+is most flexible -- works in all browsers, full control, no permission
+dialogs after initial setup.
