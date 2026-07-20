@@ -115,6 +115,86 @@ architecture makes that failure mode structurally impossible.
 
 ---
 
+---
+
+## Project Arc (historical)
+
+### Origins -- SuperComm Reverse Engineering
+
+The project began as a reverse engineering effort on SuperComm v2.2, an
+OS-9 Level II terminal/comms program. The goal was byte-perfect reassembly.
+A 6809 assembly language book was a secondary goal.
+
+The project continuity file was called CLAUDE_CONTEXT.md -- a pragmatic
+name for a pragmatic document. It was renamed CLAUDE_MANIFESTO.md when
+the document grew into something more intentional -- a philosophy document,
+not just context.
+
+Key early milestones:
+- SuperComm v2.2: byte-perfect reassembly achieved. Proved basic OS-9
+  module handling. OS-9's rigid structure made it an easier target.
+- dir (NitrOS-9): analysis started, revealed instruction coverage gaps,
+  stalled as the book became the stronger learning vehicle.
+- flames.bin (Paul Cunningham's CoCo Forth): exposed the complete absence
+  of sync/scan architecture. Led to sync-acquisition scan implementation.
+
+### The Reframe -- Learning Engine
+
+At some point the project was explicitly reframed: not a SuperComm
+disassembly project that also has a book, but a learning engine where the
+tools exist because building them requires understanding 6809 assembly at
+a level that reading about it doesn't produce.
+
+The disassembled binaries became homework problems, not deliverables.
+The actual deliverables: dis6x09.py, cocotools, the book, the XRoar
+WASM page.
+
+### The Book
+
+Six chapters planned. Two complete drafts (ch01, ch02). Ch03 started.
+
+Ch01: Humble Beginnings -- BASIC type-in listing, assembly introduced
+Ch02: The Six Concepts -- complete HELLO.ASM revealed section by section
+Ch03: The Number Guessing Game -- incremental build from BASIC to assembly
+Ch04: Compare and Branch -- CC register deep dive (pending)
+Ch05-07: planned
+
+The COMTRAN TEN story anchors Ch03 -- Daniel's personal account of
+hand-translating mnemonics to hex for an unfamiliar machine in the early
+1980s. A guess-the-number program reconstructed from memory by the 09
+Claude instance during the lwasm audit series.
+
+### The XRoar WASM Page
+
+Built as a browser-based CoCo emulator. CM-8 monitor bezel overlay
+designed as SVG (hand-crafted TANDY label, skewY transform for perspective).
+Size slider, log panel, DECB binary header parser added.
+
+The FIRQ/RTS cart entry mechanism documented through direct testing --
+a significant finding that corrects common misunderstanding about cartridge
+ROM behavior.
+
+### cocotools -- The Python Assembler
+
+Built as a self-contained Python replacement for lwasm + toolshed + decb.
+Goal: learners need only Python, no platform-specific binaries.
+
+The lwasm translation audit series: 16 packages, 14 Claude instances,
+July 16-18 2026. 296 tests. 20+ bugs found and fixed. See July 20 2026
+entry for the architectural conclusion.
+
+### On Continuity
+
+The project ran across many Claude sessions. Each instance arrived fresh.
+The CLAUDE_MANIFESTO.md carried forward everything that would otherwise
+be relearned. The git history carries the detailed record. This journal
+carries the arc and the decisions.
+
+The instances that contributed most are named in commit messages and
+package SUMMARY.md files. Their work persists even though they don't.
+
+---
+
 ## Entries to add (pending)
 
 - The CC_CLOBBERING_LOADS shadowing bug (package 06)
