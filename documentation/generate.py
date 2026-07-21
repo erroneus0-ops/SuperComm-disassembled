@@ -81,6 +81,31 @@ import glob
 import os
 import sys
 
+# ============================================================
+# GLOBAL ENCODING FIX
+# ============================================================
+# This overrides the built-in open() function to default to UTF-8.
+# Why? Windows defaults to 'cp1252', which crashes on Unicode symbols 
+# (like arrows ←, ↕) found in our JSON and CSS files.
+# This ensures the script works identically on Windows, Linux, and Mac.
+# ============================================================
+
+import builtins  # <--- THIS LINE IS REQUIRED
+
+# 1. Save the ORIGINAL open function to a safe variable name
+_original_open = builtins.open
+
+def _utf8_open(file, mode='r', *args, **kwargs):
+    # If mode is text (not binary 'b'), force encoding to utf-8 unless explicitly set
+    if 'b' not in mode:
+        kwargs.setdefault('encoding', 'utf-8')
+
+    # 2. Call the SAVED original function, NOT builtins.open
+    return _original_open(file, mode, *args, **kwargs)
+
+# 3. NOW replace the global built-in
+builtins.open = _utf8_open
+
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'html')
 OPCODES_DIR = os.path.join(os.path.dirname(__file__), 'opcodes')
 

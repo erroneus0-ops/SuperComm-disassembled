@@ -57,7 +57,7 @@ Load index register X with the immediate value `$0600`.
 The assembler evaluates `SCREEN+512` = `$0400 + $0200` = `$0600`.
 You provide the result — the assembler is not here.
 
-Find **OpRef.LDX** in the instruction reference appendix. Identify the
+Find **OpRef.LDX** (click the link to review, back button to come back here) in the instruction reference appendix. Identify the
 opcode byte and determine the following two operand bytes. Note them
 to complete the line below.
 
@@ -119,11 +119,12 @@ from the postbyte reference are combined using bitwise OR to produce the
 final byte. The fields occupy non-overlapping bit positions so the OR
 simply merges them without conflict.
 
-Find the register X row in the register field table and the `,-R` row
-in the mode field table. Fill in the OR derivation below and combine
-the results.
+Step 1: Find the register X row in the *register* field table.  Note the three bit pattern.
+Step 2: Find the `,-R` row in the *mode* field table. Note the five bit pattern.
+Step 3: Combine the two bit patterns, the register pattern first, the mode pattern second.
+        Fill in the logical OR derivation below and combine the results.
 
-OR derivation:
+OR derivation illustrated:
 
 ```
 Register X field:   1 0 0 x x x x x  =  $XX
