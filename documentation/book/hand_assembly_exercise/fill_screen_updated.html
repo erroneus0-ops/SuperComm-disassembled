@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Fill Screen Exercise</title>
+    <!-- This CSS automatically switches between Light and Dark based on your OS setting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+        /* Ensure code blocks scroll nicely */
+        pre {
+            overflow-x: auto; 
+        }
+    </style>
+</head>
+<body class="markdown-body">
+    <h1 id="hand-assembly-exercise-fill-screen">Hand Assembly Exercise: Fill Screen</h1>
+<p>This exercise has two parts. In the first, you will encode a short machine
+language routine by hand — deriving each byte from an instruction reference
+and a postbyte table — and load it into the CoCo using BASIC. In the second,
+you will load the same bytes at a different address and watch what happens.</p>
+<hr />
+<h2 id="before-you-begin">Before You Begin</h2>
+<p>You will need:</p>
+<ul>
+<li>A text editor with a monospaced font (Notepad, Notepad++, vi, or similar)</li>
+<li>The 6809 instruction reference for the instructions used here</li>
+<li>The indexed addressing postbyte reference</li>
+</ul>
+<p>Open your text editor and copy the template below. Leave the left margin
+blank — that is where you will write the bytes you derive.</p>
+<pre><code>                    SCREEN  EQU     $0400
+
+                            ORG     $3F00
+
+         Start      LDX     #SCREEN+512
+                    LDA     #$60
+         Loop       STA     ,-X
+                    CMPX    #SCREEN
+                    BNE     Loop
+                            RTS
+</code></pre>
+<p>The routine fills the CoCo text screen with a single character, working
+backward from the last screen position to the first. It then returns to
+BASIC.</p>
+<p><code>SCREEN</code> is the address of the first byte of text screen memory: <code>$0400</code>.
+The screen is 512 bytes long, so <code>SCREEN+512</code> = <code>$0600</code> — one byte past
+the end.</p>
+<hr />
+<h2 id="step-1-encode-each-instruction">Step 1: Encode Each Instruction</h2>
+<p>Work through the routine one instruction at a time. For each instruction,
+find it in the reference appendix, fill in the blanks, then write the
+bytes in the left margin of your template. The answers are in the Answer
+Key at the end of this document — cover them until you are done.</p>
+<hr />
+<h3 id="ldx-screen512">LDX #SCREEN+512</h3>
+<p>Load index register X with the immediate value <code>$0600</code>.</p>
+<p>The assembler evaluates <code>SCREEN+512</code> = <code>$0400 + $0200</code> = <code>$0600</code>.
+You provide the result — the assembler is not here.</p>
+<p>Find <strong>OpRef.LDX</strong> (click the link to review, back button to come back here) in the instruction reference appendix. Identify the
+opcode byte and determine the following two operand bytes. Note them
+to complete the line below.</p>
+<pre><code>Opcode:   $XX
+Operand:  $XX  $XX     (high byte = $06, low byte = $00)
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__ __ __            LDX     #SCREEN+512
+</code></pre>
+<hr />
+<h3 id="lda-60">LDA #$60</h3>
+<p>Load accumulator A with the immediate value <code>$60</code>.</p>
+<p><code>$60</code> is the space character in the VDG second character set — the same
+set used by Color BASIC for normal video. This is the fill character.
+You can change it later.</p>
+<p>Find <strong>OpRef.LDA</strong> in the instruction reference appendix. Identify the
+opcode byte and note it to complete the line below.</p>
+<pre><code>Opcode:   $XX
+Operand:  $60
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__ 60               LDA     #$60
+</code></pre>
+<hr />
+<h3 id="sta-x">STA ,-X</h3>
+<p>Store accumulator A to the address in X, after first decrementing X by one.</p>
+<p>This is indexed addressing with pre-decrement. The instruction has two
+bytes: the opcode and a postbyte that encodes the addressing mode.</p>
+<p>Find <strong>OpRef.STA</strong> in the instruction reference appendix, then
+<strong>OpRef.PB</strong> for the postbyte. Complete the OR derivation and note
+both bytes below.</p>
+<pre><code>Opcode:   $XX
+Postbyte: $XX
+</code></pre>
+<p>The postbyte is not looked up directly — it is constructed. Two fields
+from the postbyte reference are combined using bitwise OR to produce the
+final byte. The fields occupy non-overlapping bit positions so the OR
+simply merges them without conflict.</p>
+<p>Step 1: Find the register X row in the <strong><u>register</u></strong> field table.  Note the three bit pattern.<br />
+Step 2: Find the <code>,-R</code> row in the <strong><u>mode</u></strong> field table. Note the five bit pattern.<br />
+Step 3: Combine the two bit patterns, the register pattern first, the mode pattern second.<br />
+        Fill in the logical OR derivation below and combine the results.  </p>
+<p>OR derivation illustrated:</p>
+<pre><code>Register X field:   1 0 0 x x x x x  =  $XX
+Pre-decrement mode: x x x 0 0 0 1 0  =  $XX
+OR result:          1 0 0 0 0 0 1 0  =  $XX
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__ __               STA     ,-X
+</code></pre>
+<p>This is the <code>Loop</code> label. Note the address this instruction assembles at:
+<code>$3F05</code>. You will need it for the branch offset below.</p>
+<hr />
+<h3 id="cmpx-screen">CMPX #SCREEN</h3>
+<p>Compare X with the immediate value <code>$0400</code>.</p>
+<p>When X reaches <code>$0400</code> — the start of screen memory — the loop is done.
+CMPX sets the condition codes without changing X.</p>
+<p>Find <strong>OpRef.CMPX</strong>. Note the opcode and two operand bytes below.</p>
+<pre><code>Opcode:   $XX
+Operand:  $XX  $XX     (high byte = $04, low byte = $00)
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__ __ __            CMPX    #SCREEN
+</code></pre>
+<p><strong>How CMPX communicates its result</strong></p>
+<p>CMPX subtracts the operand from X and discards the result. The only
+output is a set of bits written into the Condition Code register (CC).
+Each bit captures one aspect of what the subtraction produced:</p>
+<ul>
+<li><strong>Z</strong> (Zero) — set if the result was exactly zero; cleared otherwise</li>
+<li><strong>N</strong> (Negative) — set if the result was negative (bit 15 was 1)</li>
+<li><strong>V</strong> (Overflow) — set if signed overflow occurred</li>
+<li><strong>C</strong> (Carry) — set if unsigned borrow occurred</li>
+</ul>
+<p>X is not changed. The CC register is the communication channel between
+an instruction that tests a condition and the instruction that acts on it.</p>
+<p>The conditional branch that follows does not know what instruction set the
+CC bits. It only reads them. The programmer creates the relationship —
+CMPX followed by BNE is meaningful because the programmer placed them in
+that order, not because the CPU enforces any connection between them.</p>
+<p><strong>BNE and the Z bit</strong></p>
+<p>BNE — Branch if Not Equal — reads only the Z bit. If Z is clear (the
+subtraction result was not zero, meaning X ≠ <code>$0400</code>), it branches. If Z
+is set (the result was zero, meaning X = <code>$0400</code>), it falls through to the
+next instruction.</p>
+<p>BNE is one of the few conditional branches that means the same thing
+regardless of whether the values are treated as signed or unsigned. Not
+equal is not equal either way. Other branches — greater than, less than —
+behave differently depending on signed or unsigned interpretation. That
+distinction will be covered when those branches are introduced.</p>
+<hr />
+<h3 id="bne-loop">BNE Loop</h3>
+<p>Branch to <code>Loop</code> if X has not yet reached <code>$0400</code>.</p>
+<p>BNE takes a single signed byte offset. The offset encodes both direction
+(backward or forward) and distance (in bytes) from the instruction after
+BNE to the target. Direction plus distance — a vector. The relative offset
+byte is the branch vector, and it is not a fixed address but a value the
+CPU computes into one at runtime.</p>
+<p><strong>Where is the PC when the offset is applied?</strong></p>
+<p>The CPU fetches bytes one at a time, advancing the program counter after
+each fetch. BNE is two bytes: opcode and offset. By the time both are
+fetched, PC points at the instruction after BNE — not at BNE itself.</p>
+<pre><code>$3F0A   26          BNE opcode     &lt;- PC advances to $3F0B after this fetch
+$3F0B   ??          offset byte    &lt;- PC advances to $3F0C after this fetch
+$3F0C   39          RTS            &lt;- PC is here when the offset is applied
+</code></pre>
+<p><strong>Deriving the offset</strong></p>
+<p><code>Loop</code> is at <code>$3F05</code>. PC is at <code>$3F0C</code>. The branch goes backward.</p>
+<pre><code>Distance: $3F0C - $3F05 = 7 bytes back
+Offset:   -7
+</code></pre>
+<p><strong>Two's complement of 7:</strong></p>
+<pre><code>Step 1. Write 7 in binary:    %0000 0111
+Step 2. Invert every bit:     %1111 1000
+Step 3. Add 1:                %1111 1001
+Step 4. Group into hex:       %1111 = $F   %1001 = $9   Result: $XX
+</code></pre>
+<p>Verify: <code>$3F0C + (-7)</code> = <code>$3F05</code>. That is <code>Loop</code>. Correct.</p>
+<p>Find <strong>OpRef.BNE</strong>. Derive the signed offset byte and note both bytes below.</p>
+<pre><code>Opcode:   $XX
+Operand:  $XX
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__ __               BNE     Loop
+</code></pre>
+<hr />
+<h3 id="rts">RTS</h3>
+<p>Return to the caller (BASIC). No operand.</p>
+<p>Find <strong>OpRef.RTS</strong>. Note the single opcode byte below.</p>
+<pre><code>Opcode:   $XX
+</code></pre>
+<p>Write in your margin:</p>
+<pre><code>__                  RTS
+</code></pre>
+<hr />
+<h2 id="step-2-verify-your-bytes">Step 2: Verify Your Bytes</h2>
+<p>Your completed margin should show thirteen bytes. Count them before
+checking the answer key.</p>
+<pre><code>__ __ __            LDX     #SCREEN+512
+__ __               LDA     #$60
+__ __               STA     ,-X
+__ __ __            CMPX    #SCREEN
+__ __               BNE     Loop
+__                  RTS
+</code></pre>
+<p>If you have thirteen bytes, check your work against the Answer Key at
+the end of this document.</p>
+<hr />
+<h2 id="step-3-load-and-run">Step 3: Load and Run</h2>
+<p>Type the following BASIC program. The DATA statements contain your
+hand-assembled bytes — hex strings matching what you wrote in your
+margin, with the fill character on its own line.</p>
+<pre><code class="language-basic">10 A=&amp;H3F00
+20 FOR I=0 TO 12:READ H$
+30 POKE A+I,VAL(&quot;&amp;H&quot;+H$)
+40 NEXT I
+50 EXEC A
+80 DATA &quot;8E&quot;,&quot;06&quot;,&quot;00&quot;,&quot;86&quot;
+90 DATA &quot;60&quot;
+100 DATA &quot;A7&quot;,&quot;82&quot;,&quot;8C&quot;,&quot;04&quot;,&quot;00&quot;
+110 DATA &quot;26&quot;,&quot;F9&quot;,&quot;39&quot;
+</code></pre>
+<p>Type <code>RUN</code> and press Enter. The screen fills from bottom-right to
+top-left. BASIC prints <code>OK</code> when the routine returns.</p>
+<p>The DATA statements map directly to your hand-assembled bytes:</p>
+<ul>
+<li>Line 80: <code>LDX #$0600</code> opcode and operand, then <code>LDA</code> opcode</li>
+<li>Line 90: <code>LDA</code> operand — the fill character, isolated for easy editing</li>
+<li>Line 100: <code>STA ,-X</code> opcode and postbyte, then <code>CMPX #$0400</code> opcode and operand</li>
+<li>Line 110: <code>BNE</code> opcode and offset, then <code>RTS</code></li>
+</ul>
+<p>Once it works, try these additions:</p>
+<pre><code class="language-basic">60 PRINT @0,;
+70 A$=INKEY$:IF A$=&quot;&quot; THEN 70
+</code></pre>
+<p>Line 60 positions the cursor without clearing the screen. Line 70
+waits for a keypress before returning to BASIC — useful when the
+fill happens faster than you can see it.</p>
+<hr />
+<h2 id="step-4-change-the-fill-character">Step 4: Change the Fill Character</h2>
+<p>Change line 90 to use a different fill character value. Try <code>"86"</code> — that
+is <code>$86</code>, a graphics block character:</p>
+<pre><code class="language-basic">90 DATA &quot;86&quot;
+</code></pre>
+<p>Type <code>RUN</code>. The screen fills with a checkerboard pattern of alternating
+green and black blocks. The routine is unchanged — only the fill character
+is different.</p>
+<p>Values between 64 (<code>$40</code>) and 127 (<code>$7F</code>) produce visible text characters
+in normal video. Values between 128 (<code>$80</code>) and 191 (<code>$BF</code>) produce
+graphics block characters. Experiment with different values and observe
+the results.</p>
+<p>Or let the CoCo choose:</p>
+<pre><code class="language-basic">41 POKE A+4,RND(256)-1
+</code></pre>
+<p>Add that line and run the program repeatedly. <code>RND(256)-1</code> produces a
+random value from 0 to 255 — the full byte range. Every run is different.</p>
+<hr />
+<h2 id="part-two-the-chaos-experiment">Part Two: The Chaos Experiment</h2>
+<p>The routine works correctly when loaded at <code>$3F00</code>. Now load it at <code>$0400</code>
+— the start of screen memory — and see what happens.</p>
+<p>Saving before running is advised. Unpredictable results may follow.</p>
+<pre><code class="language-basic">SAVE &quot;FILLSCR&quot;
+</code></pre>
+<p>Change line 10 of your BASIC program:</p>
+<pre><code class="language-basic">10 A=&amp;H400
+</code></pre>
+<p>Both POKE and EXEC use <code>A</code> as a base address with an offset applied —
+<code>POKE A+I</code> adds the loop counter to <code>A</code> exactly as indexed addressing
+adds an offset to a register. Change the base on line 10 and everything
+that follows it moves with it. The concept is the same in both languages;
+only the vocabulary differs.</p>
+<p>This experiment is only possible because the routine is
+position-independent. It contains no references to its own location
+in memory — only references to the fixed hardware address <code>$0400</code>,
+which is always <code>$0400</code> regardless of where the code lives. The same
+thirteen bytes run identically at <code>$3F00</code> or <code>$0400</code> or anywhere else.</p>
+<p>More on position-independent code later.</p>
+<p>Type <code>RUN</code>.</p>
+<p>The routine begins filling the screen from <code>$05FF</code> toward <code>$0400</code>. As it
+works backward it will eventually reach the addresses where its own
+instructions live. At that point it overwrites its own code with character
+data. The processor continues fetching and executing whatever bytes happen
+to be at the program counter — which are now fill characters, not
+instructions.</p>
+<p>What happens next depends on which character value you chose. Each character
+byte will be interpreted as a 6809 opcode. Some may be harmless. Some may
+cause a jump to a random address. The CoCo may freeze, crash to BASIC, or
+produce unexpected screen patterns before stopping.</p>
+<p>By loading the code into screen memory we introduced a bug. As the
+routine fills backward toward <code>$0400</code>, it overwrites its own instructions
+with fill character bytes. The crash pattern varies on the fill character.</p>
+<p>If the fill character happens to be <code>$39</code> — the RTS opcode — the routine
+runs normally until it replaces the BNE instruction's offset byte. At that
+point the branch goes somewhere unexpected and the crash follows.</p>
+<p>Any other fill character produces less predictable results. The processor
+executes whatever opcode the fill byte represents, with whatever follows
+in memory as its operand. Where it goes from there is anyone's guess.</p>
+<hr />
+<h2 id="what-you-just-did">What You Just Did</h2>
+<p>You derived machine code bytes from an instruction reference and a postbyte
+table. You loaded those bytes into memory. You executed them. The machine
+did what you told it, exactly as you told it.</p>
+<p>This is what the assembler does on your behalf for every instruction in
+every program. For thirteen bytes it is a reasonable exercise. For nine
+hundred it is not. For nine thousand it is not possible.</p>
+<p>The assembler is not magic. It is arithmetic, applied consistently, without
+mistakes, faster than you can.</p>
+<hr />
+<h2 id="answer-key">Answer Key</h2>
+<p>Check your work here after completing Step 2.</p>
+<pre><code>8E 06 00            LDX     #SCREEN+512
+86 60               LDA     #$60
+A7 82               STA     ,-X
+8C 04 00            CMPX    #SCREEN
+26 F9               BNE     Loop
+39                  RTS
+</code></pre>
+<p>Thirteen bytes in sequence:</p>
+<pre><code>8E 06 00 86 60 A7 82 8C 04 00 26 F9 39
+</code></pre>
+<p><strong>STA postbyte derivation:</strong></p>
+<pre><code>Register X field:   1 0 0 x x x x x  =  $80
+Pre-decrement mode: x x x 0 0 0 1 0  =  $02
+OR result:          1 0 0 0 0 0 1 0  =  $82
+</code></pre>
+<p><strong>BNE offset derivation:</strong></p>
+<pre><code>PC after BNE fetch: $3F0C
+Loop address:       $3F05
+Distance:           7 bytes back
+Two's complement:   %0000 0111 -&gt; %1111 1000 -&gt; %1111 1001 = $F9
+</code></pre>
+<hr />
+<p>The following references were used in this exercise. Specific page numbers
+and chapter locations will be filled in when this document is placed in the
+final book structure.</p>
+<p><strong>6809 Instruction Reference — Load group</strong>
+LDX immediate, LDA immediate.</p>
+<p><strong>6809 Instruction Reference — Store group</strong>
+STA indexed.</p>
+<p><strong>6809 Instruction Reference — Compare group</strong>
+CMPX immediate.</p>
+<p><strong>6809 Instruction Reference — Branch group</strong>
+BNE relative.</p>
+<p><strong>6809 Instruction Reference — Miscellaneous group</strong>
+RTS inherent.</p>
+<p><strong>Indexed Addressing Postbyte Reference</strong>
+Pre-decrement by 1 (<code>,-X</code>), postbyte derivation by OR of register
+and mode fields.</p>
+<hr />
+<h2 id="appendix-instruction-reference">Appendix: Instruction Reference</h2>
+<p>This appendix contains the reference data needed to complete this exercise.
+The condition code column uses these symbols: <code>↕</code> changes, <code>-</code> unchanged,
+<code>0</code> always cleared.</p>
+<hr />
+<h3 id="how-to-read-an-entry">How to Read an Entry</h3>
+<p>Each instruction entry shows:</p>
+<ul>
+<li><strong>Operation</strong> — what the instruction does in register-transfer notation</li>
+<li><strong>Mode</strong> — the addressing mode used</li>
+<li><strong>Opcode</strong> — the hex byte that identifies this instruction</li>
+<li><strong>Bytes</strong> — total bytes including opcode and any operands</li>
+<li><strong>Cycles</strong> — clock cycles to execute</li>
+<li><strong>CC</strong> — effect on condition codes: H N Z V C</li>
+</ul>
+<hr />
+<h3 id="details-on-reading-the-condition-code-register-notation">Details on Reading the Condition Code Register Notation</h3>
+<p>The Condition Code register (CC) is an 8-bit register. Each bit is a flag
+that records one aspect of the result of the most recent instruction that
+affects it. Not all instructions affect all bits — the CC column in each
+entry shows which bits are affected by that instruction.</p>
+<p><strong>Bit layout:</strong></p>
+<pre><code>| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+|---|---|---|---|---|---|---|---|
+| E | F | H | I | N | Z | V | C |
+</code></pre>
+<pre><code>E  Entire    -- set when the entire CPU state was saved on the stack
+F  FIRQ mask -- masks the fast interrupt request when set
+H  Half carry -- carry out of bit 3 (used in BCD arithmetic)
+I  IRQ mask  -- masks the interrupt request when set
+N  Negative  -- set if the result had bit 7 (or bit 15) set
+Z  Zero      -- set if the result was exactly zero
+V  Overflow  -- set if   signed arithmetic overflow occurred
+C  Carry     -- set if unsigned carry or borrow occurred
+</code></pre>
+<p>The bits used in everyday programming are N, Z, V, and C. E, F, and I
+are interrupt control bits. H appears in BCD arithmetic.</p>
+<p><strong>Table symbols:</strong></p>
+<p>The CC column in each instruction entry uses these symbols:</p>
+<pre><code>↕   the bit changes to reflect the result of the instruction
+-   the bit is not affected by this instruction
+0   the bit is always cleared by this instruction
+1   the bit is always set by this instruction
+</code></pre>
+<p><strong>Example — LDX immediate:</strong></p>
+<pre><code>| CC |  H  |  N  |  Z  |  V  |  C  |
+|    |  -  |  ↕  |  ↕  |  0  |  -  |
+</code></pre>
+<p>H is unaffected. N and Z change to reflect whether the loaded value was
+negative or zero. V is always cleared. C is unaffected.</p>
+<p><strong>Example — CMPX immediate:</strong></p>
+<pre><code>| CC |  H  |  N  |  Z  |  V  |  C  |
+|    |  -  |  ↕  |  ↕  |  ↕  |  ↕  |
+</code></pre>
+<p>N, Z, V, and C all change to reflect the result of the comparison.
+BNE reads only Z. Other branches read N, V, C, or combinations of them.</p>
+<hr />
+<h3 id="oprefldx-ldx-load-index-register-x">OpRef.LDX — LDX — Load Index Register X</h3>
+<p><strong>Operation:</strong> X ← M:M+1</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immediate</td>
+<td>$8E</td>
+<td>3</td>
+<td>3</td>
+<td>LDX #nn</td>
+</tr>
+</tbody>
+</table>
+<p>The operand is a 16-bit value — two bytes, high byte first.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>↕</td>
+<td>↕</td>
+<td>0</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="opreflda-lda-load-accumulator-a">OpRef.LDA — LDA — Load Accumulator A</h3>
+<p><strong>Operation:</strong> A ← M</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immediate</td>
+<td>$86</td>
+<td>2</td>
+<td>2</td>
+<td>LDA #n</td>
+</tr>
+</tbody>
+</table>
+<p>The operand is an 8-bit value — one byte.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>↕</td>
+<td>↕</td>
+<td>0</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="oprefsta-sta-store-accumulator-a">OpRef.STA — STA — Store Accumulator A</h3>
+<p><strong>Operation:</strong> M ← A</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Indexed</td>
+<td>$A7</td>
+<td>2+</td>
+<td>4+</td>
+<td>STA addr,R</td>
+</tr>
+</tbody>
+</table>
+<p>Indexed mode requires a postbyte after the opcode. See <strong>OpRef.PB</strong>
+below. Bytes and cycles shown are minimums — the postbyte may add more.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>↕</td>
+<td>↕</td>
+<td>0</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="oprefcmpx-cmpx-compare-index-register-x">OpRef.CMPX — CMPX — Compare Index Register X</h3>
+<p><strong>Operation:</strong> X − M:M+1 (result discarded, condition codes set)</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immediate</td>
+<td>$8C</td>
+<td>3</td>
+<td>4</td>
+<td>CMPX #nn</td>
+</tr>
+</tbody>
+</table>
+<p>The operand is a 16-bit value — two bytes, high byte first. X is not
+changed. Only the condition codes reflect the result.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>↕</td>
+<td>↕</td>
+<td>↕</td>
+<td>↕</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="oprefbne-bne-branch-if-not-equal-z0">OpRef.BNE — BNE — Branch if Not Equal (Z=0)</h3>
+<p><strong>Operation:</strong> PC ← PC + offset if Z=0</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relative</td>
+<td>$26</td>
+<td>2</td>
+<td>3/3</td>
+<td>BNE label</td>
+</tr>
+</tbody>
+</table>
+<p>The operand is a signed 8-bit offset. The offset is added to the PC
+after both bytes of the instruction have been fetched. See the branch
+offset derivation in Step 1.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="oprefrts-rts-return-from-subroutine">OpRef.RTS — RTS — Return from Subroutine</h3>
+<p><strong>Operation:</strong> PC ← M[SP]; SP ← SP+2</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Opcode</th>
+<th>Bytes</th>
+<th>Cycles</th>
+<th>Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inherent</td>
+<td>$39</td>
+<td>1</td>
+<td>5</td>
+<td>RTS</td>
+</tr>
+</tbody>
+</table>
+<p>No operand. Pulls the return address from the stack.</p>
+<table>
+<thead>
+<tr>
+<th>CC</th>
+<th>H</th>
+<th>N</th>
+<th>Z</th>
+<th>V</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="oprefpb-appendix-indexed-addressing-postbyte">OpRef.PB — Appendix: Indexed Addressing Postbyte</h2>
+<p>Every instruction using indexed addressing requires a postbyte immediately
+after the opcode. The postbyte encodes the pointer register and the
+addressing mode.</p>
+<p>The postbyte is derived by OR-ing the register field and the mode field.
+The fields occupy non-overlapping bit positions.</p>
+<p><strong>Bit map:</strong></p>
+<table>
+<thead>
+<tr>
+<th>7</th>
+<th>6</th>
+<th>5</th>
+<th>4</th>
+<th>3</th>
+<th>2</th>
+<th>1</th>
+<th>0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r</td>
+<td>R</td>
+<td>R</td>
+<td>i</td>
+<td>m</td>
+<td>m</td>
+<td>m</td>
+<td>m</td>
+</tr>
+</tbody>
+</table>
+<pre><code>r    = 1 for standard indexed mode
+RR   = register select (00=X  01=Y  10=U  11=S)
+i    = 1 for indirect mode
+mmmm = mode select (see table below)
+</code></pre>
+<p><strong>Register field (bits 6-5 when bit 7=1):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Register</th>
+<th>Bits 6-5</th>
+<th>Bit pattern</th>
+<th>Hex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X</td>
+<td>00</td>
+<td>1 0 0 x x x x x</td>
+<td>$80</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>01</td>
+<td>1 0 1 x x x x x</td>
+<td>$A0</td>
+</tr>
+<tr>
+<td>U</td>
+<td>10</td>
+<td>1 1 0 x x x x x</td>
+<td>$C0</td>
+</tr>
+<tr>
+<td>S</td>
+<td>11</td>
+<td>1 1 1 x x x x x</td>
+<td>$E0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mode field (bits 3-0, bit 4=0 for non-indirect):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Bit pattern</th>
+<th>Hex</th>
+<th>+bytes</th>
+<th>+Cycles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>,R+</td>
+<td>x x x 0 0 0 0 0</td>
+<td>$00</td>
+<td>0</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>,R++</td>
+<td>x x x 0 0 0 0 1</td>
+<td>$01</td>
+<td>0</td>
+<td>+3</td>
+</tr>
+<tr>
+<td>,-R</td>
+<td>x x x 0 0 0 1 0</td>
+<td>$02</td>
+<td>0</td>
+<td>+2</td>
+</tr>
+<tr>
+<td>,--R</td>
+<td>x x x 0 0 0 1 1</td>
+<td>$03</td>
+<td>0</td>
+<td>+3</td>
+</tr>
+<tr>
+<td>,R</td>
+<td>x x x 0 0 1 0 0</td>
+<td>$04</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>B,R</td>
+<td>x x x 0 0 1 0 1</td>
+<td>$05</td>
+<td>0</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>A,R</td>
+<td>x x x 0 0 1 1 0</td>
+<td>$06</td>
+<td>0</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>n8,R</td>
+<td>x x x 0 1 0 0 0</td>
+<td>$08</td>
+<td>1</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>n16,R</td>
+<td>x x x 0 1 0 0 1</td>
+<td>$09</td>
+<td>2</td>
+<td>+4</td>
+</tr>
+<tr>
+<td>D,R</td>
+<td>x x x 0 1 0 1 1</td>
+<td>$0B</td>
+<td>0</td>
+<td>+4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Worked example: STA ,-X</strong></p>
+<pre><code>Register X:    1 0 0 x x x x x  =  $80
+Mode ,-R:      x x x 0 0 0 1 0  =  $02
+OR result:     1 0 0 0 0 0 1 0  =  $82
+</code></pre>
+<p>Opcode <code>$A7</code>, postbyte <code>$82</code> — two bytes total.</p>
+</body>
+</html>

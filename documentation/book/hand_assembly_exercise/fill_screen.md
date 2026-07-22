@@ -119,11 +119,11 @@ from the postbyte reference are combined using bitwise OR to produce the
 final byte. The fields occupy non-overlapping bit positions so the OR
 simply merges them without conflict.
 
-Step 1: Find the register X row in the *register* field table.  Note the three bit pattern.
-Step 2: Find the `,-R` row in the *mode* field table. Note the five bit pattern.
-Step 3: Combine the two bit patterns, the register pattern first, the mode pattern second.
-        Fill in the logical OR derivation below and combine the results.
-
+Step 1: Find the register X row in the **<u>register</u>** field table.  Note the three bit pattern.  
+Step 2: Find the `,-R` row in the **<u>mode</u>** field table. Note the five bit pattern.  
+Step 3: Combine the two bit patterns, the register pattern first, the mode pattern second.  
+        Fill in the logical OR derivation below and combine the results.  
+  
 OR derivation illustrated:
 
 ```
