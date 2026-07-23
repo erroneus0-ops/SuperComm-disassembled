@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Indexed Addressing Postbyte</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .postbyte-table td.center { text-align: center; }
+    .postbyte-table td.description { font-size: 0.85rem; color: var(--text-dim); }
+    .reg-table { width: auto; margin-bottom: 1.5rem; }
+    .reg-table td, .reg-table th { padding: 0.25rem 1rem; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Indexed Addressing Postbyte</span>
+  </nav>
+  <main>
+    <h2>Indexed Addressing — Postbyte Encoding</h2>
+    <p>Every instruction using indexed addressing requires a postbyte immediately after the opcode. The postbyte encodes the pointer register, indexing type, offset size, and whether indirect addressing is used. This table is shared by all instructions that show 'indexed' mode.</p>
+
+    <h3>Notes</h3>
+    <ul><li>Bits 6-5 of the postbyte select the pointer register: 00=X  01=Y  10=U  11=S</li><li>Bit 4 selects indirect mode (EA is address of address). Not available for auto-increment/decrement by 1.</li><li>For 5-bit offset (postbyte < $80): bits 4-0 are the signed offset, bits 6-5 are the register. No indirect.</li><li>Cycles shown are additional cycles added to the instruction's base indexed cycle count.</li><li>PC-relative modes use R=PC (bits 6-5 = 11 would mean S; PC-relative is a special encoding -- see below).</li><li>Postbyte $9F = extended indirect [addr] -- 16-bit address in the two bytes following the postbyte.</li></ul>
+
+    <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
+    <table class="modes-table reg-table">
+      <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
+      <tbody><tr><td><code>%00xxxxx</code></td><td>X</td></tr><tr><td><code>%01xxxxx</code></td><td>Y</td></tr><tr><td><code>%10xxxxx</code></td><td>U</td></tr><tr><td><code>%11xxxxx</code></td><td>S</td></tr></tbody>
+    </table>
+
+    <h3>Postbyte Modes</h3>
+    <table class="modes-table postbyte-table" style="width:100%">
+      <thead>
+        <tr>
+          <th>Syntax</th>
+          <th>Description</th>
+          <th>Postbyte (per register)</th>
+          <th>Extra bytes</th>
+          <th>Extra cycles</th>
+          <th>Indirect postbyte</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+  <td><code>n,R</code></td>
+  <td class="description">Bits 4-0 are a 5-bit signed offset (-16 to +15). Bits 6-5 select register. Bit 4 is part of the offset, NOT indirect. No additional bytes.</td>
+  <td>—</td>
+  <td class="center">0</td>
+  <td class="center">+1</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td><code>,R</code></td>
+  <td class="description">Effective address is the register value. Same as 0,R but encoded with bit 7=1.</td>
+  <td>X=<code>$84</code>  Y=<code>$A4</code>  U=<code>$C4</code>  S=<code>$E4</code></td>
+  <td class="center">0</td>
+  <td class="center">+0</td>
+  <td>X=<code>$94</code>  Y=<code>$B4</code>  U=<code>$D4</code>  S=<code>$F4</code></td>
+</tr>
+<tr>
+  <td><code>,R+</code></td>
+  <td class="description">Use register as EA, then increment register by 1.</td>
+  <td>X=<code>$80</code>  Y=<code>$A0</code>  U=<code>$C0</code>  S=<code>$E0</code></td>
+  <td class="center">0</td>
+  <td class="center">+2</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td><code>,R++</code></td>
+  <td class="description">Use register as EA, then increment register by 2.</td>
+  <td>X=<code>$81</code>  Y=<code>$A1</code>  U=<code>$C1</code>  S=<code>$E1</code></td>
+  <td class="center">0</td>
+  <td class="center">+3</td>
+  <td>X=<code>$91</code>  Y=<code>$B1</code>  U=<code>$D1</code>  S=<code>$F1</code></td>
+</tr>
+<tr>
+  <td><code>,-R</code></td>
+  <td class="description">Decrement register by 1, then use as EA.</td>
+  <td>X=<code>$82</code>  Y=<code>$A2</code>  U=<code>$C2</code>  S=<code>$E2</code></td>
+  <td class="center">0</td>
+  <td class="center">+2</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td><code>,--R</code></td>
+  <td class="description">Decrement register by 2, then use as EA.</td>
+  <td>X=<code>$83</code>  Y=<code>$A3</code>  U=<code>$C3</code>  S=<code>$E3</code></td>
+  <td class="center">0</td>
+  <td class="center">+3</td>
+  <td>X=<code>$93</code>  Y=<code>$B3</code>  U=<code>$D3</code>  S=<code>$F3</code></td>
+</tr>
+<tr>
+  <td><code>n,R</code></td>
+  <td class="description">8-bit signed offset (-128 to +127) in the byte following the postbyte.</td>
+  <td>X=<code>$88</code>  Y=<code>$A8</code>  U=<code>$C8</code>  S=<code>$E8</code></td>
+  <td class="center">1</td>
+  <td class="center">+1</td>
+  <td>X=<code>$98</code>  Y=<code>$B8</code>  U=<code>$D8</code>  S=<code>$F8</code></td>
+</tr>
+<tr>
+  <td><code>n,R</code></td>
+  <td class="description">16-bit signed offset in the two bytes following the postbyte (big-endian).</td>
+  <td>X=<code>$89</code>  Y=<code>$A9</code>  U=<code>$C9</code>  S=<code>$E9</code></td>
+  <td class="center">2</td>
+  <td class="center">+4</td>
+  <td>X=<code>$99</code>  Y=<code>$B9</code>  U=<code>$D9</code>  S=<code>$F9</code></td>
+</tr>
+<tr>
+  <td><code>A,R</code></td>
+  <td class="description">A register (8-bit signed) added to pointer register.</td>
+  <td>X=<code>$86</code>  Y=<code>$A6</code>  U=<code>$C6</code>  S=<code>$E6</code></td>
+  <td class="center">0</td>
+  <td class="center">+1</td>
+  <td>X=<code>$96</code>  Y=<code>$B6</code>  U=<code>$D6</code>  S=<code>$F6</code></td>
+</tr>
+<tr>
+  <td><code>B,R</code></td>
+  <td class="description">B register (8-bit signed) added to pointer register.</td>
+  <td>X=<code>$85</code>  Y=<code>$A5</code>  U=<code>$C5</code>  S=<code>$E5</code></td>
+  <td class="center">0</td>
+  <td class="center">+1</td>
+  <td>X=<code>$95</code>  Y=<code>$B5</code>  U=<code>$D5</code>  S=<code>$F5</code></td>
+</tr>
+<tr>
+  <td><code>D,R</code></td>
+  <td class="description">D register (16-bit signed) added to pointer register.</td>
+  <td>X=<code>$8B</code>  Y=<code>$AB</code>  U=<code>$CB</code>  S=<code>$EB</code></td>
+  <td class="center">0</td>
+  <td class="center">+4</td>
+  <td>X=<code>$9B</code>  Y=<code>$BB</code>  U=<code>$DB</code>  S=<code>$FB</code></td>
+</tr>
+<tr>
+  <td><code>n,PCR</code></td>
+  <td class="description">8-bit signed offset from Program Counter. Used for position-independent data references.</td>
+  <td>PC=<code>$8C</code></td>
+  <td class="center">1</td>
+  <td class="center">+1</td>
+  <td>PC=<code>$9C</code></td>
+</tr>
+<tr>
+  <td><code>n,PCR</code></td>
+  <td class="description">16-bit signed offset from Program Counter.</td>
+  <td>PC=<code>$8D</code></td>
+  <td class="center">2</td>
+  <td class="center">+5</td>
+  <td>PC=<code>$9D</code></td>
+</tr>
+<tr>
+  <td><code>[addr]</code></td>
+  <td class="description">16-bit absolute address in the two bytes following the postbyte. EA is the contents of that address (indirect). Always indirect. No register involved.</td>
+  <td>=<code>$9F</code></td>
+  <td class="center">2</td>
+  <td class="center">+5</td>
+  <td>—</td>
+</tr></tbody>
+    </table>
+
+    <h3>Hand Assembly Examples</h3>
+    <table class="modes-table" style="width:100%">
+      <thead>
+        <tr><th>Syntax</th><th>Bytes</th><th>Total bytes</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+<tr>
+  <td><code>STA ,X+</code></td>
+  <td><code>$A7</code> <code>$80</code></td>
+  <td class="center">2</td>
+  <td>Store A to address in X, then X = X + 1</td>
+</tr>
+<tr>
+  <td><code>STA ,-X</code></td>
+  <td><code>$A7</code> <code>$82</code></td>
+  <td class="center">2</td>
+  <td>X = X - 1, then store A to new address in X</td>
+</tr>
+<tr>
+  <td><code>LDA ,X</code></td>
+  <td><code>$A6</code> <code>$84</code></td>
+  <td class="center">2</td>
+  <td>Load A from address in X, X unchanged</td>
+</tr>
+<tr>
+  <td><code>LDA 5,Y</code></td>
+  <td><code>$A6</code> <code>$29</code></td>
+  <td class="center">2</td>
+  <td>Load A from Y+5. 5-bit offset: bits 6-5=01 (Y), bits 4-0=00101</td>
+</tr>
+<tr>
+  <td><code>LDA $10,X</code></td>
+  <td><code>$A6</code> <code>$88</code> <code>$10</code></td>
+  <td class="center">3</td>
+  <td>Load A from X+$10. 8-bit offset follows postbyte.</td>
+</tr>
+<tr>
+  <td><code>LDA [,X++]</code></td>
+  <td><code>$A6</code> <code>$91</code></td>
+  <td class="center">2</td>
+  <td>Indirect: load A from address stored at X, then X = X + 2</td>
+</tr></tbody>
+    </table>
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>
