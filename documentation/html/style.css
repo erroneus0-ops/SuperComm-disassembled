@@ -165,6 +165,12 @@ h3.mnemonic {
 }
 
 /* Modes table */
+.encoding-examples-table td:last-child {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .postbyte-table {
   table-layout: fixed;
   width: 100%;

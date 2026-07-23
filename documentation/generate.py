@@ -936,6 +936,12 @@ h3.mnemonic {
 }
 
 /* Modes table */
+.encoding-examples-table td:last-child {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .postbyte-table {
   table-layout: fixed;
   width: 100%;
@@ -1234,7 +1240,13 @@ def render_postbyte_page(data):
   <style>
     .postbyte-table td.center {{ text-align: center; }}
     .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
-    .postbyte-table {{ font-family: "Courier New", monospace; font-size: 0.82rem; }}
+    .encoding-examples-table td:last-child {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.postbyte-table {{ font-family: "Courier New", monospace; font-size: 0.82rem; }}
     .postbyte-table td, .postbyte-table th {{ text-align: center; white-space: nowrap; }}
     .postbyte-table td:first-child, .postbyte-table th:first-child,
     .postbyte-table td:last-child, .postbyte-table th:last-child {{ text-align: left; white-space: nowrap; }}
@@ -1370,16 +1382,15 @@ def render_postbyte_page(data):
     -->
 
     <h3>Encoding Examples</h3>
-    <table class="modes-table" style="width:100%">
+    <table class="modes-table encoding-examples-table" style="width:100%; table-layout:fixed;">
       <colgroup>
-        <col style="width:32%"><!-- Description -->
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:20%"><!-- Direct -->
-        <col style="width:16%"><!-- Indirect -->
+        <col style="width:14%"><!-- Syntax -->
+        <col style="width:20%"><!-- Bytes -->
+        <col style="width:10%"><!-- Total bytes -->
+        <col style="width:56%"><!-- Description -->
       </colgroup>
       <thead>
-        <tr><th>Syntax</th><th>Bytes</th><th>Total bytes</th><th>Description</th></tr>
+        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th>Total bytes</th><th style="text-align:left">Description</th></tr>
       </thead>
       <tbody>{"".join(ex_rows)}</tbody>
     </table>
