@@ -1189,10 +1189,14 @@ def render_postbyte_page(data):
     notes_html = ''.join(f'<li>{n}</li>' for n in data.get('notes', []))
 
     # Register bits table
-    reg_rows = ''.join(
-        f'<tr><td><code>%{r["bits"]}xxxxx</code></td><td>{r["register"]}</td></tr>'
-        for r in data['register_bits']['values']
-    )
+    def reg_bit_row(r):
+        b6, b5 = r['bits'][0], r['bits'][1]
+        return (f'<tr>'
+                f'<td>1</td><td>{b6}</td><td>{b5}</td>'
+                f'<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>'
+                f'<td style="text-align:left"><strong>{r["register"]}</strong></td>'
+                f'</tr>')
+    reg_rows = ''.join(reg_bit_row(r) for r in data['register_bits']['values'])
 
     # Main postbyte modes table
     mode_rows = []
@@ -1240,7 +1244,13 @@ def render_postbyte_page(data):
   <style>
     .postbyte-table td.center {{ text-align: center; }}
     .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
-    .encoding-examples-table td:last-child {{
+    .or-derive-table td {{ text-align: center; }}
+.or-derive-table td:first-child, .or-derive-table th:first-child {{ text-align: left; }}
+.or-derive-table td:last-child, .or-derive-table th:last-child {{ text-align: center; }}
+.reg-table td, .reg-table th {{ text-align: center; }}
+.reg-table td:last-child, .reg-table th:last-child {{ text-align: left; }}
+
+.encoding-examples-table td:last-child {{
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -1285,15 +1295,15 @@ def render_postbyte_page(data):
     <ul>{notes_html}</ul>
 
     <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
-    <table class="modes-table reg-table">
+    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem;">
       <colgroup>
-        <col style="width:32%"><!-- Description -->
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:20%"><!-- Direct -->
-        <col style="width:16%"><!-- Indirect -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:60%"><!-- Register -->
       </colgroup>
-      <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
+      <thead>
+        <tr><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Register</th></tr>
+      </thead>
       <tbody>{reg_rows}</tbody>
     </table>
 
@@ -1353,20 +1363,24 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace;">
+    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
       <colgroup>
         <col style="width:30%"><!-- Field -->
         <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
         <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:10%"><!-- Hex -->
+        <col style="width:8%"><!-- Hex -->
       </colgroup>
       <thead>
-        <tr><th style="text-align:left">Field</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Hex</th></tr>
+        <tr style="background:var(--bg2,#2a2a2a); color:var(--text-dim,#888)">
+          <th style="text-align:left">Field</th>
+          <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
+          <th>Hex</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Register X (bits 6-5 = 00)</td><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>$80</td></tr>
-        <tr><td>Mode ,&#x2013;R (pre-decrement 1)</td><td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
-        <tr class="section-header"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><strong>$82</strong></td></tr>
+        <tr><td>Register X (bits 6-5 = 00)</td><td>1</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>$80</td></tr>
+        <tr><td>Mode ,&#x2013;R (pre-decrement 1)</td><td>-</td><td>-</td><td>-</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
+        <tr style="background:var(--bg2,#2a2a2a); color:var(--cc-set,#f0c060); font-weight:bold"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$82</td></tr>
       </tbody>
     </table>
     <p>To use a different register, change bits 6-5. To use a different mode, change bits 3-0.
@@ -1389,7 +1403,7 @@ def render_postbyte_page(data):
         <col style="width:56%"><!-- Description -->
       </colgroup>
       <thead>
-        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th>Total bytes</th><th style="text-align:left">Description</th></tr>
+        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th style="text-align:center">Bytes</th><th style="text-align:left">Description</th></tr>
       </thead>
       <tbody>{"".join(ex_rows)}</tbody>
     </table>

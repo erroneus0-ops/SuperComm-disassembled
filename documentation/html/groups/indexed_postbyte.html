@@ -8,7 +8,13 @@
   <style>
     .postbyte-table td.center { text-align: center; }
     .postbyte-table td.description { font-size: 0.85rem; color: var(--text-dim); }
-    .encoding-examples-table td:last-child {
+    .or-derive-table td { text-align: center; }
+.or-derive-table td:first-child, .or-derive-table th:first-child { text-align: left; }
+.or-derive-table td:last-child, .or-derive-table th:last-child { text-align: center; }
+.reg-table td, .reg-table th { text-align: center; }
+.reg-table td:last-child, .reg-table th:last-child { text-align: left; }
+
+.encoding-examples-table td:last-child {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -53,16 +59,16 @@
     <ul><li>Bits 6-5 of the postbyte select the pointer register: 00=X  01=Y  10=U  11=S</li><li>Bit 4 selects indirect mode (EA is address of address). Not available for auto-increment/decrement by 1.</li><li>For 5-bit offset (postbyte < $80): bits 4-0 are the signed offset, bits 6-5 are the register. No indirect.</li><li>Cycles shown are additional cycles added to the instruction's base indexed cycle count.</li><li>PC-relative modes use R=PC (bits 6-5 = 11 would mean S; PC-relative is a special encoding -- see below).</li><li>Postbyte $9F = extended indirect [addr] -- 16-bit address in the two bytes following the postbyte.</li></ul>
 
     <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
-    <table class="modes-table reg-table">
+    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem;">
       <colgroup>
-        <col style="width:32%"><!-- Description -->
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:20%"><!-- Direct -->
-        <col style="width:16%"><!-- Indirect -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:60%"><!-- Register -->
       </colgroup>
-      <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
-      <tbody><tr><td><code>%00xxxxx</code></td><td>X</td></tr><tr><td><code>%01xxxxx</code></td><td>Y</td></tr><tr><td><code>%10xxxxx</code></td><td>U</td></tr><tr><td><code>%11xxxxx</code></td><td>S</td></tr></tbody>
+      <thead>
+        <tr><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Register</th></tr>
+      </thead>
+      <tbody><tr><td>1</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>X</strong></td></tr><tr><td>1</td><td>0</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>Y</strong></td></tr><tr><td>1</td><td>1</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>U</strong></td></tr><tr><td>1</td><td>1</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>S</strong></td></tr></tbody>
     </table>
 
     <h3>Postbyte Bit Map</h3>
@@ -121,20 +127,24 @@
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace;">
+    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
       <colgroup>
         <col style="width:30%"><!-- Field -->
         <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
         <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:10%"><!-- Hex -->
+        <col style="width:8%"><!-- Hex -->
       </colgroup>
       <thead>
-        <tr><th style="text-align:left">Field</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Hex</th></tr>
+        <tr style="background:var(--bg2,#2a2a2a); color:var(--text-dim,#888)">
+          <th style="text-align:left">Field</th>
+          <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
+          <th>Hex</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Register X (bits 6-5 = 00)</td><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>$80</td></tr>
-        <tr><td>Mode ,&#x2013;R (pre-decrement 1)</td><td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
-        <tr class="section-header"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><strong>$82</strong></td></tr>
+        <tr><td>Register X (bits 6-5 = 00)</td><td>1</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>$80</td></tr>
+        <tr><td>Mode ,&#x2013;R (pre-decrement 1)</td><td>-</td><td>-</td><td>-</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
+        <tr style="background:var(--bg2,#2a2a2a); color:var(--cc-set,#f0c060); font-weight:bold"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$82</td></tr>
       </tbody>
     </table>
     <p>To use a different register, change bits 6-5. To use a different mode, change bits 3-0.
@@ -157,7 +167,7 @@
         <col style="width:56%"><!-- Description -->
       </colgroup>
       <thead>
-        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th>Total bytes</th><th style="text-align:left">Description</th></tr>
+        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th style="text-align:center">Bytes</th><th style="text-align:left">Description</th></tr>
       </thead>
       <tbody>
 <tr>
