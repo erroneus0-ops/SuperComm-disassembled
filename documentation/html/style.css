@@ -165,6 +165,23 @@ h3.mnemonic {
 }
 
 /* Modes table */
+.postbyte-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.postbyte-table td,
+.postbyte-table th {
+  text-align: center;
+}
+.postbyte-table td:first-child,
+.postbyte-table th:first-child,
+.postbyte-table td:nth-child(10),
+.postbyte-table th:nth-child(10),
+.postbyte-table td:nth-child(11),
+.postbyte-table th:nth-child(11) {
+  text-align: left;
+}
+
 .modes-table {
   width: max-content;
   table-layout: fixed;

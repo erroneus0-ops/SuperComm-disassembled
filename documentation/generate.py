@@ -480,22 +480,22 @@ def render_instruction(instr):
     <div style="display:flex;gap:2rem;align-items:flex-start">
       <table class="modes-table" style="width:auto">
         <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody>{rows16}</tbody>
       </table>
       <table class="modes-table" style="width:auto">
         <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody>{rows8}</tbody>
@@ -611,11 +611,11 @@ def render_instruction(instr):
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr>
@@ -628,11 +628,11 @@ def render_instruction(instr):
     </table>
     <table class="cc-table">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
@@ -650,11 +650,11 @@ def render_instruction(instr):
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr>
@@ -667,11 +667,11 @@ def render_instruction(instr):
     </table>
     <table class="cc-table">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
@@ -936,6 +936,23 @@ h3.mnemonic {
 }
 
 /* Modes table */
+.postbyte-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.postbyte-table td,
+.postbyte-table th {
+  text-align: center;
+}
+.postbyte-table td:first-child,
+.postbyte-table th:first-child,
+.postbyte-table td:nth-child(10),
+.postbyte-table th:nth-child(10),
+.postbyte-table td:nth-child(11),
+.postbyte-table th:nth-child(11) {
+  text-align: left;
+}
+
 .modes-table {
   width: max-content;
   table-layout: fixed;
@@ -1258,11 +1275,11 @@ def render_postbyte_page(data):
     <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
     <table class="modes-table reg-table">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
       <tbody>{reg_rows}</tbody>
@@ -1271,13 +1288,13 @@ def render_postbyte_page(data):
     <h3>Postbyte Bit Map</h3>
     <p>All postbyte values shown for register X (bits 6-5 = 00). For Y add $20, U add $40, S add $60.<br>
     <strong style="color:var(--cc-set,#f0c060)">I</strong> = indirect bit set (1); mode also available in indirect form [&hellip;].</p>
-    <table class="modes-table postbyte-table" style="width:100%; font-family: monospace; font-size: 0.85rem; table-layout: fixed;">
+    <table class="modes-table postbyte-table" style="font-family: monospace; font-size: 0.85rem;">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr>
@@ -1301,21 +1318,21 @@ def render_postbyte_page(data):
         <tr><td>register U base</td><td>1</td><td>1</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
         <tr><td>register S base</td><td>1</td><td>1</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
         <tr class="section-header"><td colspan="11"><strong>5-bit signed offset (bit 7=0, no indirect)</strong></td></tr>
-        <tr><td>±4-bit signed offset</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td style="text-align:left"><code>LDA -1,X</code></td><td style="text-align:left">—</td></tr>
+        <tr><td>±4-bit signed offset</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td><code>LDA -1,X</code></td><td>—</td></tr>
         <tr class="section-header"><td colspan="11"><strong>Standard indexed (bit 7=1)</strong></td></tr>
-        <tr><td>post-increment by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td style="text-align:left"><code>LDA ,X+</code></td><td style="text-align:left">—</td></tr>
-        <tr><td>post-increment by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>0</td><td>1</td><td style="text-align:left"><code>LDA ,X++</code></td><td style="text-align:left"><code>LDA [,X++]</code></td></tr>
-        <tr><td>pre-decrement by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td style="text-align:left"><code>LDA ,-X</code></td><td style="text-align:left">—</td></tr>
-        <tr><td>pre-decrement by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>1</td><td>1</td><td style="text-align:left"><code>LDA ,--X</code></td><td style="text-align:left"><code>LDA [,--X]</code></td></tr>
-        <tr><td>zero offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>0</td><td style="text-align:left"><code>LDA ,X</code></td><td style="text-align:left"><code>LDA [,X]</code></td></tr>
-        <tr><td>B accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>1</td><td style="text-align:left"><code>LDA B,X</code></td><td style="text-align:left"><code>LDA [B,X]</code></td></tr>
-        <tr><td>A accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>1</td><td>0</td><td style="text-align:left"><code>LDA A,X</code></td><td style="text-align:left"><code>LDA [A,X]</code></td></tr>
-        <tr><td>±7-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>0</td><td style="text-align:left"><code>LDA $01,X</code></td><td style="text-align:left"><code>LDA [$01,X]</code></td></tr>
-        <tr><td>±15-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>1</td><td style="text-align:left"><code>LDA $0100,X</code></td><td style="text-align:left"><code>LDA [$0100,X]</code></td></tr>
-        <tr><td>D accumulator offset (16-bit)</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>1</td><td>1</td><td style="text-align:left"><code>LDY D,X</code></td><td style="text-align:left"><code>LDY [D,X]</code></td></tr>
-        <tr><td>±7-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>0</td><td style="text-align:left"><code>LDA $01,PCR</code></td><td style="text-align:left"><code>LDA [$01,PCR]</code></td></tr>
-        <tr><td>±15-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>1</td><td style="text-align:left"><code>LDA $0001,PCR</code></td><td style="text-align:left"><code>LDA [$0001,PCR]</code></td></tr>
-        <tr><td>extended indirect — fixed postbyte $9F</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td style="text-align:left">—</td><td style="text-align:left"><code>LDA [$0000]</code></td></tr>
+        <tr><td>post-increment by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>LDA ,X+</code></td><td>—</td></tr>
+        <tr><td>post-increment by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>0</td><td>1</td><td><code>LDA ,X++</code></td><td><code>LDA [,X++]</code></td></tr>
+        <tr><td>pre-decrement by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><code>LDA ,-X</code></td><td>—</td></tr>
+        <tr><td>pre-decrement by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>1</td><td>1</td><td><code>LDA ,--X</code></td><td><code>LDA [,--X]</code></td></tr>
+        <tr><td>zero offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>0</td><td><code>LDA ,X</code></td><td><code>LDA [,X]</code></td></tr>
+        <tr><td>B accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>1</td><td><code>LDA B,X</code></td><td><code>LDA [B,X]</code></td></tr>
+        <tr><td>A accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>1</td><td>0</td><td><code>LDA A,X</code></td><td><code>LDA [A,X]</code></td></tr>
+        <tr><td>±7-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>0</td><td><code>LDA $01,X</code></td><td><code>LDA [$01,X]</code></td></tr>
+        <tr><td>±15-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>1</td><td><code>LDA $0100,X</code></td><td><code>LDA [$0100,X]</code></td></tr>
+        <tr><td>D accumulator offset (16-bit)</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>1</td><td>1</td><td><code>LDY D,X</code></td><td><code>LDY [D,X]</code></td></tr>
+        <tr><td>±7-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>0</td><td><code>LDA $01,PCR</code></td><td><code>LDA [$01,PCR]</code></td></tr>
+        <tr><td>±15-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>1</td><td><code>LDA $0001,PCR</code></td><td><code>LDA [$0001,PCR]</code></td></tr>
+        <tr><td>extended indirect — fixed postbyte $9F</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>—</td><td><code>LDA [$0000]</code></td></tr>
       </tbody>
     </table>
 
@@ -1326,11 +1343,11 @@ def render_postbyte_page(data):
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
     <table class="modes-table postbyte-table" style="width:auto; font-family:monospace;">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr><th style="text-align:left">Field</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Hex</th></tr>
@@ -1355,11 +1372,11 @@ def render_postbyte_page(data):
     <h3>Encoding Examples</h3>
     <table class="modes-table" style="width:100%">
       <colgroup>
-        <col style="width:28%"><!-- Description -->
+        <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:22%"><!-- Direct -->
-        <col style="width:20%"><!-- Indirect -->
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
       </colgroup>
       <thead>
         <tr><th>Syntax</th><th>Bytes</th><th>Total bytes</th><th>Description</th></tr>
