@@ -1192,7 +1192,8 @@ def render_postbyte_page(data):
     def reg_bit_row(r):
         b6, b5 = r['bits'][0], r['bits'][1]
         return (f'<tr>'
-                f'<td>1</td><td>{b6}</td><td>{b5}</td>'
+                f'<td style="color:var(--cc-set,#f0c060);font-weight:bold">1</td>'
+                f'<td>{b6}</td><td>{b5}</td>'
                 f'<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>'
                 f'<td style="text-align:left"><strong>{r["register"]}</strong></td>'
                 f'</tr>')
@@ -1250,6 +1251,8 @@ def render_postbyte_page(data):
 .reg-table td, .reg-table th {{ text-align: center; }}
 .reg-table td:last-child, .reg-table th:last-child {{ text-align: left; }}
 
+.encoding-examples-table td:nth-child(3) {{ text-align: center; }}
+
 .encoding-examples-table td:last-child {{
   white-space: normal;
   overflow: visible;
@@ -1295,14 +1298,18 @@ def render_postbyte_page(data):
     <ul>{notes_html}</ul>
 
     <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
-    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem;">
+    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem; width:auto;">
       <colgroup>
-        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
-        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
-        <col style="width:60%"><!-- Register -->
+        <col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem">
+        <col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem">
+        <col style="min-width:6rem"><!-- Register -->
       </colgroup>
       <thead>
-        <tr><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Register</th></tr>
+        <tr>
+          <th style="text-align:center;color:var(--cc-set,#f0c060)">7</th>
+          <th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
+          <th style="text-align:left">Register</th>
+        </tr>
       </thead>
       <tbody>{reg_rows}</tbody>
     </table>
@@ -1365,16 +1372,19 @@ def render_postbyte_page(data):
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
     <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
       <colgroup>
-        <col style="width:30%"><!-- Field -->
-        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:8%"><!-- Hex -->
+        <col style="width:35%"><!-- Field -->
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:7%"><!-- Hex -->
       </colgroup>
       <thead>
         <tr style="background:var(--bg2,#2a2a2a); color:var(--text-dim,#888)">
           <th style="text-align:left">Field</th>
-          <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
-          <th>Hex</th>
+          <th style="text-align:center">7</th><th style="text-align:center">6</th>
+          <th style="text-align:center">5</th><th style="text-align:center">4</th>
+          <th style="text-align:center">3</th><th style="text-align:center">2</th>
+          <th style="text-align:center">1</th><th style="text-align:center">0</th>
+          <th style="text-align:center">Hex</th>
         </tr>
       </thead>
       <tbody>
@@ -1399,7 +1409,7 @@ def render_postbyte_page(data):
       <colgroup>
         <col style="width:14%"><!-- Syntax -->
         <col style="width:20%"><!-- Bytes -->
-        <col style="width:10%"><!-- Total bytes -->
+        <col style="width:8%"><!-- Bytes -->
         <col style="width:56%"><!-- Description -->
       </colgroup>
       <thead>

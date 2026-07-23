@@ -14,6 +14,8 @@
 .reg-table td, .reg-table th { text-align: center; }
 .reg-table td:last-child, .reg-table th:last-child { text-align: left; }
 
+.encoding-examples-table td:nth-child(3) { text-align: center; }
+
 .encoding-examples-table td:last-child {
   white-space: normal;
   overflow: visible;
@@ -59,16 +61,20 @@
     <ul><li>Bits 6-5 of the postbyte select the pointer register: 00=X  01=Y  10=U  11=S</li><li>Bit 4 selects indirect mode (EA is address of address). Not available for auto-increment/decrement by 1.</li><li>For 5-bit offset (postbyte < $80): bits 4-0 are the signed offset, bits 6-5 are the register. No indirect.</li><li>Cycles shown are additional cycles added to the instruction's base indexed cycle count.</li><li>PC-relative modes use R=PC (bits 6-5 = 11 would mean S; PC-relative is a special encoding -- see below).</li><li>Postbyte $9F = extended indirect [addr] -- 16-bit address in the two bytes following the postbyte.</li></ul>
 
     <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
-    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem;">
+    <table class="modes-table reg-table" style="font-family:monospace; font-size:0.85rem; width:auto;">
       <colgroup>
-        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
-        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
-        <col style="width:60%"><!-- Register -->
+        <col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem">
+        <col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem"><col style="width:2.5rem">
+        <col style="min-width:6rem"><!-- Register -->
       </colgroup>
       <thead>
-        <tr><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Register</th></tr>
+        <tr>
+          <th style="text-align:center;color:var(--cc-set,#f0c060)">7</th>
+          <th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
+          <th style="text-align:left">Register</th>
+        </tr>
       </thead>
-      <tbody><tr><td>1</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>X</strong></td></tr><tr><td>1</td><td>0</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>Y</strong></td></tr><tr><td>1</td><td>1</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>U</strong></td></tr><tr><td>1</td><td>1</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>S</strong></td></tr></tbody>
+      <tbody><tr><td style="color:var(--cc-set,#f0c060);font-weight:bold">1</td><td>0</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>X</strong></td></tr><tr><td style="color:var(--cc-set,#f0c060);font-weight:bold">1</td><td>0</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>Y</strong></td></tr><tr><td style="color:var(--cc-set,#f0c060);font-weight:bold">1</td><td>1</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>U</strong></td></tr><tr><td style="color:var(--cc-set,#f0c060);font-weight:bold">1</td><td>1</td><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td style="text-align:left"><strong>S</strong></td></tr></tbody>
     </table>
 
     <h3>Postbyte Bit Map</h3>
@@ -129,16 +135,19 @@
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
     <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
       <colgroup>
-        <col style="width:30%"><!-- Field -->
-        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
-        <col style="width:8%"><!-- Hex -->
+        <col style="width:35%"><!-- Field -->
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:7%"><!-- Hex -->
       </colgroup>
       <thead>
         <tr style="background:var(--bg2,#2a2a2a); color:var(--text-dim,#888)">
           <th style="text-align:left">Field</th>
-          <th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th>
-          <th>Hex</th>
+          <th style="text-align:center">7</th><th style="text-align:center">6</th>
+          <th style="text-align:center">5</th><th style="text-align:center">4</th>
+          <th style="text-align:center">3</th><th style="text-align:center">2</th>
+          <th style="text-align:center">1</th><th style="text-align:center">0</th>
+          <th style="text-align:center">Hex</th>
         </tr>
       </thead>
       <tbody>
@@ -163,7 +172,7 @@
       <colgroup>
         <col style="width:14%"><!-- Syntax -->
         <col style="width:20%"><!-- Bytes -->
-        <col style="width:10%"><!-- Total bytes -->
+        <col style="width:8%"><!-- Bytes -->
         <col style="width:56%"><!-- Description -->
       </colgroup>
       <thead>
@@ -202,7 +211,7 @@
 </tr>
 <tr>
   <td><code>LDA $100,X</code></td>
-  <td><code>$A6</code> <code>$89</code> <code>$01 00</code></td>
+  <td><code>$A6</code> <code>$89</code> <code>$$01 $00</code></td>
   <td class="center">4</td>
   <td>Load A from X+$0100. Offset $100 exceeds 8-bit range, uses 16-bit offset mode. Two offset bytes follow postbyte.</td>
 </tr>

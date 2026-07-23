@@ -240,7 +240,7 @@
       "syntax": "LDA $100,X",
       "opcode": "A6",
       "postbyte": "89",
-      "operand": "01 00",
+      "operand": "$01 $00",
       "total_bytes": 4,
       "description": "Load A from X+$0100. Offset $100 exceeds 8-bit range, uses 16-bit offset mode. Two offset bytes follow postbyte."
     },
