@@ -789,6 +789,7 @@ def render_css():
   --cc-cleared:  #888;
   --cc-undef:    #c05050;
   --pb-tint:     #1e2a1e;
+  --accent-visited: #7aaac8;
 }
 
 @media (prefers-color-scheme: light) {
@@ -808,13 +809,16 @@ def render_css():
     --cc-cleared:  #6a5a40;
     --cc-undef:    #aa2222;
     --pb-tint:     #e8f0e8;
+    --accent-visited: #4477aa;
   }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 tr.pb-row td { background: var(--pb-tint); }
-p.pb-note { background: var(--pb-tint); }
+p.pb-note { background: var(--pb-tint); display: inline-block; border-radius: 3px; }
+a:visited { color: var(--accent-visited, #8ab4d8); }
+a.postbyte-link:visited { color: var(--accent-visited, #8ab4d8); }
 
 body {
   font-family: Georgia, 'Times New Roman', serif;
