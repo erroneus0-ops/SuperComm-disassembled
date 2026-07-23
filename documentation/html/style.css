@@ -15,9 +15,33 @@
   --cc-set:      #f0c060;
   --cc-cleared:  #888;
   --cc-undef:    #c05050;
+  --pb-tint:     #1e2a1e;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:          #f8f6f0;
+    --bg2:         #eeeae0;
+    --bg3:         #e4e0d4;
+    --border:      #c8c0b0;
+    --text:        #2a2010;
+    --text-dim:    #6a5a40;
+    --accent:      #2255aa;
+    --accent2:     #227755;
+    --mnemonic:    #995500;
+    --code-bg:     #f0ece0;
+    --cc-affected: #227755;
+    --cc-set:      #995500;
+    --cc-cleared:  #6a5a40;
+    --cc-undef:    #aa2222;
+    --pb-tint:     #e8f0e8;
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+tr.pb-row td { background: var(--pb-tint); }
+p.pb-note { background: var(--pb-tint); }
 
 body {
   font-family: Georgia, 'Times New Roman', serif;

@@ -392,8 +392,10 @@ def render_modes_table_compact(modes, ref_url='../groups/indexed_postbyte.html')
         mode_style = 'color:var(--text-muted);font-size:0.8rem;font-style:italic' if italic else ''
         op = r['opcode']
         op_cell = f'<td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">{op}</td>' if op == '″' else f'<td class="col-opcode"><code>${op}</code></td>'
+        is_indexed = 'indexed' in r.get('mode','').lower() or r.get('italic', False)
+        pb_attr = ' class="pb-row"' if is_indexed else ''
         html_rows.append(
-            f'<tr style="{top_style}">'
+            f'<tr style="{top_style}"{pb_attr}>'
             f'<td style="{mode_style}">{r["mode"]}</td>'
             f'<td style="font-family:monospace;font-size:0.85rem">{r["syntax"]}</td>'
             f'{op_cell}'
@@ -402,7 +404,7 @@ def render_modes_table_compact(modes, ref_url='../groups/indexed_postbyte.html')
             f'</tr>'
         )
 
-    ref = f'<p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="{ref_url}">Indexed Addressing Reference</a></p>'
+    ref = f'<p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="{ref_url}">Indexed Addressing Reference</a></p>'
 
     return '\n'.join(html_rows), ref
 
@@ -786,9 +788,33 @@ def render_css():
   --cc-set:      #f0c060;
   --cc-cleared:  #888;
   --cc-undef:    #c05050;
+  --pb-tint:     #1e2a1e;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:          #f8f6f0;
+    --bg2:         #eeeae0;
+    --bg3:         #e4e0d4;
+    --border:      #c8c0b0;
+    --text:        #2a2010;
+    --text-dim:    #6a5a40;
+    --accent:      #2255aa;
+    --accent2:     #227755;
+    --mnemonic:    #995500;
+    --code-bg:     #f0ece0;
+    --cc-affected: #227755;
+    --cc-set:      #995500;
+    --cc-cleared:  #6a5a40;
+    --cc-undef:    #aa2222;
+    --pb-tint:     #e8f0e8;
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+tr.pb-row td { background: var(--pb-tint); }
+p.pb-note { background: var(--pb-tint); }
 
 body {
   font-family: Georgia, 'Times New Roman', serif;

@@ -40,12 +40,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ANDA #n</td><td class="col-opcode"><code>$84</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ANDA <addr</td><td class="col-opcode"><code>$94</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ANDA addr</td><td class="col-opcode"><code>$B4</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A4</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A4</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -65,7 +65,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -158,12 +158,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ANDB #n</td><td class="col-opcode"><code>$C4</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ANDB <addr</td><td class="col-opcode"><code>$D4</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ANDB addr</td><td class="col-opcode"><code>$F4</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E4</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E4</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -183,7 +183,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -293,7 +293,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -362,12 +362,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ORA #n</td><td class="col-opcode"><code>$8A</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ORA <addr</td><td class="col-opcode"><code>$9A</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ORA addr</td><td class="col-opcode"><code>$BA</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$AA</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$AA</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -387,7 +387,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -480,12 +480,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ORB #n</td><td class="col-opcode"><code>$CA</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ORB <addr</td><td class="col-opcode"><code>$DA</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ORB addr</td><td class="col-opcode"><code>$FA</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$EA</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$EA</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -505,7 +505,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -615,7 +615,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -684,12 +684,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">EORA #n</td><td class="col-opcode"><code>$88</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">EORA <addr</td><td class="col-opcode"><code>$98</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">EORA addr</td><td class="col-opcode"><code>$B8</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A8</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A8</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -709,7 +709,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -802,12 +802,12 @@
         <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">EORB #n</td><td class="col-opcode"><code>$C8</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
 <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">EORB <addr</td><td class="col-opcode"><code>$D8</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">EORB addr</td><td class="col-opcode"><code>$F8</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E8</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E8</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -827,7 +827,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -937,7 +937,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -1023,7 +1023,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -1091,12 +1091,12 @@
       <tbody>
         <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">COM <addr</td><td class="col-opcode"><code>$03</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">COM addr</td><td class="col-opcode"><code>$73</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$63</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$63</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -1116,7 +1116,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -1225,7 +1225,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -1311,7 +1311,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
@@ -1379,12 +1379,12 @@
       <tbody>
         <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">CLR <addr</td><td class="col-opcode"><code>$0F</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
 <tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">CLR addr</td><td class="col-opcode"><code>$7F</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$6F</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
-<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
-<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$6F</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="" class="pb-row"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
       </tbody>
     </table>
     <table class="cc-table">
@@ -1404,7 +1404,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <p class="pb-note" style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;padding:0.3rem 0.5rem;border-radius:3px">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
   <div class="tables-wrap print-only">
     <table class="modes-table">
       <colgroup>
