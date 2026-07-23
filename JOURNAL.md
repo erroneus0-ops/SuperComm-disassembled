@@ -264,3 +264,51 @@ validated against the current WASM build."
 
 The 296 tests don't retire. They become the continuous validation bridge
 between the WASM ground truth and the Python reference implementation.
+
+---
+
+## Note: [,R+] and [,-R] -- No Indirect for Single Auto-Step
+
+Paul Cunningham's repo mentioned that `LDA [,-S]` isn't valid.
+This is correct but incompletely scoped.
+
+The restriction applies to ALL 16-bit index-capable registers, not just S.
+`[,R+]` and `[,-R]` (single auto-increment and single auto-decrement)
+have no indirect form for any register -- X, Y, U, or S.
+
+The postbyte table confirms this: only `++` and `--` variants have the
+indirect bit (I) available. Single-step variants do not.
+
+Correct statement:
+  Single auto-increment [,R+] and single auto-decrement [,-R] are not
+  valid in indirect mode for any register. This is a hardware constraint,
+  not a register-specific limitation.
+
+Double step [,R++] and [,--R] ARE valid in indirect mode.
+
+The postbyte bit map in the reference pages reflects this correctly --
+,R+ and ,-R rows show no I symbol; ,R++ and ,--R rows show I.
+
+---
+
+## Note: [,R+] and [,-R] -- No Indirect for Single Auto-Step
+
+Paul Cunningham's repo mentioned that LDA [,-S] is not valid.
+This is correct but incompletely scoped.
+
+The restriction applies to ALL 16-bit index-capable registers, not just S.
+[,R+] and [,-R] (single auto-increment and single auto-decrement)
+have no indirect form for any register -- X, Y, U, or S.
+
+The postbyte table confirms this: only ++ and -- variants have the
+indirect bit (I) available. Single-step variants do not.
+
+Correct statement:
+  Single auto-increment [,R+] and single auto-decrement [,-R] are not
+  valid in indirect mode for any register. This is a hardware constraint,
+  not a register-specific limitation.
+
+Double step [,R++] and [,--R] ARE valid in indirect mode.
+
+The postbyte bit map in the reference pages reflects this correctly --
+,R+ and ,-R rows show no I symbol; ,R++ and ,--R rows show I.
