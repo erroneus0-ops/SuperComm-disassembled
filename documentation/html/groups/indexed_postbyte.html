@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Indexed Addressing Postbyte</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .postbyte-table td.center { text-align: center; }
+    .postbyte-table td.description { font-size: 0.85rem; color: var(--text-dim); }
+    .encoding-examples-table td:last-child {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.postbyte-table { font-family: "Courier New", monospace; font-size: 0.82rem; }
+    .postbyte-table td, .postbyte-table th { text-align: center; white-space: nowrap; }
+    .postbyte-table td:first-child, .postbyte-table th:first-child,
+    .postbyte-table td:last-child, .postbyte-table th:last-child { text-align: left; white-space: nowrap; }
+    .postbyte-table td:first-child, .postbyte-table th:first-child { width: 6rem; }
+    .postbyte-table td:nth-child(2), .postbyte-table th:nth-child(2),
+    .postbyte-table td:nth-child(3), .postbyte-table th:nth-child(3),
+    .postbyte-table td:nth-child(4), .postbyte-table th:nth-child(4),
+    .postbyte-table td:nth-child(5), .postbyte-table th:nth-child(5),
+    .postbyte-table td:nth-child(6), .postbyte-table th:nth-child(6),
+    .postbyte-table td:nth-child(7), .postbyte-table th:nth-child(7),
+    .postbyte-table td:nth-child(8), .postbyte-table th:nth-child(8),
+    .postbyte-table td:nth-child(9), .postbyte-table th:nth-child(9) { width: 1.8rem; padding: 0.2rem 0.1rem; }
+    .postbyte-table td:last-child, .postbyte-table th:last-child { width: auto; }
+    .postbyte-table td[contenteditable] { background: var(--bg3); min-width: 8rem; }
+    .postbyte-table td[contenteditable]:focus { outline: 1px solid var(--accent); background: var(--bg2); }
+    .postbyte-table tr.section-header td {
+      background: var(--bg3) !important;
+      color: var(--mnemonic);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+    }
+    .reg-table { width: auto; margin-bottom: 1.5rem; }
+    .reg-table td, .reg-table th { padding: 0.25rem 1rem; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Indexed Addressing Postbyte</span>
+  </nav>
+  <main>
+    <h2>Indexed Addressing — Postbyte Encoding</h2>
+    <p>Every instruction using indexed addressing requires a postbyte immediately after the opcode. The postbyte encodes the pointer register, indexing type, offset size, and whether indirect addressing is used. This table is shared by all instructions that show 'indexed' mode.</p>
+
+    <h3>Notes</h3>
+    <ul><li>Bits 6-5 of the postbyte select the pointer register: 00=X  01=Y  10=U  11=S</li><li>Bit 4 selects indirect mode (EA is address of address). Not available for auto-increment/decrement by 1.</li><li>For 5-bit offset (postbyte < $80): bits 4-0 are the signed offset, bits 6-5 are the register. No indirect.</li><li>Cycles shown are additional cycles added to the instruction's base indexed cycle count.</li><li>PC-relative modes use R=PC (bits 6-5 = 11 would mean S; PC-relative is a special encoding -- see below).</li><li>Postbyte $9F = extended indirect [addr] -- 16-bit address in the two bytes following the postbyte.</li></ul>
+
+    <h3>Pointer Register Selection (bits 6-5 when bit 7 = 1)</h3>
+    <table class="modes-table reg-table">
+      <colgroup>
+        <col style="width:32%"><!-- Description -->
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
+      </colgroup>
+      <thead><tr><th>Bit pattern</th><th>Register</th></tr></thead>
+      <tbody><tr><td><code>%00xxxxx</code></td><td>X</td></tr><tr><td><code>%01xxxxx</code></td><td>Y</td></tr><tr><td><code>%10xxxxx</code></td><td>U</td></tr><tr><td><code>%11xxxxx</code></td><td>S</td></tr></tbody>
+    </table>
+
+    <h3>Postbyte Bit Map</h3>
+    <p>All postbyte values shown for register X (bits 6-5 = 00). For Y add $20, U add $40, S add $60.<br>
+    <strong style="color:var(--cc-set,#f0c060)">I</strong> = indirect bit set (1); mode also available in indirect form [&hellip;].</p>
+    <table class="modes-table postbyte-table" style="font-family: monospace; font-size: 0.85rem;">
+      <colgroup>
+        <col style="width:32%"><!-- Description -->
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th style="text-align:left">Description</th>
+          <th>7</th><th>6</th><th>5</th><th>4</th>
+          <th>3</th><th>2</th><th>1</th><th>0</th>
+          <th style="text-align:left">Direct</th>
+          <th style="text-align:left">Indirect</th>
+        </tr>
+        <tr style="font-size:0.75rem; color:var(--text-dim)">
+          <th></th>
+          <th>r</th><th>R</th><th>R</th><th style="color:var(--cc-set,#f0c060)">I</th>
+          <th>m</th><th>m</th><th>m</th><th>m</th>
+          <th></th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-header"><td colspan="11"><strong>Register select (bits 6-5 when bit 7=1)</strong></td></tr>
+        <tr><td>register X base</td><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
+        <tr><td>register Y base</td><td>1</td><td>0</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
+        <tr><td>register U base</td><td>1</td><td>1</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
+        <tr><td>register S base</td><td>1</td><td>1</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
+        <tr class="section-header"><td colspan="11"><strong>5-bit signed offset (bit 7=0, no indirect)</strong></td></tr>
+        <tr><td>±4-bit signed offset</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td><code>LDA -1,X</code></td><td>—</td></tr>
+        <tr class="section-header"><td colspan="11"><strong>Standard indexed (bit 7=1)</strong></td></tr>
+        <tr><td>post-increment by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>LDA ,X+</code></td><td>—</td></tr>
+        <tr><td>post-increment by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>0</td><td>1</td><td><code>LDA ,X++</code></td><td><code>LDA [,X++]</code></td></tr>
+        <tr><td>pre-decrement by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><code>LDA ,-X</code></td><td>—</td></tr>
+        <tr><td>pre-decrement by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>1</td><td>1</td><td><code>LDA ,--X</code></td><td><code>LDA [,--X]</code></td></tr>
+        <tr><td>zero offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>0</td><td><code>LDA ,X</code></td><td><code>LDA [,X]</code></td></tr>
+        <tr><td>B accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>1</td><td><code>LDA B,X</code></td><td><code>LDA [B,X]</code></td></tr>
+        <tr><td>A accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>1</td><td>0</td><td><code>LDA A,X</code></td><td><code>LDA [A,X]</code></td></tr>
+        <tr><td>±7-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>0</td><td><code>LDA $01,X</code></td><td><code>LDA [$01,X]</code></td></tr>
+        <tr><td>±15-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>1</td><td><code>LDA $0100,X</code></td><td><code>LDA [$0100,X]</code></td></tr>
+        <tr><td>D accumulator offset (16-bit)</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>1</td><td>1</td><td><code>LDY D,X</code></td><td><code>LDY [D,X]</code></td></tr>
+        <tr><td>±7-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>0</td><td><code>LDA $01,PCR</code></td><td><code>LDA [$01,PCR]</code></td></tr>
+        <tr><td>±15-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>1</td><td><code>LDA $0001,PCR</code></td><td><code>LDA [$0001,PCR]</code></td></tr>
+        <tr><td>extended indirect — fixed postbyte $9F</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>—</td><td><code>LDA [$0000]</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Deriving a Postbyte</h3>
+    <p>The postbyte is the bitwise OR of the register field and the mode field.
+    The fields occupy non-overlapping bit positions, so no arithmetic is needed —
+    just OR the two rows together.</p>
+    <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
+    <table class="modes-table encoding-examples-table" style="width:auto; font-family:monospace;">
+      <colgroup>
+        <col style="width:32%"><!-- Description -->
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
+        <col style="width:20%"><!-- Direct -->
+        <col style="width:16%"><!-- Indirect -->
+      </colgroup>
+      <thead>
+        <tr><th style="text-align:left">Field</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Hex</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>$80</td></tr>
+        <tr><td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
+        <tr class="section-header"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><strong>$82</strong></td></tr>
+      </tbody>
+    </table>
+    <p>To use a different register, change bits 6-5. To use a different mode, change bits 3-0.
+    The fields never overlap so the OR always produces a unique, valid postbyte.</p>
+
+    <!-- NOTE: "Collect Notes as CSV" button and collectNotes() function removed.
+         The feature exported the postbyte table notes column as CSV -- a half-formed
+         version of a byte-to-instruction decoder (bytes in, human-readable out).
+         The concept is worth revisiting as part of a debugging tool: given a raw
+         opcode byte + postbyte, identify the instruction and addressing mode.
+         See git history (generate.py around line 1269) for the original implementation.
+    -->
+
+    <h3>Encoding Examples</h3>
+    <table class="modes-table encoding-examples-table" style="width:100%; table-layout:fixed;">
+      <colgroup>
+        <col style="width:14%"><!-- Syntax -->
+        <col style="width:20%"><!-- Bytes -->
+        <col style="width:10%"><!-- Total bytes -->
+        <col style="width:56%"><!-- Description -->
+      </colgroup>
+      <thead>
+        <tr><th style="text-align:left">Syntax</th><th style="text-align:left">Bytes</th><th>Total bytes</th><th style="text-align:left">Description</th></tr>
+      </thead>
+      <tbody>
+<tr>
+  <td><code>STA ,X+</code></td>
+  <td><code>$A7</code> <code>$80</code></td>
+  <td class="center">2</td>
+  <td>Store A to address in X, then X = X + 1</td>
+</tr>
+<tr>
+  <td><code>STA ,-X</code></td>
+  <td><code>$A7</code> <code>$82</code></td>
+  <td class="center">2</td>
+  <td>X = X - 1, then store A to new address in X</td>
+</tr>
+<tr>
+  <td><code>LDA ,X</code></td>
+  <td><code>$A6</code> <code>$84</code></td>
+  <td class="center">2</td>
+  <td>Load A from address in X, X unchanged</td>
+</tr>
+<tr>
+  <td><code>LDA 5,Y</code></td>
+  <td><code>$A6</code> <code>$29</code></td>
+  <td class="center">2</td>
+  <td>Load A from Y+5. 5-bit offset: bits 6-5=01 (Y), bits 4-0=00101</td>
+</tr>
+<tr>
+  <td><code>LDA $10,X</code></td>
+  <td><code>$A6</code> <code>$88</code> <code>$10</code></td>
+  <td class="center">3</td>
+  <td>Load A from X+$10. 8-bit offset follows postbyte.</td>
+</tr>
+<tr>
+  <td><code>LDA $100,X</code></td>
+  <td><code>$A6</code> <code>$89</code> <code>$01 00</code></td>
+  <td class="center">4</td>
+  <td>Load A from X+$0100. Offset $100 exceeds 8-bit range, uses 16-bit offset mode. Two offset bytes follow postbyte.</td>
+</tr>
+<tr>
+  <td><code>LDA [,X++]</code></td>
+  <td><code>$A6</code> <code>$91</code></td>
+  <td class="center">2</td>
+  <td>Indirect: load A from address stored at X, then X = X + 2</td>
+</tr></tbody>
+    </table>
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>

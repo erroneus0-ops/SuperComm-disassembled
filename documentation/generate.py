@@ -1240,11 +1240,11 @@ def render_postbyte_page(data):
   <style>
     .postbyte-table td.center {{ text-align: center; }}
     .postbyte-table td.description {{ font-size: 0.85rem; color: var(--text-dim); }}
-    .encoding-examples-table td:last-child {
+    .encoding-examples-table td:last-child {{
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-}
+}}
 
 .postbyte-table {{ font-family: "Courier New", monospace; font-size: 0.82rem; }}
     .postbyte-table td, .postbyte-table th {{ text-align: center; white-space: nowrap; }}
