@@ -1353,20 +1353,19 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table encoding-examples-table" style="width:auto; font-family:monospace;">
+    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace;">
       <colgroup>
-        <col style="width:32%"><!-- Description -->
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-        <col style="width:20%"><!-- Direct -->
-        <col style="width:16%"><!-- Indirect -->
+        <col style="width:30%"><!-- Field -->
+        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
+        <col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
+        <col style="width:10%"><!-- Hex -->
       </colgroup>
       <thead>
         <tr><th style="text-align:left">Field</th><th>7</th><th>6</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>0</th><th style="text-align:left">Hex</th></tr>
       </thead>
       <tbody>
-        <tr><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>$80</td></tr>
-        <tr><td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
+        <tr><td>Register X (bits 6-5 = 00)</td><td>1</td><td>0</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>$80</td></tr>
+        <tr><td>Mode ,&#x2013;R (pre-decrement 1)</td><td>x</td><td>x</td><td>x</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>$02</td></tr>
         <tr class="section-header"><td>OR result</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td><strong>$82</strong></td></tr>
       </tbody>
     </table>
