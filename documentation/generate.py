@@ -1341,7 +1341,7 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table postbyte-table" style="width:auto; font-family:monospace;">
+    <table class="modes-table encoding-examples-table" style="width:auto; font-family:monospace;">
       <colgroup>
         <col style="width:32%"><!-- Description -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
