@@ -66,7 +66,7 @@
         { "mode": "inherent", "syntax": "SWI", "opcode": "3F", "bytes": 1, "cycles": 19 }
       ],
       "flow": "branch_unconditional",
-      "notes": "Pushes all registers with E set, then vectors through $FFFA/$FFFB. Under OS-9 this is the syscall mechanism — the byte following SWI is the syscall number."
+      "notes": "Pushes all registers with E set, then vectors through $FFFA/$FFFB."
     },
     {
       "mnemonic": "SWI2",
