@@ -181,43 +181,43 @@
       <tbody>
 <tr>
   <td><code>STA ,X+</code></td>
-  <td><code>$A7</code> <code>$80</code></td>
+  <td><code>$A7 $80</code></td>
   <td class="center">2</td>
   <td>Store A to address in X, then X = X + 1</td>
 </tr>
 <tr>
   <td><code>STA ,-X</code></td>
-  <td><code>$A7</code> <code>$82</code></td>
+  <td><code>$A7 $82</code></td>
   <td class="center">2</td>
   <td>X = X - 1, then store A to new address in X</td>
 </tr>
 <tr>
   <td><code>LDA ,X</code></td>
-  <td><code>$A6</code> <code>$84</code></td>
+  <td><code>$A6 $84</code></td>
   <td class="center">2</td>
   <td>Load A from address in X, X unchanged</td>
 </tr>
 <tr>
   <td><code>LDA 5,Y</code></td>
-  <td><code>$A6</code> <code>$29</code></td>
+  <td><code>$A6 $29</code></td>
   <td class="center">2</td>
   <td>Load A from Y+5. 5-bit offset: bits 6-5=01 (Y), bits 4-0=00101</td>
 </tr>
 <tr>
   <td><code>LDA $10,X</code></td>
-  <td><code>$A6</code> <code>$88</code> <code>$10</code></td>
+  <td><code>$A6 $88 $10</code></td>
   <td class="center">3</td>
   <td>Load A from X+$10. 8-bit offset follows postbyte.</td>
 </tr>
 <tr>
   <td><code>LDA $100,X</code></td>
-  <td><code>$A6</code> <code>$89</code> <code>$01</code> <code>$00</code></td>
+  <td><code>$A6 $89 $01 $00</code></td>
   <td class="center">4</td>
   <td>Load A from X+$0100. Offset $100 exceeds 8-bit range, uses 16-bit offset mode. Two offset bytes follow postbyte.</td>
 </tr>
 <tr>
   <td><code>LDA [,X++]</code></td>
-  <td><code>$A6</code> <code>$91</code></td>
+  <td><code>$A6 $91</code></td>
   <td class="center">2</td>
   <td>Indirect: load A from address stored at X, then X = X + 2</td>
 </tr></tbody>

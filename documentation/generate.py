@@ -1225,18 +1225,18 @@ def render_postbyte_page(data):
     # Hand assembly examples
     ex_rows = []
     for ex in data.get('encoding_examples', []):
-        op2 = f' <code>${ex["postbyte"]}</code>' if 'postbyte' in ex else ''
+        def fmt_byte(b):
+            return b if b.startswith('$') else f'${b}'
         def fmt_operand(s):
-            # Split on spaces, prepend $ to any byte not already prefixed
-            return ' '.join(
-                f'<code>${b}</code>' if not b.startswith('$') else f'<code>{b}</code>'
-                for b in s.split()
-            )
-        op3 = ' ' + fmt_operand(ex['operand']) if 'operand' in ex else ''
+            return ' '.join(fmt_byte(b) for b in s.split())
+        # Build entire bytes cell as one <code> block for clean copy-paste
+        postbyte_str = f' {fmt_byte(ex["postbyte"])}' if 'postbyte' in ex else ''
+        operand_str  = f' {fmt_operand(ex["operand"])}' if 'operand' in ex else ''
+        bytes_cell   = f'<code>${ex["opcode"]}{postbyte_str}{operand_str}</code>'
         ex_rows.append(f'''
 <tr>
   <td><code>{ex["syntax"]}</code></td>
-  <td><code>${ex["opcode"]}</code>{op2}{op3}</td>
+  <td>{bytes_cell}</td>
   <td class="center">{ex["total_bytes"]}</td>
   <td>{ex["description"]}</td>
 </tr>''')
