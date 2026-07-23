@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6809 Reference — Arithmetic</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../index.html">Index</a>
+    <span class="group-title">Arithmetic</span>
+    <a href="indexed_postbyte.html" class="postbyte-link">Indexed Addressing Postbyte Reference</a>
+  </nav>
+  <main>
+    <h2>Arithmetic</h2>
+    
+<div class="instruction" id="ADDA">
+  <h3 class="mnemonic">ADDA <span class="full-name">— Add Memory to Accumulator A</span></h3>
+  <div class="operation"><code>A ← A + M</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ADDA #n</td><td class="col-opcode"><code>$8B</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ADDA <addr</td><td class="col-opcode"><code>$9B</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ADDA addr</td><td class="col-opcode"><code>$BB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>ADDA #n</code></td><td class="col-opcode"><code>$8B</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ADDA &lt;addr</code></td><td class="col-opcode"><code>$9B</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ADDA addr</code></td><td class="col-opcode"><code>$BB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$AB</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">H is set if carry from bit 3 — used for BCD arithmetic. Follow with DAA for BCD correction.</p>
+</div>
+
+
+<div class="instruction" id="ADDB">
+  <h3 class="mnemonic">ADDB <span class="full-name">— Add Memory to Accumulator B</span></h3>
+  <div class="operation"><code>B ← B + M</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ADDB #n</td><td class="col-opcode"><code>$CB</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ADDB <addr</td><td class="col-opcode"><code>$DB</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ADDB addr</td><td class="col-opcode"><code>$FB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>ADDB #n</code></td><td class="col-opcode"><code>$CB</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ADDB &lt;addr</code></td><td class="col-opcode"><code>$DB</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ADDB addr</code></td><td class="col-opcode"><code>$FB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$EB</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">H is set if carry from bit 3.</p>
+</div>
+
+
+<div class="instruction" id="ADDD">
+  <h3 class="mnemonic">ADDD <span class="full-name">— Add Memory to Double Accumulator D</span></h3>
+  <div class="operation"><code>D ← D + M:M+1</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ADDD #nn</td><td class="col-opcode"><code>$C3</code></td><td class="col-bytes">3</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ADDD <addr</td><td class="col-opcode"><code>$D3</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ADDD addr</td><td class="col-opcode"><code>$F3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>ADDD #nn</code></td><td class="col-opcode"><code>$C3</code></td><td class="col-bytes">3</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ADDD &lt;addr</code></td><td class="col-opcode"><code>$D3</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ADDD addr</code></td><td class="col-opcode"><code>$F3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">4</td><td class="col-cycles">14</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$E3</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">16-bit addition. H is not affected.</p>
+</div>
+
+
+<div class="instruction" id="ADCA">
+  <h3 class="mnemonic">ADCA <span class="full-name">— Add with Carry to Accumulator A</span></h3>
+  <div class="operation"><code>A ← A + M + C</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ADCA #n</td><td class="col-opcode"><code>$89</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ADCA <addr</td><td class="col-opcode"><code>$99</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ADCA addr</td><td class="col-opcode"><code>$B9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>ADCA #n</code></td><td class="col-opcode"><code>$89</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ADCA &lt;addr</code></td><td class="col-opcode"><code>$99</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ADCA addr</code></td><td class="col-opcode"><code>$B9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$A9</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Used for multi-byte addition — add low bytes with ADDA, then high bytes with ADCA to propagate carry.</p>
+</div>
+
+
+<div class="instruction" id="ADCB">
+  <h3 class="mnemonic">ADCB <span class="full-name">— Add with Carry to Accumulator B</span></h3>
+  <div class="operation"><code>B ← B + M + C</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">ADCB #n</td><td class="col-opcode"><code>$C9</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">ADCB <addr</td><td class="col-opcode"><code>$D9</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">ADCB addr</td><td class="col-opcode"><code>$F9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>ADCB #n</code></td><td class="col-opcode"><code>$C9</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>ADCB &lt;addr</code></td><td class="col-opcode"><code>$D9</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>ADCB addr</code></td><td class="col-opcode"><code>$F9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$E9</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Used for multi-byte addition.</p>
+</div>
+
+
+<div class="instruction" id="SUBA">
+  <h3 class="mnemonic">SUBA <span class="full-name">— Subtract Memory from Accumulator A</span></h3>
+  <div class="operation"><code>A ← A - M</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">SUBA #n</td><td class="col-opcode"><code>$80</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">SUBA <addr</td><td class="col-opcode"><code>$90</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">SUBA addr</td><td class="col-opcode"><code>$B0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>SUBA #n</code></td><td class="col-opcode"><code>$80</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>SUBA &lt;addr</code></td><td class="col-opcode"><code>$90</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>SUBA addr</code></td><td class="col-opcode"><code>$B0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$A0</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">C is set if borrow (unsigned underflow). V is set if signed overflow.</p>
+</div>
+
+
+<div class="instruction" id="SUBB">
+  <h3 class="mnemonic">SUBB <span class="full-name">— Subtract Memory from Accumulator B</span></h3>
+  <div class="operation"><code>B ← B - M</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">SUBB #n</td><td class="col-opcode"><code>$C0</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">SUBB <addr</td><td class="col-opcode"><code>$D0</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">SUBB addr</td><td class="col-opcode"><code>$F0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>SUBB #n</code></td><td class="col-opcode"><code>$C0</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>SUBB &lt;addr</code></td><td class="col-opcode"><code>$D0</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>SUBB addr</code></td><td class="col-opcode"><code>$F0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$E0</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">C is set if borrow. V is set if signed overflow.</p>
+</div>
+
+
+<div class="instruction" id="SUBD">
+  <h3 class="mnemonic">SUBD <span class="full-name">— Subtract Memory from Double Accumulator D</span></h3>
+  <div class="operation"><code>D ← D - M:M+1</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">SUBD #nn</td><td class="col-opcode"><code>$83</code></td><td class="col-bytes">3</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">SUBD <addr</td><td class="col-opcode"><code>$93</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">SUBD addr</td><td class="col-opcode"><code>$B3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>SUBD #nn</code></td><td class="col-opcode"><code>$83</code></td><td class="col-bytes">3</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>SUBD &lt;addr</code></td><td class="col-opcode"><code>$93</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>SUBD addr</code></td><td class="col-opcode"><code>$B3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">4</td><td class="col-cycles">14</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$A3</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">16-bit subtraction.</p>
+</div>
+
+
+<div class="instruction" id="SBCA">
+  <h3 class="mnemonic">SBCA <span class="full-name">— Subtract with Carry from Accumulator A</span></h3>
+  <div class="operation"><code>A ← A - M - C</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">SBCA #n</td><td class="col-opcode"><code>$82</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">SBCA <addr</td><td class="col-opcode"><code>$92</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">SBCA addr</td><td class="col-opcode"><code>$B2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>SBCA #n</code></td><td class="col-opcode"><code>$82</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>SBCA &lt;addr</code></td><td class="col-opcode"><code>$92</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>SBCA addr</code></td><td class="col-opcode"><code>$B2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$A2</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Used for multi-byte subtraction — subtract low bytes with SUBA, then high bytes with SBCA to propagate borrow.</p>
+</div>
+
+
+<div class="instruction" id="SBCB">
+  <h3 class="mnemonic">SBCB <span class="full-name">— Subtract with Carry from Accumulator B</span></h3>
+  <div class="operation"><code>B ← B - M - C</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">immediate</td><td style="font-family:monospace;font-size:0.85rem">SBCB #n</td><td class="col-opcode"><code>$C2</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">SBCB <addr</td><td class="col-opcode"><code>$D2</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">SBCB addr</td><td class="col-opcode"><code>$F2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">6&#8211;7</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">4&#8211;8</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">5&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">8&#8211;12</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">immediate</td><td class="syntax"><code>SBCB #n</code></td><td class="col-opcode"><code>$C2</code></td><td class="col-bytes">2</td><td class="col-cycles">2</td></tr>
+<tr><td class="mode">direct</td><td class="syntax"><code>SBCB &lt;addr</code></td><td class="col-opcode"><code>$D2</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>SBCB addr</code></td><td class="col-opcode"><code>$F2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">4</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">4</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">2</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">3</td><td class="col-cycles">5</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">3</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">4</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$E2</code></td><td class="col-bytes">4</td><td class="col-cycles">9</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Used for multi-byte subtraction.</p>
+</div>
+
+
+<div class="instruction" id="MUL">
+  <h3 class="mnemonic">MUL <span class="full-name">— Unsigned Multiply</span></h3>
+  <div class="operation"><code>D ← A × B  (unsigned)</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">MUL</td><td class="col-opcode"><code>$3D</code></td><td class="col-bytes">1</td><td class="col-cycles">11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>MUL</code></td><td class="col-opcode"><code>$3D</code></td><td class="col-bytes">1</td><td class="col-cycles">11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Multiplies unsigned 8-bit A by unsigned 8-bit B. 16-bit result in D. C is set to bit 7 of B (the MSB of the result's low byte) — useful for rounding. Z reflects whether result is zero.</p>
+</div>
+
+
+<div class="instruction" id="NEG">
+  <h3 class="mnemonic">NEG <span class="full-name">— Negate Memory</span></h3>
+  <div class="operation"><code>M ← 0 - M  (two's complement)</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">direct</td><td style="font-family:monospace;font-size:0.85rem">NEG <addr</td><td class="col-opcode"><code>$00</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr style=""><td style="">extended</td><td style="font-family:monospace;font-size:0.85rem">NEG addr</td><td class="col-opcode"><code>$70</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — auto ±</td><td style="font-family:monospace;font-size:0.85rem">,R+ &nbsp; ,R++ &nbsp; ,-R &nbsp; ,--R</td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">8&#8211;9</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R++] &nbsp; [,--R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — offset</td><td style="font-family:monospace;font-size:0.85rem">n,R &nbsp; ,R &nbsp; A/B,R &nbsp; D,R</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">6&#8211;10</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[,R] &nbsp; [n,R] &nbsp; [A/B,R] &nbsp; [D,R]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">2&#8211;4</td><td class="col-cycles">9&#8211;13</td></tr>
+<tr style="border-top:1px solid var(--border-strong)"><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indexed — PC-relative</td><td style="font-family:monospace;font-size:0.85rem">n,PCR</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">7&#8211;11</td></tr>
+<tr style=""><td style="color:var(--text-muted);font-size:0.8rem;font-style:italic">indirect</td><td style="font-family:monospace;font-size:0.85rem">[n,PCR]</td><td style="text-align:center;font-family:monospace;font-size:0.85rem;color:var(--text-muted)">″</td><td class="col-bytes">3&#8211;4</td><td class="col-cycles">10&#8211;14</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">direct</td><td class="syntax"><code>NEG &lt;addr</code></td><td class="col-opcode"><code>$00</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">extended</td><td class="syntax"><code>NEG addr</code></td><td class="col-opcode"><code>$70</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 5&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset)</td><td class="syntax"><code>,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">6</td></tr>
+<tr><td class="mode">indexed — No offset (zero offset), indirect</td><td class="syntax"><code>[,R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 1</td><td class="syntax"><code>,R+</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2</td><td class="syntax"><code>,R++</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Post&#8209;increment by 2, indirect</td><td class="syntax"><code>[,R++]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 1</td><td class="syntax"><code>,-R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">8</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2</td><td class="syntax"><code>,--R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">9</td></tr>
+<tr><td class="mode">indexed — Pre&#8209;decrement by 2, indirect</td><td class="syntax"><code>[,--R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">12</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset</td><td class="syntax"><code>n,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">4</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit signed constant offset, indirect</td><td class="syntax"><code>[n,R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">4</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset</td><td class="syntax"><code>A/B,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — accumulator A/B offset, indirect</td><td class="syntax"><code>[A/B,R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset</td><td class="syntax"><code>D,R</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — Accumulator D offset, indirect</td><td class="syntax"><code>[D,R]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">2</td><td class="col-cycles">13</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">3</td><td class="col-cycles">7</td></tr>
+<tr><td class="mode">indexed — 8&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">3</td><td class="col-cycles">10</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset</td><td class="syntax"><code>n,PCR</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+<tr><td class="mode">indexed — 16&#8209;bit PC&#8209;relative offset, indirect</td><td class="syntax"><code>[n,PCR]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">4</td><td class="col-cycles">14</td></tr>
+<tr><td class="mode">indexed — Extended indirect</td><td class="syntax"><code>[addr]</code></td><td class="col-opcode"><code>$60</code></td><td class="col-bytes">4</td><td class="col-cycles">11</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">V is set if operand was $80 (overflow — two's complement of $80 is $80). C is set if operand was non-zero.</p>
+</div>
+
+
+<div class="instruction" id="NEGA">
+  <h3 class="mnemonic">NEGA <span class="full-name">— Negate Accumulator A</span></h3>
+  <div class="operation"><code>A ← 0 - A</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">NEGA</td><td class="col-opcode"><code>$40</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>NEGA</code></td><td class="col-opcode"><code>$40</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">V is set if A was $80. C is set if A was non-zero.</p>
+</div>
+
+
+<div class="instruction" id="NEGB">
+  <h3 class="mnemonic">NEGB <span class="full-name">— Negate Accumulator B</span></h3>
+  <div class="operation"><code>B ← 0 - B</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">NEGB</td><td class="col-opcode"><code>$50</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>NEGB</code></td><td class="col-opcode"><code>$50</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">V is set if B was $80. C is set if B was non-zero.</p>
+</div>
+
+
+<div class="instruction" id="DAA">
+  <h3 class="mnemonic">DAA <span class="full-name">— Decimal Adjust Accumulator A</span></h3>
+  <div class="operation"><code>A ← BCD adjust of A</code></div>
+  
+  <div class="tables-wrap no-print">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style=""><td style="">inherent</td><td style="font-family:monospace;font-size:0.85rem">DAA</td><td class="col-opcode"><code>$19</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-undefined" title="Undefined">?</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem">Precise cycle counts and postbyte encoding &rarr; <a href="../groups/indexed_postbyte.html">Indexed Addressing Reference</a></p>
+  <div class="tables-wrap print-only">
+    <table class="modes-table">
+      <colgroup>
+        <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="mode">inherent</td><td class="syntax"><code>DAA</code></td><td class="col-opcode"><code>$19</code></td><td class="col-bytes">1</td><td class="col-cycles">2</td></tr>
+      </tbody>
+    </table>
+    <table class="cc-table">
+      <thead>
+        <tr><th colspan="5">Condition Codes</th></tr>
+        <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="cc-cell"><span class="cc-unchanged" title="Not affected">—</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td><td class="cc-cell"><span class="cc-undefined" title="Undefined">?</span></td><td class="cc-cell"><span class="cc-affected" title="Set or cleared based on result">↕</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <p class="notes">Adjusts A after BCD addition (ADDA or ADCA) to produce a valid BCD result. Uses H and C flags set by the preceding addition. V is undefined after DAA. Must only be used after addition — not subtraction.</p>
+</div>
+
+  </main>
+  <footer>
+    <p>Motorola MC6809 Instruction Reference</p>
+  </footer>
+</body>
+</html>
