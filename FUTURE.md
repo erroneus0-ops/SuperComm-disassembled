@@ -384,3 +384,57 @@ Limitation: not supported in Firefox yet.
 For the development environment the hybrid Python server approach
 is most flexible -- works in all browsers, full control, no permission
 dialogs after initial setup.
+
+---
+
+## Book -- Framing Note: Bit Cost and Reach
+
+In the postbyte table: use conventional 5-bit / 8-bit / 16-bit field widths.
+The table is about construction of the byte, not operational use.
+
+In the bit-wise math chapter: explore the ±framing explicitly.
+A signed field "spends" one bit to buy direction. The remaining bits
+define the reach. An 8-bit signed offset has 7 bits of reach: ±127.
+
+Key insight worth developing:
+  "An offset is always added. Adding a negative number is subtraction.
+   The sign bit doesn't represent a value -- it represents direction.
+   Direction costs one bit."
+
+This connects to:
+  - Two's complement as a design choice, not an arbitrary convention
+  - Why sign extension works (propagating the cost of direction)
+  - Why the 6809's LEAX n,PCR is more powerful than it looks
+    (n is signed, so you can branch backward as well as forward)
+
+The ±4-bit / ±7-bit / ±15-bit notation may appear as a temporary
+alternative framing for the learner to try on -- not as the primary
+notation but as a tool for building intuition before returning to
+the conventional field-width description.
+
+---
+
+## Book -- Framing Note: Bit Cost and Reach
+
+In the postbyte table: use conventional 5-bit / 8-bit / 16-bit field widths.
+The table is about construction of the byte, not operational use.
+
+In the bit-wise math chapter: explore the ±framing explicitly.
+A signed field "spends" one bit to buy direction. The remaining bits
+define the reach. An 8-bit signed offset has 7 bits of reach: ±127.
+
+Key insight worth developing:
+  "An offset is always added. Adding a negative number is subtraction.
+   The sign bit doesn't represent a value -- it represents direction.
+   Direction costs one bit."
+
+This connects to:
+  - Two's complement as a design choice, not an arbitrary convention
+  - Why sign extension works (propagating the cost of direction)
+  - Why the 6809's LEAX n,PCR is more powerful than it looks
+    (n is signed, so you can branch backward as well as forward)
+
+The +-bit / +-bit / +-bit notation may appear as a temporary
+alternative framing for the learner to try on -- not as the primary
+notation but as a tool for building intuition before returning to
+the conventional field-width description.
