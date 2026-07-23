@@ -1226,7 +1226,13 @@ def render_postbyte_page(data):
     ex_rows = []
     for ex in data.get('encoding_examples', []):
         op2 = f' <code>${ex["postbyte"]}</code>' if 'postbyte' in ex else ''
-        op3 = f' <code>${ex.get("operand","")}</code>' if 'operand' in ex else ''
+        def fmt_operand(s):
+            # Split on spaces, prepend $ to any byte not already prefixed
+            return ' '.join(
+                f'<code>${b}</code>' if not b.startswith('$') else f'<code>{b}</code>'
+                for b in s.split()
+            )
+        op3 = ' ' + fmt_operand(ex['operand']) if 'operand' in ex else ''
         ex_rows.append(f'''
 <tr>
   <td><code>{ex["syntax"]}</code></td>
@@ -1370,7 +1376,7 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
+    <table class="modes-table or-derive-table" style="width:50%; font-family:monospace; font-size:0.85rem;">
       <colgroup>
         <col style="width:17%"><!-- Field -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
