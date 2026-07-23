@@ -1225,12 +1225,18 @@ def render_postbyte_page(data):
     # Hand assembly examples
     ex_rows = []
     for ex in data.get('encoding_examples', []):
-        op2 = f' <code>${ex["postbyte"]}</code>' if 'postbyte' in ex else ''
-        op3 = f' <code>${ex.get("operand","")}</code>' if 'operand' in ex else ''
+        def fmt_byte(b):
+            return b if b.startswith('$') else f'${b}'
+        def fmt_operand(s):
+            return ' '.join(fmt_byte(b) for b in s.split())
+        # Build entire bytes cell as one <code> block for clean copy-paste
+        postbyte_str = f' {fmt_byte(ex["postbyte"])}' if 'postbyte' in ex else ''
+        operand_str  = f' {fmt_operand(ex["operand"])}' if 'operand' in ex else ''
+        bytes_cell   = f'<code>${ex["opcode"]}{postbyte_str}{operand_str}</code>'
         ex_rows.append(f'''
 <tr>
   <td><code>{ex["syntax"]}</code></td>
-  <td><code>${ex["opcode"]}</code>{op2}{op3}</td>
+  <td>{bytes_cell}</td>
   <td class="center">{ex["total_bytes"]}</td>
   <td>{ex["description"]}</td>
 </tr>''')
@@ -1370,7 +1376,7 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
+    <table class="modes-table or-derive-table" style="width:50%; font-family:monospace; font-size:0.85rem;">
       <colgroup>
         <col style="width:17%"><!-- Field -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
