@@ -815,6 +815,13 @@ def render_css():
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+@media print {
+  h3 { break-after: avoid; page-break-after: avoid; }
+  table { break-inside: avoid; page-break-inside: avoid; }
+  h3 + table, h3 + p + table, h3 + p + p + table { break-before: avoid; }
+  p.pb-note { break-after: avoid; page-break-after: avoid; }
+}
+
 tr.pb-row td { background: var(--pb-tint); }
 p.pb-note { background: var(--pb-tint); display: inline-block; border-radius: 3px; }
 a:visited { color: var(--accent-visited, #8ab4d8); }
