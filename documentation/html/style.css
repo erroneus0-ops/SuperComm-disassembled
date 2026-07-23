@@ -167,8 +167,8 @@ h3.mnemonic {
 /* Modes table */
 .encoding-examples-table td:last-child {
   white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .postbyte-table {

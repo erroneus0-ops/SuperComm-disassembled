@@ -938,8 +938,8 @@ h3.mnemonic {
 /* Modes table */
 .encoding-examples-table td:last-child {
   white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .postbyte-table {
@@ -1261,8 +1261,8 @@ def render_postbyte_page(data):
 
 .encoding-examples-table td:last-child {{
   white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  word-wrap: break-word;
 }}
 
 .postbyte-table {{ font-family: "Courier New", monospace; font-size: 0.82rem; }}
@@ -1376,7 +1376,7 @@ def render_postbyte_page(data):
     The fields occupy non-overlapping bit positions, so no arithmetic is needed —
     just OR the two rows together.</p>
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
-    <table class="modes-table or-derive-table" style="width:50%; font-family:monospace; font-size:0.85rem;">
+    <table class="modes-table or-derive-table" style="width:50; font-family:monospace; font-size:0.85rem;">
       <colgroup>
         <col style="width:17%"><!-- Field -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
