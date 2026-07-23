@@ -1372,7 +1372,7 @@ def render_postbyte_page(data):
     <p><strong>Example: <code>STA ,-X</code> &rarr; opcode <code>$A7</code>, postbyte <code>$82</code></strong></p>
     <table class="modes-table or-derive-table" style="width:auto; font-family:monospace; font-size:0.85rem;">
       <colgroup>
-        <col style="width:35%"><!-- Field -->
+        <col style="width:17%"><!-- Field -->
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
         <col style="width:7%"><!-- Hex -->
