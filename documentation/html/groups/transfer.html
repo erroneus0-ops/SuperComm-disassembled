@@ -24,6 +24,13 @@
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr>
           <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
@@ -34,6 +41,13 @@
       </tbody>
     </table>
     <table class="cc-table">
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
         <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
@@ -49,6 +63,13 @@
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr>
           <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
@@ -59,6 +80,13 @@
       </tbody>
     </table>
     <table class="cc-table">
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
         <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
@@ -75,11 +103,25 @@
     <code>TFR D,X</code> &rarr; <code>$0</code>&nbsp;|&nbsp;<code>$1</code> &rarr; postbyte <code>$01</code> &rarr; bytes <code>$1F $01</code>.</p>
     <div style="display:flex;gap:2rem;align-items:flex-start">
       <table class="modes-table" style="width:auto">
-        <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
+      <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody><tr><td style="text-align:center"><code>D</code></td><td style="text-align:center"><code>$0</code></td></tr><tr><td style="text-align:center"><code>X</code></td><td style="text-align:center"><code>$1</code></td></tr><tr><td style="text-align:center"><code>Y</code></td><td style="text-align:center"><code>$2</code></td></tr><tr><td style="text-align:center"><code>U</code></td><td style="text-align:center"><code>$3</code></td></tr><tr><td style="text-align:center"><code>S</code></td><td style="text-align:center"><code>$4</code></td></tr><tr><td style="text-align:center"><code>PC</code></td><td style="text-align:center"><code>$5</code></td></tr></tbody>
       </table>
       <table class="modes-table" style="width:auto">
-        <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
+      <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody><tr><td style="text-align:center"><code>A</code></td><td style="text-align:center"><code>$8</code></td></tr><tr><td style="text-align:center"><code>B</code></td><td style="text-align:center"><code>$9</code></td></tr><tr><td style="text-align:center"><code>CC</code></td><td style="text-align:center"><code>$A</code></td></tr><tr><td style="text-align:center"><code>DP</code></td><td style="text-align:center"><code>$B</code></td></tr></tbody>
       </table>
     </div>
@@ -194,6 +236,13 @@
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr>
           <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
@@ -204,6 +253,13 @@
       </tbody>
     </table>
     <table class="cc-table">
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
         <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
@@ -219,6 +275,13 @@
       <colgroup>
         <col class="col-mode"><col class="col-syntax"><col class="col-opcode"><col class="col-bytes"><col class="col-cycles">
       </colgroup>
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr>
           <th>Mode</th><th>Syntax</th><th class="col-opcode">Opcode</th><th class="col-bytes">Bytes</th><th class="col-cycles">Cycles</th>
@@ -229,6 +292,13 @@
       </tbody>
     </table>
     <table class="cc-table">
+      <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
       <thead>
         <tr><th colspan="5">Condition Codes</th></tr>
         <tr><th>H</th><th>N</th><th>Z</th><th>V</th><th>C</th></tr>
@@ -245,11 +315,25 @@
     <code>TFR D,X</code> &rarr; <code>$0</code>&nbsp;|&nbsp;<code>$1</code> &rarr; postbyte <code>$01</code> &rarr; bytes <code>$1F $01</code>.</p>
     <div style="display:flex;gap:2rem;align-items:flex-start">
       <table class="modes-table" style="width:auto">
-        <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
+      <thead><tr><th colspan="2">16-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody><tr><td style="text-align:center"><code>D</code></td><td style="text-align:center"><code>$0</code></td></tr><tr><td style="text-align:center"><code>X</code></td><td style="text-align:center"><code>$1</code></td></tr><tr><td style="text-align:center"><code>Y</code></td><td style="text-align:center"><code>$2</code></td></tr><tr><td style="text-align:center"><code>U</code></td><td style="text-align:center"><code>$3</code></td></tr><tr><td style="text-align:center"><code>S</code></td><td style="text-align:center"><code>$4</code></td></tr><tr><td style="text-align:center"><code>PC</code></td><td style="text-align:center"><code>$5</code></td></tr></tbody>
       </table>
       <table class="modes-table" style="width:auto">
-        <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
+        <colgroup>
+        <col style="width:22%"><!-- Description -->
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+        <col style="width:24%"><!-- Direct -->
+        <col style="width:22%"><!-- Indirect -->
+      </colgroup>
+      <thead><tr><th colspan="2">8-bit</th></tr><tr><th>Reg</th><th>Code</th></tr></thead>
         <tbody><tr><td style="text-align:center"><code>A</code></td><td style="text-align:center"><code>$8</code></td></tr><tr><td style="text-align:center"><code>B</code></td><td style="text-align:center"><code>$9</code></td></tr><tr><td style="text-align:center"><code>CC</code></td><td style="text-align:center"><code>$A</code></td></tr><tr><td style="text-align:center"><code>DP</code></td><td style="text-align:center"><code>$B</code></td></tr></tbody>
       </table>
     </div>
