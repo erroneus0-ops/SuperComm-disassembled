@@ -438,3 +438,50 @@ The +-bit / +-bit / +-bit notation may appear as a temporary
 alternative framing for the learner to try on -- not as the primary
 notation but as a tool for building intuition before returning to
 the conventional field-width description.
+
+---
+
+## Book -- The Programmer's Processor (paragraph seed)
+
+Context: introducing the postbyte or the indexed addressing chapter.
+The inversion between programmer intention and hardware execution.
+
+---
+
+Raw material to distill:
+
+The mnemonic reads left to right as intention: "load A from this address."
+The silicon works right to left. For LDA [n16,PCR]:
+
+  1. Read PC
+  2. Fetch 16-bit offset from next two bytes
+  3. Add offset to PC → effective address
+  4. Read the word at that address → pointer
+  5. Read the byte at the pointer → data
+  6. Gate data into A
+
+Six steps. The programmer wrote four tokens. The hardware spent 8+ clock
+cycles doing work the programmer never had to think about.
+
+The clock cycle counts in the reference tables are the honest accounting
+of that hidden complexity. The postbyte table is not just a reference --
+it is a cost schedule. Every layer of indirection is another memory access.
+Every auto-increment saves a separate instruction.
+
+The 6809 was designed for programmers, not for microcontroller implementation.
+The contrast with an 8051 or PIC is sharp -- those processors expose the
+hardware. You manipulate specific registers because those are the physical
+things. The addressing modes are a direct map of silicon capabilities.
+
+The 6809 hides that. LDA [n16,PCR] tells the processor your intention.
+The processor works out the mechanics. The programmer thinks in terms of
+what the data IS, not where the bus has to travel to get it.
+
+That design choice has a cost measured in clock cycles. The 6809 is honest
+about it. Once a programmer understands that every addressing layer costs
+something real, the table stops being reference material and becomes a tool
+for reasoning about tradeoffs. That is the moment the architecture starts
+to make sense not just as a specification but as a design philosophy.
+
+Tone: expressive, reflective. Not a tutorial paragraph -- a moment of
+recognition for the reader who has just learned what the postbyte does.
