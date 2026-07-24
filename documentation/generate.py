@@ -1390,7 +1390,7 @@ def render_postbyte_page(data):
         <tr><td>register U base</td><td>1</td><td>1</td><td>0</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
         <tr><td>register S base</td><td>1</td><td>1</td><td>1</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td></td><td></td></tr>
         <tr class="section-header"><td colspan="11"><strong>5-bit signed offset (bit 7=0, no indirect)</strong></td></tr>
-        <tr><td>±4-bit signed offset</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td><code>LDA -1,X</code></td><td>—</td></tr>
+        <tr><td>5-bit signed offset</td><td>0</td><td>R</td><td>R</td><td>n</td><td>n</td><td>n</td><td>n</td><td>n</td><td><code>LDA -1,X</code></td><td>—</td></tr>
         <tr class="section-header"><td colspan="11"><strong>Standard indexed (bit 7=1)</strong></td></tr>
         <tr><td>post-increment by 1</td><td>1</td><td>R</td><td>R</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><code>LDA ,X+</code></td><td>—</td></tr>
         <tr><td>post-increment by 2</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>0</td><td>0</td><td>1</td><td><code>LDA ,X++</code></td><td><code>LDA [,X++]</code></td></tr>
@@ -1399,11 +1399,11 @@ def render_postbyte_page(data):
         <tr><td>zero offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>0</td><td><code>LDA ,X</code></td><td><code>LDA [,X]</code></td></tr>
         <tr><td>B accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>0</td><td>1</td><td><code>LDA B,X</code></td><td><code>LDA [B,X]</code></td></tr>
         <tr><td>A accumulator offset</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>0</td><td>1</td><td>1</td><td>0</td><td><code>LDA A,X</code></td><td><code>LDA [A,X]</code></td></tr>
-        <tr><td>±7-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>0</td><td><code>LDA $01,X</code></td><td><code>LDA [$01,X]</code></td></tr>
-        <tr><td>±15-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>1</td><td><code>LDA $0100,X</code></td><td><code>LDA [$0100,X]</code></td></tr>
+        <tr><td>8-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>0</td><td><code>LDA $01,X</code></td><td><code>LDA [$01,X]</code></td></tr>
+        <tr><td>16-bit signed offset follows</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>0</td><td>1</td><td><code>LDA $0100,X</code></td><td><code>LDA [$0100,X]</code></td></tr>
         <tr><td>D accumulator offset (16-bit)</td><td>1</td><td>R</td><td>R</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>0</td><td>1</td><td>1</td><td><code>LDY D,X</code></td><td><code>LDY [D,X]</code></td></tr>
-        <tr><td>±7-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>0</td><td><code>LDA $01,PCR</code></td><td><code>LDA [$01,PCR]</code></td></tr>
-        <tr><td>±15-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>1</td><td><code>LDA $0001,PCR</code></td><td><code>LDA [$0001,PCR]</code></td></tr>
+        <tr><td>8-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>0</td><td><code>LDA $01,PCR</code></td><td><code>LDA [$01,PCR]</code></td></tr>
+        <tr><td>16-bit PC-relative offset follows</td><td>1</td><td>X</td><td>X</td><td style="color:var(--cc-set,#f0c060);font-weight:bold">I</td><td>1</td><td>1</td><td>0</td><td>1</td><td><code>LDA $0001,PCR</code></td><td><code>LDA [$0001,PCR]</code></td></tr>
         <tr><td>extended indirect — fixed postbyte $9F</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>—</td><td><code>LDA [$0000]</code></td></tr>
       </tbody>
     </table>

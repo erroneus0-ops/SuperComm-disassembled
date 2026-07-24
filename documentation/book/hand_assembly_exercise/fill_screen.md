@@ -704,37 +704,42 @@ i    = 1 for indirect mode
 mmmm = mode select (see table below)
 ```
 
+Only the two rows this exercise actually uses are shown below — the
+register select entry for X, and the pre-decrement-by-1 mode. This
+mirrors the layout of the full indexed addressing postbyte reference
+page (`documentation/html/groups/indexed_postbyte.html`), which lists
+every register and every mode; see that page for the complete table.
 
-**Register field (bits 6-5 when bit 7=1):**
+| Description | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 | Direct | Indirect |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Register select (bits 6-5 when bit 7=1)** | | | | | | | | | | |
+| register X base | 1 | 0 | 0 | x | x | x | x | x | | |
+| **Standard indexed (bit 7=1)** | | | | | | | | | | |
+| pre-decrement by 1 | 1 | R | R | 0 | 0 | 0 | 1 | 0 | `STA ,-X` | — |
 
-| Register | Bits 6-5 | Bit pattern     | Hex  |
-|----------|----------|-----------------|------|
-| X        | 00       | 1 0 0 x x x x x | $80  |
-| Y        | 01       | 1 0 1 x x x x x | $A0  |
-| U        | 10       | 1 1 0 x x x x x | $C0  |
-| S        | 11       | 1 1 1 x x x x x | $E0  |
+The bold rows above are section headers (shown as colored divider rows
+in the generated reference) — they describe the group, not a specific
+bit pattern by themselves. `x` in the register row means those bits are
+not constrained by register selection alone — they belong to the mode
+field. `R` in the mode row means those bits are supplied by whichever
+register was selected above, not by this field.
 
-**Mode field (bits 3-0, bit 4=0 for non-indirect):**
+**Deriving a Postbyte**
 
-| Syntax  | Bit pattern     | Hex  | +bytes | +Cycles |
-|---------|-----------------|------|--------|---------|
-| ,R+     | x x x 0 0 0 0 0 | $00  | 0      | +2      |
-| ,R++    | x x x 0 0 0 0 1 | $01  | 0      | +3      |
-| ,-R     | x x x 0 0 0 1 0 | $02  | 0      | +2      |
-| ,--R    | x x x 0 0 0 1 1 | $03  | 0      | +3      |
-| ,R      | x x x 0 0 1 0 0 | $04  | 0      |  0      |
-| B,R     | x x x 0 0 1 0 1 | $05  | 0      | +1      |
-| A,R     | x x x 0 0 1 1 0 | $06  | 0      | +1      |
-| n8,R    | x x x 0 1 0 0 0 | $08  | 1      | +1      |
-| n16,R   | x x x 0 1 0 0 1 | $09  | 2      | +4      |
-| D,R     | x x x 0 1 0 1 1 | $0B  | 0      | +4      |
+The postbyte is the bitwise OR of the register field and the mode
+field. The fields occupy non-overlapping bit positions, so no
+arithmetic is needed — just OR the two rows together.
 
-**Worked example: STA ,-X**
+Here, `-` means something more specific than the `x` above: it means
+this field contributes nothing at this position — treat it as 0 for
+the OR. That is what makes the OR arithmetic below come out correct.
 
-```
-Register X:    1 0 0 x x x x x  =  $80
-Mode ,-R:      x x x 0 0 0 1 0  =  $02
-OR result:     1 0 0 0 0 0 1 0  =  $82
-```
+**Worked example: `STA ,-X`**
+
+| Field | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 | Hex |
+|---|---|---|---|---|---|---|---|---|---|
+| Register X (bits 6-5 = 00) | 1 | 0 | 0 | - | - | - | - | - | $80 |
+| Mode ,-R (pre-decrement 1) | - | - | - | 0 | 0 | 0 | 1 | 0 | $02 |
+| **OR result** | **1** | **0** | **0** | **0** | **0** | **0** | **1** | **0** | **$82** |
 
 Opcode `$A7`, postbyte `$82` — two bytes total.

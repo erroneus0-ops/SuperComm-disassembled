@@ -1154,6 +1154,19 @@ cleanly in any monospaced editor.
 unambiguous. A `0` in a bit pattern means the bit is zero. An `x` means
 the bit is not constrained by this field.
 
+**Exception — `-` in OR-derivation tables.** When a table shows two (or
+more) partial bit-patterns being OR'd together into a final result (e.g.
+register field OR mode field = postbyte), use `-` instead of `x` for the
+positions a given row does not own. This is a different concept from the
+general don't-care case above: `x` means "this bit is a true wildcard,
+either value is fine" (used in classification/identification tables,
+like postbyte mode rows). `-` means "this field contributes nothing at
+this position — treat it as 0 for the purpose of this OR." The OR only
+produces the correct result because those positions genuinely are zero
+in each partial row, not merely unexamined. Confirmed in
+`documentation/generate.py`'s postbyte "Deriving a Postbyte" OR table —
+this was working as intended, not a bug, when reviewed July 2026.
+
 **Spaced bit patterns** — `1 0 0 x x x x x` not `100xxxxx`. One space
 between each bit. Groups of four may be spaced further for readability.
 
