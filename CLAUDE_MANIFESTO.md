@@ -64,7 +64,7 @@ everything that would otherwise have to be relearned the hard way.
 **This project is a learning engine.**
 
 The tools exist because building them requires understanding 6809 assembly,
-OS-9 structure, and CoCo hardware at a level that reading about them doesn't
+OS-9/DECB structure, and CoCo hardware at a level that reading about them doesn't
 produce. The book exists because explaining something requires understanding
 it more completely than using it does. Each activity deepens the other.
 
@@ -75,7 +75,7 @@ understanding.
 **The actual deliverables are:**
 1. **dis6x09.py** -- a general 6809/6309 disassembler for any binary format
 2. **The Python cocotools toolkit** -- self-contained replacement for platform-
-   specific binaries (lwasm, toolshed, decb)
+   specific binaries (lwasm, toolshed, related tools)
 3. **The book** -- 6809 assembly language programming for the CoCo DECB
    environment, written from first principles
 4. **The XRoar WASM page** -- browser-based CoCo emulator with enhancements
@@ -101,24 +101,6 @@ level for that format -- flames.bin revealed what OS-9 was hiding.
 **Daniel's local:** C:\DATA\supercomm (work), D:\git\supercomm (home)
 **Claude's local:** /home/claude/SuperComm/ (cloned fresh each session)
 **Daniel's pseudonym:** 三浦按針 (Miura Anjin)
-
----
-
-## GitHub Authentication
-
-Daniel provides a base64-encoded, REVERSED token at session start.
-Decode and reverse it, configure git:
-
-```python
-import base64, subprocess, os
-t = base64.b64decode('TOKEN_HERE').decode().strip()[::-1]
-home = os.path.expanduser('~')
-with open(f'{home}/.git-credentials', 'w') as f:
-    f.write(f'https://erroneus0-ops:{t}@github.com\n')
-subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
-subprocess.run(['git', 'config', '--global', 'user.email', 'claude@anthropic.com'])
-subprocess.run(['git', 'config', '--global', 'user.name', 'Claude'])
-```
 
 ---
 
