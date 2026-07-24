@@ -104,24 +104,6 @@ level for that format -- flames.bin revealed what OS-9 was hiding.
 
 ---
 
-## GitHub Authentication
-
-Daniel provides a base64-encoded, REVERSED token at session start.
-Decode and reverse it, configure git:
-
-```python
-import base64, subprocess, os
-t = base64.b64decode('TOKEN_HERE').decode().strip()[::-1]
-home = os.path.expanduser('~')
-with open(f'{home}/.git-credentials', 'w') as f:
-    f.write(f'https://erroneus0-ops:{t}@github.com\n')
-subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
-subprocess.run(['git', 'config', '--global', 'user.email', 'claude@anthropic.com'])
-subprocess.run(['git', 'config', '--global', 'user.name', 'Claude'])
-```
-
----
-
 ## Repository Structure
 
 ```
