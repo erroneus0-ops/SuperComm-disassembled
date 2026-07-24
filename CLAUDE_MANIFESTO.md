@@ -6,6 +6,14 @@
 # Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
 # philosophy document, not just context.
 
+## This Repository
+
+This is a personal project. It is public on GitHub.
+It contains no credentials, no secrets, no private information.
+It is backed up in multiple locations.
+The worst outcome of any mistake is that work must be restored or redone.
+Operate accordingly.
+
 ## Getting a New Claude Session Up to Speed
 
 Two scenarios, depending on what kind of Claude you're starting:
