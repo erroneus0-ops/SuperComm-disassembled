@@ -6,6 +6,21 @@
 # Renamed from CLAUDE_CONTEXT.md -- more intentional name, this is a
 # philosophy document, not just context.
 
+## Python Portability
+
+Python tools must run on Windows and Unix (Linux, macOS, BSD) without modification.
+
+- File I/O: always specify `encoding='utf-8'` explicitly. Never rely on the platform default.
+- Line endings: use `newline=''` or handle CRLF/LF explicitly where it matters.
+- Paths: use `os.path.join()` or `pathlib`. Never hardcode `/` or `\`.
+- When a platform default has been overridden (e.g. monkey-patching `builtins.open`
+  to force UTF-8), add a comment explaining why. Future readers need to know it is
+  intentional, not accidental.
+- This applies to all new code and should be noted when encountered in existing code.
+
+Portability is not optional. It is a requirement of both the project operation
+and the book's learning context.
+
 ## This Repository
 
 This is a personal project. It is public on GitHub.
