@@ -485,3 +485,79 @@ to make sense not just as a specification but as a design philosophy.
 
 Tone: expressive, reflective. Not a tutorial paragraph -- a moment of
 recognition for the reader who has just learned what the postbyte does.
+
+---
+
+## Browser Development Environment -- Target Architecture
+
+**Goal:** Minimal install, maximal tools. Everything runs in the browser.
+Local Python wrappers provide the same functionality from the command line.
+
+### The environment consists of:
+
+**Editor (CodeMirror or equivalent)**
+A Notepad++-like embedded editor with syntax highlighting for:
+- Markdown (.md)
+- CoCo Color BASIC
+- Basic09 (Pascal is the closest analog -- investigate Basic09 grammar for
+  syntax highlighter definition; structured, typed, block-scoped like Pascal)
+- 6x09 Assembly language including:
+  - lwasm directives (ORG, EQU, RMB, FCB, FDB, etc.)
+  - 6809/6309 instruction set
+  - OS-9 and DECB context (different memory models, different calling conventions)
+  - Significant memory address ranges as named constants / hover hints:
+    IRQ/SWI/NMI/FIRQ vectors, BASIC ROM entry points, hardware registers,
+    screen RAM, direct page locations
+
+**WASM Toolchain (already built)**
+- lwasm -- assemble source to binary
+- toolshed -- DECB DSK operations, OS-9, CECB cassette
+- makewav -- binary to WAV/CAS for cassette loading
+- lst2cmt -- lwasm listing to MAME/XRoar debugger comment file (KEY TOOL)
+
+**XRoar WASM (Ciaran's emulator)**
+Extended incrementally to support robust debugging:
+- Load and run programs directly from the browser environment
+- Debugger integration: breakpoints, register inspection, memory view
+- Comment file support: display commented assembly source alongside
+  disassembly in the debugger (lst2cmt produces these -- this is the
+  bridge between source and running code)
+- Goal: edit source → assemble → load into XRoar → debug with source
+  comments visible, all without leaving the browser
+
+**Command Interface**
+Semi-functional CLI within the browser for running tools.
+Mirrors the Python wrapper CLI exactly -- same commands, same arguments.
+User learns one interface that works in both contexts.
+
+**Local fallback**
+Python wrappers (already written) provide identical functionality
+from the actual command line. User installs Node.js, runs the same
+commands. No other installation required.
+
+### The lst2cmt connection
+
+lst2cmt converts an lwasm listing file to an XML comment file that
+XRoar's debugger (and MAME) can load alongside the disassembly.
+This is the mechanism that makes source-level debugging possible:
+  assemble with --list → lst2cmt → load .xml into XRoar debugger
+  → step through code with original source comments visible
+
+This is the most powerful debugging workflow available without a
+full IDE. Worth building toward explicitly.
+
+### Basic09 note
+
+Basic09 is OS-9's structured BASIC -- block-scoped, typed, compiled
+to intermediate code (I-code). Pascal is the closest analog in terms
+of syntax and structure. A Pascal syntax highlighter would be a
+reasonable starting point for a Basic09 highlighter. Investigate
+the Basic09 grammar for differences (PROCEDURE vs PROGRAM, type
+declarations, OS-9 system call syntax).
+
+### Philosophy
+
+The book reader should be able to open a URL and start writing assembly.
+The experienced user should be able to drop to the command line and use
+the same tools. The environment should never require explaining before
+it can be used.
