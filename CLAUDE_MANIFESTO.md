@@ -21,6 +21,58 @@ Python tools must run on Windows and Unix (Linux, macOS, BSD) without modificati
 Portability is not optional. It is a requirement of both the project operation
 and the book's learning context.
 
+## Wrapper Design: Translate Environments, Not Tool Semantics
+
+This project's WASM wrapper functions (`lwasm_wrapper.c`, `toolshed_wrapper.c`,
+etc.) exist to run the *actual* compiled tool -- lwasm, toolshed, cecb -- not a
+reimplementation of it. That has a specific design consequence: **a wrapper
+should never reconstruct the tool's own argument-parsing logic.** If a wrapper
+takes friendly, separate parameters (a load address, an exec address, a file
+type) and internally rebuilds a command string from them, that reconstruction
+is a second, parallel implementation of something the real tool's CLI parser
+already does correctly -- and it can silently diverge from it.
+
+This actually happened: the original `ts_cecb_copy` took `load_addr` as a
+separate parameter and added a `0x` prefix to it *unless the address already
+started with '0'* (e.g. "0400"). Since the native `cecbcopy.c` parses addresses
+with `strtol(..., 0)`, a bare leading zero with no `0x` prefix gets read as
+**octal**, not hex. A perfectly normal CoCo address like $0400 was silently
+misread. The fix (`ts_cecb_run`) takes the real `cecb` command string directly
+and passes it straight through -- there is no second parser to disagree with
+the first one.
+
+**The rule:** wrapper functions should accept the real CLI syntax as a string
+(or as close to it as Emscripten's calling convention allows) and pass it
+through to the tool's own argument parser, rather than exposing a set of
+"friendlier" typed parameters that get reassembled into a command line
+internally. If you can run `--help` on the real tool and the wrapper's
+interface doesn't resemble what you see, that's worth questioning.
+
+**This does not mean "no translation, ever."** There is a second, entirely
+different category of translation that *is* necessary and should not be
+confused with the first: translating between the host's environment and the
+sandbox's environment. Emscripten's virtual filesystem (`MEMFS`) is always
+POSIX-style -- root at `/`, no drive letters, forward slashes -- regardless of
+whether the actual host is Windows, WSL2, or native Linux. Confirmed directly
+in `xroar-custom.js`: `PATH.isAbs` checks for a leading `/`, not a drive
+letter; the mounted directories (`/tmp`, `/home/web_user`, `/dev`) are all
+Unix conventions. A path like `D:\git\supercomm\HELLO.ASM` or
+`/mnt/d/git/supercomm/HELLO.ASM` (WSL) has no meaning inside the sandbox until
+something bridges it to a virtual path like `/in.asm` -- there is no `D:`
+drive in there to refer to. That bridging is not reconstructing the tool's
+argument semantics; it's translating between two genuinely different address
+spaces, and it has to happen somewhere.
+
+**The distinction in one sentence:** translate the *environment* (host paths
+into sandbox paths) at the boundary; never translate the *tool's own
+vocabulary* (its flags, addressing conventions, command structure) into a
+parallel wrapper-side implementation of the same logic. The first is a
+bridge. The second is a second parser waiting to disagree with the first one.
+This is the same discipline as the Python Portability rules above -- explicit,
+never assumed, commented when something is being bridged rather than left
+alone -- just applied at the host/sandbox boundary instead of the
+Windows/Unix one.
+
 ## This Repository
 
 This is a personal project. It is public on GitHub.
