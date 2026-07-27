@@ -1001,9 +1001,6 @@ void wasm_vdrive_flush(void) {
 
 // Debug exports -- read/write emulated memory, get CPU registers
 
-#include "mc6809/mc6809.h"
-#include "part.h"
-
 uint8_t wasm_read_byte(int addr) {
 	if (!xroar.machine) return 0;
 	return xroar.machine->read_byte(xroar.machine, addr & 0xffff, 0);
@@ -1015,44 +1012,44 @@ void wasm_write_byte(int addr, int value) {
 }
 
 uint16_t wasm_get_pc(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? cpu->reg_pc : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? cpu->reg_pc : 0;
 }
 uint8_t wasm_get_cc(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? cpu->reg_cc : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? cpu->reg_cc : 0;
 }
 uint8_t wasm_get_a(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? MC6809_REG_A(cpu) : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? MC6809_REG_A(cpu) : 0;
 }
 uint8_t wasm_get_b(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? MC6809_REG_B(cpu) : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? MC6809_REG_B(cpu) : 0;
 }
 uint16_t wasm_get_x(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? cpu->reg_x : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? cpu->reg_x : 0;
 }
 uint16_t wasm_get_y(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? cpu->reg_y : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? cpu->reg_y : 0;
 }
 uint16_t wasm_get_s(void) {
-    if (!xroar.machine) return 0;
-    struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
-        &xroar.machine->part, "CPU", "MC6809");
-    return cpu ? cpu->reg_s : 0;
+	if (!xroar.machine) return 0;
+	struct MC6809 *cpu = (struct MC6809 *)part_component_by_id_is_a(
+		&xroar.machine->part, "CPU", "MC6809");
+	return cpu ? cpu->reg_s : 0;
 }

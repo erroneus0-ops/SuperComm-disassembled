@@ -22,6 +22,7 @@
 #define XROAR_WASM_H_
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "sdl2/common.h"
 
@@ -79,6 +80,19 @@ void wasm_load_file(const char *filename, int type, int drive);
 void wasm_queue_basic(const char *string);
 void wasm_resize(int w, int h);
 void wasm_vdrive_flush(void);
+
+// Debug/monitor interface -- direct CPU register and memory access, for a
+// future monitor/debugger page. Not part of upstream XRoar as of 1.11.
+
+uint8_t wasm_read_byte(int addr);
+void wasm_write_byte(int addr, int value);
+uint16_t wasm_get_pc(void);
+uint8_t wasm_get_cc(void);
+uint8_t wasm_get_a(void);
+uint8_t wasm_get_b(void);
+uint16_t wasm_get_x(void);
+uint16_t wasm_get_y(void);
+uint16_t wasm_get_s(void);
 
 #endif
 
