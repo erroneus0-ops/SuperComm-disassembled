@@ -126,3 +126,30 @@ the whole mechanism these findings were about no longer exists:
    cross-document event propagation quirks between the inner SVG
    document and the outer page -- which the handle-based rebuild
    sidesteps entirely rather than continuing to patch around.
+
+## Future item, explicitly not for now (added 2026-07-30)
+
+**Multi-machine keyboard selection.** CoCo2 and Dragon keyboards share
+most of their scheme with CoCo3 (Motorola reference implementation
+common ancestry -- confirmed directly: real hardware only has one real
+SHIFT switch, with both keycaps wired in parallel to the same matrix
+line, which is why our shift-key-sharing fix earlier tonight was
+correct, not just a simplification). Building a CoCo2/Dragon keyboard
+SVG is expected to be mostly layout work -- moving/removing keys from
+the existing CoCo3 artwork, no code changes needed for that part.
+
+The separate, genuinely code-level piece: letting someone actually
+*choose* which board is active at runtime. That means swapping the
+`<object data="...">` source, probably wired to the existing "Machine:"
+dropdown in the toolbox (since the active board should logically follow
+whichever machine is being emulated), and very possibly needing its own
+`KEY_SCANCODES` table per board, since different real machines could
+have genuine differences in what their physical keys map to. Explicitly
+deferred -- not started, not scoped in detail yet, just flagged so it
+doesn't get lost.
+
+Also still flagged from earlier, unresolved: whether CTRL has a similar
+"two keycaps, one real matrix switch" story on real hardware (like
+SHIFT does), which might explain why it didn't appear under its own
+name in the direct raw-mode scancode table the same way SHIFT's
+sharing did.
