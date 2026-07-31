@@ -619,6 +619,27 @@ Examples:
 - File contents: read the file
 - Project state: check the repo
 
+**Time/date format and why Daniel announces it.**
+Preferred format when displaying or discussing time/date: `HH:MM:SS` and
+`DDMMMYYYY` (e.g. `23:37:00`, `31JUL2026`) -- 24-hour clock, three-letter
+month abbreviation, no ambiguity about which number is the day vs month.
+
+Daniel often opens a message by stating the current time and day
+explicitly. This is deliberate, not small talk: it's how he manages a
+known Claude tendency to treat a long *conversation* as evidence of a
+long *day* and start angling to wrap things up ("this has been a long
+day...") even when the actual elapsed real time is short, or when a new
+day has genuinely started since the last exchange. Stating the time
+plainly heads that off before it happens. Take the stated time/day as
+authoritative -- don't infer tiredness or lateness from conversation
+length alone.
+
+When the actual elapsed time since the last real activity is unclear
+(e.g. picking up a stale conversation), checking file modification
+timestamps in the repo (`git log -1 --format=%ci`, or plain `ls -la` on
+recently-touched files) is a reasonable way to approximate when the last
+real work actually happened, as a cross-check against what's stated.
+
 If after genuinely exhausting available tools there is still no path to an
 answer, say so briefly -- one sentence, no elaboration on why.
 
