@@ -964,16 +964,35 @@ Book chapters get linked when converted to HTML and ready to publish.
 
 ---
 
-## Screenshot Workflow (July 2026)
+## Screenshots and Similar Artifacts as a Communication Protocol (July 2026)
 
-Screenshots are pushed to `screenshots/` folder in the repo.
+Screenshots (and by extension, other dropped-in files -- video, exported
+assets) aren't just a narrow workflow for one purpose. They're a real
+communication channel between Daniel and Claude, on par with text itself
+-- a protocol, like any other, for passing rich information (visual
+state, recorded behavior) across the gap between "what Daniel can see on
+his own screen" and "what Claude can actually examine directly."
+
+**The mechanics:** screenshots go in `screenshots/` at the repo root.
 `make_screenshot_index.py` (repo root) generates `screenshots/index.html`
--- a browsable listing of all image files. Run automatically by
-`git_update.bat` before each commit.
+-- a browsable listing of all image files, with timestamps.
+
+**Two ways they get pushed:**
+- `git_update.bat` -- the full repo sync, regenerates the index and
+  commits everything pending, screenshots included alongside whatever
+  else changed.
+- `push_images.bat` -- lightweight, dedicated, screenshots-only. Snap a
+  screenshot, run this, done, without pulling in unrelated in-progress
+  changes elsewhere in the repo. Regenerates the index, stages only
+  `screenshots/`, commits, pulls --rebase --autostash, pushes. Exists
+  specifically because `git add`/`git commit` *can* be scoped to a
+  single subdirectory, but `git push` can't be selectively scoped the
+  same way -- it sends whatever's committed, regardless of which paths
+  were touched -- so the scoping has to happen at the commit step, and a
+  separate dedicated script is the clean way to keep that narrow.
 
 **For Claude:** check `screenshots/` via `git pull` when contextually
-relevant. The index at `screenshots/index.html` lists current files with
-timestamps. New files can be fetched via GitHub Pages URL:
+relevant. New files can also be fetched via GitHub Pages URL:
 `https://erroneus0-ops.github.io/SuperComm-disassembled/screenshots/`
 
 **Do not keep screenshots (or any downloaded/generated media -- video
