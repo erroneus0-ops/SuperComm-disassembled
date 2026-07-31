@@ -153,3 +153,49 @@ Also still flagged from earlier, unresolved: whether CTRL has a similar
 SHIFT does), which might explain why it didn't appear under its own
 name in the direct raw-mode scancode table the same way SHIFT's
 sharing did.
+
+## Future item, not started -- custom machine-configuration system (added 2026-07-31)
+
+Goal: let Daniel define named machine startup configurations (the
+`-machine`/`-cart`/etc. options string XRoar takes) through the web UI
+itself, without touching XRoar's source -- directly motivated by the
+environment project's actual completion criterion being *maintainability*
+of ongoing changes, not a fixed feature list (see the lwtools 4.24->4.25
+upgrade-as-process-validation parallel Daniel drew).
+
+Worked out design, in layers, each solving a genuinely different problem
+-- discussed but not built:
+
+- **A JSON config file, git-tracked** -- name + comment + options string
+  per entry, plus a marker for which entry the file itself considers
+  default. Portable between Daniel's own machines via normal `git pull`
+  (home/office), which is the thing cookies/localStorage can never do,
+  since those are tied to one browser on one device.
+- **A textarea (view + copy/paste + edit + apply)** -- replaces a
+  file-export/import dialog entirely. Shows the current config JSON,
+  editable in place, "Apply" reloads the in-memory list from whatever's
+  in the box. Also serves as the direct-editing interface -- no separate
+  add/edit form needed. Fits how Daniel actually shares things in
+  conversation (pasted text, not attached files) -- if someone needs to
+  reproduce his exact setup for debugging, paste-and-apply covers it
+  without any file at all.
+- **`localStorage`** -- remembers only which single config was last
+  selected, purely local to one browser, never the actual config data
+  itself. Startup logic: check localStorage first; if it names a config
+  still present in the list, use it; otherwise fall back to whatever the
+  file/textarea-loaded list marks as its own default.
+
+Explicitly considered and set aside for now: cookies (wrong tool --
+their whole design purpose is automatic server visibility, irrelevant
+for a static page with no server logic at all) and a URL-parameter
+sharing mechanism (genuinely useful, but the textarea alone may already
+cover the sharing case well enough -- open question whether it's worth
+adding on top, not decided).
+
+**New idea raised alongside this, also not started:** XRoar's own
+built-in "Hardware" tab (in its native menu bar -- Software | File |
+View | Hardware | Help) offers a limited, fixed selection of machine
+configs. Once this custom system exists with its own more flexible,
+user-definable list, consider hiding or replacing that native tab
+entirely, since it would be redundant with (and more limited than) the
+custom system.
