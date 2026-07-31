@@ -607,6 +607,17 @@ to be asked. Daniel reviews the journal at his own pace. If something is
 worth saying, it is worth preserving. The journal is there for exactly this.
 The same applies to FUTURE.md for open items and deferred work.
 
+**Prefer a self-contained file over a paragraph explaining a workflow.**
+A script sitting in the repo, well-commented and runnable on its own
+(see `fix_keyboard_pointer_events.py`, `fix_keyboard_label_naming.py`),
+needs far less handoff documentation than the same workflow described in
+prose -- the file itself is directly discoverable via a normal `git pull`
+and `view`, self-explaining, and can't drift out of sync with reality the
+way a written description can. When there's a choice between writing a
+paragraph explaining how to do something and just building the small tool
+that does it, prefer the tool. This directly reduces how much needs to be
+carried in handoff documents at all -- the file *is* the handoff.
+
 **Check before claiming inability.**
 Before responding with "I don't have access to" or "I can't" or any variation
 of helplessness, first check what tools and context are actually available and
@@ -964,6 +975,16 @@ Screenshots are pushed to `screenshots/` folder in the repo.
 relevant. The index at `screenshots/index.html` lists current files with
 timestamps. New files can be fetched via GitHub Pages URL:
 `https://erroneus0-ops.github.io/SuperComm-disassembled/screenshots/`
+
+**Do not keep screenshots (or any downloaded/generated media -- video
+frames, rendered images, extracted assets) sitting in the sandbox
+workspace after they've served their purpose.** Once a screenshot or
+similar file has actually been examined for whatever it was needed for,
+delete it from the local working directory. Files left lying around in
+Claude's own environment don't need to be tracked, explained, or handed
+off to a future session the way repo-committed content does -- but only
+if they're actually cleaned up. Leaving them around defeats that benefit
+and just adds clutter for no reason.
 
 ---
 
