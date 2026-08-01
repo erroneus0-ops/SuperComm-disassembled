@@ -1,0 +1,14 @@
+# .gitattributes -- enforce Unix (LF) line endings for text files,
+# repo-wide, regardless of which machine or git config touches it.
+#
+# text=auto: git still auto-detects binary vs text files correctly
+#   (so .exe, .wasm, images, etc. are never touched/mangled)
+# eol=lf: whatever git decides is a text file gets normalized to LF,
+#   both in the repo and on checkout -- no CRLF conversion, on any
+#   machine, regardless of that machine's own core.autocrlf setting.
+#
+# Only affects files added/committed after this file exists -- doesn't
+# retroactively rewrite line endings already sitting in existing repo
+# history.
+
+* text=auto eol=lf
