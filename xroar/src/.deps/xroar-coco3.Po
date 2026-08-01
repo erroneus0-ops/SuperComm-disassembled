@@ -1,0 +1,131 @@
+xroar-coco3.o: coco3.c ../top-config.h ../config.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/assert.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/features.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/math.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/math.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdlib.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdlib.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/alloca.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/string.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/string.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/strings.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/sys/stat.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/stat.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/stat.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/types.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/endian.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/endian.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/select.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/unistd.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/stddef.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stddef.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_header_macro.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_ptrdiff_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_size_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_wchar_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_null.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_max_align_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_offsetof.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/stdint.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdint.h \
+  ../portalib/array.h ../portalib/delegate.h ../portalib/sds.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdarg.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/stdarg.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdarg.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_header_macro.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg___gnuc_va_list.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_list.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_arg.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg___va_copy.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_copy.h \
+  ../portalib/xalloc.h ao.h breakpoint.h cart.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h \
+  xconfig.h events.h part.h crc32.h crclist.h gdb.h joystick.h module.h \
+  keyboard.h dkbd.h logging.h machine.h mc6809/hd6309.h debug_cpu.h \
+  mc6809/mc6809.h ../portalib/pl-endian.h mc6821.h messenger.h ntsc.h \
+  ../portalib/intfuncs.h printer.h ram.h rombank.h romlist.h serialise.h \
+  sound.h tape.h tcc1014/tcc1014.h ui.h vo.h vo_render.h xroar.h
+../top-config.h:
+../config.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/assert.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/features.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/math.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/math.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdlib.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdlib.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/alloca.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/string.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/string.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/strings.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/sys/stat.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/stat.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/stat.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/types.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/endian.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/endian.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/sys/select.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/unistd.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/wasi/api.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stddef.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stddef.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_header_macro.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_ptrdiff_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_size_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_wchar_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_null.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_max_align_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_offsetof.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stdint.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdint.h:
+../portalib/array.h:
+../portalib/delegate.h:
+../portalib/sds.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdarg.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stdarg.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdarg.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_header_macro.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg___gnuc_va_list.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_list.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_arg.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg___va_copy.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stdarg_va_copy.h:
+../portalib/xalloc.h:
+ao.h:
+breakpoint.h:
+cart.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdio.h:
+xconfig.h:
+events.h:
+part.h:
+crc32.h:
+crclist.h:
+gdb.h:
+joystick.h:
+module.h:
+keyboard.h:
+dkbd.h:
+logging.h:
+machine.h:
+mc6809/hd6309.h:
+debug_cpu.h:
+mc6809/mc6809.h:
+../portalib/pl-endian.h:
+mc6821.h:
+messenger.h:
+ntsc.h:
+../portalib/intfuncs.h:
+printer.h:
+ram.h:
+rombank.h:
+romlist.h:
+serialise.h:
+sound.h:
+tape.h:
+tcc1014/tcc1014.h:
+ui.h:
+vo.h:
+vo_render.h:
+xroar.h:

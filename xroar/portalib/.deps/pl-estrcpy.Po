@@ -1,0 +1,11 @@
+pl-estrcpy.o: pl-estrcpy.c \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdlib.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdlib.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/features.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/alloca.h
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/compat/stdlib.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdlib.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/features.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/alloca.h:

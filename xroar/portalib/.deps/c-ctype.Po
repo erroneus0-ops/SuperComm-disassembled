@@ -1,0 +1,8 @@
+c-ctype.o: c-ctype.c ../top-config.h ../config.h c-ctype.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/stdbool.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdbool.h
+../top-config.h:
+../config.h:
+c-ctype.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stdbool.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdbool.h:

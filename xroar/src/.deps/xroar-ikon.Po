@@ -1,0 +1,3 @@
+xroar-ikon.o: ikon.c ../top-config.h ../config.h
+../top-config.h:
+../config.h:

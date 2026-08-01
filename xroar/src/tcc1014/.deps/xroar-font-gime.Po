@@ -1,0 +1,1 @@
+tcc1014/xroar-font-gime.o: tcc1014/font-gime.c

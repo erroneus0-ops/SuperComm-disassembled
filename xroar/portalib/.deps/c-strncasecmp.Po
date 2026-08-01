@@ -1,0 +1,28 @@
+c-strncasecmp.o: c-strncasecmp.c ../top-config.h ../config.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/stddef.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stddef.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_header_macro.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_ptrdiff_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_size_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_wchar_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_null.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_max_align_t.h \
+  /home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_offsetof.h \
+  c-ctype.h /home/daniel/emsdk/upstream/lib/clang/23/include/stdbool.h \
+  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdbool.h \
+  c-strcase.h
+../top-config.h:
+../config.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stddef.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stddef.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_header_macro.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_ptrdiff_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_size_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_wchar_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_null.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_max_align_t.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/__stddef_offsetof.h:
+c-ctype.h:
+/home/daniel/emsdk/upstream/lib/clang/23/include/stdbool.h:
+/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdbool.h:
+c-strcase.h:
