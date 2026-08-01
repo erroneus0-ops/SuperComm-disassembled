@@ -1,7 +1,0 @@
-mc6847/xroar-font-6847t1.o: mc6847/font-6847t1.c \
-  /home/daniel/emsdk/upstream/lib/clang/23/include/stdint.h \
-  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdint.h \
-  /home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h
-/home/daniel/emsdk/upstream/lib/clang/23/include/stdint.h:
-/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/stdint.h:
-/home/daniel/emsdk/upstream/emscripten/cache/sysroot/include/bits/alltypes.h:
