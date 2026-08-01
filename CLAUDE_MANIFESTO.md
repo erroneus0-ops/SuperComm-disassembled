@@ -194,7 +194,7 @@ cocotools/
   basic.py              PLANNED -- BASIC tokenizer
 
 documentation/
-  generate.py           generates HTML opcode reference from JSON
+  generate_opcode_reference_html.py           generates HTML opcode reference from JSON
   opcodes/              12 JSON files, 131 instructions total
   html/                 generated HTML opcode reference
   book/
@@ -432,7 +432,7 @@ like postbyte mode rows). `-` means "this field contributes nothing at
 this position — treat it as 0 for the purpose of this OR." The OR only
 produces the correct result because those positions genuinely are zero
 in each partial row, not merely unexamined. Confirmed in
-`documentation/generate.py`'s postbyte "Deriving a Postbyte" OR table —
+`documentation/generate_opcode_reference_html.py`'s postbyte "Deriving a Postbyte" OR table —
 this was working as intended, not a bug, when reviewed July 2026.
 
 **Spaced bit patterns** — `1 0 0 x x x x x` not `100xxxxx`. One space

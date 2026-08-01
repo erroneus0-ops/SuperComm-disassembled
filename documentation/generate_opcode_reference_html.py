@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate.py — 6809 Reference Manual HTML generator
+generate_opcode_reference_html.py — 6809 Reference Manual HTML generator
 Reads opcodes/*.json and produces HTML reference pages.
 
 Usage:

@@ -15,7 +15,7 @@ A complete disassembly and reconstruction of **SuperComm**, a CoCo communication
 ```
 SuperComm-disassembled/
 ├── documentation/
-│   ├── generate.py          -- generates all HTML from JSON opcodes data
+│   ├── generate_opcode_reference_html.py          -- generates all HTML from JSON opcodes data
 │   ├── opcodes/             -- JSON files, one per instruction group
 │   └── html/                -- generated HTML (committed, served via GitHub Pages)
 ├── wasm/
@@ -90,7 +90,7 @@ python cocotools_wasm\toolshed.py cecbbulkerase HELLO.CAS
 
 **URL:** https://erroneus0-ops.github.io/SuperComm-disassembled/
 
-**Status:** Live, generated from `documentation/generate.py` + JSON opcode files.
+**Status:** Live, generated from `documentation/generate_opcode_reference_html.py` + JSON opcode files.
 
 **Recent work on indexed addressing postbyte page:**
 - `I` symbol (amber) marks bit 4 where indirect mode is available
