@@ -312,3 +312,37 @@ Double step [,R++] and [,--R] ARE valid in indirect mode.
 
 The postbyte bit map in the reference pages reflects this correctly --
 ,R+ and ,-R rows show no I symbol; ,R++ and ,--R rows show I.
+
+---
+
+## 01Aug2026 -- Windows Credential Manager: one credential per HOST, not per repo
+
+Discovered while planning the future multi-repo split (Book/Environment/
+Tools). Real, easy-to-forget gotcha worth flagging clearly.
+
+By default, Git Credential Manager on Windows keys stored credentials by
+HOSTNAME ALONE (e.g. "github.com"), not by full repository URL. This
+means if multiple personal access tokens are ever used against the same
+host (one per repo, say), Windows Credential Manager will only ever hold
+ONE entry for that host -- whichever token was used most recently
+silently overwrites the previous one. Symptom: confusing "wrong
+permissions" errors switching between repos, since git keeps handing
+whichever token happens to be cached to whatever repo you're actually
+working in.
+
+Fix, one-time per machine:
+
+    git config --global credential.useHttpPath true
+
+This tells GCM to use the FULL repository path (not just hostname) as
+the credential lookup key. With this set, Windows Credential Manager
+holds genuinely separate entries per repo (visible as distinct entries
+like `git:https://github.com/erroneus0-ops/book-repo` if you open
+Credential Manager and look). Git resolves the correct one automatically
+based on which directory you're in -- no manual credential picking
+needed, since each repo's own `.git/config` already stores its specific
+remote URL.
+
+Needs setting once per machine (home and office both), not per repo --
+after that single command, every future repo/token combination on that
+machine works correctly without further configuration.
