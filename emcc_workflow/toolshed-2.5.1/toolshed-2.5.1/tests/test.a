@@ -1,6 +1,0 @@
- comb
- lda #0
- bcs L01
- rts
-L01 incb
- rts
