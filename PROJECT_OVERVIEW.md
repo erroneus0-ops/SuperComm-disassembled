@@ -129,7 +129,7 @@ python cocotools_wasm\toolshed.py cecbbulkerase HELLO.CAS
 
 - **makewav WAV** — works at 9600Hz (matched from XRoar's own CSAVEM output)
 - **CECB CAS** — bulkerase creates correct empty CAS; copy data block not writing yet
-- **bin2cas.pl** — Ciaran's perl script in `wasm/makewav/reference/`, multi-segment not supported yet
+- **bin2cas.pl** — Ciaran's perl script in `wasm_builds/makewav/reference/`, multi-segment not supported yet
 - **Key finding** — XRoar expects 9600Hz sample rate
 - **Ciaran question pending** — cassette timing, WAV format details
 - **HELLO.BIN** — loads to $0000 (ORG 0, position-independent), needs address override for cassette
