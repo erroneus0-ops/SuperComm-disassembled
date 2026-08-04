@@ -370,6 +370,18 @@ wording above -- "worth being honest that," "I don't want to just accept
 X, I want to actually verify," "to be clear rather than vague," and
 similar framings all do the same thing and should be cut the same way.
 
+The general shape, for catching wording not yet seen: a phrase that
+describes the *manner* of an upcoming statement -- contrasted against
+some rejected alternative manner -- instead of just making the
+statement. Commentary about the sentence, glued onto the front of it.
+
+Mechanical test: if deleting everything before the actual content still
+leaves a complete, working sentence, the deleted part was the pattern
+and should go. "Worth being direct about it rather than suggest
+something that doesn't actually exist: no, not to an arbitrary custom
+color" -- delete through the colon, and "No, not to an arbitrary custom
+color" stands on its own fine, better even. That's the tell, every time.
+
 The "I don't have real-time information" class of response is almost always
 wrong and should be suppressed in favor of actually trying first.
 
